@@ -1,0 +1,20 @@
+/Library/
+/Temp/
+/Obj/
+/Logs/
+/UserSettings/
+/Build/
+/Builds/
+*.csproj
+*.sln
+*.blend1
+*.log
+
+# Local scene snapshots and Unity-generated project files
+/Assets/LibraryCharacter/Backups/
+/Assets/LibraryCharacter/Backups.meta
+/MemoryCaptures/
+/Recordings/
+*.user
+*.suo
+*.tmp

@@ -1,0 +1,877 @@
+{
+  "entries": [
+    {
+      "index": 0,
+      "sourceMaterial": "ActualTileFloor_sharedassets2_assets_170",
+      "texture": "ActualTileFloor-sharedassets2.assets-170.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 33
+    },
+    {
+      "index": 1,
+      "sourceMaterial": "BSODAMachine",
+      "texture": "BSODAMachine.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": false,
+      "objects": 2
+    },
+    {
+      "index": 2,
+      "sourceMaterial": "BSODA_Side",
+      "texture": "",
+      "color": [
+        0.08823531866073608,
+        0.08823531866073608,
+        0.08823531866073608,
+        1.0
+      ],
+      "solid": false,
+      "objects": 19
+    },
+    {
+      "index": 3,
+      "sourceMaterial": "Baldi_Poster",
+      "texture": "Baldi_Poster.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 1
+    },
+    {
+      "index": 4,
+      "sourceMaterial": "BasicFloor_sharedassets2_assets_378",
+      "texture": "BasicFloor-sharedassets2.assets-378.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 31
+    },
+    {
+      "index": 5,
+      "sourceMaterial": "Black",
+      "texture": "",
+      "color": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 117
+    },
+    {
+      "index": 6,
+      "sourceMaterial": "BootsPoster",
+      "texture": "BootsPoster.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 1
+    },
+    {
+      "index": 7,
+      "sourceMaterial": "Bully_Poster",
+      "texture": "Bully_Poster.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 1
+    },
+    {
+      "index": 8,
+      "sourceMaterial": "Carpet",
+      "texture": "Carpet.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 257
+    },
+    {
+      "index": 9,
+      "sourceMaterial": "Ceiling",
+      "texture": "Ceiling.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 471
+    },
+    {
+      "index": 10,
+      "sourceMaterial": "Cheese",
+      "texture": "Cheese.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 4
+    },
+    {
+      "index": 11,
+      "sourceMaterial": "Crafters_Poster",
+      "texture": "Crafters_Poster.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 1
+    },
+    {
+      "index": 12,
+      "sourceMaterial": "Dark_Ceiling",
+      "texture": "Ceiling.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 14
+    },
+    {
+      "index": 13,
+      "sourceMaterial": "Dark_TileFloor",
+      "texture": "TileFloor.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 14
+    },
+    {
+      "index": 14,
+      "sourceMaterial": "Dark_WhiteBrickWall",
+      "texture": "WallWithMolding-sharedassets2.assets-190.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 25
+    },
+    {
+      "index": 15,
+      "sourceMaterial": "Dark_Window",
+      "texture": "Window.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 1
+    },
+    {
+      "index": 16,
+      "sourceMaterial": "Default_Material",
+      "texture": "",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": false,
+      "objects": 3
+    },
+    {
+      "index": 17,
+      "sourceMaterial": "Desk",
+      "texture": "wood.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 234
+    },
+    {
+      "index": 18,
+      "sourceMaterial": "ElBack_sharedassets2_assets_278",
+      "texture": "ElBack-sharedassets2.assets-278.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 70
+    },
+    {
+      "index": 19,
+      "sourceMaterial": "ElFloor_sharedassets2_assets_326",
+      "texture": "ElFloor-sharedassets2.assets-326.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 1
+    },
+    {
+      "index": 20,
+      "sourceMaterial": "ElLWall_sharedassets2_assets_172",
+      "texture": "ElLWall-sharedassets2.assets-172.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 1
+    },
+    {
+      "index": 21,
+      "sourceMaterial": "ElRWall_sharedassets2_assets_409",
+      "texture": "ElRWall-sharedassets2.assets-409.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 1
+    },
+    {
+      "index": 22,
+      "sourceMaterial": "Elevate",
+      "texture": "Elevate_0.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 3
+    },
+    {
+      "index": 23,
+      "sourceMaterial": "FluoresecentLight_sharedassets2_assets_370",
+      "texture": "FluoresecentLight-sharedassets2.assets-370.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 1
+    },
+    {
+      "index": 24,
+      "sourceMaterial": "Grass",
+      "texture": "Grass.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 79
+    },
+    {
+      "index": 25,
+      "sourceMaterial": "Homestar",
+      "texture": "Homestar.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 1
+    },
+    {
+      "index": 26,
+      "sourceMaterial": "IMG_0567",
+      "texture": "",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 1
+    },
+    {
+      "index": 27,
+      "sourceMaterial": "IMG_2679",
+      "texture": "",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 1
+    },
+    {
+      "index": 28,
+      "sourceMaterial": "IMG_5748",
+      "texture": "",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 1
+    },
+    {
+      "index": 29,
+      "sourceMaterial": "IMG_7686",
+      "texture": "",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 1
+    },
+    {
+      "index": 30,
+      "sourceMaterial": "Locker",
+      "texture": "Locker.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 227
+    },
+    {
+      "index": 31,
+      "sourceMaterial": "LockerBlue_sharedassets2_assets_441",
+      "texture": "LockerBlue-sharedassets2.assets-441.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 9
+    },
+    {
+      "index": 32,
+      "sourceMaterial": "LockerSide",
+      "texture": "",
+      "color": [
+        1.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 228
+    },
+    {
+      "index": 33,
+      "sourceMaterial": "Lore",
+      "texture": "Lore.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 1
+    },
+    {
+      "index": 34,
+      "sourceMaterial": "Math",
+      "texture": "Math.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 1
+    },
+    {
+      "index": 35,
+      "sourceMaterial": "New_Material",
+      "texture": "",
+      "color": [
+        0.0,
+        0.9882349967956543,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 8
+    },
+    {
+      "index": 36,
+      "sourceMaterial": "PRI_Poster",
+      "texture": "PRI_Poster.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 1
+    },
+    {
+      "index": 37,
+      "sourceMaterial": "Ph_Ceiling",
+      "texture": "Placeholder_Celing.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 182
+    },
+    {
+      "index": 38,
+      "sourceMaterial": "Ph_Floor",
+      "texture": "Placeholder_Floor.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 95
+    },
+    {
+      "index": 39,
+      "sourceMaterial": "Ph_Wall",
+      "texture": "Placeholder_Wall.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 76
+    },
+    {
+      "index": 40,
+      "sourceMaterial": "PhonePoster",
+      "texture": "PhonePoster.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 1
+    },
+    {
+      "index": 41,
+      "sourceMaterial": "Playtime_Poster",
+      "texture": "Playtime_Poster.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 1
+    },
+    {
+      "index": 42,
+      "sourceMaterial": "Prize_Poster",
+      "texture": "Prize_Poster.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 1
+    },
+    {
+      "index": 43,
+      "sourceMaterial": "SaloonWall_sharedassets2_assets_429",
+      "texture": "SaloonWall-sharedassets2.assets-429.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 18
+    },
+    {
+      "index": 44,
+      "sourceMaterial": "SchoolAttention",
+      "texture": "SchoolAttention.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 2
+    },
+    {
+      "index": 45,
+      "sourceMaterial": "SchoolRulesPoster",
+      "texture": "SchoolRulesPoster.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 3
+    },
+    {
+      "index": 46,
+      "sourceMaterial": "ScissorsPoster",
+      "texture": "ScissorsPoster.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 1
+    },
+    {
+      "index": 47,
+      "sourceMaterial": "Sweep_Poster",
+      "texture": "Sweep_Poster.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 1
+    },
+    {
+      "index": 48,
+      "sourceMaterial": "TileFloor",
+      "texture": "TileFloor.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 175
+    },
+    {
+      "index": 49,
+      "sourceMaterial": "WD_NoSqueePoster",
+      "texture": "WD_NoSqueePoster.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 1
+    },
+    {
+      "index": 50,
+      "sourceMaterial": "WallFade",
+      "texture": "WallFade.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 44
+    },
+    {
+      "index": 51,
+      "sourceMaterial": "WhiteBrickWall",
+      "texture": "WallWithMolding-sharedassets2.assets-190.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 586
+    },
+    {
+      "index": 52,
+      "sourceMaterial": "WhiteBrickWallThin",
+      "texture": "WallWithMolding-sharedassets2.assets-190.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 24
+    },
+    {
+      "index": 53,
+      "sourceMaterial": "Window",
+      "texture": "Window.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 17
+    },
+    {
+      "index": 54,
+      "sourceMaterial": "ZestyMachine",
+      "texture": "ZestyMachine.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": false,
+      "objects": 1
+    },
+    {
+      "index": 55,
+      "sourceMaterial": "_99",
+      "texture": "99.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 1
+    },
+    {
+      "index": 56,
+      "sourceMaterial": "comic00",
+      "texture": "comic00.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 1
+    },
+    {
+      "index": 57,
+      "sourceMaterial": "comic01",
+      "texture": "comic01.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 1
+    },
+    {
+      "index": 58,
+      "sourceMaterial": "dab",
+      "texture": "dab.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 1
+    },
+    {
+      "index": 59,
+      "sourceMaterial": "fence",
+      "texture": "fence.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 60
+    },
+    {
+      "index": 60,
+      "sourceMaterial": "g",
+      "texture": "g.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 1
+    },
+    {
+      "index": 61,
+      "sourceMaterial": "recyclefood",
+      "texture": "recyclefood.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 3
+    },
+    {
+      "index": 62,
+      "sourceMaterial": "sorry2",
+      "texture": "sorry2.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 1
+    },
+    {
+      "index": 63,
+      "sourceMaterial": "wALL",
+      "texture": "WallWithMolding-sharedassets2.assets-190.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 1
+    },
+    {
+      "index": 64,
+      "sourceMaterial": "what",
+      "texture": "what.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 1
+    },
+    {
+      "index": 65,
+      "sourceMaterial": "world",
+      "texture": "world.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 1
+    },
+    {
+      "index": 66,
+      "sourceMaterial": "wow",
+      "texture": "wow.png",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "solid": true,
+      "objects": 1
+    }
+  ],
+  "omittedStaticDoorFaces": 46,
+  "scale": 0.25
+}

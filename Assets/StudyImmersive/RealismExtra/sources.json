@@ -1,0 +1,56 @@
+[
+  {
+    "id": "tree_small_02",
+    "page": "https://polyhaven.com/a/tree_small_02",
+    "license": "CC0",
+    "maps": {
+      "leaves_nor_gl": "leaves_nor_gl.jpg",
+      "leaves_diff": "leaves_diff.jpg",
+      "nor_gl": "nor_gl.jpg",
+      "branch_diff": "branch_diff.jpg",
+      "branch_nor_gl": "branch_nor_gl.jpg",
+      "leaves_alpha": "leaves_alpha.jpg",
+      "Diffuse": "diffuse.jpg"
+    },
+    "mesh": "https://dl.polyhaven.org/file/ph-assets/Models/fbx/2k/tree_small_02/tree_small_02_2k.fbx"
+  },
+  {
+    "id": "round_wooden_table_02",
+    "page": "https://polyhaven.com/a/round_wooden_table_02",
+    "license": "CC0",
+    "maps": {
+      "Diffuse": "diffuse.jpg",
+      "nor_gl": "nor_gl.jpg"
+    },
+    "mesh": "https://dl.polyhaven.org/file/ph-assets/Models/fbx/2k/round_wooden_table_02/round_wooden_table_02_2k.fbx"
+  },
+  {
+    "id": "dining_table",
+    "page": "https://polyhaven.com/a/dining_table",
+    "license": "CC0",
+    "maps": {
+      "Diffuse": "diffuse.jpg",
+      "nor_gl": "nor_gl.jpg"
+    },
+    "mesh": "https://dl.polyhaven.org/file/ph-assets/Models/fbx/2k/dining_table/dining_table_2k.fbx"
+  },
+  {
+    "id": "coffee_table_round_01",
+    "page": "https://polyhaven.com/a/coffee_table_round_01",
+    "license": "CC0",
+    "maps": {
+      "Diffuse": "diffuse.jpg",
+      "nor_gl": "nor_gl.jpg"
+    },
+    "mesh": "https://dl.polyhaven.org/file/ph-assets/Models/fbx/2k/coffee_table_round_01/coffee_table_round_01_2k.fbx"
+  },
+  {
+    "id": "poly_wool_herringbone",
+    "page": "https://polyhaven.com/a/poly_wool_herringbone",
+    "license": "CC0",
+    "maps": {
+      "Diffuse": "diffuse.jpg",
+      "nor_gl": "nor_gl.jpg"
+    }
+  }
+]

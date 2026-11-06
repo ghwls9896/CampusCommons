@@ -1,0 +1,9995 @@
+{
+  "materials": [
+    {
+      "name": "cream",
+      "hex": "#EEE8D9"
+    },
+    {
+      "name": "wall",
+      "hex": "#F6F1E6"
+    },
+    {
+      "name": "oak",
+      "hex": "#B88D60"
+    },
+    {
+      "name": "dark",
+      "hex": "#293C3A"
+    },
+    {
+      "name": "sage",
+      "hex": "#8BA991"
+    },
+    {
+      "name": "mint",
+      "hex": "#C5D7C4"
+    },
+    {
+      "name": "purple",
+      "hex": "#A29BC4"
+    },
+    {
+      "name": "lavender",
+      "hex": "#DCD8ED"
+    },
+    {
+      "name": "coral",
+      "hex": "#D99379"
+    },
+    {
+      "name": "gold",
+      "hex": "#E8BE70"
+    },
+    {
+      "name": "white",
+      "hex": "#FFFFFF"
+    },
+    {
+      "name": "leaf",
+      "hex": "#4C795B"
+    },
+    {
+      "name": "soil",
+      "hex": "#554638"
+    },
+    {
+      "name": "screen",
+      "hex": "#243E49"
+    },
+    {
+      "name": "rug",
+      "hex": "#DBCEB8"
+    }
+  ],
+  "shapes": [
+    {
+      "name": "Lounge floor",
+      "position": [
+        0,
+        -0.16,
+        0
+      ],
+      "scale": [
+        36,
+        0.32,
+        28
+      ],
+      "material": "cream",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "West wall",
+      "position": [
+        -18,
+        1.7,
+        0
+      ],
+      "scale": [
+        0.25,
+        3.4,
+        28
+      ],
+      "material": "wall",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "West wall skirting",
+      "position": [
+        -18,
+        0.12,
+        0
+      ],
+      "scale": [
+        0.25,
+        0.24,
+        28.04
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "East wall",
+      "position": [
+        18,
+        1.7,
+        0
+      ],
+      "scale": [
+        0.25,
+        3.4,
+        28
+      ],
+      "material": "wall",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "East wall skirting",
+      "position": [
+        18,
+        0.12,
+        0
+      ],
+      "scale": [
+        0.25,
+        0.24,
+        28.04
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "South wall",
+      "position": [
+        0,
+        1.7,
+        -14
+      ],
+      "scale": [
+        36,
+        3.4,
+        0.25
+      ],
+      "material": "wall",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "South wall skirting",
+      "position": [
+        0,
+        0.12,
+        -14
+      ],
+      "scale": [
+        36,
+        0.24,
+        0.29
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Shared wall",
+      "position": [
+        -14.25,
+        1.7,
+        14
+      ],
+      "scale": [
+        7.5,
+        3.4,
+        0.25
+      ],
+      "material": "wall",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Shared wall skirting",
+      "position": [
+        -14.25,
+        0.12,
+        14
+      ],
+      "scale": [
+        7.5,
+        0.24,
+        0.29
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Shared wall",
+      "position": [
+        0.0,
+        1.7,
+        14
+      ],
+      "scale": [
+        15.0,
+        3.4,
+        0.25
+      ],
+      "material": "wall",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Shared wall skirting",
+      "position": [
+        0.0,
+        0.12,
+        14
+      ],
+      "scale": [
+        15.0,
+        0.24,
+        0.29
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Shared wall",
+      "position": [
+        14.25,
+        1.7,
+        14
+      ],
+      "scale": [
+        7.5,
+        3.4,
+        0.25
+      ],
+      "material": "wall",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Shared wall skirting",
+      "position": [
+        14.25,
+        0.12,
+        14
+      ],
+      "scale": [
+        7.5,
+        0.24,
+        0.29
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Quiz floor",
+      "position": [
+        -9,
+        -0.16,
+        22
+      ],
+      "scale": [
+        16,
+        0.32,
+        16
+      ],
+      "material": "mint",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz west",
+      "position": [
+        -17,
+        1.7,
+        22
+      ],
+      "scale": [
+        0.25,
+        3.4,
+        16
+      ],
+      "material": "wall",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz west skirting",
+      "position": [
+        -17,
+        0.12,
+        22
+      ],
+      "scale": [
+        0.25,
+        0.24,
+        16.04
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz east",
+      "position": [
+        -1,
+        1.7,
+        22
+      ],
+      "scale": [
+        0.25,
+        3.4,
+        16
+      ],
+      "material": "wall",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz east skirting",
+      "position": [
+        -1,
+        0.12,
+        22
+      ],
+      "scale": [
+        0.25,
+        0.24,
+        16.04
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz north",
+      "position": [
+        -9,
+        1.7,
+        30
+      ],
+      "scale": [
+        16,
+        3.4,
+        0.25
+      ],
+      "material": "wall",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz north skirting",
+      "position": [
+        -9,
+        0.12,
+        30
+      ],
+      "scale": [
+        16,
+        0.24,
+        0.29
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz lintel",
+      "position": [
+        -9,
+        3.08,
+        14
+      ],
+      "scale": [
+        3,
+        0.64,
+        0.3
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz doorway",
+      "position": [
+        -10.620000000000001,
+        1.4,
+        14
+      ],
+      "scale": [
+        0.24,
+        2.8,
+        0.4
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz doorway",
+      "position": [
+        -7.38,
+        1.4,
+        14
+      ],
+      "scale": [
+        0.24,
+        2.8,
+        0.4
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz threshold",
+      "position": [
+        -9,
+        0.015,
+        14
+      ],
+      "scale": [
+        3,
+        0.03,
+        1.8
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": false,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz plant pot",
+      "position": [
+        -2.5,
+        0.35,
+        28.4
+      ],
+      "scale": [
+        0.76,
+        0.7,
+        0.76
+      ],
+      "material": "cream",
+      "kind": "Cylinder",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz plant stem",
+      "position": [
+        -2.5,
+        1,
+        28.4
+      ],
+      "scale": [
+        0.11,
+        1.4,
+        0.11
+      ],
+      "material": "oak",
+      "kind": "Cylinder",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz plant leaves",
+      "position": [
+        -2.7800000000000002,
+        1.4,
+        28.4
+      ],
+      "scale": [
+        0.75,
+        0.8,
+        0.65
+      ],
+      "material": "leaf",
+      "kind": "Sphere",
+      "yaw": 0,
+      "solid": false,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz plant leaves",
+      "position": [
+        -2.27,
+        1.65,
+        28.52
+      ],
+      "scale": [
+        0.75,
+        0.8,
+        0.65
+      ],
+      "material": "leaf",
+      "kind": "Sphere",
+      "yaw": 0,
+      "solid": false,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz plant leaves",
+      "position": [
+        -2.5,
+        1.95,
+        28.299999999999997
+      ],
+      "scale": [
+        0.75,
+        0.8,
+        0.65
+      ],
+      "material": "leaf",
+      "kind": "Sphere",
+      "yaw": 0,
+      "solid": false,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz plant pot",
+      "position": [
+        -15.5,
+        0.35,
+        28.4
+      ],
+      "scale": [
+        0.76,
+        0.7,
+        0.76
+      ],
+      "material": "cream",
+      "kind": "Cylinder",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz plant stem",
+      "position": [
+        -15.5,
+        1,
+        28.4
+      ],
+      "scale": [
+        0.11,
+        1.4,
+        0.11
+      ],
+      "material": "oak",
+      "kind": "Cylinder",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz plant leaves",
+      "position": [
+        -15.78,
+        1.4,
+        28.4
+      ],
+      "scale": [
+        0.75,
+        0.8,
+        0.65
+      ],
+      "material": "leaf",
+      "kind": "Sphere",
+      "yaw": 0,
+      "solid": false,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz plant leaves",
+      "position": [
+        -15.27,
+        1.65,
+        28.52
+      ],
+      "scale": [
+        0.75,
+        0.8,
+        0.65
+      ],
+      "material": "leaf",
+      "kind": "Sphere",
+      "yaw": 0,
+      "solid": false,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz plant leaves",
+      "position": [
+        -15.5,
+        1.95,
+        28.299999999999997
+      ],
+      "scale": [
+        0.75,
+        0.8,
+        0.65
+      ],
+      "material": "leaf",
+      "kind": "Sphere",
+      "yaw": 0,
+      "solid": false,
+      "group": "Quiz"
+    },
+    {
+      "name": "Mafia floor",
+      "position": [
+        9,
+        -0.16,
+        22
+      ],
+      "scale": [
+        16,
+        0.32,
+        16
+      ],
+      "material": "lavender",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia west",
+      "position": [
+        1,
+        1.7,
+        22
+      ],
+      "scale": [
+        0.25,
+        3.4,
+        16
+      ],
+      "material": "wall",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia west skirting",
+      "position": [
+        1,
+        0.12,
+        22
+      ],
+      "scale": [
+        0.25,
+        0.24,
+        16.04
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia east",
+      "position": [
+        17,
+        1.7,
+        22
+      ],
+      "scale": [
+        0.25,
+        3.4,
+        16
+      ],
+      "material": "wall",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia east skirting",
+      "position": [
+        17,
+        0.12,
+        22
+      ],
+      "scale": [
+        0.25,
+        0.24,
+        16.04
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia north",
+      "position": [
+        9,
+        1.7,
+        30
+      ],
+      "scale": [
+        16,
+        3.4,
+        0.25
+      ],
+      "material": "wall",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia north skirting",
+      "position": [
+        9,
+        0.12,
+        30
+      ],
+      "scale": [
+        16,
+        0.24,
+        0.29
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia lintel",
+      "position": [
+        9,
+        3.08,
+        14
+      ],
+      "scale": [
+        3,
+        0.64,
+        0.3
+      ],
+      "material": "purple",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia doorway",
+      "position": [
+        7.38,
+        1.4,
+        14
+      ],
+      "scale": [
+        0.24,
+        2.8,
+        0.4
+      ],
+      "material": "purple",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia doorway",
+      "position": [
+        10.620000000000001,
+        1.4,
+        14
+      ],
+      "scale": [
+        0.24,
+        2.8,
+        0.4
+      ],
+      "material": "purple",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia threshold",
+      "position": [
+        9,
+        0.015,
+        14
+      ],
+      "scale": [
+        3,
+        0.03,
+        1.8
+      ],
+      "material": "purple",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": false,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia plant pot",
+      "position": [
+        15.5,
+        0.35,
+        28.4
+      ],
+      "scale": [
+        0.76,
+        0.7,
+        0.76
+      ],
+      "material": "cream",
+      "kind": "Cylinder",
+      "yaw": 0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia plant stem",
+      "position": [
+        15.5,
+        1,
+        28.4
+      ],
+      "scale": [
+        0.11,
+        1.4,
+        0.11
+      ],
+      "material": "oak",
+      "kind": "Cylinder",
+      "yaw": 0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia plant leaves",
+      "position": [
+        15.22,
+        1.4,
+        28.4
+      ],
+      "scale": [
+        0.75,
+        0.8,
+        0.65
+      ],
+      "material": "leaf",
+      "kind": "Sphere",
+      "yaw": 0,
+      "solid": false,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia plant leaves",
+      "position": [
+        15.73,
+        1.65,
+        28.52
+      ],
+      "scale": [
+        0.75,
+        0.8,
+        0.65
+      ],
+      "material": "leaf",
+      "kind": "Sphere",
+      "yaw": 0,
+      "solid": false,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia plant leaves",
+      "position": [
+        15.5,
+        1.95,
+        28.299999999999997
+      ],
+      "scale": [
+        0.75,
+        0.8,
+        0.65
+      ],
+      "material": "leaf",
+      "kind": "Sphere",
+      "yaw": 0,
+      "solid": false,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia plant pot",
+      "position": [
+        2.5,
+        0.35,
+        28.4
+      ],
+      "scale": [
+        0.76,
+        0.7,
+        0.76
+      ],
+      "material": "cream",
+      "kind": "Cylinder",
+      "yaw": 0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia plant stem",
+      "position": [
+        2.5,
+        1,
+        28.4
+      ],
+      "scale": [
+        0.11,
+        1.4,
+        0.11
+      ],
+      "material": "oak",
+      "kind": "Cylinder",
+      "yaw": 0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia plant leaves",
+      "position": [
+        2.2199999999999998,
+        1.4,
+        28.4
+      ],
+      "scale": [
+        0.75,
+        0.8,
+        0.65
+      ],
+      "material": "leaf",
+      "kind": "Sphere",
+      "yaw": 0,
+      "solid": false,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia plant leaves",
+      "position": [
+        2.73,
+        1.65,
+        28.52
+      ],
+      "scale": [
+        0.75,
+        0.8,
+        0.65
+      ],
+      "material": "leaf",
+      "kind": "Sphere",
+      "yaw": 0,
+      "solid": false,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia plant leaves",
+      "position": [
+        2.5,
+        1.95,
+        28.299999999999997
+      ],
+      "scale": [
+        0.75,
+        0.8,
+        0.65
+      ],
+      "material": "leaf",
+      "kind": "Sphere",
+      "yaw": 0,
+      "solid": false,
+      "group": "Mafia"
+    },
+    {
+      "name": "Conversation rug",
+      "position": [
+        -10,
+        0.015,
+        -5
+      ],
+      "scale": [
+        7.5,
+        0.03,
+        6
+      ],
+      "material": "rug",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": false,
+      "group": "Lounge"
+    },
+    {
+      "name": "Social sofa base",
+      "position": [
+        -10.0,
+        0.35,
+        -6.8
+      ],
+      "scale": [
+        3.5,
+        0.45,
+        1.2
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Social sofa back",
+      "position": [
+        -10.0,
+        0.95,
+        -7.3
+      ],
+      "scale": [
+        3.5,
+        1.0,
+        0.25
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Social sofa cushion",
+      "position": [
+        -11.1,
+        0.65,
+        -6.76
+      ],
+      "scale": [
+        1.04,
+        0.28,
+        0.95
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Social sofa cushion",
+      "position": [
+        -10.0,
+        0.65,
+        -6.76
+      ],
+      "scale": [
+        1.04,
+        0.28,
+        0.95
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Social sofa cushion",
+      "position": [
+        -8.9,
+        0.65,
+        -6.76
+      ],
+      "scale": [
+        1.04,
+        0.28,
+        0.95
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Social sofa arm",
+      "position": [
+        -11.7,
+        0.8,
+        -6.8
+      ],
+      "scale": [
+        0.22,
+        0.7,
+        1.2
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Social sofa arm",
+      "position": [
+        -8.3,
+        0.8,
+        -6.8
+      ],
+      "scale": [
+        0.22,
+        0.7,
+        1.2
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Lounge armchair seat",
+      "position": [
+        -12.4,
+        0.52,
+        -3.7
+      ],
+      "scale": [
+        0.76,
+        0.18,
+        0.76
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 145,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Lounge armchair back",
+      "position": [
+        -12.583544459632336,
+        0.96,
+        -3.4378713458275225
+      ],
+      "scale": [
+        0.76,
+        0.8,
+        0.14
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 145,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Lounge armchair leg",
+      "position": [
+        -12.333694585856755,
+        0.24,
+        -3.3239633102271897
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 145,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Lounge armchair leg",
+      "position": [
+        -12.02396331022719,
+        0.24,
+        -3.7663054141432455
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 145,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Lounge armchair leg",
+      "position": [
+        -12.77603668977281,
+        0.24,
+        -3.633694585856755
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 145,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Lounge armchair leg",
+      "position": [
+        -12.466305414143246,
+        0.24,
+        -4.076036689772811
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 145,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Lounge armchair seat",
+      "position": [
+        -7.6,
+        0.52,
+        -3.7
+      ],
+      "scale": [
+        0.76,
+        0.18,
+        0.76
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 215,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Lounge armchair back",
+      "position": [
+        -7.416455540367665,
+        0.96,
+        -3.437871345827523
+      ],
+      "scale": [
+        0.76,
+        0.8,
+        0.14
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 215,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Lounge armchair leg",
+      "position": [
+        -7.223963310227189,
+        0.24,
+        -3.633694585856755
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 215,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Lounge armchair leg",
+      "position": [
+        -7.533694585856754,
+        0.24,
+        -4.076036689772811
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 215,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Lounge armchair leg",
+      "position": [
+        -7.666305414143245,
+        0.24,
+        -3.3239633102271897
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 215,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Lounge armchair leg",
+      "position": [
+        -7.97603668977281,
+        0.24,
+        -3.7663054141432455
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 215,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Coffee table top",
+      "position": [
+        -10,
+        0.48,
+        -5
+      ],
+      "scale": [
+        2.3,
+        0.12,
+        1.25
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Coffee table leg",
+      "position": [
+        -10.874,
+        0.24,
+        -5.4
+      ],
+      "scale": [
+        0.09,
+        0.48,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Coffee table leg",
+      "position": [
+        -10.874,
+        0.24,
+        -4.6
+      ],
+      "scale": [
+        0.09,
+        0.48,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Coffee table leg",
+      "position": [
+        -9.126,
+        0.24,
+        -5.4
+      ],
+      "scale": [
+        0.09,
+        0.48,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Coffee table leg",
+      "position": [
+        -9.126,
+        0.24,
+        -4.6
+      ],
+      "scale": [
+        0.09,
+        0.48,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Table planter",
+      "position": [
+        -10,
+        0.68,
+        -5
+      ],
+      "scale": [
+        0.3,
+        0.28,
+        0.3
+      ],
+      "material": "cream",
+      "kind": "Cylinder",
+      "yaw": 0,
+      "solid": false,
+      "group": "Lounge"
+    },
+    {
+      "name": "Small plant",
+      "position": [
+        -10,
+        0.96,
+        -5
+      ],
+      "scale": [
+        0.45,
+        0.4,
+        0.45
+      ],
+      "material": "leaf",
+      "kind": "Sphere",
+      "yaw": 0,
+      "solid": false,
+      "group": "Lounge"
+    },
+    {
+      "name": "Cluster plant pot",
+      "position": [
+        -6.85,
+        0.35,
+        -7.2
+      ],
+      "scale": [
+        0.76,
+        0.7,
+        0.76
+      ],
+      "material": "cream",
+      "kind": "Cylinder",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Cluster plant stem",
+      "position": [
+        -6.85,
+        1,
+        -7.2
+      ],
+      "scale": [
+        0.11,
+        1.4,
+        0.11
+      ],
+      "material": "oak",
+      "kind": "Cylinder",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Cluster plant leaves",
+      "position": [
+        -7.13,
+        1.4,
+        -7.2
+      ],
+      "scale": [
+        0.75,
+        0.8,
+        0.65
+      ],
+      "material": "leaf",
+      "kind": "Sphere",
+      "yaw": 0,
+      "solid": false,
+      "group": "Lounge"
+    },
+    {
+      "name": "Cluster plant leaves",
+      "position": [
+        -6.619999999999999,
+        1.65,
+        -7.08
+      ],
+      "scale": [
+        0.75,
+        0.8,
+        0.65
+      ],
+      "material": "leaf",
+      "kind": "Sphere",
+      "yaw": 0,
+      "solid": false,
+      "group": "Lounge"
+    },
+    {
+      "name": "Cluster plant leaves",
+      "position": [
+        -6.85,
+        1.95,
+        -7.3
+      ],
+      "scale": [
+        0.75,
+        0.8,
+        0.65
+      ],
+      "material": "leaf",
+      "kind": "Sphere",
+      "yaw": 0,
+      "solid": false,
+      "group": "Lounge"
+    },
+    {
+      "name": "Conversation rug",
+      "position": [
+        10,
+        0.015,
+        -5
+      ],
+      "scale": [
+        7.5,
+        0.03,
+        6
+      ],
+      "material": "rug",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": false,
+      "group": "Lounge"
+    },
+    {
+      "name": "Social sofa base",
+      "position": [
+        10.0,
+        0.35,
+        -6.8
+      ],
+      "scale": [
+        3.5,
+        0.45,
+        1.2
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Social sofa back",
+      "position": [
+        10.0,
+        0.95,
+        -7.3
+      ],
+      "scale": [
+        3.5,
+        1.0,
+        0.25
+      ],
+      "material": "coral",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Social sofa cushion",
+      "position": [
+        8.9,
+        0.65,
+        -6.76
+      ],
+      "scale": [
+        1.04,
+        0.28,
+        0.95
+      ],
+      "material": "coral",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Social sofa cushion",
+      "position": [
+        10.0,
+        0.65,
+        -6.76
+      ],
+      "scale": [
+        1.04,
+        0.28,
+        0.95
+      ],
+      "material": "coral",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Social sofa cushion",
+      "position": [
+        11.1,
+        0.65,
+        -6.76
+      ],
+      "scale": [
+        1.04,
+        0.28,
+        0.95
+      ],
+      "material": "coral",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Social sofa arm",
+      "position": [
+        8.3,
+        0.8,
+        -6.8
+      ],
+      "scale": [
+        0.22,
+        0.7,
+        1.2
+      ],
+      "material": "coral",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Social sofa arm",
+      "position": [
+        11.7,
+        0.8,
+        -6.8
+      ],
+      "scale": [
+        0.22,
+        0.7,
+        1.2
+      ],
+      "material": "coral",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Lounge armchair seat",
+      "position": [
+        7.6,
+        0.52,
+        -3.7
+      ],
+      "scale": [
+        0.76,
+        0.18,
+        0.76
+      ],
+      "material": "coral",
+      "kind": "Cube",
+      "yaw": 145,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Lounge armchair back",
+      "position": [
+        7.416455540367665,
+        0.96,
+        -3.4378713458275225
+      ],
+      "scale": [
+        0.76,
+        0.8,
+        0.14
+      ],
+      "material": "coral",
+      "kind": "Cube",
+      "yaw": 145,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Lounge armchair leg",
+      "position": [
+        7.666305414143245,
+        0.24,
+        -3.3239633102271897
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 145,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Lounge armchair leg",
+      "position": [
+        7.97603668977281,
+        0.24,
+        -3.7663054141432455
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 145,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Lounge armchair leg",
+      "position": [
+        7.223963310227189,
+        0.24,
+        -3.633694585856755
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 145,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Lounge armchair leg",
+      "position": [
+        7.533694585856754,
+        0.24,
+        -4.076036689772811
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 145,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Lounge armchair seat",
+      "position": [
+        12.4,
+        0.52,
+        -3.7
+      ],
+      "scale": [
+        0.76,
+        0.18,
+        0.76
+      ],
+      "material": "coral",
+      "kind": "Cube",
+      "yaw": 215,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Lounge armchair back",
+      "position": [
+        12.583544459632336,
+        0.96,
+        -3.437871345827523
+      ],
+      "scale": [
+        0.76,
+        0.8,
+        0.14
+      ],
+      "material": "coral",
+      "kind": "Cube",
+      "yaw": 215,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Lounge armchair leg",
+      "position": [
+        12.77603668977281,
+        0.24,
+        -3.633694585856755
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 215,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Lounge armchair leg",
+      "position": [
+        12.466305414143246,
+        0.24,
+        -4.076036689772811
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 215,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Lounge armchair leg",
+      "position": [
+        12.333694585856755,
+        0.24,
+        -3.3239633102271897
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 215,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Lounge armchair leg",
+      "position": [
+        12.02396331022719,
+        0.24,
+        -3.7663054141432455
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 215,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Coffee table top",
+      "position": [
+        10,
+        0.48,
+        -5
+      ],
+      "scale": [
+        2.3,
+        0.12,
+        1.25
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Coffee table leg",
+      "position": [
+        9.126,
+        0.24,
+        -5.4
+      ],
+      "scale": [
+        0.09,
+        0.48,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Coffee table leg",
+      "position": [
+        9.126,
+        0.24,
+        -4.6
+      ],
+      "scale": [
+        0.09,
+        0.48,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Coffee table leg",
+      "position": [
+        10.874,
+        0.24,
+        -5.4
+      ],
+      "scale": [
+        0.09,
+        0.48,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Coffee table leg",
+      "position": [
+        10.874,
+        0.24,
+        -4.6
+      ],
+      "scale": [
+        0.09,
+        0.48,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Table planter",
+      "position": [
+        10,
+        0.68,
+        -5
+      ],
+      "scale": [
+        0.3,
+        0.28,
+        0.3
+      ],
+      "material": "cream",
+      "kind": "Cylinder",
+      "yaw": 0,
+      "solid": false,
+      "group": "Lounge"
+    },
+    {
+      "name": "Small plant",
+      "position": [
+        10,
+        0.96,
+        -5
+      ],
+      "scale": [
+        0.45,
+        0.4,
+        0.45
+      ],
+      "material": "leaf",
+      "kind": "Sphere",
+      "yaw": 0,
+      "solid": false,
+      "group": "Lounge"
+    },
+    {
+      "name": "Cluster plant pot",
+      "position": [
+        13.15,
+        0.35,
+        -7.2
+      ],
+      "scale": [
+        0.76,
+        0.7,
+        0.76
+      ],
+      "material": "cream",
+      "kind": "Cylinder",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Cluster plant stem",
+      "position": [
+        13.15,
+        1,
+        -7.2
+      ],
+      "scale": [
+        0.11,
+        1.4,
+        0.11
+      ],
+      "material": "oak",
+      "kind": "Cylinder",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Cluster plant leaves",
+      "position": [
+        12.870000000000001,
+        1.4,
+        -7.2
+      ],
+      "scale": [
+        0.75,
+        0.8,
+        0.65
+      ],
+      "material": "leaf",
+      "kind": "Sphere",
+      "yaw": 0,
+      "solid": false,
+      "group": "Lounge"
+    },
+    {
+      "name": "Cluster plant leaves",
+      "position": [
+        13.38,
+        1.65,
+        -7.08
+      ],
+      "scale": [
+        0.75,
+        0.8,
+        0.65
+      ],
+      "material": "leaf",
+      "kind": "Sphere",
+      "yaw": 0,
+      "solid": false,
+      "group": "Lounge"
+    },
+    {
+      "name": "Cluster plant leaves",
+      "position": [
+        13.15,
+        1.95,
+        -7.3
+      ],
+      "scale": [
+        0.75,
+        0.8,
+        0.65
+      ],
+      "material": "leaf",
+      "kind": "Sphere",
+      "yaw": 0,
+      "solid": false,
+      "group": "Lounge"
+    },
+    {
+      "name": "Conversation rug",
+      "position": [
+        -10,
+        0.015,
+        6
+      ],
+      "scale": [
+        7.5,
+        0.03,
+        6
+      ],
+      "material": "rug",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": false,
+      "group": "Lounge"
+    },
+    {
+      "name": "Social sofa base",
+      "position": [
+        -10.0,
+        0.35,
+        4.2
+      ],
+      "scale": [
+        3.5,
+        0.45,
+        1.2
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Social sofa back",
+      "position": [
+        -10.0,
+        0.95,
+        3.7
+      ],
+      "scale": [
+        3.5,
+        1.0,
+        0.25
+      ],
+      "material": "purple",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Social sofa cushion",
+      "position": [
+        -11.1,
+        0.65,
+        4.24
+      ],
+      "scale": [
+        1.04,
+        0.28,
+        0.95
+      ],
+      "material": "purple",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Social sofa cushion",
+      "position": [
+        -10.0,
+        0.65,
+        4.24
+      ],
+      "scale": [
+        1.04,
+        0.28,
+        0.95
+      ],
+      "material": "purple",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Social sofa cushion",
+      "position": [
+        -8.9,
+        0.65,
+        4.24
+      ],
+      "scale": [
+        1.04,
+        0.28,
+        0.95
+      ],
+      "material": "purple",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Social sofa arm",
+      "position": [
+        -11.7,
+        0.8,
+        4.2
+      ],
+      "scale": [
+        0.22,
+        0.7,
+        1.2
+      ],
+      "material": "purple",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Social sofa arm",
+      "position": [
+        -8.3,
+        0.8,
+        4.2
+      ],
+      "scale": [
+        0.22,
+        0.7,
+        1.2
+      ],
+      "material": "purple",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Lounge armchair seat",
+      "position": [
+        -12.4,
+        0.52,
+        7.3
+      ],
+      "scale": [
+        0.76,
+        0.18,
+        0.76
+      ],
+      "material": "purple",
+      "kind": "Cube",
+      "yaw": 145,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Lounge armchair back",
+      "position": [
+        -12.583544459632336,
+        0.96,
+        7.5621286541724775
+      ],
+      "scale": [
+        0.76,
+        0.8,
+        0.14
+      ],
+      "material": "purple",
+      "kind": "Cube",
+      "yaw": 145,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Lounge armchair leg",
+      "position": [
+        -12.333694585856755,
+        0.24,
+        7.67603668977281
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 145,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Lounge armchair leg",
+      "position": [
+        -12.02396331022719,
+        0.24,
+        7.233694585856754
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 145,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Lounge armchair leg",
+      "position": [
+        -12.77603668977281,
+        0.24,
+        7.366305414143246
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 145,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Lounge armchair leg",
+      "position": [
+        -12.466305414143246,
+        0.24,
+        6.923963310227189
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 145,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Lounge armchair seat",
+      "position": [
+        -7.6,
+        0.52,
+        7.3
+      ],
+      "scale": [
+        0.76,
+        0.18,
+        0.76
+      ],
+      "material": "purple",
+      "kind": "Cube",
+      "yaw": 215,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Lounge armchair back",
+      "position": [
+        -7.416455540367665,
+        0.96,
+        7.5621286541724775
+      ],
+      "scale": [
+        0.76,
+        0.8,
+        0.14
+      ],
+      "material": "purple",
+      "kind": "Cube",
+      "yaw": 215,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Lounge armchair leg",
+      "position": [
+        -7.223963310227189,
+        0.24,
+        7.366305414143246
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 215,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Lounge armchair leg",
+      "position": [
+        -7.533694585856754,
+        0.24,
+        6.923963310227189
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 215,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Lounge armchair leg",
+      "position": [
+        -7.666305414143245,
+        0.24,
+        7.67603668977281
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 215,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Lounge armchair leg",
+      "position": [
+        -7.97603668977281,
+        0.24,
+        7.233694585856754
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 215,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Coffee table top",
+      "position": [
+        -10,
+        0.48,
+        6
+      ],
+      "scale": [
+        2.3,
+        0.12,
+        1.25
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Coffee table leg",
+      "position": [
+        -10.874,
+        0.24,
+        5.6
+      ],
+      "scale": [
+        0.09,
+        0.48,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Coffee table leg",
+      "position": [
+        -10.874,
+        0.24,
+        6.4
+      ],
+      "scale": [
+        0.09,
+        0.48,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Coffee table leg",
+      "position": [
+        -9.126,
+        0.24,
+        5.6
+      ],
+      "scale": [
+        0.09,
+        0.48,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Coffee table leg",
+      "position": [
+        -9.126,
+        0.24,
+        6.4
+      ],
+      "scale": [
+        0.09,
+        0.48,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Table planter",
+      "position": [
+        -10,
+        0.68,
+        6
+      ],
+      "scale": [
+        0.3,
+        0.28,
+        0.3
+      ],
+      "material": "cream",
+      "kind": "Cylinder",
+      "yaw": 0,
+      "solid": false,
+      "group": "Lounge"
+    },
+    {
+      "name": "Small plant",
+      "position": [
+        -10,
+        0.96,
+        6
+      ],
+      "scale": [
+        0.45,
+        0.4,
+        0.45
+      ],
+      "material": "leaf",
+      "kind": "Sphere",
+      "yaw": 0,
+      "solid": false,
+      "group": "Lounge"
+    },
+    {
+      "name": "Cluster plant pot",
+      "position": [
+        -6.85,
+        0.35,
+        3.8
+      ],
+      "scale": [
+        0.76,
+        0.7,
+        0.76
+      ],
+      "material": "cream",
+      "kind": "Cylinder",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Cluster plant stem",
+      "position": [
+        -6.85,
+        1,
+        3.8
+      ],
+      "scale": [
+        0.11,
+        1.4,
+        0.11
+      ],
+      "material": "oak",
+      "kind": "Cylinder",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Cluster plant leaves",
+      "position": [
+        -7.13,
+        1.4,
+        3.8
+      ],
+      "scale": [
+        0.75,
+        0.8,
+        0.65
+      ],
+      "material": "leaf",
+      "kind": "Sphere",
+      "yaw": 0,
+      "solid": false,
+      "group": "Lounge"
+    },
+    {
+      "name": "Cluster plant leaves",
+      "position": [
+        -6.619999999999999,
+        1.65,
+        3.92
+      ],
+      "scale": [
+        0.75,
+        0.8,
+        0.65
+      ],
+      "material": "leaf",
+      "kind": "Sphere",
+      "yaw": 0,
+      "solid": false,
+      "group": "Lounge"
+    },
+    {
+      "name": "Cluster plant leaves",
+      "position": [
+        -6.85,
+        1.95,
+        3.6999999999999997
+      ],
+      "scale": [
+        0.75,
+        0.8,
+        0.65
+      ],
+      "material": "leaf",
+      "kind": "Sphere",
+      "yaw": 0,
+      "solid": false,
+      "group": "Lounge"
+    },
+    {
+      "name": "Study table top",
+      "position": [
+        10,
+        0.75,
+        6
+      ],
+      "scale": [
+        6.5,
+        0.12,
+        1.6
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Study table leg",
+      "position": [
+        7.529999999999999,
+        0.375,
+        5.4879999999999995
+      ],
+      "scale": [
+        0.09,
+        0.75,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Study table leg",
+      "position": [
+        7.529999999999999,
+        0.375,
+        6.5120000000000005
+      ],
+      "scale": [
+        0.09,
+        0.75,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Study table leg",
+      "position": [
+        12.47,
+        0.375,
+        5.4879999999999995
+      ],
+      "scale": [
+        0.09,
+        0.75,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Study table leg",
+      "position": [
+        12.47,
+        0.375,
+        6.5120000000000005
+      ],
+      "scale": [
+        0.09,
+        0.75,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Study chair seat",
+      "position": [
+        7.8,
+        0.52,
+        4.65
+      ],
+      "scale": [
+        0.76,
+        0.18,
+        0.76
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Study chair back",
+      "position": [
+        7.8,
+        0.96,
+        4.33
+      ],
+      "scale": [
+        0.76,
+        0.8,
+        0.14
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Study chair leg",
+      "position": [
+        7.529999999999999,
+        0.24,
+        4.380000000000001
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Study chair leg",
+      "position": [
+        7.529999999999999,
+        0.24,
+        4.92
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Study chair leg",
+      "position": [
+        8.07,
+        0.24,
+        4.380000000000001
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Study chair leg",
+      "position": [
+        8.07,
+        0.24,
+        4.92
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Study chair seat",
+      "position": [
+        7.8,
+        0.52,
+        7.35
+      ],
+      "scale": [
+        0.76,
+        0.18,
+        0.76
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 180,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Study chair back",
+      "position": [
+        7.8,
+        0.96,
+        7.67
+      ],
+      "scale": [
+        0.76,
+        0.8,
+        0.14
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 180,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Study chair leg",
+      "position": [
+        8.07,
+        0.24,
+        7.62
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 180,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Study chair leg",
+      "position": [
+        8.07,
+        0.24,
+        7.08
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 180,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Study chair leg",
+      "position": [
+        7.529999999999999,
+        0.24,
+        7.619999999999999
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 180,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Study chair leg",
+      "position": [
+        7.53,
+        0.24,
+        7.079999999999999
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 180,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Desk notebook",
+      "position": [
+        7.8,
+        0.83,
+        6
+      ],
+      "scale": [
+        0.65,
+        0.035,
+        0.42
+      ],
+      "material": "lavender",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": false,
+      "group": "Lounge"
+    },
+    {
+      "name": "Study chair seat",
+      "position": [
+        10.0,
+        0.52,
+        4.65
+      ],
+      "scale": [
+        0.76,
+        0.18,
+        0.76
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Study chair back",
+      "position": [
+        10.0,
+        0.96,
+        4.33
+      ],
+      "scale": [
+        0.76,
+        0.8,
+        0.14
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Study chair leg",
+      "position": [
+        9.73,
+        0.24,
+        4.380000000000001
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Study chair leg",
+      "position": [
+        9.73,
+        0.24,
+        4.92
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Study chair leg",
+      "position": [
+        10.27,
+        0.24,
+        4.380000000000001
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Study chair leg",
+      "position": [
+        10.27,
+        0.24,
+        4.92
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Study chair seat",
+      "position": [
+        10.0,
+        0.52,
+        7.35
+      ],
+      "scale": [
+        0.76,
+        0.18,
+        0.76
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 180,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Study chair back",
+      "position": [
+        10.0,
+        0.96,
+        7.67
+      ],
+      "scale": [
+        0.76,
+        0.8,
+        0.14
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 180,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Study chair leg",
+      "position": [
+        10.27,
+        0.24,
+        7.62
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 180,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Study chair leg",
+      "position": [
+        10.27,
+        0.24,
+        7.08
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 180,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Study chair leg",
+      "position": [
+        9.73,
+        0.24,
+        7.619999999999999
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 180,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Study chair leg",
+      "position": [
+        9.73,
+        0.24,
+        7.079999999999999
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 180,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Desk notebook",
+      "position": [
+        10,
+        0.83,
+        6
+      ],
+      "scale": [
+        0.65,
+        0.035,
+        0.42
+      ],
+      "material": "lavender",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": false,
+      "group": "Lounge"
+    },
+    {
+      "name": "Study chair seat",
+      "position": [
+        12.2,
+        0.52,
+        4.65
+      ],
+      "scale": [
+        0.76,
+        0.18,
+        0.76
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Study chair back",
+      "position": [
+        12.2,
+        0.96,
+        4.33
+      ],
+      "scale": [
+        0.76,
+        0.8,
+        0.14
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Study chair leg",
+      "position": [
+        11.93,
+        0.24,
+        4.380000000000001
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Study chair leg",
+      "position": [
+        11.93,
+        0.24,
+        4.92
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Study chair leg",
+      "position": [
+        12.469999999999999,
+        0.24,
+        4.380000000000001
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Study chair leg",
+      "position": [
+        12.469999999999999,
+        0.24,
+        4.92
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Study chair seat",
+      "position": [
+        12.2,
+        0.52,
+        7.35
+      ],
+      "scale": [
+        0.76,
+        0.18,
+        0.76
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 180,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Study chair back",
+      "position": [
+        12.2,
+        0.96,
+        7.67
+      ],
+      "scale": [
+        0.76,
+        0.8,
+        0.14
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 180,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Study chair leg",
+      "position": [
+        12.469999999999999,
+        0.24,
+        7.62
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 180,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Study chair leg",
+      "position": [
+        12.469999999999999,
+        0.24,
+        7.08
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 180,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Study chair leg",
+      "position": [
+        11.93,
+        0.24,
+        7.619999999999999
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 180,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Study chair leg",
+      "position": [
+        11.93,
+        0.24,
+        7.079999999999999
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 180,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Desk notebook",
+      "position": [
+        12.2,
+        0.83,
+        6
+      ],
+      "scale": [
+        0.65,
+        0.035,
+        0.42
+      ],
+      "material": "lavender",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": false,
+      "group": "Lounge"
+    },
+    {
+      "name": "Bookcase back",
+      "position": [
+        -15,
+        1.25,
+        12.9
+      ],
+      "scale": [
+        3.8,
+        2.5,
+        0.22
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book shelf",
+      "position": [
+        -15,
+        0.2,
+        12.5
+      ],
+      "scale": [
+        3.8,
+        0.1,
+        0.8
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book shelf",
+      "position": [
+        -15,
+        1.0,
+        12.5
+      ],
+      "scale": [
+        3.8,
+        0.1,
+        0.8
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book shelf",
+      "position": [
+        -15,
+        1.8,
+        12.5
+      ],
+      "scale": [
+        3.8,
+        0.1,
+        0.8
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book shelf",
+      "position": [
+        -15,
+        2.6,
+        12.5
+      ],
+      "scale": [
+        3.8,
+        0.1,
+        0.8
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        -16.5,
+        0.59,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        -16.5,
+        1.39,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        -16.5,
+        2.19,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        -16.21,
+        0.59,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "coral",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        -16.21,
+        1.39,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "coral",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        -16.21,
+        2.19,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "coral",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        -15.92,
+        0.59,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "purple",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        -15.92,
+        1.39,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "purple",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        -15.92,
+        2.19,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "purple",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        -15.63,
+        0.59,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "cream",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        -15.63,
+        1.39,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "cream",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        -15.63,
+        2.19,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "cream",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        -15.34,
+        0.59,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        -15.34,
+        1.39,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        -15.34,
+        2.19,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        -15.05,
+        0.59,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "coral",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        -15.05,
+        1.39,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "coral",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        -15.05,
+        2.19,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "coral",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        -14.76,
+        0.59,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "purple",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        -14.76,
+        1.39,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "purple",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        -14.76,
+        2.19,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "purple",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        -14.47,
+        0.59,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "cream",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        -14.47,
+        1.39,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "cream",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        -14.47,
+        2.19,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "cream",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        -14.18,
+        0.59,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        -14.18,
+        1.39,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        -14.18,
+        2.19,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        -13.89,
+        0.59,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "coral",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        -13.89,
+        1.39,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "coral",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        -13.89,
+        2.19,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "coral",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        -13.6,
+        0.59,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "purple",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        -13.6,
+        1.39,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "purple",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        -13.6,
+        2.19,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "purple",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Bookcase back",
+      "position": [
+        15,
+        1.25,
+        12.9
+      ],
+      "scale": [
+        3.8,
+        2.5,
+        0.22
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book shelf",
+      "position": [
+        15,
+        0.2,
+        12.5
+      ],
+      "scale": [
+        3.8,
+        0.1,
+        0.8
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book shelf",
+      "position": [
+        15,
+        1.0,
+        12.5
+      ],
+      "scale": [
+        3.8,
+        0.1,
+        0.8
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book shelf",
+      "position": [
+        15,
+        1.8,
+        12.5
+      ],
+      "scale": [
+        3.8,
+        0.1,
+        0.8
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book shelf",
+      "position": [
+        15,
+        2.6,
+        12.5
+      ],
+      "scale": [
+        3.8,
+        0.1,
+        0.8
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        13.5,
+        0.59,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        13.5,
+        1.39,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        13.5,
+        2.19,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        13.79,
+        0.59,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "coral",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        13.79,
+        1.39,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "coral",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        13.79,
+        2.19,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "coral",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        14.08,
+        0.59,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "purple",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        14.08,
+        1.39,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "purple",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        14.08,
+        2.19,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "purple",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        14.37,
+        0.59,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "cream",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        14.37,
+        1.39,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "cream",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        14.37,
+        2.19,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "cream",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        14.66,
+        0.59,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        14.66,
+        1.39,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        14.66,
+        2.19,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        14.95,
+        0.59,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "coral",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        14.95,
+        1.39,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "coral",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        14.95,
+        2.19,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "coral",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        15.24,
+        0.59,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "purple",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        15.24,
+        1.39,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "purple",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        15.24,
+        2.19,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "purple",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        15.53,
+        0.59,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "cream",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        15.53,
+        1.39,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "cream",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        15.53,
+        2.19,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "cream",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        15.82,
+        0.59,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        15.82,
+        1.39,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        15.82,
+        2.19,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        16.11,
+        0.59,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "coral",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        16.11,
+        1.39,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "coral",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        16.11,
+        2.19,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "coral",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        16.4,
+        0.59,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "purple",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        16.4,
+        1.39,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "purple",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Book",
+      "position": [
+        16.4,
+        2.19,
+        12.5
+      ],
+      "scale": [
+        0.19,
+        0.65,
+        0.42
+      ],
+      "material": "purple",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Welcome desk top",
+      "position": [
+        0,
+        1.0,
+        -10
+      ],
+      "scale": [
+        4,
+        0.12,
+        1.1
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Welcome desk leg",
+      "position": [
+        -1.52,
+        0.5,
+        -10.352
+      ],
+      "scale": [
+        0.09,
+        1.0,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Welcome desk leg",
+      "position": [
+        -1.52,
+        0.5,
+        -9.648
+      ],
+      "scale": [
+        0.09,
+        1.0,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Welcome desk leg",
+      "position": [
+        1.52,
+        0.5,
+        -10.352
+      ],
+      "scale": [
+        0.09,
+        1.0,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Welcome desk leg",
+      "position": [
+        1.52,
+        0.5,
+        -9.648
+      ],
+      "scale": [
+        0.09,
+        1.0,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Welcome mat",
+      "position": [
+        0,
+        0.018,
+        -11.8
+      ],
+      "scale": [
+        5,
+        0.036,
+        2
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": false,
+      "group": "Lounge"
+    },
+    {
+      "name": "Tall plant pot",
+      "position": [
+        -16,
+        0.35,
+        -11
+      ],
+      "scale": [
+        0.76,
+        0.7,
+        0.76
+      ],
+      "material": "cream",
+      "kind": "Cylinder",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Tall plant stem",
+      "position": [
+        -16,
+        1,
+        -11
+      ],
+      "scale": [
+        0.11,
+        1.4,
+        0.11
+      ],
+      "material": "oak",
+      "kind": "Cylinder",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Tall plant leaves",
+      "position": [
+        -16.28,
+        1.4,
+        -11
+      ],
+      "scale": [
+        0.75,
+        0.8,
+        0.65
+      ],
+      "material": "leaf",
+      "kind": "Sphere",
+      "yaw": 0,
+      "solid": false,
+      "group": "Lounge"
+    },
+    {
+      "name": "Tall plant leaves",
+      "position": [
+        -15.77,
+        1.65,
+        -10.88
+      ],
+      "scale": [
+        0.75,
+        0.8,
+        0.65
+      ],
+      "material": "leaf",
+      "kind": "Sphere",
+      "yaw": 0,
+      "solid": false,
+      "group": "Lounge"
+    },
+    {
+      "name": "Tall plant leaves",
+      "position": [
+        -16,
+        1.95,
+        -11.1
+      ],
+      "scale": [
+        0.75,
+        0.8,
+        0.65
+      ],
+      "material": "leaf",
+      "kind": "Sphere",
+      "yaw": 0,
+      "solid": false,
+      "group": "Lounge"
+    },
+    {
+      "name": "Tall plant pot",
+      "position": [
+        16,
+        0.35,
+        -11
+      ],
+      "scale": [
+        0.76,
+        0.7,
+        0.76
+      ],
+      "material": "cream",
+      "kind": "Cylinder",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Tall plant stem",
+      "position": [
+        16,
+        1,
+        -11
+      ],
+      "scale": [
+        0.11,
+        1.4,
+        0.11
+      ],
+      "material": "oak",
+      "kind": "Cylinder",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Tall plant leaves",
+      "position": [
+        15.72,
+        1.4,
+        -11
+      ],
+      "scale": [
+        0.75,
+        0.8,
+        0.65
+      ],
+      "material": "leaf",
+      "kind": "Sphere",
+      "yaw": 0,
+      "solid": false,
+      "group": "Lounge"
+    },
+    {
+      "name": "Tall plant leaves",
+      "position": [
+        16.23,
+        1.65,
+        -10.88
+      ],
+      "scale": [
+        0.75,
+        0.8,
+        0.65
+      ],
+      "material": "leaf",
+      "kind": "Sphere",
+      "yaw": 0,
+      "solid": false,
+      "group": "Lounge"
+    },
+    {
+      "name": "Tall plant leaves",
+      "position": [
+        16,
+        1.95,
+        -11.1
+      ],
+      "scale": [
+        0.75,
+        0.8,
+        0.65
+      ],
+      "material": "leaf",
+      "kind": "Sphere",
+      "yaw": 0,
+      "solid": false,
+      "group": "Lounge"
+    },
+    {
+      "name": "Tall plant pot",
+      "position": [
+        -16,
+        0.35,
+        9
+      ],
+      "scale": [
+        0.76,
+        0.7,
+        0.76
+      ],
+      "material": "cream",
+      "kind": "Cylinder",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Tall plant stem",
+      "position": [
+        -16,
+        1,
+        9
+      ],
+      "scale": [
+        0.11,
+        1.4,
+        0.11
+      ],
+      "material": "oak",
+      "kind": "Cylinder",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Tall plant leaves",
+      "position": [
+        -16.28,
+        1.4,
+        9
+      ],
+      "scale": [
+        0.75,
+        0.8,
+        0.65
+      ],
+      "material": "leaf",
+      "kind": "Sphere",
+      "yaw": 0,
+      "solid": false,
+      "group": "Lounge"
+    },
+    {
+      "name": "Tall plant leaves",
+      "position": [
+        -15.77,
+        1.65,
+        9.12
+      ],
+      "scale": [
+        0.75,
+        0.8,
+        0.65
+      ],
+      "material": "leaf",
+      "kind": "Sphere",
+      "yaw": 0,
+      "solid": false,
+      "group": "Lounge"
+    },
+    {
+      "name": "Tall plant leaves",
+      "position": [
+        -16,
+        1.95,
+        8.9
+      ],
+      "scale": [
+        0.75,
+        0.8,
+        0.65
+      ],
+      "material": "leaf",
+      "kind": "Sphere",
+      "yaw": 0,
+      "solid": false,
+      "group": "Lounge"
+    },
+    {
+      "name": "Tall plant pot",
+      "position": [
+        16,
+        0.35,
+        9
+      ],
+      "scale": [
+        0.76,
+        0.7,
+        0.76
+      ],
+      "material": "cream",
+      "kind": "Cylinder",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Tall plant stem",
+      "position": [
+        16,
+        1,
+        9
+      ],
+      "scale": [
+        0.11,
+        1.4,
+        0.11
+      ],
+      "material": "oak",
+      "kind": "Cylinder",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Tall plant leaves",
+      "position": [
+        15.72,
+        1.4,
+        9
+      ],
+      "scale": [
+        0.75,
+        0.8,
+        0.65
+      ],
+      "material": "leaf",
+      "kind": "Sphere",
+      "yaw": 0,
+      "solid": false,
+      "group": "Lounge"
+    },
+    {
+      "name": "Tall plant leaves",
+      "position": [
+        16.23,
+        1.65,
+        9.12
+      ],
+      "scale": [
+        0.75,
+        0.8,
+        0.65
+      ],
+      "material": "leaf",
+      "kind": "Sphere",
+      "yaw": 0,
+      "solid": false,
+      "group": "Lounge"
+    },
+    {
+      "name": "Tall plant leaves",
+      "position": [
+        16,
+        1.95,
+        8.9
+      ],
+      "scale": [
+        0.75,
+        0.8,
+        0.65
+      ],
+      "material": "leaf",
+      "kind": "Sphere",
+      "yaw": 0,
+      "solid": false,
+      "group": "Lounge"
+    },
+    {
+      "name": "Timber beam",
+      "position": [
+        -17.6,
+        3.5,
+        0
+      ],
+      "scale": [
+        0.25,
+        0.25,
+        28
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": false,
+      "group": "Lounge"
+    },
+    {
+      "name": "Timber beam",
+      "position": [
+        17.6,
+        3.5,
+        0
+      ],
+      "scale": [
+        0.25,
+        0.25,
+        28
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": false,
+      "group": "Lounge"
+    },
+    {
+      "name": "Window frame",
+      "position": [
+        -17.8,
+        1.95,
+        -10
+      ],
+      "scale": [
+        0.3,
+        1.7,
+        4.5
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Frosted window",
+      "position": [
+        -17.63,
+        1.95,
+        -10
+      ],
+      "scale": [
+        0.04,
+        1.45,
+        4.25
+      ],
+      "material": "mint",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": false,
+      "group": "Lounge"
+    },
+    {
+      "name": "Window frame",
+      "position": [
+        17.8,
+        1.95,
+        -10
+      ],
+      "scale": [
+        0.3,
+        1.7,
+        4.5
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Frosted window",
+      "position": [
+        17.63,
+        1.95,
+        -10
+      ],
+      "scale": [
+        0.04,
+        1.45,
+        4.25
+      ],
+      "material": "mint",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": false,
+      "group": "Lounge"
+    },
+    {
+      "name": "Window frame",
+      "position": [
+        -17.8,
+        1.95,
+        -2
+      ],
+      "scale": [
+        0.3,
+        1.7,
+        4.5
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Frosted window",
+      "position": [
+        -17.63,
+        1.95,
+        -2
+      ],
+      "scale": [
+        0.04,
+        1.45,
+        4.25
+      ],
+      "material": "mint",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": false,
+      "group": "Lounge"
+    },
+    {
+      "name": "Window frame",
+      "position": [
+        17.8,
+        1.95,
+        -2
+      ],
+      "scale": [
+        0.3,
+        1.7,
+        4.5
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Frosted window",
+      "position": [
+        17.63,
+        1.95,
+        -2
+      ],
+      "scale": [
+        0.04,
+        1.45,
+        4.25
+      ],
+      "material": "mint",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": false,
+      "group": "Lounge"
+    },
+    {
+      "name": "Window frame",
+      "position": [
+        -17.8,
+        1.95,
+        6
+      ],
+      "scale": [
+        0.3,
+        1.7,
+        4.5
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Frosted window",
+      "position": [
+        -17.63,
+        1.95,
+        6
+      ],
+      "scale": [
+        0.04,
+        1.45,
+        4.25
+      ],
+      "material": "mint",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": false,
+      "group": "Lounge"
+    },
+    {
+      "name": "Window frame",
+      "position": [
+        17.8,
+        1.95,
+        6
+      ],
+      "scale": [
+        0.3,
+        1.7,
+        4.5
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Lounge"
+    },
+    {
+      "name": "Frosted window",
+      "position": [
+        17.63,
+        1.95,
+        6
+      ],
+      "scale": [
+        0.04,
+        1.45,
+        4.25
+      ],
+      "material": "mint",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": false,
+      "group": "Lounge"
+    },
+    {
+      "name": "Quiz stage",
+      "position": [
+        -9,
+        0.12,
+        27.6
+      ],
+      "scale": [
+        11,
+        0.24,
+        3
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz display frame",
+      "position": [
+        -9,
+        2.1,
+        29.68
+      ],
+      "scale": [
+        10,
+        2.5,
+        0.24
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz display",
+      "position": [
+        -9,
+        2.1,
+        29.52
+      ],
+      "scale": [
+        9.65,
+        2.18,
+        0.04
+      ],
+      "material": "screen",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": false,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk top",
+      "position": [
+        -14,
+        0.75,
+        18.55
+      ],
+      "scale": [
+        1.5,
+        0.12,
+        0.7
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk leg",
+      "position": [
+        -14.57,
+        0.375,
+        18.326
+      ],
+      "scale": [
+        0.09,
+        0.75,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk leg",
+      "position": [
+        -14.57,
+        0.375,
+        18.774
+      ],
+      "scale": [
+        0.09,
+        0.75,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk leg",
+      "position": [
+        -13.43,
+        0.375,
+        18.326
+      ],
+      "scale": [
+        0.09,
+        0.75,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk leg",
+      "position": [
+        -13.43,
+        0.375,
+        18.774
+      ],
+      "scale": [
+        0.09,
+        0.75,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 01 seat",
+      "position": [
+        -14.0,
+        0.52,
+        17.65
+      ],
+      "scale": [
+        0.76,
+        0.18,
+        0.76
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 01 back",
+      "position": [
+        -14.0,
+        0.96,
+        17.33
+      ],
+      "scale": [
+        0.76,
+        0.8,
+        0.14
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 01 leg",
+      "position": [
+        -14.27,
+        0.24,
+        17.38
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 01 leg",
+      "position": [
+        -14.27,
+        0.24,
+        17.919999999999998
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 01 leg",
+      "position": [
+        -13.73,
+        0.24,
+        17.38
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 01 leg",
+      "position": [
+        -13.73,
+        0.24,
+        17.919999999999998
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk top",
+      "position": [
+        -11.6,
+        0.75,
+        18.55
+      ],
+      "scale": [
+        1.5,
+        0.12,
+        0.7
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk leg",
+      "position": [
+        -12.17,
+        0.375,
+        18.326
+      ],
+      "scale": [
+        0.09,
+        0.75,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk leg",
+      "position": [
+        -12.17,
+        0.375,
+        18.774
+      ],
+      "scale": [
+        0.09,
+        0.75,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk leg",
+      "position": [
+        -11.03,
+        0.375,
+        18.326
+      ],
+      "scale": [
+        0.09,
+        0.75,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk leg",
+      "position": [
+        -11.03,
+        0.375,
+        18.774
+      ],
+      "scale": [
+        0.09,
+        0.75,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 02 seat",
+      "position": [
+        -11.6,
+        0.52,
+        17.65
+      ],
+      "scale": [
+        0.76,
+        0.18,
+        0.76
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 02 back",
+      "position": [
+        -11.6,
+        0.96,
+        17.33
+      ],
+      "scale": [
+        0.76,
+        0.8,
+        0.14
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 02 leg",
+      "position": [
+        -11.87,
+        0.24,
+        17.38
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 02 leg",
+      "position": [
+        -11.87,
+        0.24,
+        17.919999999999998
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 02 leg",
+      "position": [
+        -11.33,
+        0.24,
+        17.38
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 02 leg",
+      "position": [
+        -11.33,
+        0.24,
+        17.919999999999998
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk top",
+      "position": [
+        -6.4,
+        0.75,
+        18.55
+      ],
+      "scale": [
+        1.5,
+        0.12,
+        0.7
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk leg",
+      "position": [
+        -6.970000000000001,
+        0.375,
+        18.326
+      ],
+      "scale": [
+        0.09,
+        0.75,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk leg",
+      "position": [
+        -6.970000000000001,
+        0.375,
+        18.774
+      ],
+      "scale": [
+        0.09,
+        0.75,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk leg",
+      "position": [
+        -5.83,
+        0.375,
+        18.326
+      ],
+      "scale": [
+        0.09,
+        0.75,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk leg",
+      "position": [
+        -5.83,
+        0.375,
+        18.774
+      ],
+      "scale": [
+        0.09,
+        0.75,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 03 seat",
+      "position": [
+        -6.4,
+        0.52,
+        17.65
+      ],
+      "scale": [
+        0.76,
+        0.18,
+        0.76
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 03 back",
+      "position": [
+        -6.4,
+        0.96,
+        17.33
+      ],
+      "scale": [
+        0.76,
+        0.8,
+        0.14
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 03 leg",
+      "position": [
+        -6.67,
+        0.24,
+        17.38
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 03 leg",
+      "position": [
+        -6.67,
+        0.24,
+        17.919999999999998
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 03 leg",
+      "position": [
+        -6.130000000000001,
+        0.24,
+        17.38
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 03 leg",
+      "position": [
+        -6.130000000000001,
+        0.24,
+        17.919999999999998
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk top",
+      "position": [
+        -4,
+        0.75,
+        18.55
+      ],
+      "scale": [
+        1.5,
+        0.12,
+        0.7
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk leg",
+      "position": [
+        -4.57,
+        0.375,
+        18.326
+      ],
+      "scale": [
+        0.09,
+        0.75,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk leg",
+      "position": [
+        -4.57,
+        0.375,
+        18.774
+      ],
+      "scale": [
+        0.09,
+        0.75,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk leg",
+      "position": [
+        -3.4299999999999997,
+        0.375,
+        18.326
+      ],
+      "scale": [
+        0.09,
+        0.75,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk leg",
+      "position": [
+        -3.4299999999999997,
+        0.375,
+        18.774
+      ],
+      "scale": [
+        0.09,
+        0.75,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 04 seat",
+      "position": [
+        -4.0,
+        0.52,
+        17.65
+      ],
+      "scale": [
+        0.76,
+        0.18,
+        0.76
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 04 back",
+      "position": [
+        -4.0,
+        0.96,
+        17.33
+      ],
+      "scale": [
+        0.76,
+        0.8,
+        0.14
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 04 leg",
+      "position": [
+        -4.27,
+        0.24,
+        17.38
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 04 leg",
+      "position": [
+        -4.27,
+        0.24,
+        17.919999999999998
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 04 leg",
+      "position": [
+        -3.73,
+        0.24,
+        17.38
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 04 leg",
+      "position": [
+        -3.73,
+        0.24,
+        17.919999999999998
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk top",
+      "position": [
+        -14,
+        0.75,
+        21.150000000000002
+      ],
+      "scale": [
+        1.5,
+        0.12,
+        0.7
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk leg",
+      "position": [
+        -14.57,
+        0.375,
+        20.926000000000002
+      ],
+      "scale": [
+        0.09,
+        0.75,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk leg",
+      "position": [
+        -14.57,
+        0.375,
+        21.374000000000002
+      ],
+      "scale": [
+        0.09,
+        0.75,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk leg",
+      "position": [
+        -13.43,
+        0.375,
+        20.926000000000002
+      ],
+      "scale": [
+        0.09,
+        0.75,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk leg",
+      "position": [
+        -13.43,
+        0.375,
+        21.374000000000002
+      ],
+      "scale": [
+        0.09,
+        0.75,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 05 seat",
+      "position": [
+        -14.0,
+        0.52,
+        20.25
+      ],
+      "scale": [
+        0.76,
+        0.18,
+        0.76
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 05 back",
+      "position": [
+        -14.0,
+        0.96,
+        19.93
+      ],
+      "scale": [
+        0.76,
+        0.8,
+        0.14
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 05 leg",
+      "position": [
+        -14.27,
+        0.24,
+        19.98
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 05 leg",
+      "position": [
+        -14.27,
+        0.24,
+        20.52
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 05 leg",
+      "position": [
+        -13.73,
+        0.24,
+        19.98
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 05 leg",
+      "position": [
+        -13.73,
+        0.24,
+        20.52
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk top",
+      "position": [
+        -11.6,
+        0.75,
+        21.150000000000002
+      ],
+      "scale": [
+        1.5,
+        0.12,
+        0.7
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk leg",
+      "position": [
+        -12.17,
+        0.375,
+        20.926000000000002
+      ],
+      "scale": [
+        0.09,
+        0.75,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk leg",
+      "position": [
+        -12.17,
+        0.375,
+        21.374000000000002
+      ],
+      "scale": [
+        0.09,
+        0.75,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk leg",
+      "position": [
+        -11.03,
+        0.375,
+        20.926000000000002
+      ],
+      "scale": [
+        0.09,
+        0.75,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk leg",
+      "position": [
+        -11.03,
+        0.375,
+        21.374000000000002
+      ],
+      "scale": [
+        0.09,
+        0.75,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 06 seat",
+      "position": [
+        -11.6,
+        0.52,
+        20.25
+      ],
+      "scale": [
+        0.76,
+        0.18,
+        0.76
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 06 back",
+      "position": [
+        -11.6,
+        0.96,
+        19.93
+      ],
+      "scale": [
+        0.76,
+        0.8,
+        0.14
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 06 leg",
+      "position": [
+        -11.87,
+        0.24,
+        19.98
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 06 leg",
+      "position": [
+        -11.87,
+        0.24,
+        20.52
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 06 leg",
+      "position": [
+        -11.33,
+        0.24,
+        19.98
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 06 leg",
+      "position": [
+        -11.33,
+        0.24,
+        20.52
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk top",
+      "position": [
+        -6.4,
+        0.75,
+        21.150000000000002
+      ],
+      "scale": [
+        1.5,
+        0.12,
+        0.7
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk leg",
+      "position": [
+        -6.970000000000001,
+        0.375,
+        20.926000000000002
+      ],
+      "scale": [
+        0.09,
+        0.75,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk leg",
+      "position": [
+        -6.970000000000001,
+        0.375,
+        21.374000000000002
+      ],
+      "scale": [
+        0.09,
+        0.75,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk leg",
+      "position": [
+        -5.83,
+        0.375,
+        20.926000000000002
+      ],
+      "scale": [
+        0.09,
+        0.75,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk leg",
+      "position": [
+        -5.83,
+        0.375,
+        21.374000000000002
+      ],
+      "scale": [
+        0.09,
+        0.75,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 07 seat",
+      "position": [
+        -6.4,
+        0.52,
+        20.25
+      ],
+      "scale": [
+        0.76,
+        0.18,
+        0.76
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 07 back",
+      "position": [
+        -6.4,
+        0.96,
+        19.93
+      ],
+      "scale": [
+        0.76,
+        0.8,
+        0.14
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 07 leg",
+      "position": [
+        -6.67,
+        0.24,
+        19.98
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 07 leg",
+      "position": [
+        -6.67,
+        0.24,
+        20.52
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 07 leg",
+      "position": [
+        -6.130000000000001,
+        0.24,
+        19.98
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 07 leg",
+      "position": [
+        -6.130000000000001,
+        0.24,
+        20.52
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk top",
+      "position": [
+        -4,
+        0.75,
+        21.150000000000002
+      ],
+      "scale": [
+        1.5,
+        0.12,
+        0.7
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk leg",
+      "position": [
+        -4.57,
+        0.375,
+        20.926000000000002
+      ],
+      "scale": [
+        0.09,
+        0.75,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk leg",
+      "position": [
+        -4.57,
+        0.375,
+        21.374000000000002
+      ],
+      "scale": [
+        0.09,
+        0.75,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk leg",
+      "position": [
+        -3.4299999999999997,
+        0.375,
+        20.926000000000002
+      ],
+      "scale": [
+        0.09,
+        0.75,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk leg",
+      "position": [
+        -3.4299999999999997,
+        0.375,
+        21.374000000000002
+      ],
+      "scale": [
+        0.09,
+        0.75,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 08 seat",
+      "position": [
+        -4.0,
+        0.52,
+        20.25
+      ],
+      "scale": [
+        0.76,
+        0.18,
+        0.76
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 08 back",
+      "position": [
+        -4.0,
+        0.96,
+        19.93
+      ],
+      "scale": [
+        0.76,
+        0.8,
+        0.14
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 08 leg",
+      "position": [
+        -4.27,
+        0.24,
+        19.98
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 08 leg",
+      "position": [
+        -4.27,
+        0.24,
+        20.52
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 08 leg",
+      "position": [
+        -3.73,
+        0.24,
+        19.98
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 08 leg",
+      "position": [
+        -3.73,
+        0.24,
+        20.52
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk top",
+      "position": [
+        -14,
+        0.75,
+        23.75
+      ],
+      "scale": [
+        1.5,
+        0.12,
+        0.7
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk leg",
+      "position": [
+        -14.57,
+        0.375,
+        23.526
+      ],
+      "scale": [
+        0.09,
+        0.75,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk leg",
+      "position": [
+        -14.57,
+        0.375,
+        23.974
+      ],
+      "scale": [
+        0.09,
+        0.75,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk leg",
+      "position": [
+        -13.43,
+        0.375,
+        23.526
+      ],
+      "scale": [
+        0.09,
+        0.75,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk leg",
+      "position": [
+        -13.43,
+        0.375,
+        23.974
+      ],
+      "scale": [
+        0.09,
+        0.75,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 09 seat",
+      "position": [
+        -14.0,
+        0.52,
+        22.849999999999998
+      ],
+      "scale": [
+        0.76,
+        0.18,
+        0.76
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 09 back",
+      "position": [
+        -14.0,
+        0.96,
+        22.529999999999998
+      ],
+      "scale": [
+        0.76,
+        0.8,
+        0.14
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 09 leg",
+      "position": [
+        -14.27,
+        0.24,
+        22.58
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 09 leg",
+      "position": [
+        -14.27,
+        0.24,
+        23.119999999999997
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 09 leg",
+      "position": [
+        -13.73,
+        0.24,
+        22.58
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 09 leg",
+      "position": [
+        -13.73,
+        0.24,
+        23.119999999999997
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk top",
+      "position": [
+        -11.6,
+        0.75,
+        23.75
+      ],
+      "scale": [
+        1.5,
+        0.12,
+        0.7
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk leg",
+      "position": [
+        -12.17,
+        0.375,
+        23.526
+      ],
+      "scale": [
+        0.09,
+        0.75,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk leg",
+      "position": [
+        -12.17,
+        0.375,
+        23.974
+      ],
+      "scale": [
+        0.09,
+        0.75,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk leg",
+      "position": [
+        -11.03,
+        0.375,
+        23.526
+      ],
+      "scale": [
+        0.09,
+        0.75,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk leg",
+      "position": [
+        -11.03,
+        0.375,
+        23.974
+      ],
+      "scale": [
+        0.09,
+        0.75,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 10 seat",
+      "position": [
+        -11.6,
+        0.52,
+        22.849999999999998
+      ],
+      "scale": [
+        0.76,
+        0.18,
+        0.76
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 10 back",
+      "position": [
+        -11.6,
+        0.96,
+        22.529999999999998
+      ],
+      "scale": [
+        0.76,
+        0.8,
+        0.14
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 10 leg",
+      "position": [
+        -11.87,
+        0.24,
+        22.58
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 10 leg",
+      "position": [
+        -11.87,
+        0.24,
+        23.119999999999997
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 10 leg",
+      "position": [
+        -11.33,
+        0.24,
+        22.58
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 10 leg",
+      "position": [
+        -11.33,
+        0.24,
+        23.119999999999997
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk top",
+      "position": [
+        -6.4,
+        0.75,
+        23.75
+      ],
+      "scale": [
+        1.5,
+        0.12,
+        0.7
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk leg",
+      "position": [
+        -6.970000000000001,
+        0.375,
+        23.526
+      ],
+      "scale": [
+        0.09,
+        0.75,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk leg",
+      "position": [
+        -6.970000000000001,
+        0.375,
+        23.974
+      ],
+      "scale": [
+        0.09,
+        0.75,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk leg",
+      "position": [
+        -5.83,
+        0.375,
+        23.526
+      ],
+      "scale": [
+        0.09,
+        0.75,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk leg",
+      "position": [
+        -5.83,
+        0.375,
+        23.974
+      ],
+      "scale": [
+        0.09,
+        0.75,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 11 seat",
+      "position": [
+        -6.4,
+        0.52,
+        22.849999999999998
+      ],
+      "scale": [
+        0.76,
+        0.18,
+        0.76
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 11 back",
+      "position": [
+        -6.4,
+        0.96,
+        22.529999999999998
+      ],
+      "scale": [
+        0.76,
+        0.8,
+        0.14
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 11 leg",
+      "position": [
+        -6.67,
+        0.24,
+        22.58
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 11 leg",
+      "position": [
+        -6.67,
+        0.24,
+        23.119999999999997
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 11 leg",
+      "position": [
+        -6.130000000000001,
+        0.24,
+        22.58
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 11 leg",
+      "position": [
+        -6.130000000000001,
+        0.24,
+        23.119999999999997
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk top",
+      "position": [
+        -4,
+        0.75,
+        23.75
+      ],
+      "scale": [
+        1.5,
+        0.12,
+        0.7
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk leg",
+      "position": [
+        -4.57,
+        0.375,
+        23.526
+      ],
+      "scale": [
+        0.09,
+        0.75,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk leg",
+      "position": [
+        -4.57,
+        0.375,
+        23.974
+      ],
+      "scale": [
+        0.09,
+        0.75,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk leg",
+      "position": [
+        -3.4299999999999997,
+        0.375,
+        23.526
+      ],
+      "scale": [
+        0.09,
+        0.75,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz desk leg",
+      "position": [
+        -3.4299999999999997,
+        0.375,
+        23.974
+      ],
+      "scale": [
+        0.09,
+        0.75,
+        0.09
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 12 seat",
+      "position": [
+        -4.0,
+        0.52,
+        22.849999999999998
+      ],
+      "scale": [
+        0.76,
+        0.18,
+        0.76
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 12 back",
+      "position": [
+        -4.0,
+        0.96,
+        22.529999999999998
+      ],
+      "scale": [
+        0.76,
+        0.8,
+        0.14
+      ],
+      "material": "sage",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 12 leg",
+      "position": [
+        -4.27,
+        0.24,
+        22.58
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 12 leg",
+      "position": [
+        -4.27,
+        0.24,
+        23.119999999999997
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 12 leg",
+      "position": [
+        -3.73,
+        0.24,
+        22.58
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 12 leg",
+      "position": [
+        -3.73,
+        0.24,
+        23.119999999999997
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz aisle",
+      "position": [
+        -9,
+        0.012,
+        20
+      ],
+      "scale": [
+        1.5,
+        0.024,
+        10
+      ],
+      "material": "cream",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": false,
+      "group": "Quiz"
+    },
+    {
+      "name": "Mafia rug",
+      "position": [
+        9,
+        0.012,
+        23
+      ],
+      "scale": [
+        11.2,
+        0.024,
+        11.2
+      ],
+      "material": "purple",
+      "kind": "Cylinder",
+      "yaw": 0,
+      "solid": false,
+      "group": "Mafia"
+    },
+    {
+      "name": "Round discussion tabletop",
+      "position": [
+        9,
+        0.8,
+        23
+      ],
+      "scale": [
+        6.1,
+        0.16,
+        6.1
+      ],
+      "material": "oak",
+      "kind": "Cylinder",
+      "yaw": 0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Round table pedestal",
+      "position": [
+        9,
+        0.37,
+        23
+      ],
+      "scale": [
+        1.3,
+        0.74,
+        1.3
+      ],
+      "material": "dark",
+      "kind": "Cylinder",
+      "yaw": 0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 01 seat",
+      "position": [
+        9.0,
+        0.52,
+        27.25
+      ],
+      "scale": [
+        0.76,
+        0.18,
+        0.76
+      ],
+      "material": "purple",
+      "kind": "Cube",
+      "yaw": 180.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 01 back",
+      "position": [
+        9.0,
+        0.96,
+        27.57
+      ],
+      "scale": [
+        0.76,
+        0.8,
+        0.14
+      ],
+      "material": "purple",
+      "kind": "Cube",
+      "yaw": 180.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 01 leg",
+      "position": [
+        9.27,
+        0.24,
+        27.52
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 180.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 01 leg",
+      "position": [
+        9.27,
+        0.24,
+        26.98
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 180.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 01 leg",
+      "position": [
+        8.73,
+        0.24,
+        27.52
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 180.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 01 leg",
+      "position": [
+        8.73,
+        0.24,
+        26.98
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 180.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Player marker",
+      "position": [
+        9.0,
+        0.91,
+        25.5
+      ],
+      "scale": [
+        0.34,
+        0.05,
+        0.34
+      ],
+      "material": "gold",
+      "kind": "Cylinder",
+      "yaw": 0,
+      "solid": false,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 02 seat",
+      "position": [
+        11.498087322243011,
+        0.52,
+        26.438322226093526
+      ],
+      "scale": [
+        0.76,
+        0.18,
+        0.76
+      ],
+      "material": "purple",
+      "kind": "Cube",
+      "yaw": 216.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 02 back",
+      "position": [
+        11.686178602976602,
+        0.96,
+        26.697207664293508
+      ],
+      "scale": [
+        0.76,
+        0.8,
+        0.14
+      ],
+      "material": "purple",
+      "kind": "Cube",
+      "yaw": 216.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 02 leg",
+      "position": [
+        11.875223928843214,
+        0.24,
+        26.498054796455794
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 216.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 02 leg",
+      "position": [
+        11.557819892605279,
+        0.24,
+        26.061185619493322
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 216.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 02 leg",
+      "position": [
+        11.438354751880743,
+        0.24,
+        26.81545883269373
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 216.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 02 leg",
+      "position": [
+        11.120950715642808,
+        0.24,
+        26.378589655731258
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 216.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Player marker",
+      "position": [
+        10.469463130731183,
+        0.91,
+        25.022542485937368
+      ],
+      "scale": [
+        0.34,
+        0.05,
+        0.34
+      ],
+      "material": "gold",
+      "kind": "Cylinder",
+      "yaw": 0,
+      "solid": false,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 03 seat",
+      "position": [
+        13.041990194254403,
+        0.52,
+        24.313322226093526
+      ],
+      "scale": [
+        0.76,
+        0.18,
+        0.76
+      ],
+      "material": "purple",
+      "kind": "Cube",
+      "yaw": 252.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 03 back",
+      "position": [
+        13.346328279468851,
+        0.96,
+        24.412207664293508
+      ],
+      "scale": [
+        0.76,
+        0.8,
+        0.14
+      ],
+      "material": "purple",
+      "kind": "Cube",
+      "yaw": 252.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 03 leg",
+      "position": [
+        13.38221004213533,
+        0.24,
+        24.13997155517507
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 252.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 03 leg",
+      "position": [
+        12.868639523335947,
+        0.24,
+        23.973102378212598
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 252.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 03 leg",
+      "position": [
+        13.215340865172859,
+        0.24,
+        24.653542073974453
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 252.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 03 leg",
+      "position": [
+        12.701770346373475,
+        0.24,
+        24.48667289701198
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 252.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Player marker",
+      "position": [
+        11.377641290737884,
+        0.91,
+        23.772542485937368
+      ],
+      "scale": [
+        0.34,
+        0.05,
+        0.34
+      ],
+      "material": "gold",
+      "kind": "Cylinder",
+      "yaw": 0,
+      "solid": false,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 04 seat",
+      "position": [
+        13.041990194254403,
+        0.52,
+        21.686677773906474
+      ],
+      "scale": [
+        0.76,
+        0.18,
+        0.76
+      ],
+      "material": "purple",
+      "kind": "Cube",
+      "yaw": 288.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 04 back",
+      "position": [
+        13.346328279468851,
+        0.96,
+        21.587792335706492
+      ],
+      "scale": [
+        0.76,
+        0.8,
+        0.14
+      ],
+      "material": "purple",
+      "kind": "Cube",
+      "yaw": 288.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 04 leg",
+      "position": [
+        13.215340865172859,
+        0.24,
+        21.346457926025547
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 288.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 04 leg",
+      "position": [
+        12.701770346373475,
+        0.24,
+        21.51332710298802
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 288.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 04 leg",
+      "position": [
+        13.38221004213533,
+        0.24,
+        21.86002844482493
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 288.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 04 leg",
+      "position": [
+        12.868639523335947,
+        0.24,
+        22.026897621787402
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 288.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Player marker",
+      "position": [
+        11.377641290737884,
+        0.91,
+        22.227457514062632
+      ],
+      "scale": [
+        0.34,
+        0.05,
+        0.34
+      ],
+      "material": "gold",
+      "kind": "Cylinder",
+      "yaw": 0,
+      "solid": false,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 05 seat",
+      "position": [
+        11.498087322243011,
+        0.52,
+        19.561677773906474
+      ],
+      "scale": [
+        0.76,
+        0.18,
+        0.76
+      ],
+      "material": "purple",
+      "kind": "Cube",
+      "yaw": 324.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 05 back",
+      "position": [
+        11.686178602976602,
+        0.96,
+        19.302792335706492
+      ],
+      "scale": [
+        0.76,
+        0.8,
+        0.14
+      ],
+      "material": "purple",
+      "kind": "Cube",
+      "yaw": 324.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 05 leg",
+      "position": [
+        11.438354751880743,
+        0.24,
+        19.18454116730627
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 324.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 05 leg",
+      "position": [
+        11.120950715642808,
+        0.24,
+        19.621410344268742
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 324.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 05 leg",
+      "position": [
+        11.875223928843214,
+        0.24,
+        19.501945203544206
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 324.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 05 leg",
+      "position": [
+        11.557819892605279,
+        0.24,
+        19.938814380506678
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 324.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Player marker",
+      "position": [
+        10.469463130731183,
+        0.91,
+        20.977457514062632
+      ],
+      "scale": [
+        0.34,
+        0.05,
+        0.34
+      ],
+      "material": "gold",
+      "kind": "Cylinder",
+      "yaw": 0,
+      "solid": false,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 06 seat",
+      "position": [
+        9.0,
+        0.52,
+        18.75
+      ],
+      "scale": [
+        0.76,
+        0.18,
+        0.76
+      ],
+      "material": "purple",
+      "kind": "Cube",
+      "yaw": 360.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 06 back",
+      "position": [
+        9.0,
+        0.96,
+        18.43
+      ],
+      "scale": [
+        0.76,
+        0.8,
+        0.14
+      ],
+      "material": "purple",
+      "kind": "Cube",
+      "yaw": 360.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 06 leg",
+      "position": [
+        8.73,
+        0.24,
+        18.48
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 360.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 06 leg",
+      "position": [
+        8.73,
+        0.24,
+        19.02
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 360.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 06 leg",
+      "position": [
+        9.27,
+        0.24,
+        18.48
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 360.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 06 leg",
+      "position": [
+        9.27,
+        0.24,
+        19.02
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 360.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Player marker",
+      "position": [
+        9.0,
+        0.91,
+        20.5
+      ],
+      "scale": [
+        0.34,
+        0.05,
+        0.34
+      ],
+      "material": "gold",
+      "kind": "Cylinder",
+      "yaw": 0,
+      "solid": false,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 07 seat",
+      "position": [
+        6.501912677756989,
+        0.52,
+        19.561677773906474
+      ],
+      "scale": [
+        0.76,
+        0.18,
+        0.76
+      ],
+      "material": "purple",
+      "kind": "Cube",
+      "yaw": 396.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 07 back",
+      "position": [
+        6.313821397023398,
+        0.96,
+        19.302792335706492
+      ],
+      "scale": [
+        0.76,
+        0.8,
+        0.14
+      ],
+      "material": "purple",
+      "kind": "Cube",
+      "yaw": 396.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 07 leg",
+      "position": [
+        6.124776071156786,
+        0.24,
+        19.501945203544206
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 396.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 07 leg",
+      "position": [
+        6.442180107394721,
+        0.24,
+        19.938814380506678
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 396.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 07 leg",
+      "position": [
+        6.561645248119257,
+        0.24,
+        19.18454116730627
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 396.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 07 leg",
+      "position": [
+        6.879049284357192,
+        0.24,
+        19.621410344268742
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 396.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Player marker",
+      "position": [
+        7.5305368692688175,
+        0.91,
+        20.977457514062632
+      ],
+      "scale": [
+        0.34,
+        0.05,
+        0.34
+      ],
+      "material": "gold",
+      "kind": "Cylinder",
+      "yaw": 0,
+      "solid": false,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 08 seat",
+      "position": [
+        4.958009805745598,
+        0.52,
+        21.686677773906474
+      ],
+      "scale": [
+        0.76,
+        0.18,
+        0.76
+      ],
+      "material": "purple",
+      "kind": "Cube",
+      "yaw": 432.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 08 back",
+      "position": [
+        4.653671720531149,
+        0.96,
+        21.587792335706492
+      ],
+      "scale": [
+        0.76,
+        0.8,
+        0.14
+      ],
+      "material": "purple",
+      "kind": "Cube",
+      "yaw": 432.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 08 leg",
+      "position": [
+        4.61778995786467,
+        0.24,
+        21.86002844482493
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 432.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 08 leg",
+      "position": [
+        5.131360476664054,
+        0.24,
+        22.026897621787402
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 432.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 08 leg",
+      "position": [
+        4.784659134827142,
+        0.24,
+        21.346457926025547
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 432.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 08 leg",
+      "position": [
+        5.298229653626525,
+        0.24,
+        21.51332710298802
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 432.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Player marker",
+      "position": [
+        6.622358709262116,
+        0.91,
+        22.227457514062632
+      ],
+      "scale": [
+        0.34,
+        0.05,
+        0.34
+      ],
+      "material": "gold",
+      "kind": "Cylinder",
+      "yaw": 0,
+      "solid": false,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 09 seat",
+      "position": [
+        4.958009805745597,
+        0.52,
+        24.313322226093526
+      ],
+      "scale": [
+        0.76,
+        0.18,
+        0.76
+      ],
+      "material": "purple",
+      "kind": "Cube",
+      "yaw": 468.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 09 back",
+      "position": [
+        4.653671720531148,
+        0.96,
+        24.412207664293508
+      ],
+      "scale": [
+        0.76,
+        0.8,
+        0.14
+      ],
+      "material": "purple",
+      "kind": "Cube",
+      "yaw": 468.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 09 leg",
+      "position": [
+        4.784659134827141,
+        0.24,
+        24.653542073974453
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 468.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 09 leg",
+      "position": [
+        5.2982296536265245,
+        0.24,
+        24.48667289701198
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 468.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 09 leg",
+      "position": [
+        4.6177899578646695,
+        0.24,
+        24.13997155517507
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 468.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 09 leg",
+      "position": [
+        5.131360476664053,
+        0.24,
+        23.973102378212598
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 468.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Player marker",
+      "position": [
+        6.622358709262116,
+        0.91,
+        23.772542485937368
+      ],
+      "scale": [
+        0.34,
+        0.05,
+        0.34
+      ],
+      "material": "gold",
+      "kind": "Cylinder",
+      "yaw": 0,
+      "solid": false,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 10 seat",
+      "position": [
+        6.501912677756988,
+        0.52,
+        26.438322226093526
+      ],
+      "scale": [
+        0.76,
+        0.18,
+        0.76
+      ],
+      "material": "purple",
+      "kind": "Cube",
+      "yaw": 504.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 10 back",
+      "position": [
+        6.313821397023396,
+        0.96,
+        26.697207664293508
+      ],
+      "scale": [
+        0.76,
+        0.8,
+        0.14
+      ],
+      "material": "purple",
+      "kind": "Cube",
+      "yaw": 504.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 10 leg",
+      "position": [
+        6.561645248119256,
+        0.24,
+        26.81545883269373
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 504.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 10 leg",
+      "position": [
+        6.879049284357192,
+        0.24,
+        26.378589655731258
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 504.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 10 leg",
+      "position": [
+        6.124776071156784,
+        0.24,
+        26.498054796455794
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 504.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 10 leg",
+      "position": [
+        6.44218010739472,
+        0.24,
+        26.061185619493322
+      ],
+      "scale": [
+        0.065,
+        0.48,
+        0.065
+      ],
+      "material": "oak",
+      "kind": "Cube",
+      "yaw": 504.0,
+      "solid": true,
+      "group": "Mafia"
+    },
+    {
+      "name": "Player marker",
+      "position": [
+        7.530536869268817,
+        0.91,
+        25.022542485937368
+      ],
+      "scale": [
+        0.34,
+        0.05,
+        0.34
+      ],
+      "material": "gold",
+      "kind": "Cylinder",
+      "yaw": 0,
+      "solid": false,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia display panel",
+      "position": [
+        9,
+        2.05,
+        29.7
+      ],
+      "scale": [
+        8,
+        2.1,
+        0.2
+      ],
+      "material": "dark",
+      "kind": "Cube",
+      "yaw": 0,
+      "solid": true,
+      "group": "Mafia"
+    }
+  ],
+  "seats": [
+    {
+      "name": "Social sofa seat",
+      "position": [
+        -11.1,
+        0.81,
+        -6.75
+      ],
+      "yaw": 0,
+      "group": "Lounge"
+    },
+    {
+      "name": "Social sofa seat",
+      "position": [
+        -10.0,
+        0.81,
+        -6.75
+      ],
+      "yaw": 0,
+      "group": "Lounge"
+    },
+    {
+      "name": "Social sofa seat",
+      "position": [
+        -8.9,
+        0.81,
+        -6.75
+      ],
+      "yaw": 0,
+      "group": "Lounge"
+    },
+    {
+      "name": "Lounge armchair",
+      "position": [
+        -12.4,
+        0.62,
+        -3.7
+      ],
+      "yaw": 145,
+      "group": "Lounge"
+    },
+    {
+      "name": "Lounge armchair",
+      "position": [
+        -7.6,
+        0.62,
+        -3.7
+      ],
+      "yaw": 215,
+      "group": "Lounge"
+    },
+    {
+      "name": "Social sofa seat",
+      "position": [
+        8.9,
+        0.81,
+        -6.75
+      ],
+      "yaw": 0,
+      "group": "Lounge"
+    },
+    {
+      "name": "Social sofa seat",
+      "position": [
+        10.0,
+        0.81,
+        -6.75
+      ],
+      "yaw": 0,
+      "group": "Lounge"
+    },
+    {
+      "name": "Social sofa seat",
+      "position": [
+        11.1,
+        0.81,
+        -6.75
+      ],
+      "yaw": 0,
+      "group": "Lounge"
+    },
+    {
+      "name": "Lounge armchair",
+      "position": [
+        7.6,
+        0.62,
+        -3.7
+      ],
+      "yaw": 145,
+      "group": "Lounge"
+    },
+    {
+      "name": "Lounge armchair",
+      "position": [
+        12.4,
+        0.62,
+        -3.7
+      ],
+      "yaw": 215,
+      "group": "Lounge"
+    },
+    {
+      "name": "Social sofa seat",
+      "position": [
+        -11.1,
+        0.81,
+        4.25
+      ],
+      "yaw": 0,
+      "group": "Lounge"
+    },
+    {
+      "name": "Social sofa seat",
+      "position": [
+        -10.0,
+        0.81,
+        4.25
+      ],
+      "yaw": 0,
+      "group": "Lounge"
+    },
+    {
+      "name": "Social sofa seat",
+      "position": [
+        -8.9,
+        0.81,
+        4.25
+      ],
+      "yaw": 0,
+      "group": "Lounge"
+    },
+    {
+      "name": "Lounge armchair",
+      "position": [
+        -12.4,
+        0.62,
+        7.3
+      ],
+      "yaw": 145,
+      "group": "Lounge"
+    },
+    {
+      "name": "Lounge armchair",
+      "position": [
+        -7.6,
+        0.62,
+        7.3
+      ],
+      "yaw": 215,
+      "group": "Lounge"
+    },
+    {
+      "name": "Study chair",
+      "position": [
+        7.8,
+        0.62,
+        4.65
+      ],
+      "yaw": 0,
+      "group": "Lounge"
+    },
+    {
+      "name": "Study chair",
+      "position": [
+        7.8,
+        0.62,
+        7.35
+      ],
+      "yaw": 180,
+      "group": "Lounge"
+    },
+    {
+      "name": "Study chair",
+      "position": [
+        10,
+        0.62,
+        4.65
+      ],
+      "yaw": 0,
+      "group": "Lounge"
+    },
+    {
+      "name": "Study chair",
+      "position": [
+        10,
+        0.62,
+        7.35
+      ],
+      "yaw": 180,
+      "group": "Lounge"
+    },
+    {
+      "name": "Study chair",
+      "position": [
+        12.2,
+        0.62,
+        4.65
+      ],
+      "yaw": 0,
+      "group": "Lounge"
+    },
+    {
+      "name": "Study chair",
+      "position": [
+        12.2,
+        0.62,
+        7.35
+      ],
+      "yaw": 180,
+      "group": "Lounge"
+    },
+    {
+      "name": "Quiz seat 01",
+      "position": [
+        -14,
+        0.62,
+        17.65
+      ],
+      "yaw": 0,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 02",
+      "position": [
+        -11.6,
+        0.62,
+        17.65
+      ],
+      "yaw": 0,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 03",
+      "position": [
+        -6.4,
+        0.62,
+        17.65
+      ],
+      "yaw": 0,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 04",
+      "position": [
+        -4,
+        0.62,
+        17.65
+      ],
+      "yaw": 0,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 05",
+      "position": [
+        -14,
+        0.62,
+        20.25
+      ],
+      "yaw": 0,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 06",
+      "position": [
+        -11.6,
+        0.62,
+        20.25
+      ],
+      "yaw": 0,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 07",
+      "position": [
+        -6.4,
+        0.62,
+        20.25
+      ],
+      "yaw": 0,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 08",
+      "position": [
+        -4,
+        0.62,
+        20.25
+      ],
+      "yaw": 0,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 09",
+      "position": [
+        -14,
+        0.62,
+        22.849999999999998
+      ],
+      "yaw": 0,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 10",
+      "position": [
+        -11.6,
+        0.62,
+        22.849999999999998
+      ],
+      "yaw": 0,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 11",
+      "position": [
+        -6.4,
+        0.62,
+        22.849999999999998
+      ],
+      "yaw": 0,
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz seat 12",
+      "position": [
+        -4,
+        0.62,
+        22.849999999999998
+      ],
+      "yaw": 0,
+      "group": "Quiz"
+    },
+    {
+      "name": "Mafia seat 01",
+      "position": [
+        9.0,
+        0.62,
+        27.25
+      ],
+      "yaw": 180.0,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 02",
+      "position": [
+        11.498087322243011,
+        0.62,
+        26.438322226093526
+      ],
+      "yaw": 216.0,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 03",
+      "position": [
+        13.041990194254403,
+        0.62,
+        24.313322226093526
+      ],
+      "yaw": 252.0,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 04",
+      "position": [
+        13.041990194254403,
+        0.62,
+        21.686677773906474
+      ],
+      "yaw": 288.0,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 05",
+      "position": [
+        11.498087322243011,
+        0.62,
+        19.561677773906474
+      ],
+      "yaw": 324.0,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 06",
+      "position": [
+        9.0,
+        0.62,
+        18.75
+      ],
+      "yaw": 360.0,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 07",
+      "position": [
+        6.501912677756989,
+        0.62,
+        19.561677773906474
+      ],
+      "yaw": 396.0,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 08",
+      "position": [
+        4.958009805745598,
+        0.62,
+        21.686677773906474
+      ],
+      "yaw": 432.0,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 09",
+      "position": [
+        4.958009805745597,
+        0.62,
+        24.313322226093526
+      ],
+      "yaw": 468.0,
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia seat 10",
+      "position": [
+        6.501912677756988,
+        0.62,
+        26.438322226093526
+      ],
+      "yaw": 504.0,
+      "group": "Mafia"
+    }
+  ],
+  "labels": [
+    {
+      "name": "Quiz entrance",
+      "text": "QUIZ ROOM",
+      "position": [
+        -9,
+        3.05,
+        13.75
+      ],
+      "size": 0.36,
+      "yaw": 0,
+      "material": "dark",
+      "group": "Quiz"
+    },
+    {
+      "name": "Mafia entrance",
+      "text": "MAFIA ROOM",
+      "position": [
+        9,
+        3.05,
+        13.75
+      ],
+      "size": 0.36,
+      "yaw": 0,
+      "material": "dark",
+      "group": "Mafia"
+    },
+    {
+      "name": "Lounge title",
+      "text": "CAMPUS COMMONS",
+      "position": [
+        0,
+        2.75,
+        13.8
+      ],
+      "size": 0.7,
+      "yaw": 0,
+      "material": "dark",
+      "group": "Lounge"
+    },
+    {
+      "name": "Lounge sub",
+      "text": "MEET  /  LEARN  /  PLAY",
+      "position": [
+        0,
+        2.03,
+        13.78
+      ],
+      "size": 0.25,
+      "yaw": 0,
+      "material": "dark",
+      "group": "Lounge"
+    },
+    {
+      "name": "Welcome sign",
+      "text": "WELCOME",
+      "position": [
+        0,
+        1.04,
+        -10.57
+      ],
+      "size": 0.35,
+      "yaw": 180,
+      "material": "dark",
+      "group": "Lounge"
+    },
+    {
+      "name": "Quiz screen heading",
+      "text": "QUIZ ROOM",
+      "position": [
+        -9,
+        2.45,
+        29.46
+      ],
+      "size": 0.65,
+      "yaw": 0,
+      "material": "white",
+      "group": "Quiz"
+    },
+    {
+      "name": "Quiz screen sub",
+      "text": "READY TO THINK TOGETHER?",
+      "position": [
+        -9,
+        1.65,
+        29.44
+      ],
+      "size": 0.24,
+      "yaw": 0,
+      "material": "mint",
+      "group": "Quiz"
+    },
+    {
+      "name": "Mafia heading",
+      "text": "MAFIA CLUB",
+      "position": [
+        9,
+        2.35,
+        29.55
+      ],
+      "size": 0.65,
+      "yaw": 0,
+      "material": "white",
+      "group": "Mafia"
+    },
+    {
+      "name": "Mafia subtitle",
+      "text": "DISCUSS  /  DISCOVER  /  DECIDE",
+      "position": [
+        9,
+        1.62,
+        29.53
+      ],
+      "size": 0.22,
+      "yaw": 0,
+      "material": "lavender",
+      "group": "Mafia"
+    }
+  ]
+}

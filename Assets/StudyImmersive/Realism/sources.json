@@ -1,0 +1,68 @@
+[
+  {
+    "id": "potted_plant_02",
+    "page": "https://polyhaven.com/a/potted_plant_02",
+    "license": "CC0",
+    "maps": {
+      "leaves_diff": "leaves_diff.jpg",
+      "pot_nor_gl": "pot_nor_gl.jpg",
+      "pot_diff": "pot_diff.jpg",
+      "leaves_nor_gl": "leaves_nor_gl.jpg",
+      "leaves_alpha": "leaves_alpha.jpg"
+    },
+    "mesh": "https://dl.polyhaven.org/file/ph-assets/Models/fbx/1k/potted_plant_02/potted_plant_02_1k.fbx"
+  },
+  {
+    "id": "potted_plant_04",
+    "page": "https://polyhaven.com/a/potted_plant_04",
+    "license": "CC0",
+    "maps": {
+      "nor_gl": "nor_gl.jpg",
+      "Diffuse": "diffuse.jpg"
+    },
+    "mesh": "https://dl.polyhaven.org/file/ph-assets/Models/fbx/1k/potted_plant_04/potted_plant_04_1k.fbx"
+  },
+  {
+    "id": "calathea_orbifolia_01",
+    "page": "https://polyhaven.com/a/calathea_orbifolia_01",
+    "license": "CC0",
+    "maps": {
+      "nor_gl": "nor_gl.jpg",
+      "Alpha": "alpha.jpg",
+      "Diffuse": "diffuse.jpg"
+    },
+    "mesh": "https://dl.polyhaven.org/file/ph-assets/Models/fbx/1k/calathea_orbifolia_01/calathea_orbifolia_01_1k.fbx"
+  },
+  {
+    "id": "book_encyclopedia_set_01",
+    "page": "https://polyhaven.com/a/book_encyclopedia_set_01",
+    "license": "CC0",
+    "maps": {
+      "paper_nor_gl": "paper_nor_gl.jpg",
+      "cover_diff": "cover_diff.jpg",
+      "paper_diff": "paper_diff.jpg",
+      "cover_nor_gl": "cover_nor_gl.jpg"
+    },
+    "mesh": "https://dl.polyhaven.org/file/ph-assets/Models/fbx/1k/book_encyclopedia_set_01/book_encyclopedia_set_01_1k.fbx"
+  },
+  {
+    "id": "binder_notebook",
+    "page": "https://polyhaven.com/a/binder_notebook",
+    "license": "CC0",
+    "maps": {
+      "nor_gl": "nor_gl.jpg",
+      "Diffuse": "diffuse.jpg"
+    },
+    "mesh": "https://dl.polyhaven.org/file/ph-assets/Models/fbx/1k/binder_notebook/binder_notebook_1k.fbx"
+  },
+  {
+    "id": "sofa_03",
+    "page": "https://polyhaven.com/a/sofa_03",
+    "license": "CC0",
+    "maps": {
+      "nor_gl": "nor_gl.jpg",
+      "Diffuse": "diffuse.jpg"
+    },
+    "mesh": "https://dl.polyhaven.org/file/ph-assets/Models/fbx/1k/sofa_03/sofa_03_1k.fbx"
+  }
+]
