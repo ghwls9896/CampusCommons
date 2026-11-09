@@ -1,0 +1,43 @@
+name: Task
+description: 사람 담당자·수정 범위·완료 조건을 정하는 팀 작업
+title: "[영역] 구현할 결과"
+body:
+  - type: textarea
+    id: outcome
+    attributes:
+      label: 목표와 완료 조건
+      description: 작업 하나의 결과와 확인 방법을 적어 주세요.
+    validations:
+      required: true
+  - type: dropdown
+    id: owner
+    attributes:
+      label: 사람 담당자
+      options:
+        - HIGHCHOI
+        - Yeni-sjs
+        - ghwls9896
+        - GongBeak
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: 수정할 파일·폴더와 브랜치
+      description: 정확한 경로와 브랜치, task JSON 경로를 기록하세요. 담당자 dropdown 선택 후 실제 Assignee도 지정하세요.
+    validations:
+      required: true
+  - type: textarea
+    id: shared
+    attributes:
+      label: 공유 파일·의존 작업·조율
+      description: 공유 씬/Player/API 계약, 겹치는 Issue/PR, 순서와 담당자의 확인. 없으면 없음.
+    validations:
+      required: true
+  - type: textarea
+    id: verification
+    attributes:
+      label: 검증 계획
+      description: Unity 버전과 재현/테스트 절차. 외부 계정이 필요하면 변수 이름만 적으세요.
+    validations:
+      required: true
