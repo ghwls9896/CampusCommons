@@ -23,13 +23,17 @@
     "Assets/StudyImmersive/Resources/EscapeItemIcons/",
     "Assets/StudyImmersive/Resources/EscapeItemIcons.meta",
     "Assets/StudyImmersive/Resources/EscapePixels/",
-    "Assets/StudyImmersive/Resources/EscapePixels.meta"
+    "Assets/StudyImmersive/Resources/EscapePixels.meta",
+    "Assets/StudyImmersive/Scenes/GrandLibrary_Living.unity"
   ],
-  "shared_files": [],
+  "shared_files": [
+    "Assets/StudyImmersive/Scenes/GrandLibrary_Living.unity"
+  ],
   "depends_on": [],
   "validation": [
     "Unity 6000.4.5f1 컴파일 및 실제 Play Mode 검증",
     "탈출 입장·문제·몬스터·NPC·자판기·아이템·잠금·복귀 검사",
-    "python Tools/team/check.py --base origin/main"
+    "python Tools/team/check.py --base origin/main",
+    "101호 앞 엘리베이터 빈자리 시작 위치, 충돌·문제지·출구 경로 검사"
   ]
 }
