@@ -1,0 +1,294 @@
+PARENT Study Furniture
+ CHILD Study Table 01 active=True pos=(-3.40, 0.00, -0.30) childcount=1
+ CHILD Study Chair 01 active=True pos=(-4.12, 0.00, -1.23) childcount=1
+ CHILD Study Chair Seat 01 active=True pos=(-4.12, 0.50, -1.23) childcount=0
+ CHILD Study Chair 02 active=True pos=(-4.12, 0.00, 0.63) childcount=1
+ CHILD Study Chair Seat 02 active=True pos=(-4.12, 0.50, 0.63) childcount=0
+ CHILD Study Chair 03 active=True pos=(-2.68, 0.00, -1.23) childcount=1
+ CHILD Study Chair Seat 03 active=True pos=(-2.68, 0.50, -1.23) childcount=0
+ CHILD Study Chair 04 active=True pos=(-2.68, 0.00, 0.63) childcount=1
+ CHILD Study Chair Seat 04 active=True pos=(-2.68, 0.50, 0.63) childcount=0
+ CHILD Desk Lamp 01 active=True pos=(-3.40, 0.76, -0.30) childcount=1
+ CHILD Study Table 02 active=True pos=(3.40, 0.00, -0.30) childcount=1
+ CHILD Study Chair 05 active=True pos=(2.68, 0.00, -1.23) childcount=1
+ CHILD Study Chair Seat 05 active=True pos=(2.68, 0.50, -1.23) childcount=0
+ CHILD Study Chair 06 active=True pos=(2.68, 0.00, 0.63) childcount=1
+ CHILD Study Chair Seat 06 active=True pos=(2.68, 0.50, 0.63) childcount=0
+ CHILD Study Chair 07 active=True pos=(4.12, 0.00, -1.23) childcount=1
+ CHILD Study Chair Seat 07 active=True pos=(4.12, 0.50, -1.23) childcount=0
+ CHILD Study Chair 08 active=True pos=(4.12, 0.00, 0.63) childcount=1
+ CHILD Study Chair Seat 08 active=True pos=(4.12, 0.50, 0.63) childcount=0
+ CHILD Desk Lamp 02 active=True pos=(3.40, 0.76, -0.30) childcount=1
+ CHILD Study Table 03 active=True pos=(-3.40, 0.00, -6.45) childcount=1
+ CHILD Study Chair 09 active=True pos=(-4.12, 0.00, -7.38) childcount=1
+ CHILD Study Chair Seat 09 active=True pos=(-4.12, 0.50, -7.38) childcount=0
+ CHILD Study Chair 10 active=True pos=(-4.12, 0.00, -5.52) childcount=1
+ CHILD Study Chair Seat 10 active=True pos=(-4.12, 0.50, -5.52) childcount=0
+ CHILD Study Chair 11 active=True pos=(-2.68, 0.00, -7.38) childcount=1
+ CHILD Study Chair Seat 11 active=True pos=(-2.68, 0.50, -7.38) childcount=0
+ CHILD Study Chair 12 active=True pos=(-2.68, 0.00, -5.52) childcount=1
+ CHILD Study Chair Seat 12 active=True pos=(-2.68, 0.50, -5.52) childcount=0
+ CHILD Desk Lamp 03 active=True pos=(-3.40, 0.76, -6.45) childcount=1
+ CHILD Study Table 04 active=True pos=(3.40, 0.00, -6.45) childcount=1
+ CHILD Study Chair 13 active=True pos=(2.68, 0.00, -7.38) childcount=1
+ CHILD Study Chair Seat 13 active=True pos=(2.68, 0.50, -7.38) childcount=0
+ CHILD Study Chair 14 active=True pos=(2.68, 0.00, -5.52) childcount=1
+ CHILD Study Chair Seat 14 active=True pos=(2.68, 0.50, -5.52) childcount=0
+ CHILD Study Chair 15 active=True pos=(4.12, 0.00, -7.38) childcount=1
+ CHILD Study Chair Seat 15 active=True pos=(4.12, 0.50, -7.38) childcount=0
+ CHILD Study Chair 16 active=True pos=(4.12, 0.00, -5.52) childcount=1
+ CHILD Study Chair Seat 16 active=True pos=(4.12, 0.50, -5.52) childcount=0
+ CHILD Desk Lamp 04 active=True pos=(3.40, 0.76, -6.45) childcount=1
+ CHILD Study Table 05 active=True pos=(-3.40, 0.00, 5.85) childcount=1
+ CHILD Study Chair 17 active=True pos=(-4.12, 0.00, 4.92) childcount=1
+ CHILD Study Chair Seat 17 active=True pos=(-4.12, 0.50, 4.92) childcount=0
+ CHILD Study Chair 18 active=True pos=(-4.12, 0.00, 6.78) childcount=1
+ CHILD Study Chair Seat 18 active=True pos=(-4.12, 0.50, 6.78) childcount=0
+ CHILD Study Chair 19 active=True pos=(-2.68, 0.00, 4.92) childcount=1
+ CHILD Study Chair Seat 19 active=True pos=(-2.68, 0.50, 4.92) childcount=0
+ CHILD Study Chair 20 active=True pos=(-2.68, 0.00, 6.78) childcount=1
+ CHILD Study Chair Seat 20 active=True pos=(-2.68, 0.50, 6.78) childcount=0
+ CHILD Desk Lamp 05 active=True pos=(-3.40, 0.76, 5.85) childcount=1
+ CHILD Study Table 06 active=True pos=(3.40, 0.00, 5.85) childcount=1
+ CHILD Study Chair 21 active=True pos=(2.68, 0.00, 4.92) childcount=1
+ CHILD Study Chair Seat 21 active=True pos=(2.68, 0.50, 4.92) childcount=0
+ CHILD Study Chair 22 active=True pos=(2.68, 0.00, 6.78) childcount=1
+ CHILD Study Chair Seat 22 active=True pos=(2.68, 0.50, 6.78) childcount=0
+ CHILD Study Chair 23 active=True pos=(4.12, 0.00, 4.92) childcount=1
+ CHILD Study Chair Seat 23 active=True pos=(4.12, 0.50, 4.92) childcount=0
+ CHILD Study Chair 24 active=True pos=(4.12, 0.00, 6.78) childcount=1
+ CHILD Study Chair Seat 24 active=True pos=(4.12, 0.50, 6.78) childcount=0
+ CHILD Desk Lamp 06 active=True pos=(3.40, 0.76, 5.85) childcount=1
+PARENT Lounge Furniture
+ CHILD Sofa 01 active=True pos=(-9.00, 0.00, -6.75) childcount=1
+ CHILD Coffee Table 01 active=True pos=(-9.00, 0.00, -5.00) childcount=1
+ CHILD Lounge Chair 01 active=True pos=(-10.65, 0.00, -4.25) childcount=1
+ CHILD Lounge Chair Seat 01 active=True pos=(-10.65, 0.61, -4.25) childcount=0
+ CHILD Lounge Chair 02 active=True pos=(-7.35, 0.00, -4.25) childcount=1
+ CHILD Lounge Chair Seat 02 active=True pos=(-7.35, 0.61, -4.25) childcount=0
+ CHILD Sofa Seat 01 active=True pos=(-9.80, 0.62, -6.75) childcount=0
+ CHILD Sofa Seat 02 active=True pos=(-9.00, 0.62, -6.75) childcount=0
+ CHILD Sofa Seat 03 active=True pos=(-8.20, 0.62, -6.75) childcount=0
+ CHILD Sofa 02 active=True pos=(-9.00, 0.00, 1.25) childcount=2
+ CHILD Coffee Table 02 active=True pos=(-9.00, 0.00, 3.00) childcount=1
+ CHILD Lounge Chair 03 active=True pos=(-10.65, 0.00, 3.75) childcount=1
+ CHILD Lounge Chair Seat 03 active=True pos=(-10.65, 0.61, 3.75) childcount=0
+ CHILD Lounge Chair 04 active=True pos=(-7.35, 0.00, 3.75) childcount=1
+ CHILD Lounge Chair Seat 04 active=True pos=(-7.35, 0.61, 3.75) childcount=0
+ CHILD Sofa Seat 04 active=True pos=(-9.80, 0.62, 1.25) childcount=0
+ CHILD Sofa Seat 05 active=True pos=(-9.00, 0.62, 1.25) childcount=0
+ CHILD Sofa Seat 06 active=True pos=(-8.20, 0.62, 1.25) childcount=0
+ CHILD Sofa 03 active=True pos=(9.00, 0.00, -6.75) childcount=1
+ CHILD Coffee Table 03 active=True pos=(9.00, 0.00, -5.00) childcount=1
+ CHILD Lounge Chair 05 active=True pos=(7.35, 0.00, -4.25) childcount=1
+ CHILD Lounge Chair Seat 05 active=True pos=(7.35, 0.61, -4.25) childcount=0
+ CHILD Lounge Chair 06 active=True pos=(10.65, 0.00, -4.25) childcount=1
+ CHILD Lounge Chair Seat 06 active=True pos=(10.65, 0.61, -4.25) childcount=0
+ CHILD Sofa Seat 07 active=True pos=(8.20, 0.62, -6.75) childcount=0
+ CHILD Sofa Seat 08 active=True pos=(9.00, 0.62, -6.75) childcount=0
+ CHILD Sofa Seat 09 active=True pos=(9.80, 0.62, -6.75) childcount=0
+ CHILD Sofa 04 active=True pos=(9.00, 0.00, 1.25) childcount=2
+ CHILD Coffee Table 04 active=True pos=(9.00, 0.00, 3.00) childcount=1
+ CHILD Lounge Chair 07 active=True pos=(7.35, 0.00, 3.75) childcount=1
+ CHILD Lounge Chair Seat 07 active=True pos=(7.35, 0.61, 3.75) childcount=0
+ CHILD Lounge Chair 08 active=True pos=(10.65, 0.00, 3.75) childcount=1
+ CHILD Lounge Chair Seat 08 active=True pos=(10.65, 0.61, 3.75) childcount=0
+ CHILD Sofa Seat 10 active=True pos=(8.20, 0.62, 1.25) childcount=0
+ CHILD Sofa Seat 11 active=True pos=(9.00, 0.62, 1.25) childcount=0
+ CHILD Sofa Seat 12 active=True pos=(9.80, 0.62, 1.25) childcount=0
+ CHILD Bookcase 01 active=True pos=(-8.00, 0.00, -16.10) childcount=1
+ CHILD Bookcase 02 active=True pos=(8.00, 0.00, -16.10) childcount=1
+ CHILD Pendant lamp active=True pos=(-11.00, 10.60, -5.00) childcount=1
+ CHILD Pendant lamp active=True pos=(-11.00, 10.60, 8.00) childcount=1
+ CHILD Pendant lamp active=True pos=(11.00, 10.60, -5.00) childcount=1
+ CHILD Pendant lamp active=True pos=(11.00, 10.60, 8.00) childcount=1
+PARENT Mafia Furniture
+ CHILD Mafia Chair 01 active=True pos=(100.00, 0.00, 4.55) childcount=1
+ CHILD Mafia Seat 01 active=True pos=(100.00, 0.50, 4.55) childcount=0
+ CHILD Mafia Chair 02 active=True pos=(102.09, 0.00, 3.87) childcount=1
+ CHILD Mafia Seat 02 active=True pos=(102.09, 0.50, 3.87) childcount=0
+ CHILD Mafia Chair 03 active=True pos=(103.38, 0.00, 2.10) childcount=1
+ CHILD Mafia Seat 03 active=True pos=(103.38, 0.50, 2.10) childcount=0
+ CHILD Mafia Chair 04 active=True pos=(103.38, 0.00, -0.10) childcount=1
+ CHILD Mafia Seat 04 active=True pos=(103.38, 0.50, -0.10) childcount=0
+ CHILD Mafia Chair 05 active=True pos=(102.09, 0.00, -1.87) childcount=1
+ CHILD Mafia Seat 05 active=True pos=(102.09, 0.50, -1.87) childcount=0
+ CHILD Mafia Chair 06 active=True pos=(100.00, 0.00, -2.55) childcount=1
+ CHILD Mafia Seat 06 active=True pos=(100.00, 0.50, -2.55) childcount=0
+ CHILD Mafia Chair 07 active=True pos=(97.91, 0.00, -1.87) childcount=1
+ CHILD Mafia Seat 07 active=True pos=(97.91, 0.50, -1.87) childcount=0
+ CHILD Mafia Chair 08 active=True pos=(96.62, 0.00, -0.10) childcount=1
+ CHILD Mafia Seat 08 active=True pos=(96.62, 0.50, -0.10) childcount=0
+ CHILD Mafia Chair 09 active=True pos=(96.62, 0.00, 2.10) childcount=1
+ CHILD Mafia Seat 09 active=True pos=(96.62, 0.50, 2.10) childcount=0
+ CHILD Mafia Chair 10 active=True pos=(97.91, 0.00, 3.87) childcount=1
+ CHILD Mafia Seat 10 active=True pos=(97.91, 0.50, 3.87) childcount=0
+ CHILD Mafia Ceiling Light active=True pos=(100.00, 3.55, 1.00) childcount=1
+PARENT Quiz Furniture
+ CHILD Quiz Desk 01 active=True pos=(197.20, 0.00, 1.80) childcount=1
+ CHILD Quiz Chair 01 active=True pos=(197.20, 0.00, 0.65) childcount=1
+ CHILD Quiz Seat 01 active=True pos=(197.20, 0.50, 0.65) childcount=0
+ CHILD Quiz Desk 02 active=True pos=(202.80, 0.00, 1.80) childcount=1
+ CHILD Quiz Chair 02 active=True pos=(202.80, 0.00, 0.65) childcount=1
+ CHILD Quiz Seat 02 active=True pos=(202.80, 0.50, 0.65) childcount=0
+ CHILD Quiz Ceiling Light active=True pos=(200.00, 3.55, 0.00) childcount=1
+PARENT Cafe and future shop
+ CHILD Walnut service counter active=True pos=(0.00, 0.50, 10.85) childcount=0
+ CHILD Counter stone worktop active=True pos=(0.00, 1.04, 10.85) childcount=0
+ CHILD Counter lower brass line active=True pos=(0.00, 0.12, 10.33) childcount=0
+ CHILD Counter inset panel active=True pos=(-2.20, 0.54, 10.34) childcount=0
+ CHILD Counter inset panel active=True pos=(-1.10, 0.54, 10.34) childcount=0
+ CHILD Counter inset panel active=True pos=(0.00, 0.54, 10.34) childcount=0
+ CHILD Counter inset panel active=True pos=(1.10, 0.54, 10.34) childcount=0
+ CHILD Counter inset panel active=True pos=(2.20, 0.54, 10.34) childcount=0
+ CHILD Cafe header active=True pos=(0.00, 2.95, 11.15) childcount=0
+ CHILD Cafe header gold top active=True pos=(0.00, 3.23, 11.15) childcount=0
+ CHILD Cafe title active=True pos=(0.00, 2.96, 11.06) childcount=0
+ CHILD Sign suspension left active=True pos=(-1.45, 3.64, 11.15) childcount=0
+ CHILD Sign suspension right active=True pos=(1.45, 3.64, 11.15) childcount=0
+ CHILD Imported coffee grinder active=True pos=(-1.80, 1.58, 10.84) childcount=0
+ CHILD Espresso machine housing active=False pos=(-0.55, 1.42, 10.87) childcount=0
+ CHILD Espresso machine top active=False pos=(-0.55, 1.78, 10.87) childcount=0
+ CHILD Espresso machine front active=False pos=(-0.55, 1.43, 10.57) childcount=0
+ CHILD Espresso drip tray active=False pos=(-0.55, 1.11, 10.52) childcount=0
+ CHILD Coffee group active=False pos=(-0.87, 1.42, 10.52) childcount=0
+ CHILD Portafilter handle active=False pos=(-0.87, 1.34, 10.42) childcount=0
+ CHILD Coffee group active=False pos=(-0.23, 1.42, 10.52) childcount=0
+ CHILD Portafilter handle active=False pos=(-0.23, 1.34, 10.42) childcount=0
+ CHILD Steam wand active=False pos=(0.16, 1.34, 10.53) childcount=0
+ CHILD Porcelain cup active=False pos=(0.65, 1.14, 10.85) childcount=0
+ CHILD Porcelain cup active=False pos=(0.87, 1.14, 10.85) childcount=0
+ CHILD Porcelain cup active=False pos=(1.09, 1.14, 10.85) childcount=0
+ CHILD Porcelain cup active=False pos=(1.31, 1.14, 10.85) childcount=0
+ CHILD Menu board active=True pos=(1.85, 1.55, 10.85) childcount=0
+ CHILD Menu slate active=True pos=(1.85, 1.55, 10.79) childcount=0
+ CHILD Menu heading active=True pos=(1.85, 1.68, 10.76) childcount=0
+ CHILD Menu detail active=True pos=(1.85, 1.46, 10.76) childcount=0
+ CHILD Costume display base active=True pos=(4.05, 0.42, 10.65) childcount=0
+ CHILD Costume display top active=True pos=(4.05, 0.86, 10.65) childcount=0
+ CHILD Display rail active=True pos=(4.05, 2.03, 10.68) childcount=0
+ CHILD Display post left active=True pos=(3.60, 1.47, 10.68) childcount=0
+ CHILD Display post right active=True pos=(4.50, 1.47, 10.68) childcount=0
+ CHILD Shop plaque active=True pos=(4.05, 1.21, 10.24) childcount=0
+ CHILD Shop label active=True pos=(4.05, 1.21, 10.19) childcount=0
+ CHILD Staff interaction anchor - connect NPC here active=True pos=(0.40, 0.00, 11.70) childcount=0
+ CHILD Shop interaction anchor - connect catalogue here active=True pos=(4.05, 0.00, 9.60) childcount=0
+ CHILD Cafe warm light active=True pos=(0.00, 3.20, 10.50) childcount=0
+ CHILD Cafe detailed props active=True pos=(0.00, 0.00, 0.00) childcount=19
+PARENT Cafe and doorway update
+ CHILD Glazed atrium and roof ribs active=True pos=(0.00, 0.00, 0.00) childcount=141
+ CHILD Chandelier suspension active=True pos=(0.00, 17.25, 0.00) childcount=0
+ CHILD Victorian chandelier active=True pos=(-4.63, 11.64, -2.38) childcount=0
+ CHILD Victorian chandelier warm light active=True pos=(0.00, 10.80, 0.00) childcount=0
+ CHILD MAFIA entrance active=True pos=(14.00, 0.00, -5.50) childcount=7
+ CHILD QUIZ entrance active=True pos=(14.00, 0.00, 0.00) childcount=7
+ CHILD ESCAPE entrance active=True pos=(14.00, 0.00, 5.50) childcount=7
+ CHILD Round rug beneath Study Table 01 active=True pos=(-3.40, 0.02, -0.30) childcount=1
+ CHILD Round rug beneath Study Table 02 active=True pos=(3.40, 0.02, -0.30) childcount=1
+ CHILD Round rug beneath Study Table 03 active=True pos=(-3.40, 0.02, -6.45) childcount=1
+ CHILD Round rug beneath Study Table 04 active=True pos=(3.40, 0.02, -6.45) childcount=1
+ CHILD Round rug beneath Study Table 05 active=True pos=(-3.40, 0.02, 5.85) childcount=1
+ CHILD Round rug beneath Study Table 06 active=True pos=(3.40, 0.02, 5.85) childcount=1
+ CHILD Grey cafe rug active=True pos=(0.00, 0.02, 8.80) childcount=0
+ CHILD Cafe and future shop active=True pos=(0.00, 0.00, 0.00) childcount=42
+LOUNGE_RUG mesh=LIB_Library__rug__DETAIL transform=(0.830, 0.000, 0.000) renderer=True
+ RUG_QUARTER 0 triangles=196 bounds=(-8.170, 0.018, -5.000)/(5.700, 0.035, 5.700)
+ RUG_QUARTER 1 triangles=196 bounds=(9.830, 0.018, -5.000)/(5.700, 0.035, 5.700)
+ RUG_QUARTER 2 triangles=196 bounds=(-8.170, 0.018, 3.000)/(5.700, 0.035, 5.700)
+ RUG_QUARTER 3 triangles=196 bounds=(9.830, 0.018, 3.000)/(5.700, 0.035, 5.700)
+TABLE 1 center=498.5,-23.25 alongZ=False triangles=36 bounds=(498.50, 0.62, -23.25)/(5.00, 0.34, 1.25) heights=0.45,0.48,0.50,0.53,0.71,0.74,0.76,0.79
+ RAY across=-0.58 School Structure 017@0.525;School Structure 043@0.000
+ RAY across=-0.45 School Structure 017@0.525;School Structure 043@0.000
+ RAY across=-0.2 School Structure 017@0.788;School Structure 043@0.000
+ RAY across=0 School Structure 017@0.788;School Structure 043@0.000
+ RAY across=0.2 School Structure 017@0.788;School Structure 043@0.000
+ RAY across=0.45 School Structure 017@0.525;School Structure 043@0.000
+ RAY across=0.58 School Structure 017@0.525;School Structure 043@0.000
+TABLE 2 center=506.25,-23.25 alongZ=False triangles=36 bounds=(506.25, 0.62, -23.25)/(5.00, 0.34, 1.25) heights=0.45,0.48,0.50,0.53,0.71,0.74,0.76,0.79
+ RAY across=-0.58 School Structure 017@0.525;School Structure 004@0.000
+ RAY across=-0.45 School Structure 017@0.525;School Structure 004@0.000
+ RAY across=-0.2 School Structure 017@0.788;School Structure 004@0.000
+ RAY across=0 School Structure 017@0.788;School Structure 004@0.000
+ RAY across=0.2 School Structure 017@0.788;School Structure 004@0.000
+ RAY across=0.45 School Structure 017@0.525;School Structure 004@0.000
+ RAY across=0.58 School Structure 017@0.525;School Structure 004@0.000
+TABLE 3 center=513.25,-23.25 alongZ=False triangles=36 bounds=(513.25, 0.62, -23.25)/(5.00, 0.34, 1.25) heights=0.45,0.48,0.50,0.53,0.71,0.74,0.76,0.79
+ RAY across=-0.58 School Structure 017@0.525;School Structure 048@0.000
+ RAY across=-0.45 School Structure 017@0.525;School Structure 048@0.000
+ RAY across=-0.2 School Structure 017@0.788;School Structure 048@0.000
+ RAY across=0 School Structure 017@0.788;School Structure 048@0.000
+ RAY across=0.2 School Structure 017@0.788;School Structure 048@0.000
+ RAY across=0.45 School Structure 017@0.525;School Structure 048@0.000
+ RAY across=0.58 School Structure 017@0.525;School Structure 048@0.000
+TABLE 4 center=508.5,-28.5 alongZ=True triangles=36 bounds=(508.50, 0.62, -28.50)/(1.25, 0.34, 5.00) heights=0.45,0.48,0.50,0.53,0.71,0.74,0.76,0.79
+ RAY across=-0.58 School Structure 017@0.525;School Structure 004@0.000
+ RAY across=-0.45 School Structure 017@0.525;School Structure 004@0.000
+ RAY across=-0.2 School Structure 017@0.788;School Structure 004@0.000
+ RAY across=0 School Structure 017@0.788;School Structure 004@0.000
+ RAY across=0.2 School Structure 017@0.788;School Structure 004@0.000
+ RAY across=0.45 School Structure 017@0.525;School Structure 048@0.000
+ RAY across=0.58 School Structure 017@0.525;School Structure 048@0.000
+TABLE 5 center=513.5,-28.5 alongZ=True triangles=36 bounds=(513.50, 0.62, -28.50)/(1.25, 0.34, 5.00) heights=0.45,0.48,0.50,0.53,0.71,0.74,0.76,0.79
+ RAY across=-0.58 School Structure 017@0.525;School Structure 048@0.000
+ RAY across=-0.45 School Structure 017@0.525;School Structure 048@0.000
+ RAY across=-0.2 School Structure 017@0.788;School Structure 048@0.000
+ RAY across=0 School Structure 017@0.788;School Structure 048@0.000
+ RAY across=0.2 School Structure 017@0.788;School Structure 048@0.000
+ RAY across=0.45 School Structure 017@0.525;School Structure 048@0.000
+ RAY across=0.58 School Structure 017@0.525;School Structure 048@0.000
+TABLE 6 center=513.5,-35 alongZ=True triangles=36 bounds=(513.50, 0.62, -35.00)/(1.25, 0.34, 5.00) heights=0.45,0.48,0.50,0.53,0.71,0.74,0.76,0.79
+ RAY across=-0.58 School Structure 017@0.525;School Structure 048@0.000
+ RAY across=-0.45 School Structure 017@0.525;School Structure 048@0.000
+ RAY across=-0.2 School Structure 017@0.787;School Structure 048@0.000
+ RAY across=0 School Structure 017@0.787;School Structure 048@0.000
+ RAY across=0.2 School Structure 017@0.787;School Structure 048@0.000
+ RAY across=0.45 School Structure 017@0.525;School Structure 048@0.000
+ RAY across=0.58 School Structure 017@0.525;School Structure 048@0.000
+TABLE 7 center=500.75,-35 alongZ=True triangles=36 bounds=(500.75, 0.62, -35.00)/(1.25, 0.34, 5.00) heights=0.45,0.48,0.50,0.53,0.71,0.74,0.76,0.79
+ RAY across=-0.58 School Structure 017@0.525;School Structure 043@0.000
+ RAY across=-0.45 School Structure 017@0.525;School Structure 043@0.000
+ RAY across=-0.2 School Structure 017@0.787;School Structure 043@0.000
+ RAY across=0 School Structure 017@0.787;School Structure 043@0.000
+ RAY across=0.2 School Structure 017@0.787;School Structure 043@0.000
+ RAY across=0.45 School Structure 017@0.525;School Structure 043@0.000
+ RAY across=0.58 School Structure 017@0.525;School Structure 000@0.000
+TABLE 8 center=505.75,-32 alongZ=False triangles=36 bounds=(505.75, 0.62, -32.00)/(5.00, 0.34, 1.25) heights=0.45,0.48,0.50,0.53,0.71,0.74,0.76,0.79
+ RAY across=-0.58 School Structure 017@0.525;School Structure 004@0.000
+ RAY across=-0.45 School Structure 017@0.525;School Structure 004@0.000
+ RAY across=-0.2 School Structure 017@0.787;School Structure 004@0.000
+ RAY across=0 School Structure 017@0.787;School Structure 004@0.000
+ RAY across=0.2 School Structure 017@0.787;School Structure 004@0.000
+ RAY across=0.45 School Structure 017@0.525;School Structure 004@0.000
+ RAY across=0.58 School Structure 017@0.525;School Structure 004@0.000
+TABLE 9 center=521.25,-35 alongZ=False triangles=36 bounds=(521.25, 0.62, -35.00)/(5.00, 0.34, 1.25) heights=0.45,0.48,0.50,0.53,0.71,0.74,0.76,0.79
+ RAY across=-0.58 School Structure 017@0.525;School Structure 048@0.000
+ RAY across=-0.45 School Structure 017@0.525;School Structure 048@0.000
+ RAY across=-0.2 School Structure 017@0.787;School Structure 048@0.000
+ RAY across=0 School Structure 017@0.787;School Structure 048@0.000
+ RAY across=0.2 School Structure 017@0.787;School Structure 048@0.000
+ RAY across=0.45 School Structure 017@0.525;School Structure 048@0.000
+ RAY across=0.58 School Structure 017@0.525;School Structure 048@0.000
+TABLE 10 center=519,-26.25 alongZ=False triangles=36 bounds=(519.00, 0.62, -26.25)/(5.00, 0.34, 1.25) heights=0.45,0.48,0.50,0.53,0.71,0.74,0.76,0.79
+ RAY across=-0.58 School Structure 017@0.525;School Structure 048@0.000
+ RAY across=-0.45 School Structure 017@0.525;School Structure 048@0.000
+ RAY across=-0.2 School Structure 017@0.788;School Structure 048@0.000
+ RAY across=0 School Structure 017@0.788;School Structure 048@0.000
+ RAY across=0.2 School Structure 017@0.788;School Structure 048@0.000
+ RAY across=0.45 School Structure 017@0.525;School Structure 048@0.000
+ RAY across=0.58 School Structure 017@0.525;School Structure 048@0.000
+TABLE 11 center=518.75,-23.25 alongZ=False triangles=36 bounds=(518.75, 0.62, -23.25)/(5.00, 0.34, 1.25) heights=0.45,0.48,0.50,0.53,0.71,0.74,0.76,0.79
+ RAY across=-0.58 School Structure 017@0.525;School Structure 048@0.000
+ RAY across=-0.45 School Structure 017@0.525;School Structure 048@0.000
+ RAY across=-0.2 School Structure 017@0.788;School Structure 048@0.000
+ RAY across=0 School Structure 017@0.788;School Structure 048@0.000
+ RAY across=0.2 School Structure 017@0.788;School Structure 048@0.000
+ RAY across=0.45 School Structure 017@0.525;School Structure 048@0.000
+ RAY across=0.58 School Structure 017@0.525;School Structure 048@0.000
+TABLE 12 center=518,-21.5 alongZ=False triangles=36 bounds=(518.00, 0.62, -21.50)/(5.00, 0.34, 1.25) heights=0.45,0.48,0.50,0.53,0.71,0.74,0.76,0.79
+ RAY across=-0.58 School Structure 017@0.525;School Structure 048@0.000
+ RAY across=-0.45 School Structure 017@0.525;School Structure 048@0.000
+ RAY across=-0.2 School Structure 017@0.788;School Structure 048@0.000
+ RAY across=0 School Structure 017@0.788;School Structure 048@0.000
+ RAY across=0.2 School Structure 017@0.788;School Structure 048@0.000
+ RAY across=0.45 School Structure 017@0.525;School Structure 048@0.000
+ RAY across=0.58 School Structure 017@0.525;School Structure 048@0.000

@@ -1,0 +1,24 @@
+DESK 0 (487.75, 0.00, 35.00)
+DIR (-1.00, 0.00, 0.00) School Structure 062 point=(486.25, 1.85, 35.00) normal=(1.00, 0.00, 0.00) dist=1.50
+DIR (1.00, 0.00, 0.00) School Structure 051 point=(498.75, 1.85, 35.00) normal=(-1.00, 0.00, 0.00) dist=11.00
+DIR (0.00, 0.00, 1.00) School Structure 051 point=(487.75, 1.85, 40.00) normal=(0.00, 0.00, -1.00) dist=5.00
+DIR (0.00, 0.00, -1.00) School Structure 051 point=(487.75, 1.85, 30.00) normal=(0.00, 0.00, 1.00) dist=5.00
+DESK 1 (510.50, 0.00, 35.00)
+DIR (-1.00, 0.00, 0.00) School Structure 052 point=(501.25, 1.85, 35.00) normal=(1.00, 0.00, 0.00) dist=9.25
+DIR (1.00, 0.00, 0.00) School Structure 051 point=(513.75, 1.85, 35.00) normal=(-1.00, 0.00, 0.00) dist=3.25
+DIR (0.00, 0.00, 1.00) School Structure 051 point=(510.50, 1.85, 40.00) normal=(0.00, 0.00, -1.00) dist=5.00
+DIR (0.00, 0.00, -1.00) School Structure 051 point=(510.50, 1.85, 30.00) normal=(0.00, 0.00, 1.00) dist=5.00
+DESK 2 (489.50, 0.00, 16.25)
+DIR (-1.00, 0.00, 0.00) School Structure 025 point=(486.25, 1.85, 16.25) normal=(1.00, 0.00, 0.00) dist=3.25
+DIR (1.00, 0.00, 0.00) School Structure 051 point=(498.75, 1.85, 16.25) normal=(-1.00, 0.00, 0.00) dist=9.25
+DIR (0.00, 0.00, 1.00) School Structure 051 point=(489.50, 1.85, 22.50) normal=(0.00, 0.00, -1.00) dist=6.25
+DIR (0.00, 0.00, -1.00) School Structure 051 point=(489.50, 1.85, 10.00) normal=(0.00, 0.00, 1.00) dist=6.25
+DESK 3 (490.00, 0.00, 1.25)
+DIR (1.00, 0.00, 0.00) School Structure 058 point=(491.25, 1.85, 1.25) normal=(-1.00, 0.00, 0.00) dist=1.25
+DIR (0.00, 0.00, 1.00) School Structure 051 point=(490.00, 1.85, 7.50) normal=(0.00, 0.00, -1.00) dist=6.25
+DIR (0.00, 0.00, -1.00) School Structure 051 point=(490.00, 1.85, -5.00) normal=(0.00, 0.00, 1.00) dist=6.25
+DESK 4 (514.75, 0.00, -12.50)
+DIR (-1.00, 0.00, 0.00) School Structure 051 point=(503.75, 1.85, -12.50) normal=(1.00, 0.00, 0.00) dist=11.00
+DIR (1.00, 0.00, 0.00) School Structure 060 point=(516.25, 1.85, -12.50) normal=(-1.00, 0.00, 0.00) dist=1.50
+DIR (0.00, 0.00, 1.00) School Structure 051 point=(514.75, 1.85, -7.50) normal=(0.00, 0.00, -1.00) dist=5.00
+DIR (0.00, 0.00, -1.00) School Structure 051 point=(514.75, 1.85, -17.50) normal=(0.00, 0.00, 1.00) dist=5.00

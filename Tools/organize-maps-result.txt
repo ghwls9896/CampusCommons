@@ -1,0 +1,4 @@
+PASS
+backup=Assets/LibraryCharacter/Backups/GrandLibrary_before_final_organization.unity
+originalObjects=4575
+reachable lobby cells=2337; cafe, three doors and study areas reachable

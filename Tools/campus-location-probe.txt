@@ -1,0 +1,22 @@
+scene=Assets/StudyImmersive/Scenes/GrandLibrary_Living.unity arrival=(475.00, 0.08, 41.00) yaw=90
+RAY 0 School Structure 051 p=(475.00, 2.15, 42.50) normal=(0.00, 0.00, -1.00) dist=1.50
+RAY 22.5 School Structure 051 p=(475.62, 2.15, 42.50) normal=(0.00, 0.00, -1.00) dist=1.62
+RAY 45 School Structure 051 p=(476.50, 2.15, 42.50) normal=(0.00, 0.00, -1.00) dist=2.12
+RAY 67.5 School Structure 051 p=(478.62, 2.15, 42.50) normal=(0.00, 0.00, -1.00) dist=3.92
+RAY 90 Left Gate Leaf p=(488.70, 2.15, 41.00) normal=(-1.00, 0.00, 0.00) dist=13.70
+RAY 112.5 School Structure 051 p=(477.41, 2.15, 40.00) normal=(0.00, 0.00, 1.00) dist=2.61
+RAY 135 School Structure 051 p=(476.00, 2.15, 40.00) normal=(0.00, 0.00, 1.00) dist=1.41
+RAY 157.5 School Structure 051 p=(475.41, 2.15, 40.00) normal=(0.00, 0.00, 1.00) dist=1.08
+RAY 180 School Structure 051 p=(475.00, 2.15, 40.00) normal=(0.00, 0.00, 1.00) dist=1.00
+RAY 202.5 School Structure 051 p=(474.59, 2.15, 40.00) normal=(0.00, 0.00, 1.00) dist=1.08
+RAY 202.5 School Structure 018 p=(471.25, 2.15, 31.95) normal=(1.00, 0.00, 0.00) dist=9.80
+RAY 225 School Structure 051 p=(474.00, 2.15, 40.00) normal=(0.00, 0.00, 1.00) dist=1.41
+RAY 225 School Structure 018 p=(471.25, 2.15, 37.25) normal=(1.00, 0.00, 0.00) dist=5.30
+RAY 247.5 School Structure 018 p=(471.25, 2.15, 39.45) normal=(1.00, 0.00, 0.00) dist=4.06
+RAY 270 School Structure 063 p=(471.25, 2.15, 41.00) normal=(1.00, 0.00, 0.00) dist=3.75
+RAY 292.5 School Structure 051 p=(471.38, 2.15, 42.50) normal=(0.00, 0.00, -1.00) dist=3.92
+RAY 315 School Structure 051 p=(473.50, 2.15, 42.50) normal=(0.00, 0.00, -1.00) dist=2.12
+RAY 337.5 School Structure 051 p=(474.38, 2.15, 42.50) normal=(0.00, 0.00, -1.00) dist=1.62
+POSTER School Structure 044 pos=(488.75, 1.25, -23.75) size=(20.00, 2.50, 37.50)
+POSTER School Structure 045 pos=(508.75, 1.25, 8.75) size=(20.00, 2.50, 57.50)
+POSTER School Structure 062 pos=(486.25, 1.25, 36.25) size=(0.00, 2.50, 2.50)

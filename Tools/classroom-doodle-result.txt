@@ -1,0 +1,5 @@
+PASS
+backup=Assets/LibraryCharacter/Backups/GrandLibrary_before_classroom_doodles.unity
+repeatedNoticeSurfacesRemoved=3
+classroomBoards=5
+celebrationNotices=1

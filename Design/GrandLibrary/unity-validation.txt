@@ -1,0 +1,5 @@
+PASS
+Unity 6000.4.5f1
+Play Mode: imported textured user school and safe arrival; realistic furniture; study chair distance; sitting and standing; two quiz seats; all three portal trips and returns; two-floor curved staircase.
+Editor Search batch-mode exception separately observed: False
+Multiplayer, quiz rules, mafia rules and classroom puzzle are not implemented or tested.

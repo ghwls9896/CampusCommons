@@ -1,0 +1,210 @@
+using UnityEngine;
+
+namespace CampusCommons.GrandLibrary
+{
+    [RequireComponent(typeof(CharacterController))]
+    public class LibraryPlayer : MonoBehaviour
+    {
+        public float walkSpeed = 4.0f, runSpeed = 6.0f;
+        public LibraryPortal.Space currentSpace = LibraryPortal.Space.Library;
+        CharacterController body;
+        Transform model, leftLeg, rightLeg, leftArm, rightArm;
+        Camera cameraView;
+        LibrarySeat[] seats;
+        LibrarySeat nearest, sitting;
+        Vector3 standPosition;
+        float yaw, pitch = 16, verticalSpeed, gait, portalReadyAt, arrivalTime;
+        bool waving;
+        float waveUntil;
+        Vector3 escapeRecovery;
+        GUIStyle title, detail, hint;
+
+        public static LibraryPlayer Create()
+        {
+            var go=new GameObject("Student - local player");
+            go.layer=2;
+            go.transform.position=new Vector3(0,.08f,-9.3f);
+            var controller=go.AddComponent<CharacterController>();
+            controller.height=1.8f; controller.center=new Vector3(0,.9f,0);
+            controller.radius=.29f; controller.stepOffset=.3f; controller.skinWidth=.025f;
+            return go.AddComponent<LibraryPlayer>();
+        }
+        void Start()
+        {
+            body=GetComponent<CharacterController>();
+            seats=FindObjectsByType<LibrarySeat>(FindObjectsSortMode.None);
+            BuildAvatar();
+            foreach (var c in FindObjectsByType<Camera>(FindObjectsSortMode.None)) c.enabled=false;
+            var cam=new GameObject("Player camera"); cam.tag="MainCamera";
+            cameraView=cam.AddComponent<Camera>(); cameraView.fieldOfView=62;
+            cameraView.nearClipPlane=.08f; cameraView.farClipPlane=100;
+            cameraView.clearFlags=CameraClearFlags.Skybox;
+            cameraView.backgroundColor=new Color(.45f,.52f,.56f);
+            if (!FindFirstObjectByType<AudioListener>()) cam.AddComponent<AudioListener>();
+            UpdateCamera(true);
+        }
+        Material Material(string name, Color color)
+        {
+            var material=new Material(Shader.Find("Standard")) { name=name, color=color };
+            material.SetFloat("_Glossiness",.14f); return material;
+        }
+        Transform Part(string name, PrimitiveType shape, Transform parent, Vector3 p, Vector3 scale, Material material)
+        {
+            var part=GameObject.CreatePrimitive(shape); part.name=name; part.layer=2;
+            part.transform.SetParent(parent,false); part.transform.localPosition=p; part.transform.localScale=scale;
+            Destroy(part.GetComponent<Collider>()); part.GetComponent<Renderer>().sharedMaterial=material;
+            return part.transform;
+        }
+        void BuildAvatar()
+        {
+            model=new GameObject("Student character").transform; model.SetParent(transform,false);
+            var skin=Material("Skin",new Color(.78f,.56f,.40f));
+            var shirt=Material("Sweater",new Color(.26f,.40f,.35f));
+            var pants=Material("Trousers",new Color(.17f,.19f,.20f));
+            var shoes=Material("Shoes",new Color(.78f,.75f,.68f));
+            var hair=Material("Hair",new Color(.10f,.08f,.07f));
+            Part("Body",PrimitiveType.Capsule,model,new Vector3(0,1.03f,0),new Vector3(.59f,.4f,.4f),shirt);
+            Part("Head",PrimitiveType.Sphere,model,new Vector3(0,1.56f,0),Vector3.one*.43f,skin);
+            Part("Hair",PrimitiveType.Sphere,model,new Vector3(0,1.7f,-.025f),new Vector3(.45f,.23f,.43f),hair);
+            for (int i=-1;i<=1;i+=2)
+            {
+                Part("Eye",PrimitiveType.Sphere,model,new Vector3(i*.075f,1.59f,.195f),Vector3.one*.034f,hair);
+                var leg=new GameObject(i<0?"Left leg":"Right leg").transform; leg.SetParent(model,false);
+                leg.localPosition=new Vector3(i*.15f,.72f,0);
+                Part("Trouser leg",PrimitiveType.Capsule,leg,new Vector3(0,-.3f,0),new Vector3(.23f,.30f,.23f),pants);
+                Part("Shoe",PrimitiveType.Cube,leg,new Vector3(0,-.62f,.07f),new Vector3(.25f,.13f,.38f),shoes);
+                var arm=new GameObject(i<0?"Left arm":"Right arm").transform; arm.SetParent(model,false);
+                arm.localPosition=new Vector3(i*.38f,1.23f,0);
+                Part("Sleeve",PrimitiveType.Capsule,arm,new Vector3(0,-.2f,0),new Vector3(.20f,.24f,.2f),shirt);
+                Part("Hand",PrimitiveType.Sphere,arm,new Vector3(0,-.44f,0),Vector3.one*.17f,skin);
+                if (i<0) { leftLeg=leg; leftArm=arm; } else { rightLeg=leg; rightArm=arm; }
+            }
+        }
+        void Update()
+        {
+            if (Input.GetMouseButton(1))
+            {
+                yaw+=Input.GetAxisRaw("Mouse X")*3;
+                pitch=Mathf.Clamp(pitch-Input.GetAxisRaw("Mouse Y")*2,8,60);
+            }
+            Cursor.visible=!Input.GetMouseButton(1);
+            Cursor.lockState=Input.GetMouseButton(1)?CursorLockMode.Locked:CursorLockMode.None;
+            nearest=null; float distance=1.65f;
+            foreach(var seat in seats)
+            {
+                if (seat.occupant) continue;
+                float d=Vector3.Distance(transform.position+Vector3.up*.6f,seat.transform.position);
+                if (d<distance) { nearest=seat; distance=d; }
+            }
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+                if (sitting) Stand(); else if (nearest) TrySit(nearest);
+            }
+            if (Input.GetKeyDown(KeyCode.R)) { waving=true; waveUntil=Time.time+2; }
+            if (Time.time>waveUntil) waving=false;
+            float x=(Input.GetKey(KeyCode.D)||Input.GetKey(KeyCode.RightArrow)?1:0)-(Input.GetKey(KeyCode.A)||Input.GetKey(KeyCode.LeftArrow)?1:0);
+            float z=(Input.GetKey(KeyCode.W)||Input.GetKey(KeyCode.UpArrow)?1:0)-(Input.GetKey(KeyCode.S)||Input.GetKey(KeyCode.DownArrow)?1:0);
+            Vector3 direction=Quaternion.Euler(0,yaw,0)*Vector3.ClampMagnitude(new Vector3(x,0,z),1);
+            if (sitting) direction=Vector3.zero;
+            if (!sitting)
+            {
+                if (body.isGrounded && verticalSpeed<0) verticalSpeed=-2;
+                verticalSpeed+=Physics.gravity.y*Time.deltaTime;
+                body.Move((direction*(Input.GetKey(KeyCode.LeftShift)?runSpeed:walkSpeed)+Vector3.up*verticalSpeed)*Time.deltaTime);
+                if (direction.sqrMagnitude>.01f) model.rotation=Quaternion.Slerp(model.rotation,Quaternion.LookRotation(direction),12*Time.deltaTime);
+                if (transform.position.y < -5) MoveTo(RecoveryPoint(),currentSpace,0);
+            }
+            gait+=Time.deltaTime*(Input.GetKey(KeyCode.LeftShift)?12:8);
+            float swing=direction.sqrMagnitude>.01f?Mathf.Sin(gait)*25:0;
+            leftLeg.localRotation=Quaternion.Euler(sitting?-75:swing,0,0);
+            rightLeg.localRotation=Quaternion.Euler(sitting?-75:-swing,0,0);
+            leftArm.localRotation=Quaternion.Euler(-swing*.7f,0,0);
+            rightArm.localRotation=waving?Quaternion.Euler(0,0,-140+Mathf.Sin(Time.time*14)*20):Quaternion.Euler(swing*.7f,0,0);
+        }
+        Vector3 RecoveryPoint()
+        {
+            if (currentSpace==LibraryPortal.Space.Mafia) return new Vector3(100,.08f,-5.1f);
+            if (currentSpace==LibraryPortal.Space.Quiz) return new Vector3(200,.08f,-5.1f);
+            if (currentSpace==LibraryPortal.Space.Escape) return escapeRecovery;
+            return new Vector3(0,.08f,-9.3f);
+        }
+        public bool TrySit(LibrarySeat seat)
+        {
+            if (!seat || seat.occupant || sitting || Vector3.Distance(transform.position+Vector3.up*.6f,seat.transform.position)>1.65f) return false;
+            standPosition=transform.position; sitting=seat; seat.occupant=this;
+            body.enabled=false; transform.position=seat.transform.position-Vector3.up*.72f;
+            model.rotation=seat.transform.rotation;
+            return true;
+        }
+        public void Stand()
+        {
+            if (!sitting) return;
+            sitting.occupant=null; sitting=null; transform.position=standPosition;
+            body.enabled=true; verticalSpeed=-2;
+        }
+        public bool TryUsePortal(LibraryPortal portal)
+        {
+            if (!portal || Time.time<portalReadyAt || sitting) return false;
+            portalReadyAt=Time.time+1.2f;
+            MoveTo(portal.arrivalPosition,portal.destination,portal.arrivalYaw);
+            return true;
+        }
+        void MoveTo(Vector3 position,LibraryPortal.Space space,float newYaw)
+        {
+            Stand(); body.enabled=false; transform.position=position; body.enabled=true;
+            if (space==LibraryPortal.Space.Escape) escapeRecovery=position;
+            verticalSpeed=-2; currentSpace=space; yaw=newYaw; arrivalTime=Time.time;
+            model.rotation=Quaternion.Euler(0,newYaw,0);
+            Physics.SyncTransforms();
+            UpdateCamera(true);
+        }
+        void LateUpdate() { UpdateCamera(false); }
+        void UpdateCamera(bool immediate)
+        {
+            if (!cameraView) return;
+            Vector3 target=transform.position+Vector3.up*1.35f;
+            Vector3 delta=Quaternion.Euler(pitch,yaw,0)*new Vector3(0,0,-5.4f);
+            float distance=delta.magnitude;
+            if (Physics.SphereCast(target,.18f,delta.normalized,out RaycastHit hit,distance,~(1<<2),QueryTriggerInteraction.Ignore))
+                distance=Mathf.Max(.4f,hit.distance-.14f);
+            Vector3 p=target+delta.normalized*distance;
+            cameraView.transform.position=immediate?p:Vector3.Lerp(cameraView.transform.position,p,1-Mathf.Exp(-14*Time.deltaTime));
+            cameraView.transform.LookAt(target);
+        }
+        void OnDestroy()
+        {
+            if (sitting) sitting.occupant=null;
+            Cursor.lockState=CursorLockMode.None; Cursor.visible=true;
+            if (cameraView) Destroy(cameraView.gameObject);
+        }
+        void MakeStyles()
+        {
+            if (title!=null) return;
+            title=new GUIStyle(GUI.skin.label){fontSize=20,fontStyle=FontStyle.Bold};
+            title.normal.textColor=new Color(.94f,.87f,.74f);
+            detail=new GUIStyle(GUI.skin.label){fontSize=13}; detail.normal.textColor=new Color(.86f,.82f,.73f);
+            hint=new GUIStyle(detail){fontSize=17,fontStyle=FontStyle.Bold};
+        }
+        static void Panel(Rect r,float alpha=.8f)
+        {
+            var old=GUI.color; GUI.color=new Color(.10f,.08f,.06f,alpha); GUI.DrawTexture(r,Texture2D.whiteTexture); GUI.color=old;
+        }
+        void OnGUI()
+        {
+            MakeStyles(); var previous=GUI.matrix;
+            float s=Mathf.Min(Screen.width/1280f,Screen.height/720f);
+            GUI.matrix=Matrix4x4.TRS(new Vector3((Screen.width-1280*s)*.5f,(Screen.height-720*s)*.5f,0),Quaternion.identity,Vector3.one*s);
+            Panel(new Rect(20,20,335,77));
+            GUI.Label(new Rect(36,27,310,28),"THE GRAND LIBRARY",title);
+            string room=currentSpace==LibraryPortal.Space.Library?"LOUNGE":currentSpace==LibraryPortal.Space.Mafia?"MAFIA ROOM":currentSpace==LibraryPortal.Space.Quiz?"QUIZ ROOM  /  1 VS 1":"ESCAPE ROOM";
+            GUI.Label(new Rect(36,60,310,24),room,detail);
+            Panel(new Rect(20,643,700,56));
+            GUI.Label(new Rect(34,650,670,20),"WASD  Move    SHIFT  Run    Hold right mouse  Look",detail);
+            GUI.Label(new Rect(34,675,670,20),"E  Sit / stand    R  Wave    Walk into an oval portal to travel",detail);
+            if (nearest || sitting) { Panel(new Rect(500,565,280,45)); GUI.Label(new Rect(518,575,250,28),sitting?"E   Stand up":"E   Sit down",hint); }
+            if (arrivalTime>0 && Time.time-arrivalTime<2.5f)
+            { Panel(new Rect(500,110,280,45)); GUI.Label(new Rect(518,120,250,25),"ARRIVED  /  "+room,hint); }
+            GUI.matrix=previous;
+        }
+    }
+}

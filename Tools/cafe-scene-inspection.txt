@@ -1,0 +1,51 @@
+SCENE Assets/StudyImmersive/Scenes/GrandLibrary_Living.unity dirty=True playing=False
+OBJ Lobby Metal Detail parent=Building active=True pos=(0.000, 0.000, 0.000) rot=(270.02, 0.00, 0.00) mesh=LIB_Library__brass__DETAIL asset=Assets/GrandLibrary/Models/GrandLibrary.fbx mat=brass/Standard col=-
+OBJ Lobby Metal Structure parent=Building active=True pos=(0.000, 0.000, 0.000) rot=(270.02, 0.00, 0.00) mesh=LIB_Library__brass__SOLID asset=Assets/GrandLibrary/Models/GrandLibrary.fbx mat=brass/Standard col=MeshCollider trigger=False
+OBJ Lobby Escape Portal Detail parent=Building active=True pos=(0.000, 0.000, 0.000) rot=(270.02, 0.00, 0.00) mesh=LIB_Library__portal_escape__DETAIL asset=Assets/GrandLibrary/Models/GrandLibrary.fbx mat=portal_escape/GrandLibrary/Portal col=-
+OBJ Lobby Mafia Portal Detail parent=Building active=True pos=(0.000, 0.000, 0.000) rot=(270.02, 0.00, 0.00) mesh=LIB_Library__portal_mafia__DETAIL asset=Assets/GrandLibrary/Models/GrandLibrary.fbx mat=portal_mafia/GrandLibrary/Portal col=-
+OBJ Lobby Quiz Portal Detail parent=Building active=True pos=(0.000, 0.000, 0.000) rot=(270.02, 0.00, 0.00) mesh=LIB_Library__portal_quiz__DETAIL asset=Assets/GrandLibrary/Models/GrandLibrary.fbx mat=portal_quiz/GrandLibrary/Portal col=-
+OBJ Lobby Stone Structure parent=Building active=True pos=(0.000, 0.000, 0.000) rot=(270.02, 0.00, 0.00) mesh=LIB_Library__stone__SOLID asset=Assets/GrandLibrary/Models/GrandLibrary.fbx mat=stone/Standard col=MeshCollider trigger=False
+OBJ Lobby Dark Wood Detail parent=Building active=True pos=(0.000, 0.000, 0.000) rot=(270.02, 0.00, 0.00) mesh=LIB_Library__wood_dark__DETAIL asset=Assets/GrandLibrary/Models/GrandLibrary.fbx mat=PrunedTimber/StudyImmersive/PrunedTimber col=-
+OBJ Mafia Metal Detail parent=Building active=True pos=(0.000, 0.000, 0.000) rot=(270.02, 0.00, 0.00) mesh=NoReturn_LIB_Mafia__brass__DETAIL asset=Assets/LibraryCharacter/Generated/NoReturn_LIB_Mafia__brass__DETAIL.asset mat=brass/Standard col=-
+OBJ Mafia Quiz Portal Detail parent=Building active=True pos=(0.000, 0.000, 0.000) rot=(270.02, 0.00, 0.00) mesh=LIB_Mafia__portal_quiz__DETAIL asset=Assets/GrandLibrary/Models/GrandLibrary.fbx mat=portal_quiz/GrandLibrary/Portal col=-
+OBJ Quiz Metal Detail parent=Building active=True pos=(0.000, 0.000, 0.000) rot=(270.02, 0.00, 0.00) mesh=LIB_Quiz__brass__DETAIL asset=Assets/GrandLibrary/Models/GrandLibrary.fbx mat=brass/Standard col=-
+OBJ Quiz Quiz Portal Detail parent=Building active=True pos=(0.000, 0.000, 0.000) rot=(270.02, 0.00, 0.00) mesh=LIB_Quiz__portal_quiz__DETAIL asset=Assets/GrandLibrary/Models/GrandLibrary.fbx mat=portal_quiz/GrandLibrary/Portal col=-
+OBJ LOUNGE sign parent=Old Return Portal (Hidden) active=False pos=(488.000, 1.920, 31.060) rot=(0.00, 180.00, 0.00) mesh=- asset=- mat=Font Material/GUI/Text Shader col=- TEXT=LOUNGE
+OBJ Mafia Portal parent=Portals active=True pos=(14.000, 0.000, -5.500) rot=(0.00, 90.00, 0.00) mesh=- asset=- mat=- col=BoxCollider trigger=True DEST=Mafia arrival=(100.00, 0.08, -5.10)
+OBJ Quiz Portal parent=Portals active=True pos=(14.000, 0.000, 0.000) rot=(0.00, 90.00, 0.00) mesh=- asset=- mat=- col=BoxCollider trigger=True DEST=Quiz arrival=(200.00, 0.08, -5.10)
+OBJ Escape Portal parent=Portals active=True pos=(14.000, 0.000, 5.500) rot=(0.00, 90.00, 0.00) mesh=- asset=- mat=- col=BoxCollider trigger=True ESCAPE
+OBJ Mafia Sign parent=Portals active=True pos=(13.840, 4.450, -5.500) rot=(0.00, 90.00, 0.00) mesh=- asset=- mat=Font Material/GUI/Text Shader col=- TEXT=MAFIA
+OBJ Quiz Sign parent=Portals active=True pos=(13.840, 4.450, 0.000) rot=(0.00, 90.00, 0.00) mesh=- asset=- mat=Font Material/GUI/Text Shader col=- TEXT=QUIZ  1 VS 1
+OBJ Escape Sign parent=Portals active=True pos=(13.840, 4.450, 5.500) rot=(0.00, 90.00, 0.00) mesh=- asset=- mat=Font Material/GUI/Text Shader col=- TEXT=ESCAPE ROOM
+OBJ Mafia Return Portal parent=Portals active=False pos=(100.000, 0.000, -8.100) rot=(0.00, 0.00, 0.00) mesh=- asset=- mat=- col=BoxCollider trigger=True DEST=Library arrival=(11.50, 0.08, -5.50)
+OBJ Quiz Return Portal parent=Portals active=False pos=(200.000, 0.000, -8.100) rot=(0.00, 0.00, 0.00) mesh=- asset=- mat=- col=BoxCollider trigger=True DEST=Library arrival=(11.50, 0.08, 0.00)
+OBJ Old Return Point (Hidden) parent=Portals active=False pos=(488.000, 0.000, 31.000) rot=(0.00, 0.00, 0.00) mesh=- asset=- mat=- col=BoxCollider trigger=True DEST=Library arrival=(11.50, 0.08, 5.50)
+OBJ Sign parent=Exit Door active=True pos=(473.760, 2.680, -33.125) rot=(0.00, 270.00, 0.00) mesh=- asset=- mat=Font Material/GUI/Text Shader col=- TEXT=EXIT
+OBJ Sign parent=Exit Door active=True pos=(473.740, 2.680, -33.125) rot=(0.00, 90.00, 0.00) mesh=- asset=- mat=Font Material/GUI/Text Shader col=- TEXT=EXIT
+OBJ Grand double-ring chandelier parent=Library interior update active=True pos=(0.000, 0.000, 0.000) rot=(0.00, 0.00, 0.00) mesh=- asset=- mat=- col=-
+ASSET door-wooden-door-metal/source/door wooden.fbx found=True
+  overall bounds center=(0.0000, -0.0054, -0.0001) size=(1.3399, 2.4552, 0.2057) renderers=2
+  قاب bounds=(0.000, -0.005, -0.016)/(1.340, 2.455, 0.135) mesh=قاب mats=Mat.1
+  قاب_1 bounds=(0.000, 0.000, 0.000)/(1.200, 2.300, 0.206) mesh=قاب_1 mats=Mat
+ASSET canarian-cafe-coffee-grinder/source/grinder-for export.fbx found=True
+  overall bounds center=(-0.0055, -0.9278, 0.1608) size=(1.8060, 3.7808, 2.1116) renderers=1
+  grinder-for export(Clone) bounds=(-0.006, -0.928, 0.161)/(1.806, 3.781, 2.112) mesh=beans_1 mats=Mat
+ASSET grey-carpet/source/extracted/model.fbx found=True
+  overall bounds center=(0.0000, 0.0000, 0.0585) size=(1.6824, 1.4025, 0.1171) renderers=1
+  model(Clone) bounds=(0.000, 0.000, 0.059)/(1.682, 1.402, 0.117) mesh=model mats=tex_u1_v1
+ASSET round-carpet/source/extracted/round-carpet.obj found=True
+  overall bounds center=(0.0000, 0.0757, 0.0000) size=(80.0000, 0.5211, 80.0000) renderers=1
+  default bounds=(0.000, 0.076, 0.000)/(80.000, 0.521, 80.000) mesh=default mats=contour,carpet_texture
+ASSET victorian-chandelier/source/lamparaTecho.fbx found=True
+  overall bounds center=(-18.5360, 14.8252, 36.3412) size=(4.7627, 5.3529, 4.7037) renderers=683
+  moldurasLamparaTecho:bombillaTecho1 bounds=(-17.337, 14.935, 35.126)/(0.394, 0.938, 0.394) mesh=moldurasLamparaTecho:bombillaTecho1 mats=lampara3D
+  moldurasLamparaTecho:bombillaTecho2 bounds=(-18.554, 15.883, 34.426)/(0.422, 0.938, 0.422) mesh=moldurasLamparaTecho:bombillaTecho2 mats=lampara3D
+  moldurasLamparaTecho:bombillaTecho3 bounds=(-16.622, 15.883, 36.325)/(0.422, 0.938, 0.422) mesh=moldurasLamparaTecho:bombillaTecho3 mats=lampara3D
+  moldurasLamparaTecho:bombillaTecho4 bounds=(-17.321, 14.935, 37.543)/(0.394, 0.938, 0.394) mesh=moldurasLamparaTecho:bombillaTecho4 mats=lampara3D
+  moldurasLamparaTecho:bombillaTecho5 bounds=(-18.520, 15.883, 38.252)/(0.422, 0.938, 0.422) mesh=moldurasLamparaTecho:bombillaTecho5 mats=lampara3D
+  moldurasLamparaTecho:bombillaTecho6 bounds=(-19.737, 14.935, 37.552)/(0.394, 0.938, 0.394) mesh=moldurasLamparaTecho:bombillaTecho6 mats=lampara3D
+  moldurasLamparaTecho:bombillaTecho7 bounds=(-20.452, 15.883, 36.356)/(0.422, 0.938, 0.422) mesh=moldurasLamparaTecho:bombillaTecho7 mats=lampara3D
+  moldurasLamparaTecho:bombillaTecho8 bounds=(-19.752, 14.935, 35.139)/(0.394, 0.938, 0.394) mesh=moldurasLamparaTecho:bombillaTecho8 mats=lampara3D
+ASSET victorian-chandelier/source/victorian_chandelier_optimized.fbx found=True
+  overall bounds center=(4.2638, 1.0697, 2.1981) size=(4.7627, 5.3529, 4.7037) renderers=1
+  victorian_chandelier_optimized(Clone) bounds=(4.264, 1.070, 2.198)/(4.763, 5.353, 4.704) mesh=VictorianChandelier_Combined mats=lampara3D

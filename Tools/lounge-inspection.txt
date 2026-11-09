@@ -1,0 +1,242 @@
+Scene Assets/StudyImmersive/Scenes/GrandLibrary_Living.unity dirty=False playing=False
+Lobby Metal Detail | parent=Building | active=True | pos=(0.00, 0.00, 0.00) | rot=(270.0, 0.0, 0.0) | scale=(100.00, 100.00, 100.00) | bounds=(0.00, 7.12, 0.00) / (36.57, 14.13, 38.34) | col=
+Mafia Metal Detail | parent=Building | active=True | pos=(0.00, 0.00, 0.00) | rot=(270.0, 0.0, 0.0) | scale=(100.00, 100.00, 100.00) | bounds=(100.00, 2.13, 0.25) / (14.04, 4.15, 16.90) | col=
+Quiz Metal Detail | parent=Building | active=True | pos=(0.00, 0.00, 0.00) | rot=(270.0, 0.0, 0.0) | scale=(100.00, 100.00, 100.00) | bounds=(0.00, 0.00, 0.00) / (0.00, 0.00, 0.00) | col=
+Sofa 01 | parent=Lounge Furniture | active=True | pos=(-9.00, 0.00, -6.75) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-9.00, 0.45, -6.75) / (3.00, 0.90, 1.05) | col=BoxCollider/True
+sofa_02 | parent=Sofa 01 | active=True | pos=(-9.00, 0.00, -6.66) | rot=(0.0, 0.0, 0.0) | scale=(1.66, 1.27, 1.28) | bounds=(-9.00, 0.45, -6.75) / (3.00, 0.90, 1.05) | col=
+sofa_02_Base | parent=sofa_02 | active=True | pos=(-9.00, 0.00, -6.62) | rot=(270.0, 0.0, 0.0) | scale=(166.01, 128.40, 126.85) | bounds=(-9.00, 0.45, -6.75) / (3.00, 0.90, 1.04) | col=
+sofa_02_Seat | parent=sofa_02 | active=True | pos=(-9.00, 0.00, -6.62) | rot=(270.0, 0.0, 0.0) | scale=(166.01, 128.40, 126.85) | bounds=(-9.00, 0.42, -6.56) / (2.35, 0.21, 0.68) | col=
+Coffee Table 01 | parent=Lounge Furniture | active=True | pos=(-9.00, 0.00, -5.00) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-9.00, 0.28, -5.00) / (1.50, 0.55, 1.50) | col=BoxCollider/True
+Lounge Chair 01 | parent=Lounge Furniture | active=True | pos=(-10.65, 0.00, -4.25) | rot=(0.0, 125.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-10.65, 0.49, -4.25) / (1.42, 0.98, 1.39) | col=BoxCollider/True
+Lounge Chair Seat 01 | parent=Lounge Furniture | active=True | pos=(-10.65, 0.61, -4.25) | rot=(0.0, 125.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-10.65, 0.61, -4.25) / (0.00, 0.00, 0.00) | col=
+Lounge Chair 02 | parent=Lounge Furniture | active=True | pos=(-7.35, 0.00, -4.25) | rot=(0.0, 235.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-7.35, 0.49, -4.25) / (1.42, 0.98, 1.39) | col=BoxCollider/True
+Lounge Chair Seat 02 | parent=Lounge Furniture | active=True | pos=(-7.35, 0.61, -4.25) | rot=(0.0, 235.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-7.35, 0.61, -4.25) / (0.00, 0.00, 0.00) | col=
+Sofa Seat 01 | parent=Lounge Furniture | active=True | pos=(-9.80, 0.62, -6.75) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-9.80, 0.62, -6.75) / (0.00, 0.00, 0.00) | col=
+Sofa Seat 02 | parent=Lounge Furniture | active=True | pos=(-9.00, 0.62, -6.75) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-9.00, 0.62, -6.75) / (0.00, 0.00, 0.00) | col=
+Sofa Seat 03 | parent=Lounge Furniture | active=True | pos=(-8.20, 0.62, -6.75) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-8.20, 0.62, -6.75) / (0.00, 0.00, 0.00) | col=
+Sofa 02 | parent=Lounge Furniture | active=True | pos=(-9.00, 0.00, 1.25) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-9.00, 0.63, 1.25) / (3.00, 1.27, 1.05) | col=BoxCollider/True
+sofa_02 | parent=Sofa 02 | active=False | pos=(-9.00, 0.00, 1.34) | rot=(0.0, 0.0, 0.0) | scale=(1.66, 1.27, 1.28) | bounds=(-9.00, 0.45, 1.25) / (3.00, 0.90, 1.05) | col=
+sofa_02_Base | parent=sofa_02 | active=False | pos=(-9.00, 0.00, 1.38) | rot=(270.0, 0.0, 0.0) | scale=(166.01, 128.40, 126.85) | bounds=(-9.00, 0.45, 1.25) / (3.00, 0.90, 1.04) | col=
+sofa_02_Seat | parent=sofa_02 | active=False | pos=(-9.00, 0.00, 1.38) | rot=(270.0, 0.0, 0.0) | scale=(166.01, 128.40, 126.85) | bounds=(-9.00, 0.42, 1.44) / (2.35, 0.21, 0.68) | col=
+Brown Sofa | parent=Sofa 02 | active=True | pos=(-9.00, 0.00, 1.25) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-9.00, 0.63, 1.25) / (3.00, 1.27, 0.79) | col=
+sofa_03 | parent=Brown Sofa | active=True | pos=(-9.00, 0.00, 1.25) | rot=(270.0, 0.0, 0.0) | scale=(109.84, 84.95, 113.50) | bounds=(-9.00, 0.63, 1.25) / (3.00, 1.27, 0.79) | col=
+Coffee Table 02 | parent=Lounge Furniture | active=True | pos=(-9.00, 0.00, 3.00) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-9.00, 0.28, 3.00) / (1.50, 0.55, 1.50) | col=BoxCollider/True
+Lounge Chair 03 | parent=Lounge Furniture | active=True | pos=(-10.65, 0.00, 3.75) | rot=(0.0, 125.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-10.65, 0.49, 3.75) / (1.42, 0.98, 1.39) | col=BoxCollider/True
+Lounge Chair Seat 03 | parent=Lounge Furniture | active=True | pos=(-10.65, 0.61, 3.75) | rot=(0.0, 125.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-10.65, 0.61, 3.75) / (0.00, 0.00, 0.00) | col=
+Lounge Chair 04 | parent=Lounge Furniture | active=True | pos=(-7.35, 0.00, 3.75) | rot=(0.0, 235.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-7.35, 0.49, 3.75) / (1.42, 0.98, 1.39) | col=BoxCollider/True
+Lounge Chair Seat 04 | parent=Lounge Furniture | active=True | pos=(-7.35, 0.61, 3.75) | rot=(0.0, 235.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-7.35, 0.61, 3.75) / (0.00, 0.00, 0.00) | col=
+Sofa Seat 04 | parent=Lounge Furniture | active=True | pos=(-9.80, 0.62, 1.25) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-9.80, 0.62, 1.25) / (0.00, 0.00, 0.00) | col=
+Sofa Seat 05 | parent=Lounge Furniture | active=True | pos=(-9.00, 0.62, 1.25) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-9.00, 0.62, 1.25) / (0.00, 0.00, 0.00) | col=
+Sofa Seat 06 | parent=Lounge Furniture | active=True | pos=(-8.20, 0.62, 1.25) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-8.20, 0.62, 1.25) / (0.00, 0.00, 0.00) | col=
+Sofa 03 | parent=Lounge Furniture | active=True | pos=(9.00, 0.00, -6.75) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(9.00, 0.45, -6.75) / (3.00, 0.90, 1.05) | col=BoxCollider/True
+sofa_02 | parent=Sofa 03 | active=True | pos=(9.00, 0.00, -6.66) | rot=(0.0, 0.0, 0.0) | scale=(1.66, 1.27, 1.28) | bounds=(9.00, 0.45, -6.75) / (3.00, 0.90, 1.05) | col=
+sofa_02_Base | parent=sofa_02 | active=True | pos=(9.00, 0.00, -6.62) | rot=(270.0, 0.0, 0.0) | scale=(166.01, 128.40, 126.85) | bounds=(9.00, 0.45, -6.75) / (3.00, 0.90, 1.04) | col=
+sofa_02_Seat | parent=sofa_02 | active=True | pos=(9.00, 0.00, -6.62) | rot=(270.0, 0.0, 0.0) | scale=(166.01, 128.40, 126.85) | bounds=(9.00, 0.42, -6.56) / (2.35, 0.21, 0.68) | col=
+Coffee Table 03 | parent=Lounge Furniture | active=True | pos=(9.00, 0.00, -5.00) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(9.00, 0.28, -5.00) / (1.50, 0.55, 1.50) | col=BoxCollider/True
+Lounge Chair 05 | parent=Lounge Furniture | active=True | pos=(7.35, 0.00, -4.25) | rot=(0.0, 125.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(7.35, 0.49, -4.25) / (1.42, 0.98, 1.39) | col=BoxCollider/True
+Lounge Chair Seat 05 | parent=Lounge Furniture | active=True | pos=(7.35, 0.61, -4.25) | rot=(0.0, 125.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(7.35, 0.61, -4.25) / (0.00, 0.00, 0.00) | col=
+Lounge Chair 06 | parent=Lounge Furniture | active=True | pos=(10.65, 0.00, -4.25) | rot=(0.0, 235.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(10.65, 0.49, -4.25) / (1.42, 0.98, 1.39) | col=BoxCollider/True
+Lounge Chair Seat 06 | parent=Lounge Furniture | active=True | pos=(10.65, 0.61, -4.25) | rot=(0.0, 235.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(10.65, 0.61, -4.25) / (0.00, 0.00, 0.00) | col=
+Sofa Seat 07 | parent=Lounge Furniture | active=True | pos=(8.20, 0.62, -6.75) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(8.20, 0.62, -6.75) / (0.00, 0.00, 0.00) | col=
+Sofa Seat 08 | parent=Lounge Furniture | active=True | pos=(9.00, 0.62, -6.75) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(9.00, 0.62, -6.75) / (0.00, 0.00, 0.00) | col=
+Sofa Seat 09 | parent=Lounge Furniture | active=True | pos=(9.80, 0.62, -6.75) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(9.80, 0.62, -6.75) / (0.00, 0.00, 0.00) | col=
+Sofa 04 | parent=Lounge Furniture | active=True | pos=(9.00, 0.00, 1.25) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(9.00, 0.63, 1.25) / (3.00, 1.27, 1.05) | col=BoxCollider/True
+sofa_02 | parent=Sofa 04 | active=False | pos=(9.00, 0.00, 1.34) | rot=(0.0, 0.0, 0.0) | scale=(1.66, 1.27, 1.28) | bounds=(9.00, 0.45, 1.25) / (3.00, 0.90, 1.05) | col=
+sofa_02_Base | parent=sofa_02 | active=False | pos=(9.00, 0.00, 1.38) | rot=(270.0, 0.0, 0.0) | scale=(166.01, 128.40, 126.85) | bounds=(9.00, 0.45, 1.25) / (3.00, 0.90, 1.04) | col=
+sofa_02_Seat | parent=sofa_02 | active=False | pos=(9.00, 0.00, 1.38) | rot=(270.0, 0.0, 0.0) | scale=(166.01, 128.40, 126.85) | bounds=(9.00, 0.42, 1.44) / (2.35, 0.21, 0.68) | col=
+Brown Sofa | parent=Sofa 04 | active=True | pos=(9.00, 0.00, 1.25) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(9.00, 0.63, 1.25) / (3.00, 1.27, 0.79) | col=
+sofa_03 | parent=Brown Sofa | active=True | pos=(9.00, 0.00, 1.25) | rot=(270.0, 0.0, 0.0) | scale=(109.84, 84.95, 113.50) | bounds=(9.00, 0.63, 1.25) / (3.00, 1.27, 0.79) | col=
+Coffee Table 04 | parent=Lounge Furniture | active=True | pos=(9.00, 0.00, 3.00) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(9.00, 0.28, 3.00) / (1.50, 0.55, 1.50) | col=BoxCollider/True
+Lounge Chair 07 | parent=Lounge Furniture | active=True | pos=(7.35, 0.00, 3.75) | rot=(0.0, 125.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(7.35, 0.49, 3.75) / (1.42, 0.98, 1.39) | col=BoxCollider/True
+Lounge Chair Seat 07 | parent=Lounge Furniture | active=True | pos=(7.35, 0.61, 3.75) | rot=(0.0, 125.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(7.35, 0.61, 3.75) / (0.00, 0.00, 0.00) | col=
+Lounge Chair 08 | parent=Lounge Furniture | active=True | pos=(10.65, 0.00, 3.75) | rot=(0.0, 235.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(10.65, 0.49, 3.75) / (1.42, 0.98, 1.39) | col=BoxCollider/True
+Lounge Chair Seat 08 | parent=Lounge Furniture | active=True | pos=(10.65, 0.61, 3.75) | rot=(0.0, 235.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(10.65, 0.61, 3.75) / (0.00, 0.00, 0.00) | col=
+Sofa Seat 10 | parent=Lounge Furniture | active=True | pos=(8.20, 0.62, 1.25) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(8.20, 0.62, 1.25) / (0.00, 0.00, 0.00) | col=
+Sofa Seat 11 | parent=Lounge Furniture | active=True | pos=(9.00, 0.62, 1.25) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(9.00, 0.62, 1.25) / (0.00, 0.00, 0.00) | col=
+Sofa Seat 12 | parent=Lounge Furniture | active=True | pos=(9.80, 0.62, 1.25) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(9.80, 0.62, 1.25) / (0.00, 0.00, 0.00) | col=
+Bookcase 01 | parent=Lounge Furniture | active=True | pos=(-13.70, 0.00, -10.50) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-13.70, 1.15, -10.50) / (1.50, 2.31, 0.69) | col=BoxCollider/True
+wooden_bookshelf_worn | parent=Bookcase 01 | active=True | pos=(-13.70, 0.00, -10.50) | rot=(270.0, 0.0, 0.0) | scale=(109.17, 118.73, 111.82) | bounds=(-13.70, 1.15, -10.50) / (1.50, 2.31, 0.69) | col=
+Bookcase 02 | parent=Lounge Furniture | active=True | pos=(13.70, 0.00, -10.50) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(13.70, 1.15, -10.50) / (1.50, 2.31, 0.69) | col=BoxCollider/True
+wooden_bookshelf_worn | parent=Bookcase 02 | active=True | pos=(13.70, 0.00, -10.50) | rot=(270.0, 0.0, 0.0) | scale=(109.17, 118.73, 111.82) | bounds=(13.70, 1.15, -10.50) / (1.50, 2.31, 0.69) | col=
+Study Table 01 | parent=Study Furniture | active=True | pos=(-3.40, 0.00, -0.30) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-3.40, 0.38, -0.30) / (2.55, 0.75, 1.05) | col=BoxCollider/True
+Study Chair 01 | parent=Study Furniture | active=True | pos=(-4.12, 0.00, -1.23) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-4.12, 0.52, -1.24) / (0.56, 1.05, 0.65) | col=BoxCollider/True
+Study Chair Seat 01 | parent=Study Furniture | active=True | pos=(-4.12, 0.50, -1.23) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-4.12, 0.50, -1.23) / (0.00, 0.00, 0.00) | col=
+Study Chair 02 | parent=Study Furniture | active=True | pos=(-4.12, 0.00, 0.63) | rot=(0.0, 180.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-4.12, 0.52, 0.64) / (0.56, 1.05, 0.65) | col=BoxCollider/True
+Study Chair Seat 02 | parent=Study Furniture | active=True | pos=(-4.12, 0.50, 0.63) | rot=(0.0, 180.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-4.12, 0.50, 0.63) / (0.00, 0.00, 0.00) | col=
+Study Chair 03 | parent=Study Furniture | active=True | pos=(-2.68, 0.00, -1.23) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-2.68, 0.52, -1.24) / (0.56, 1.05, 0.65) | col=BoxCollider/True
+Study Chair Seat 03 | parent=Study Furniture | active=True | pos=(-2.68, 0.50, -1.23) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-2.68, 0.50, -1.23) / (0.00, 0.00, 0.00) | col=
+Study Chair 04 | parent=Study Furniture | active=True | pos=(-2.68, 0.00, 0.63) | rot=(0.0, 180.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-2.68, 0.52, 0.64) / (0.56, 1.05, 0.65) | col=BoxCollider/True
+Study Chair Seat 04 | parent=Study Furniture | active=True | pos=(-2.68, 0.50, 0.63) | rot=(0.0, 180.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-2.68, 0.50, 0.63) / (0.00, 0.00, 0.00) | col=
+Study Table 02 | parent=Study Furniture | active=True | pos=(3.40, 0.00, -0.30) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(3.40, 0.38, -0.30) / (2.55, 0.75, 1.05) | col=BoxCollider/True
+Study Chair 05 | parent=Study Furniture | active=True | pos=(2.68, 0.00, -1.23) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(2.68, 0.52, -1.24) / (0.56, 1.05, 0.65) | col=BoxCollider/True
+Study Chair Seat 05 | parent=Study Furniture | active=True | pos=(2.68, 0.50, -1.23) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(2.68, 0.50, -1.23) / (0.00, 0.00, 0.00) | col=
+Study Chair 06 | parent=Study Furniture | active=True | pos=(2.68, 0.00, 0.63) | rot=(0.0, 180.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(2.68, 0.52, 0.64) / (0.56, 1.05, 0.65) | col=BoxCollider/True
+Study Chair Seat 06 | parent=Study Furniture | active=True | pos=(2.68, 0.50, 0.63) | rot=(0.0, 180.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(2.68, 0.50, 0.63) / (0.00, 0.00, 0.00) | col=
+Study Chair 07 | parent=Study Furniture | active=True | pos=(4.12, 0.00, -1.23) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(4.12, 0.52, -1.24) / (0.56, 1.05, 0.65) | col=BoxCollider/True
+Study Chair Seat 07 | parent=Study Furniture | active=True | pos=(4.12, 0.50, -1.23) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(4.12, 0.50, -1.23) / (0.00, 0.00, 0.00) | col=
+Study Chair 08 | parent=Study Furniture | active=True | pos=(4.12, 0.00, 0.63) | rot=(0.0, 180.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(4.12, 0.52, 0.64) / (0.56, 1.05, 0.65) | col=BoxCollider/True
+Study Chair Seat 08 | parent=Study Furniture | active=True | pos=(4.12, 0.50, 0.63) | rot=(0.0, 180.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(4.12, 0.50, 0.63) / (0.00, 0.00, 0.00) | col=
+Study Table 03 | parent=Study Furniture | active=True | pos=(-3.40, 0.00, -6.45) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-3.40, 0.38, -6.45) / (2.55, 0.75, 1.05) | col=BoxCollider/True
+Study Chair 09 | parent=Study Furniture | active=True | pos=(-4.12, 0.00, -7.38) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-4.12, 0.52, -7.39) / (0.56, 1.05, 0.65) | col=BoxCollider/True
+Study Chair Seat 09 | parent=Study Furniture | active=True | pos=(-4.12, 0.50, -7.38) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-4.12, 0.50, -7.38) / (0.00, 0.00, 0.00) | col=
+Study Chair 10 | parent=Study Furniture | active=True | pos=(-4.12, 0.00, -5.52) | rot=(0.0, 180.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-4.12, 0.52, -5.51) / (0.56, 1.05, 0.65) | col=BoxCollider/True
+Study Chair Seat 10 | parent=Study Furniture | active=True | pos=(-4.12, 0.50, -5.52) | rot=(0.0, 180.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-4.12, 0.50, -5.52) / (0.00, 0.00, 0.00) | col=
+Study Chair 11 | parent=Study Furniture | active=True | pos=(-2.68, 0.00, -7.38) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-2.68, 0.52, -7.39) / (0.56, 1.05, 0.65) | col=BoxCollider/True
+Study Chair Seat 11 | parent=Study Furniture | active=True | pos=(-2.68, 0.50, -7.38) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-2.68, 0.50, -7.38) / (0.00, 0.00, 0.00) | col=
+Study Chair 12 | parent=Study Furniture | active=True | pos=(-2.68, 0.00, -5.52) | rot=(0.0, 180.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-2.68, 0.52, -5.51) / (0.56, 1.05, 0.65) | col=BoxCollider/True
+Study Chair Seat 12 | parent=Study Furniture | active=True | pos=(-2.68, 0.50, -5.52) | rot=(0.0, 180.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-2.68, 0.50, -5.52) / (0.00, 0.00, 0.00) | col=
+Study Table 04 | parent=Study Furniture | active=True | pos=(3.40, 0.00, -6.45) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(3.40, 0.38, -6.45) / (2.55, 0.75, 1.05) | col=BoxCollider/True
+Study Chair 13 | parent=Study Furniture | active=True | pos=(2.68, 0.00, -7.38) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(2.68, 0.52, -7.39) / (0.56, 1.05, 0.65) | col=BoxCollider/True
+Study Chair Seat 13 | parent=Study Furniture | active=True | pos=(2.68, 0.50, -7.38) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(2.68, 0.50, -7.38) / (0.00, 0.00, 0.00) | col=
+Study Chair 14 | parent=Study Furniture | active=True | pos=(2.68, 0.00, -5.52) | rot=(0.0, 180.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(2.68, 0.52, -5.51) / (0.56, 1.05, 0.65) | col=BoxCollider/True
+Study Chair Seat 14 | parent=Study Furniture | active=True | pos=(2.68, 0.50, -5.52) | rot=(0.0, 180.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(2.68, 0.50, -5.52) / (0.00, 0.00, 0.00) | col=
+Study Chair 15 | parent=Study Furniture | active=True | pos=(4.12, 0.00, -7.38) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(4.12, 0.52, -7.39) / (0.56, 1.05, 0.65) | col=BoxCollider/True
+Study Chair Seat 15 | parent=Study Furniture | active=True | pos=(4.12, 0.50, -7.38) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(4.12, 0.50, -7.38) / (0.00, 0.00, 0.00) | col=
+Study Chair 16 | parent=Study Furniture | active=True | pos=(4.12, 0.00, -5.52) | rot=(0.0, 180.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(4.12, 0.52, -5.51) / (0.56, 1.05, 0.65) | col=BoxCollider/True
+Study Chair Seat 16 | parent=Study Furniture | active=True | pos=(4.12, 0.50, -5.52) | rot=(0.0, 180.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(4.12, 0.50, -5.52) / (0.00, 0.00, 0.00) | col=
+Study Table 05 | parent=Study Furniture | active=True | pos=(-3.40, 0.00, 5.85) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-3.40, 0.38, 5.85) / (2.55, 0.75, 1.05) | col=BoxCollider/True
+Study Chair 17 | parent=Study Furniture | active=True | pos=(-4.12, 0.00, 4.92) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-4.12, 0.52, 4.91) / (0.56, 1.05, 0.65) | col=BoxCollider/True
+Study Chair Seat 17 | parent=Study Furniture | active=True | pos=(-4.12, 0.50, 4.92) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-4.12, 0.50, 4.92) / (0.00, 0.00, 0.00) | col=
+Study Chair 18 | parent=Study Furniture | active=True | pos=(-4.12, 0.00, 6.78) | rot=(0.0, 180.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-4.12, 0.52, 6.79) / (0.56, 1.05, 0.65) | col=BoxCollider/True
+Study Chair Seat 18 | parent=Study Furniture | active=True | pos=(-4.12, 0.50, 6.78) | rot=(0.0, 180.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-4.12, 0.50, 6.78) / (0.00, 0.00, 0.00) | col=
+Study Chair 19 | parent=Study Furniture | active=True | pos=(-2.68, 0.00, 4.92) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-2.68, 0.52, 4.91) / (0.56, 1.05, 0.65) | col=BoxCollider/True
+Study Chair Seat 19 | parent=Study Furniture | active=True | pos=(-2.68, 0.50, 4.92) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-2.68, 0.50, 4.92) / (0.00, 0.00, 0.00) | col=
+Study Chair 20 | parent=Study Furniture | active=True | pos=(-2.68, 0.00, 6.78) | rot=(0.0, 180.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-2.68, 0.52, 6.79) / (0.56, 1.05, 0.65) | col=BoxCollider/True
+Study Chair Seat 20 | parent=Study Furniture | active=True | pos=(-2.68, 0.50, 6.78) | rot=(0.0, 180.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-2.68, 0.50, 6.78) / (0.00, 0.00, 0.00) | col=
+Study Table 06 | parent=Study Furniture | active=True | pos=(3.40, 0.00, 5.85) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(3.40, 0.38, 5.85) / (2.55, 0.75, 1.05) | col=BoxCollider/True
+Study Chair 21 | parent=Study Furniture | active=True | pos=(2.68, 0.00, 4.92) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(2.68, 0.52, 4.91) / (0.56, 1.05, 0.65) | col=BoxCollider/True
+Study Chair Seat 21 | parent=Study Furniture | active=True | pos=(2.68, 0.50, 4.92) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(2.68, 0.50, 4.92) / (0.00, 0.00, 0.00) | col=
+Study Chair 22 | parent=Study Furniture | active=True | pos=(2.68, 0.00, 6.78) | rot=(0.0, 180.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(2.68, 0.52, 6.79) / (0.56, 1.05, 0.65) | col=BoxCollider/True
+Study Chair Seat 22 | parent=Study Furniture | active=True | pos=(2.68, 0.50, 6.78) | rot=(0.0, 180.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(2.68, 0.50, 6.78) / (0.00, 0.00, 0.00) | col=
+Study Chair 23 | parent=Study Furniture | active=True | pos=(4.12, 0.00, 4.92) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(4.12, 0.52, 4.91) / (0.56, 1.05, 0.65) | col=BoxCollider/True
+Study Chair Seat 23 | parent=Study Furniture | active=True | pos=(4.12, 0.50, 4.92) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(4.12, 0.50, 4.92) / (0.00, 0.00, 0.00) | col=
+Study Chair 24 | parent=Study Furniture | active=True | pos=(4.12, 0.00, 6.78) | rot=(0.0, 180.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(4.12, 0.52, 6.79) / (0.56, 1.05, 0.65) | col=BoxCollider/True
+Study Chair Seat 24 | parent=Study Furniture | active=True | pos=(4.12, 0.50, 6.78) | rot=(0.0, 180.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(4.12, 0.50, 6.78) / (0.00, 0.00, 0.00) | col=
+Mafia Chair 01 | parent=Mafia Furniture | active=True | pos=(100.00, 0.00, 4.55) | rot=(0.0, 180.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(100.00, 0.54, 4.56) / (0.58, 1.08, 0.65) | col=BoxCollider/True
+Mafia Seat 01 | parent=Mafia Furniture | active=True | pos=(100.00, 0.50, 4.55) | rot=(0.0, 180.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(100.00, 0.50, 4.55) / (0.00, 0.00, 0.00) | col=
+Mafia Chair 02 | parent=Mafia Furniture | active=True | pos=(102.09, 0.00, 3.87) | rot=(0.0, 216.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(102.09, 0.54, 3.88) / (0.85, 1.08, 0.87) | col=BoxCollider/True
+Mafia Seat 02 | parent=Mafia Furniture | active=True | pos=(102.09, 0.50, 3.87) | rot=(0.0, 216.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(102.09, 0.50, 3.87) / (0.00, 0.00, 0.00) | col=
+Mafia Chair 03 | parent=Mafia Furniture | active=True | pos=(103.38, 0.00, 2.10) | rot=(0.0, 252.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(103.38, 0.54, 2.10) / (0.80, 1.08, 0.75) | col=BoxCollider/True
+Mafia Seat 03 | parent=Mafia Furniture | active=True | pos=(103.38, 0.50, 2.10) | rot=(0.0, 252.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(103.38, 0.50, 2.10) / (0.00, 0.00, 0.00) | col=
+Mafia Chair 04 | parent=Mafia Furniture | active=True | pos=(103.38, 0.00, -0.10) | rot=(0.0, 288.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(103.38, 0.54, -0.10) / (0.80, 1.08, 0.75) | col=BoxCollider/True
+Mafia Seat 04 | parent=Mafia Furniture | active=True | pos=(103.38, 0.50, -0.10) | rot=(0.0, 288.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(103.38, 0.50, -0.10) / (0.00, 0.00, 0.00) | col=
+Mafia Chair 05 | parent=Mafia Furniture | active=True | pos=(102.09, 0.00, -1.87) | rot=(0.0, 324.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(102.09, 0.54, -1.88) / (0.85, 1.08, 0.87) | col=BoxCollider/True
+Mafia Seat 05 | parent=Mafia Furniture | active=True | pos=(102.09, 0.50, -1.87) | rot=(0.0, 324.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(102.09, 0.50, -1.87) / (0.00, 0.00, 0.00) | col=
+Mafia Chair 06 | parent=Mafia Furniture | active=True | pos=(100.00, 0.00, -2.55) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(100.00, 0.54, -2.56) / (0.58, 1.08, 0.65) | col=BoxCollider/True
+Mafia Seat 06 | parent=Mafia Furniture | active=True | pos=(100.00, 0.50, -2.55) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(100.00, 0.50, -2.55) / (0.00, 0.00, 0.00) | col=
+Mafia Chair 07 | parent=Mafia Furniture | active=True | pos=(97.91, 0.00, -1.87) | rot=(0.0, 36.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(97.91, 0.54, -1.88) / (0.85, 1.08, 0.87) | col=BoxCollider/True
+Mafia Seat 07 | parent=Mafia Furniture | active=True | pos=(97.91, 0.50, -1.87) | rot=(0.0, 36.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(97.91, 0.50, -1.87) / (0.00, 0.00, 0.00) | col=
+Mafia Chair 08 | parent=Mafia Furniture | active=True | pos=(96.62, 0.00, -0.10) | rot=(0.0, 72.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(96.62, 0.54, -0.10) / (0.80, 1.08, 0.75) | col=BoxCollider/True
+Mafia Seat 08 | parent=Mafia Furniture | active=True | pos=(96.62, 0.50, -0.10) | rot=(0.0, 72.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(96.62, 0.50, -0.10) / (0.00, 0.00, 0.00) | col=
+Mafia Chair 09 | parent=Mafia Furniture | active=True | pos=(96.62, 0.00, 2.10) | rot=(0.0, 108.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(96.62, 0.54, 2.10) / (0.80, 1.08, 0.75) | col=BoxCollider/True
+Mafia Seat 09 | parent=Mafia Furniture | active=True | pos=(96.62, 0.50, 2.10) | rot=(0.0, 108.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(96.62, 0.50, 2.10) / (0.00, 0.00, 0.00) | col=
+Mafia Chair 10 | parent=Mafia Furniture | active=True | pos=(97.91, 0.00, 3.87) | rot=(0.0, 144.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(97.91, 0.54, 3.88) / (0.85, 1.08, 0.87) | col=BoxCollider/True
+Mafia Seat 10 | parent=Mafia Furniture | active=True | pos=(97.91, 0.50, 3.87) | rot=(0.0, 144.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(97.91, 0.50, 3.87) / (0.00, 0.00, 0.00) | col=
+Quiz Desk 01 | parent=Quiz Furniture | active=True | pos=(197.20, 0.00, 1.80) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(197.20, 0.40, 1.80) / (2.00, 0.80, 0.90) | col=BoxCollider/True
+Quiz Chair 01 | parent=Quiz Furniture | active=True | pos=(197.20, 0.00, 0.65) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(197.20, 0.54, 0.64) / (0.58, 1.08, 0.65) | col=BoxCollider/True
+Quiz Seat 01 | parent=Quiz Furniture | active=True | pos=(197.20, 0.50, 0.65) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(197.20, 0.50, 0.65) / (0.00, 0.00, 0.00) | col=
+Quiz Desk 02 | parent=Quiz Furniture | active=True | pos=(202.80, 0.00, 1.80) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(202.80, 0.40, 1.80) / (2.00, 0.80, 0.90) | col=BoxCollider/True
+Quiz Chair 02 | parent=Quiz Furniture | active=True | pos=(202.80, 0.00, 0.65) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(202.80, 0.54, 0.64) / (0.58, 1.08, 0.65) | col=BoxCollider/True
+Quiz Seat 02 | parent=Quiz Furniture | active=True | pos=(202.80, 0.50, 0.65) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(202.80, 0.50, 0.65) / (0.00, 0.00, 0.00) | col=
+Lighting | parent=ROOT | active=True | pos=(0.00, 0.00, 0.00) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(0.00, 0.00, 0.00) / (0.00, 0.00, 0.00) | col=
+Skylight | parent=Lighting | active=True | pos=(0.00, 0.00, 0.00) | rot=(52.0, 330.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(0.00, 0.00, 0.00) / (0.00, 0.00, 0.00) | col= | light=Directional 0.63 range=10
+Lounge Light 01 | parent=Lighting | active=True | pos=(-10.00, 8.00, -6.00) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-10.00, 8.00, -6.00) / (0.00, 0.00, 0.00) | col= | light=Point 1.35 range=20
+Lounge Light 02 | parent=Lighting | active=True | pos=(-10.00, 8.00, 7.00) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-10.00, 8.00, 7.00) / (0.00, 0.00, 0.00) | col= | light=Point 1.35 range=20
+Lounge Light 03 | parent=Lighting | active=True | pos=(0.00, 8.00, -6.00) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(0.00, 8.00, -6.00) / (0.00, 0.00, 0.00) | col= | light=Point 1.35 range=20
+Lounge Light 04 | parent=Lighting | active=True | pos=(0.00, 8.00, 7.00) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(0.00, 8.00, 7.00) / (0.00, 0.00, 0.00) | col= | light=Point 1.35 range=20
+Lounge Light 05 | parent=Lighting | active=True | pos=(10.00, 8.00, -6.00) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(10.00, 8.00, -6.00) / (0.00, 0.00, 0.00) | col= | light=Point 1.35 range=20
+Lounge Light 06 | parent=Lighting | active=True | pos=(10.00, 8.00, 7.00) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(10.00, 8.00, 7.00) / (0.00, 0.00, 0.00) | col= | light=Point 1.35 range=20
+Room Ceiling Light 01 | parent=Lighting | active=True | pos=(100.00, 4.00, 0.00) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(100.00, 4.00, 0.00) / (0.00, 0.00, 0.00) | col= | light=Point 1.9 range=20
+Room Ceiling Light 02 | parent=Lighting | active=True | pos=(200.00, 4.00, 0.00) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(200.00, 4.00, 0.00) / (0.00, 0.00, 0.00) | col= | light=Point 1.9 range=20
+Room Ceiling Light 03 | parent=Lighting | active=True | pos=(300.00, 4.00, 0.00) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(300.00, 4.00, 0.00) / (0.00, 0.00, 0.00) | col= | light=Point 1.9 range=20
+Planter | parent=Plants and Props | active=True | pos=(0.00, 0.00, 0.00) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(96.78, 0.83, -1.03) / (219.31, 1.65, 25.80) | col=
+Bookcase Props 01 | parent=Desk Props | active=True | pos=(-13.70, 0.48, -10.25) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-13.70, 0.60, -10.25) / (0.62, 0.24, 0.18) | col=
+Bookcase Props 02 | parent=Desk Props | active=True | pos=(-13.70, 1.05, -10.25) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-13.70, 1.17, -10.25) / (0.62, 0.24, 0.18) | col=
+Bookcase Props 03 | parent=Desk Props | active=True | pos=(-13.70, 1.62, -10.25) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-13.70, 1.74, -10.25) / (0.62, 0.24, 0.18) | col=
+Bookcase Props 04 | parent=Desk Props | active=True | pos=(13.70, 0.48, -10.25) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(13.70, 0.60, -10.25) / (0.62, 0.24, 0.18) | col=
+Bookcase Props 05 | parent=Desk Props | active=True | pos=(13.70, 1.05, -10.25) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(13.70, 1.17, -10.25) / (0.62, 0.24, 0.18) | col=
+Bookcase Props 06 | parent=Desk Props | active=True | pos=(13.70, 1.62, -10.25) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(13.70, 1.74, -10.25) / (0.62, 0.24, 0.18) | col=
+Room Bookcase 01 | parent=Room Props | active=True | pos=(92.30, 0.00, -0.50) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(92.30, 1.13, -0.50) / (1.20, 2.25, 0.50) | col=BoxCollider/True
+wooden_bookshelf_worn | parent=Model | active=True | pos=(92.30, 0.00, -0.50) | rot=(270.0, 0.0, 0.0) | scale=(87.34, 86.01, 109.04) | bounds=(92.30, 1.13, -0.50) / (1.20, 2.25, 0.50) | col=
+Room Bookcase 02 | parent=Room Props | active=True | pos=(107.70, 0.00, -0.50) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(107.70, 1.13, -0.50) / (1.20, 2.25, 0.50) | col=BoxCollider/True
+wooden_bookshelf_worn | parent=Model | active=True | pos=(107.70, 0.00, -0.50) | rot=(270.0, 0.0, 0.0) | scale=(87.34, 86.01, 109.04) | bounds=(107.70, 1.13, -0.50) / (1.20, 2.25, 0.50) | col=
+Room Bookcase 03 | parent=Room Props | active=True | pos=(193.70, 0.00, -1.00) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(193.70, 1.13, -1.00) / (1.20, 2.25, 0.50) | col=BoxCollider/True
+wooden_bookshelf_worn | parent=Model | active=True | pos=(193.70, 0.00, -1.00) | rot=(270.0, 0.0, 0.0) | scale=(87.34, 86.01, 109.04) | bounds=(193.70, 1.13, -1.00) / (1.20, 2.25, 0.50) | col=
+Room Bookcase 04 | parent=Room Props | active=True | pos=(206.30, 0.00, -1.00) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(206.30, 1.13, -1.00) / (1.20, 2.25, 0.50) | col=BoxCollider/True
+wooden_bookshelf_worn | parent=Model | active=True | pos=(206.30, 0.00, -1.00) | rot=(270.0, 0.0, 0.0) | scale=(87.34, 86.01, 109.04) | bounds=(206.30, 1.13, -1.00) / (1.20, 2.25, 0.50) | col=
+Tree Planter 01 | parent=Trees and Grass | active=True | pos=(0.00, 0.00, 0.00) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-14.00, 2.35, -7.00) / (3.30, 4.70, 3.30) | col=
+Planter | parent=Tree Planter 01 | active=True | pos=(-14.00, 0.21, -7.00) | rot=(0.0, 0.0, 0.0) | scale=(1.50, 0.21, 1.50) | bounds=(-14.00, 0.21, -7.00) / (1.50, 0.42, 1.50) | col=CapsuleCollider/True
+Planter Rim | parent=Tree Planter 01 | active=True | pos=(-14.00, 0.40, -7.00) | rot=(0.0, 0.0, 0.0) | scale=(1.53, 0.02, 1.53) | bounds=(-14.00, 0.40, -7.00) / (1.53, 0.04, 1.53) | col=
+Tree Planter 02 | parent=Trees and Grass | active=True | pos=(0.00, 0.00, 0.00) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(12.00, 2.35, -13.00) / (4.49, 4.70, 4.49) | col=
+Planter | parent=Tree Planter 02 | active=True | pos=(12.00, 0.21, -13.00) | rot=(0.0, 0.0, 0.0) | scale=(1.50, 0.21, 1.50) | bounds=(12.00, 0.21, -13.00) / (1.50, 0.42, 1.50) | col=CapsuleCollider/True
+Planter Rim | parent=Tree Planter 02 | active=True | pos=(12.00, 0.40, -13.00) | rot=(0.0, 0.0, 0.0) | scale=(1.53, 0.02, 1.53) | bounds=(12.00, 0.40, -13.00) / (1.53, 0.04, 1.53) | col=
+Tree Planter 03 | parent=Trees and Grass | active=True | pos=(0.00, 0.00, 0.00) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-15.00, 2.35, 5.00) / (4.55, 4.70, 4.55) | col=
+Planter | parent=Tree Planter 03 | active=True | pos=(-15.00, 0.21, 5.00) | rot=(0.0, 0.0, 0.0) | scale=(1.50, 0.21, 1.50) | bounds=(-15.00, 0.21, 5.00) / (1.50, 0.42, 1.50) | col=CapsuleCollider/True
+Planter Rim | parent=Tree Planter 03 | active=True | pos=(-15.00, 0.40, 5.00) | rot=(0.0, 0.0, 0.0) | scale=(1.53, 0.02, 1.53) | bounds=(-15.00, 0.40, 5.00) / (1.53, 0.04, 1.53) | col=
+Tree Planter 04 | parent=Trees and Grass | active=True | pos=(0.00, 0.00, 0.00) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(14.00, 2.35, 11.00) / (3.47, 4.70, 3.47) | col=
+Planter | parent=Tree Planter 04 | active=True | pos=(14.00, 0.21, 11.00) | rot=(0.0, 0.0, 0.0) | scale=(1.50, 0.21, 1.50) | bounds=(14.00, 0.21, 11.00) / (1.50, 0.42, 1.50) | col=CapsuleCollider/True
+Planter Rim | parent=Tree Planter 04 | active=True | pos=(14.00, 0.40, 11.00) | rot=(0.0, 0.0, 0.0) | scale=(1.53, 0.02, 1.53) | bounds=(14.00, 0.40, 11.00) / (1.53, 0.04, 1.53) | col=
+Grass Planter 01 | parent=Trees and Grass | active=True | pos=(0.00, 0.00, 0.00) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(6.41, 5.12, 15.10) / (0.63, 0.64, 0.63) | col=
+Planter | parent=Grass Planter 01 | active=True | pos=(6.41, 4.93, 15.10) | rot=(0.0, 0.0, 0.0) | scale=(0.62, 0.13, 0.62) | bounds=(6.41, 4.93, 15.10) / (0.62, 0.25, 0.62) | col=CapsuleCollider/True
+Planter Rim | parent=Grass Planter 01 | active=True | pos=(6.41, 5.03, 15.10) | rot=(0.0, 0.0, 0.0) | scale=(0.63, 0.02, 0.63) | bounds=(6.41, 5.03, 15.10) / (0.63, 0.04, 0.63) | col=
+Grass Planter 02 | parent=Trees and Grass | active=True | pos=(0.00, 0.00, 0.00) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(15.20, 5.12, 6.14) / (0.64, 0.64, 0.63) | col=
+Planter | parent=Grass Planter 02 | active=True | pos=(15.21, 4.93, 6.14) | rot=(0.0, 0.0, 0.0) | scale=(0.62, 0.13, 0.62) | bounds=(15.21, 4.93, 6.14) / (0.62, 0.25, 0.62) | col=CapsuleCollider/True
+Planter Rim | parent=Grass Planter 02 | active=True | pos=(15.21, 5.03, 6.14) | rot=(0.0, 0.0, 0.0) | scale=(0.63, 0.02, 0.63) | bounds=(15.21, 5.03, 6.14) / (0.63, 0.04, 0.63) | col=
+Grass Planter 03 | parent=Trees and Grass | active=True | pos=(0.00, 0.00, 0.00) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(15.10, 5.12, -6.41) / (0.63, 0.64, 0.63) | col=
+Planter | parent=Grass Planter 03 | active=True | pos=(15.10, 4.93, -6.41) | rot=(0.0, 0.0, 0.0) | scale=(0.62, 0.13, 0.62) | bounds=(15.10, 4.93, -6.41) / (0.62, 0.25, 0.62) | col=CapsuleCollider/True
+Planter Rim | parent=Grass Planter 03 | active=True | pos=(15.10, 5.03, -6.41) | rot=(0.0, 0.0, 0.0) | scale=(0.63, 0.02, 0.63) | bounds=(15.10, 5.03, -6.41) / (0.63, 0.04, 0.63) | col=
+Grass Planter 04 | parent=Trees and Grass | active=True | pos=(0.00, 0.00, 0.00) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(6.14, 5.12, -15.21) / (0.63, 0.64, 0.63) | col=
+Planter | parent=Grass Planter 04 | active=True | pos=(6.14, 4.93, -15.21) | rot=(0.0, 0.0, 0.0) | scale=(0.62, 0.13, 0.62) | bounds=(6.14, 4.93, -15.21) / (0.62, 0.25, 0.62) | col=CapsuleCollider/True
+Planter Rim | parent=Grass Planter 04 | active=True | pos=(6.14, 5.03, -15.21) | rot=(0.0, 0.0, 0.0) | scale=(0.63, 0.02, 0.63) | bounds=(6.14, 5.03, -15.21) / (0.63, 0.04, 0.63) | col=
+Grass Planter 05 | parent=Trees and Grass | active=True | pos=(0.00, 0.00, 0.00) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-6.41, 5.12, -15.10) / (0.63, 0.64, 0.63) | col=
+Planter | parent=Grass Planter 05 | active=True | pos=(-6.41, 4.93, -15.10) | rot=(0.0, 0.0, 0.0) | scale=(0.62, 0.13, 0.62) | bounds=(-6.41, 4.93, -15.10) / (0.62, 0.25, 0.62) | col=CapsuleCollider/True
+Planter Rim | parent=Grass Planter 05 | active=True | pos=(-6.41, 5.03, -15.10) | rot=(0.0, 0.0, 0.0) | scale=(0.63, 0.02, 0.63) | bounds=(-6.41, 5.03, -15.10) / (0.63, 0.04, 0.63) | col=
+Grass Planter 06 | parent=Trees and Grass | active=True | pos=(0.00, 0.00, 0.00) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-15.21, 5.12, -6.14) / (0.63, 0.64, 0.63) | col=
+Planter | parent=Grass Planter 06 | active=True | pos=(-15.21, 4.93, -6.14) | rot=(0.0, 0.0, 0.0) | scale=(0.62, 0.13, 0.62) | bounds=(-15.21, 4.93, -6.14) / (0.62, 0.25, 0.62) | col=CapsuleCollider/True
+Planter Rim | parent=Grass Planter 06 | active=True | pos=(-15.21, 5.03, -6.14) | rot=(0.0, 0.0, 0.0) | scale=(0.63, 0.02, 0.63) | bounds=(-15.21, 5.03, -6.14) / (0.63, 0.04, 0.63) | col=
+Grass Planter 07 | parent=Trees and Grass | active=True | pos=(0.00, 0.00, 0.00) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-15.10, 5.12, 6.41) / (0.63, 0.64, 0.63) | col=
+Planter | parent=Grass Planter 07 | active=True | pos=(-15.10, 4.93, 6.41) | rot=(0.0, 0.0, 0.0) | scale=(0.62, 0.13, 0.62) | bounds=(-15.10, 4.93, 6.41) / (0.62, 0.25, 0.62) | col=CapsuleCollider/True
+Planter Rim | parent=Grass Planter 07 | active=True | pos=(-15.10, 5.03, 6.41) | rot=(0.0, 0.0, 0.0) | scale=(0.63, 0.02, 0.63) | bounds=(-15.10, 5.03, 6.41) / (0.63, 0.04, 0.63) | col=
+Grass Planter 08 | parent=Trees and Grass | active=True | pos=(0.00, 0.00, 0.00) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-6.14, 5.12, 15.21) / (0.63, 0.64, 0.63) | col=
+Planter | parent=Grass Planter 08 | active=True | pos=(-6.14, 4.93, 15.21) | rot=(0.0, 0.0, 0.0) | scale=(0.62, 0.13, 0.62) | bounds=(-6.14, 4.93, 15.21) / (0.62, 0.25, 0.62) | col=CapsuleCollider/True
+Planter Rim | parent=Grass Planter 08 | active=True | pos=(-6.14, 5.03, 15.21) | rot=(0.0, 0.0, 0.0) | scale=(0.63, 0.02, 0.63) | bounds=(-6.14, 5.03, 15.21) / (0.63, 0.04, 0.63) | col=
+Grass Planter 09 | parent=Trees and Grass | active=True | pos=(0.00, 0.00, 0.00) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(6.41, 9.92, 15.10) / (0.63, 0.64, 0.63) | col=
+Planter | parent=Grass Planter 09 | active=True | pos=(6.41, 9.73, 15.10) | rot=(0.0, 0.0, 0.0) | scale=(0.62, 0.13, 0.62) | bounds=(6.41, 9.73, 15.10) / (0.62, 0.25, 0.62) | col=CapsuleCollider/True
+Planter Rim | parent=Grass Planter 09 | active=True | pos=(6.41, 9.83, 15.10) | rot=(0.0, 0.0, 0.0) | scale=(0.63, 0.02, 0.63) | bounds=(6.41, 9.83, 15.10) / (0.63, 0.04, 0.63) | col=
+Grass Planter 10 | parent=Trees and Grass | active=True | pos=(0.00, 0.00, 0.00) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(15.21, 9.92, 6.14) / (0.63, 0.64, 0.63) | col=
+Planter | parent=Grass Planter 10 | active=True | pos=(15.21, 9.73, 6.14) | rot=(0.0, 0.0, 0.0) | scale=(0.62, 0.13, 0.62) | bounds=(15.21, 9.73, 6.14) / (0.62, 0.25, 0.62) | col=CapsuleCollider/True
+Planter Rim | parent=Grass Planter 10 | active=True | pos=(15.21, 9.83, 6.14) | rot=(0.0, 0.0, 0.0) | scale=(0.63, 0.02, 0.63) | bounds=(15.21, 9.83, 6.14) / (0.63, 0.04, 0.63) | col=
+Grass Planter 11 | parent=Trees and Grass | active=True | pos=(0.00, 0.00, 0.00) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(15.10, 9.92, -6.41) / (0.63, 0.64, 0.63) | col=
+Planter | parent=Grass Planter 11 | active=True | pos=(15.10, 9.73, -6.41) | rot=(0.0, 0.0, 0.0) | scale=(0.62, 0.13, 0.62) | bounds=(15.10, 9.73, -6.41) / (0.62, 0.25, 0.62) | col=CapsuleCollider/True
+Planter Rim | parent=Grass Planter 11 | active=True | pos=(15.10, 9.83, -6.41) | rot=(0.0, 0.0, 0.0) | scale=(0.63, 0.02, 0.63) | bounds=(15.10, 9.83, -6.41) / (0.63, 0.04, 0.63) | col=
+Grass Planter 12 | parent=Trees and Grass | active=True | pos=(0.00, 0.00, 0.00) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(6.14, 9.92, -15.21) / (0.63, 0.64, 0.63) | col=
+Planter | parent=Grass Planter 12 | active=True | pos=(6.14, 9.73, -15.21) | rot=(0.0, 0.0, 0.0) | scale=(0.62, 0.13, 0.62) | bounds=(6.14, 9.73, -15.21) / (0.62, 0.25, 0.62) | col=CapsuleCollider/True
+Planter Rim | parent=Grass Planter 12 | active=True | pos=(6.14, 9.83, -15.21) | rot=(0.0, 0.0, 0.0) | scale=(0.63, 0.02, 0.63) | bounds=(6.14, 9.83, -15.21) / (0.63, 0.04, 0.63) | col=
+Grass Planter 13 | parent=Trees and Grass | active=True | pos=(0.00, 0.00, 0.00) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-6.41, 9.92, -15.09) / (0.63, 0.64, 0.64) | col=
+Planter | parent=Grass Planter 13 | active=True | pos=(-6.41, 9.73, -15.10) | rot=(0.0, 0.0, 0.0) | scale=(0.62, 0.13, 0.62) | bounds=(-6.41, 9.73, -15.10) / (0.62, 0.25, 0.62) | col=CapsuleCollider/True
+Planter Rim | parent=Grass Planter 13 | active=True | pos=(-6.41, 9.83, -15.10) | rot=(0.0, 0.0, 0.0) | scale=(0.63, 0.02, 0.63) | bounds=(-6.41, 9.83, -15.10) / (0.63, 0.04, 0.63) | col=
+Grass Planter 14 | parent=Trees and Grass | active=True | pos=(0.00, 0.00, 0.00) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-15.21, 9.92, -6.14) / (0.63, 0.64, 0.63) | col=
+Planter | parent=Grass Planter 14 | active=True | pos=(-15.21, 9.73, -6.14) | rot=(0.0, 0.0, 0.0) | scale=(0.62, 0.13, 0.62) | bounds=(-15.21, 9.73, -6.14) / (0.62, 0.25, 0.62) | col=CapsuleCollider/True
+Planter Rim | parent=Grass Planter 14 | active=True | pos=(-15.21, 9.83, -6.14) | rot=(0.0, 0.0, 0.0) | scale=(0.63, 0.02, 0.63) | bounds=(-15.21, 9.83, -6.14) / (0.63, 0.04, 0.63) | col=
+Grass Planter 15 | parent=Trees and Grass | active=True | pos=(0.00, 0.00, 0.00) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-15.10, 9.92, 6.41) / (0.63, 0.64, 0.64) | col=
+Planter | parent=Grass Planter 15 | active=True | pos=(-15.10, 9.73, 6.41) | rot=(0.0, 0.0, 0.0) | scale=(0.62, 0.13, 0.62) | bounds=(-15.10, 9.73, 6.41) / (0.62, 0.25, 0.62) | col=CapsuleCollider/True
+Planter Rim | parent=Grass Planter 15 | active=True | pos=(-15.10, 9.83, 6.41) | rot=(0.0, 0.0, 0.0) | scale=(0.63, 0.02, 0.63) | bounds=(-15.10, 9.83, 6.41) / (0.63, 0.04, 0.63) | col=
+Grass Planter 16 | parent=Trees and Grass | active=True | pos=(0.00, 0.00, 0.00) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-6.14, 9.92, 15.21) / (0.63, 0.64, 0.63) | col=
+Planter | parent=Grass Planter 16 | active=True | pos=(-6.14, 9.73, 15.21) | rot=(0.0, 0.0, 0.0) | scale=(0.62, 0.13, 0.62) | bounds=(-6.14, 9.73, 15.21) / (0.62, 0.25, 0.62) | col=CapsuleCollider/True
+Planter Rim | parent=Grass Planter 16 | active=True | pos=(-6.14, 9.83, 15.21) | rot=(0.0, 0.0, 0.0) | scale=(0.63, 0.02, 0.63) | bounds=(-6.14, 9.83, 15.21) / (0.63, 0.04, 0.63) | col=
+Grass Planter 17 | parent=Trees and Grass | active=True | pos=(0.00, 0.00, 0.00) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(93.00, 0.32, 6.00) / (0.66, 0.64, 0.66) | col=
+Planter | parent=Grass Planter 17 | active=True | pos=(93.00, 0.13, 6.00) | rot=(0.0, 0.0, 0.0) | scale=(0.65, 0.13, 0.65) | bounds=(93.00, 0.13, 6.00) / (0.65, 0.25, 0.65) | col=CapsuleCollider/True
+Planter Rim | parent=Grass Planter 17 | active=True | pos=(93.00, 0.23, 6.00) | rot=(0.0, 0.0, 0.0) | scale=(0.66, 0.02, 0.66) | bounds=(93.00, 0.23, 6.00) / (0.66, 0.04, 0.66) | col=
+Grass Planter 18 | parent=Trees and Grass | active=True | pos=(0.00, 0.00, 0.00) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(107.00, 0.32, 6.00) / (0.66, 0.64, 0.66) | col=
+Planter | parent=Grass Planter 18 | active=True | pos=(107.00, 0.13, 6.00) | rot=(0.0, 0.0, 0.0) | scale=(0.65, 0.13, 0.65) | bounds=(107.00, 0.13, 6.00) / (0.65, 0.25, 0.65) | col=CapsuleCollider/True
+Planter Rim | parent=Grass Planter 18 | active=True | pos=(107.00, 0.23, 6.00) | rot=(0.0, 0.0, 0.0) | scale=(0.66, 0.02, 0.66) | bounds=(107.00, 0.23, 6.00) / (0.66, 0.04, 0.66) | col=
+Grass Planter 19 | parent=Trees and Grass | active=True | pos=(0.00, 0.00, 0.00) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(194.00, 0.32, 5.70) / (0.66, 0.64, 0.66) | col=
+Planter | parent=Grass Planter 19 | active=True | pos=(194.00, 0.13, 5.70) | rot=(0.0, 0.0, 0.0) | scale=(0.65, 0.13, 0.65) | bounds=(194.00, 0.13, 5.70) / (0.65, 0.25, 0.65) | col=CapsuleCollider/True
+Planter Rim | parent=Grass Planter 19 | active=True | pos=(194.00, 0.23, 5.70) | rot=(0.0, 0.0, 0.0) | scale=(0.66, 0.02, 0.66) | bounds=(194.00, 0.23, 5.70) / (0.66, 0.04, 0.66) | col=
+Grass Planter 20 | parent=Trees and Grass | active=True | pos=(0.00, 0.00, 0.00) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(206.00, 0.32, 5.70) / (0.66, 0.64, 0.66) | col=
+Planter | parent=Grass Planter 20 | active=True | pos=(206.00, 0.13, 5.70) | rot=(0.0, 0.0, 0.0) | scale=(0.65, 0.13, 0.65) | bounds=(206.00, 0.13, 5.70) / (0.65, 0.25, 0.65) | col=CapsuleCollider/True
+Planter Rim | parent=Grass Planter 20 | active=True | pos=(206.00, 0.23, 5.70) | rot=(0.0, 0.0, 0.0) | scale=(0.66, 0.02, 0.66) | bounds=(206.00, 0.23, 5.70) / (0.66, 0.04, 0.66) | col=
+Coffee Table Plant 01 | parent=Lounge Decorations | active=True | pos=(-9.00, 0.56, -5.00) | rot=(0.0, 0.0, 0.0) | scale=(0.90, 0.90, 0.90) | bounds=(-9.00, 0.66, -5.00) / (0.16, 0.22, 0.16) | col=
+Coffee Table Plant 02 | parent=Lounge Decorations | active=True | pos=(-9.00, 0.56, 3.00) | rot=(0.0, 90.0, 0.0) | scale=(0.90, 0.90, 0.90) | bounds=(-9.00, 0.66, 3.00) / (0.16, 0.22, 0.16) | col=
+Coffee Table Plant 03 | parent=Lounge Decorations | active=True | pos=(9.00, 0.56, -5.00) | rot=(0.0, 180.0, 0.0) | scale=(0.90, 0.90, 0.90) | bounds=(9.00, 0.66, -5.00) / (0.16, 0.22, 0.16) | col=
+Coffee Table Plant 04 | parent=Lounge Decorations | active=True | pos=(9.00, 0.56, 3.00) | rot=(0.0, 270.0, 0.0) | scale=(0.90, 0.90, 0.90) | bounds=(9.00, 0.66, 3.00) / (0.16, 0.22, 0.16) | col=

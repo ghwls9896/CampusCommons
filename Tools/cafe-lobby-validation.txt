@@ -1,0 +1,2 @@
+FAIL: System.Exception: Open the saved living scene and stop Play before testing.
+  at CampusCommons.LibraryCharacter.Editor.CafeLobbyValidation.Begin () [0x00048] in C:\Users\ghwls\OneDrive\문서\ChatGPT\open\CampusCommons\Assets\LibraryCharacter\Editor\CafeLobbyValidation.cs:18 

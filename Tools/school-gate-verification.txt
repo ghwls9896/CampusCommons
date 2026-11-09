@@ -1,0 +1,15 @@
+GATE Classroom Door 13 center=(500.00, 1.25, 30.00) width=1.79 penetrations=
+GATE Classroom Door 14 center=(483.75, 1.25, -41.25) width=1.79 penetrations=
+GATE Classroom Door 15 center=(506.25, 1.25, -6.25) width=1.79 penetrations=
+GATE Classroom Door 17 center=(511.25, 1.25, 41.25) width=1.79 penetrations=
+GATE Classroom Door 18 center=(488.75, 1.25, 41.25) width=1.79 penetrations=
+GATE Classroom Door 20 center=(493.75, 1.25, -31.25) width=1.79 penetrations=
+GATE Classroom Door 21 center=(526.25, 1.25, -31.25) width=1.79 penetrations=
+GATE Classroom Door 22 center=(492.50, 1.25, -7.50) width=1.79 penetrations=
+GATES=8 PENETRATING=0
+TOTAL_BLOCKED=0 / 46
+DOOR_CASE_PASS case=0 moved=1.860046
+DOOR_CASE_PASS case=1 moved=2.264357
+DOOR_CASE_PASS case=2 moved=2.376587
+DOOR_CASE_PASS case=3 moved=2.376617
+MONSTER_BEHAVIOUR_PLAYMODE_PASS 360 sight, occlusion, room search, final hunt, camera jumpscare, audio, 4 doorway crossings
