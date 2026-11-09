@@ -36,6 +36,8 @@ AGENTS.md를 자동으로 읽는 도구도 작업 시작 시 읽었는지 확인
 
 기존 `Tools/` 경로는 대문자를 유지합니다. Windows/macOS에서 `tools/`와 별개로 취급되지 않으므로 새 도구도 `Tools/` 아래에 만듭니다.
 
+공유된 PR은 [협업 설정 #3](https://github.com/ghwls9896/CampusCommons/pull/3)과 [퀴즈 Draft #4](https://github.com/ghwls9896/CampusCommons/pull/4)입니다. 협업 PR을 먼저 통합합니다.
+
 현재 알려진 작업은 [협업 설정 #1](https://github.com/ghwls9896/CampusCommons/issues/1), [PDF 퀴즈룸 #2](https://github.com/ghwls9896/CampusCommons/issues/2)입니다. 다른 팀원의 로컬 구현은 아직 이 저장소에서 확인되지 않았으므로 완료 상태를 임의로 기록하지 않았습니다. 각자 현재 작업 Issue/초기 Draft PR을 등록하면 전체 작업이 보입니다.
 
 ## 저장소 관리자 ghwls9896가 한 번 할 설정
