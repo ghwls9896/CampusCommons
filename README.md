@@ -78,3 +78,7 @@ Blender 재생성 명령(PowerShell):
 ```powershell
 & 'C:\Program Files\Blender Foundation\Blender 4.4\blender.exe' --background --python .\Tools\build_world.py
 ```
+
+## PDF 퀴즈룸 (1인 복습)
+
+Render 무료 백엔드 + Gemini API로 PDF에서 레벨 1·2·3 문제를 하나씩 생성하고 정답·해설·근거 페이지를 확인합니다. 계정 가입, 배포, Unity 연결 방법은 [퀴즈룸 설정 안내](docs/QUIZ_ROOM_SETUP.md)를 참고하세요.

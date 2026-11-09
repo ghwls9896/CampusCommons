@@ -18,3 +18,12 @@
 *.user
 *.suo
 *.tmp
+
+# PDF quiz backend: local environments, credentials and uploaded study material
+backend/.venv/
+**/__pycache__/
+**/.pytest_cache/
+.env
+.env.*
+!.env.example
+backend/*.pdf

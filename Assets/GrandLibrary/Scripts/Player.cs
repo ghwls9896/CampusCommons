@@ -95,6 +95,12 @@ namespace CampusCommons.GrandLibrary
                 return;
             }
             if(exitConfirm)return;
+            var quiz = GetComponent<CampusCommons.Quiz.QuizRoom>();
+            if (quiz && quiz.BlocksMovement)
+            {
+                Cursor.visible=true; Cursor.lockState=CursorLockMode.None;
+                AnimateAvatar(Vector3.zero,false); return;
+            }
             if(Input.GetKeyDown(KeyCode.V))ToggleView();
             bool looking=firstPerson || Input.GetMouseButton(1);
             if (looking)
@@ -257,12 +263,13 @@ namespace CampusCommons.GrandLibrary
         }
         void OnGUI()
         {
+            if (currentSpace==Portal.Space.Quiz && !exitConfirm) return;
             MakeStyles(); var previous=GUI.matrix;
             float s=Mathf.Min(Screen.width/1280f,Screen.height/720f);
             GUI.matrix=Matrix4x4.TRS(new Vector3((Screen.width-1280*s)*.5f,(Screen.height-720*s)*.5f,0),Quaternion.identity,Vector3.one*s);
             Panel(new Rect(20,20,335,77));
             GUI.Label(new Rect(36,27,310,28),"THE GRAND LIBRARY",title);
-            string room=currentSpace==Portal.Space.Library?"LOUNGE":currentSpace==Portal.Space.Mafia?"MAFIA ROOM":currentSpace==Portal.Space.Quiz?"QUIZ ROOM  /  1 VS 1":"ESCAPE ROOM";
+            string room=currentSpace==Portal.Space.Library?"LOUNGE":currentSpace==Portal.Space.Mafia?"MAFIA ROOM":currentSpace==Portal.Space.Quiz?"QUIZ ROOM  /  SOLO":"ESCAPE ROOM";
             GUI.Label(new Rect(36,60,310,24),room,detail);
             if (nearestDoor || nearest || sitting) { Panel(new Rect(480,565,320,45)); GUI.Label(new Rect(498,575,300,28),sitting?"E   Stand up":nearestDoor?"E   Enter " + nearestDoor.destinationLabel:"E   Sit down",hint); }
             if (arrivalTime>0 && Time.time-arrivalTime<2.5f)
