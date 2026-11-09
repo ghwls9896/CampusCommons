@@ -1,20 +1,35 @@
 {
   "id": "cc-15",
-  "title": "탈출룸 저해상도 아이템 스프라이트",
+  "title": "탈출룸 아이템 NPC 몬스터 통합",
   "owner": "ghwls9896",
   "branch": "codex/cc-15-item-icons",
   "issue": "https://github.com/ghwls9896/CampusCommons/issues/15",
   "scope": [
     "Assets/StudyImmersive/Art/EscapeItemIcons/",
     "Assets/StudyImmersive/Art/EscapeItemIcons.meta",
+    "Assets/StudyImmersive/Art/EscapePixels/",
+    "Assets/StudyImmersive/Art/EscapePixels.meta",
+    "Assets/StudyImmersive/Scripts/EscapeGame.cs",
+    "Assets/StudyImmersive/Scripts/EscapeBarricade/",
+    "Assets/StudyImmersive/Scripts/EscapeBarricade.meta",
+    "Assets/StudyImmersive/Scripts/EscapeSystems/",
+    "Assets/StudyImmersive/Scripts/EscapeSystems.meta",
+    "Assets/LibraryCharacter/Scripts/Monster.cs",
+    "Assets/LibraryCharacter/Scripts/Door.cs",
+    "Assets/LibraryCharacter/Resources/CrowJumpscare.png",
+    "Assets/LibraryCharacter/Sprites/ScholarBird_Billboard.png",
+    "docs/tasks/cc-11.json",
+    "docs/tasks/cc-11.md",
+    "docs/tasks/cc-13.json",
+    "docs/tasks/cc-13.md",
     "docs/tasks/cc-15.json",
     "docs/tasks/cc-15.md"
   ],
   "shared_files": [],
   "depends_on": [],
   "validation": [
-    "세 PNG 투명도·작은 크기 가독성과 공결 문구 확인",
-    "Unity 6000.4.5f1 Sprite 및 Point 설정 확인",
+    "Unity 6000.4.5f1 컴파일 및 실제 Play Mode 검증",
+    "탈출 입장·문제·몬스터·NPC·자판기·아이템·잠금·복귀 검사",
     "python Tools/team/check.py --base origin/main"
   ]
 }
