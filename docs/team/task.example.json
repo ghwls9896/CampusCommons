@@ -1,0 +1,11 @@
+{
+  "id": "cc-123",
+  "title": "사용자가 확인할 수 있는 변경 결과",
+  "owner": "HIGHCHOI",
+  "branch": "feat/cc-123-description",
+  "issue": "https://github.com/ghwls9896/CampusCommons/issues/123",
+  "scope": ["Assets/QuizRoom/", "Assets/QuizRoom.meta"],
+  "shared_files": [],
+  "depends_on": [],
+  "validation": ["Unity 6000.4.5f1 컴파일", "해당 룸의 진입/동작/퇴장 검사"]
+}

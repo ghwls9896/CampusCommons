@@ -1,0 +1,42 @@
+name: Team checks
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, edited, ready_for_review]
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: team-checks-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  team-checks:
+    name: team-checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
+        with:
+          python-version: '3.14'
+      - name: Test collaboration checks
+        run: python -m unittest discover -s tools/team/tests -v
+      - name: Check PR scope and Unity file hygiene
+        if: github.event_name == 'pull_request'
+        run: python tools/team/check.py --event "$GITHUB_EVENT_PATH"
+      - name: Test backend when present (no API secrets)
+        shell: bash
+        run: |
+          if [ -d backend ]; then
+            test -f backend/requirements-dev.txt
+            python -m pip install -r backend/requirements-dev.txt
+            cd backend
+            python -m pytest -q
+          else
+            echo 'No backend in this revision; Unity runtime validation remains a PR review requirement.'
+          fi

@@ -18,3 +18,13 @@
 *.user
 *.suo
 *.tmp
+
+# Isolated agent workspaces and local secrets
+/.worktrees/
+/worktrees/
+**/.venv/
+**/__pycache__/
+**/.pytest_cache/
+.env
+.env.*
+!.env.example
