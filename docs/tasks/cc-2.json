@@ -1,0 +1,41 @@
+{
+  "id": "cc-2",
+  "title": "PDF로 레벨별 문제를 생성하는 1인 퀴즈룸",
+  "owner": "HIGHCHOI",
+  "branch": "codex/pdf-quiz-room",
+  "issue": "https://github.com/ghwls9896/CampusCommons/issues/2",
+  "scope": [
+    "Assets/QuizRoom/",
+    "Assets/QuizRoom.meta",
+    "Assets/GrandLibrary/Scripts/GameStart.cs",
+    "Assets/GrandLibrary/Scripts/Player.cs",
+    "Packages/manifest.json",
+    "Packages/packages-lock.json",
+    "backend/",
+    "render.yaml",
+    ".gitignore",
+    "README.md",
+    "docs/QUIZ_ROOM_SETUP.md",
+    "docs/superpowers/specs/2026-11-09-pdf-quiz-design.md",
+    "docs/superpowers/plans/2026-11-09-pdf-quiz.md",
+    "docs/superpowers/plans/2026-11-09-pdf-quiz-progress.md",
+    "tools/tests/QuizSessionTests.cs"
+  ],
+  "shared_files": [
+    "Assets/GrandLibrary/Scripts/GameStart.cs",
+    "Assets/GrandLibrary/Scripts/Player.cs",
+    "Packages/manifest.json",
+    "Packages/packages-lock.json",
+    "backend/app.py",
+    "render.yaml"
+  ],
+  "depends_on": [
+    "https://github.com/ghwls9896/CampusCommons/issues/1"
+  ],
+  "validation": [
+    "백엔드 pytest: 26 passed (가짜 upstream)",
+    "C# QuizSessionTests: 20 checks passed",
+    "임시 Unity 6000.6 컴파일 및 QuizRoomTest 통과; 원본6000.4유지",
+    "실제 Gemini/Render/standalone 빌드는 아직 미검증"
+  ]
+}
