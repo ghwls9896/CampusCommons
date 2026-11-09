@@ -9,6 +9,13 @@
 
 세부 파일 경계는 [OWNERSHIP.md](OWNERSHIP.md)에 있습니다. 담당 기능을 위한 영구 브랜치를 미리 만들지 않고, **작업 하나마다 짧은 브랜치**를 만듭니다. 예: `feat/cc-12-mafia-vote`, `feat/cc-13-avatar-animation`, `feat/cc-14-login` (예시 번호이며 실제 Issue가 아님).
 
+## 승인 담당
+
+- **다른 팀원의 PR → HIGHCHOI 승인**
+- **HIGHCHOI의 PR → ghwls9896 승인**
+
+전원 승인은 필요하지 않습니다. 지정된 한 사람이 최종 리뷰하고, 기능 담당자는 필요한 기술 조율에 참여합니다. HIGHCHOI가 일반 통합을 관리하고 본인 PR은 ghwls9896가 처리합니다. 자동 리뷰 요청 workflow는 main 반영 후 Ready 상태의 PR 이벤트부터 동작합니다. CODEOWNERS는 두 계정 중 하나의 승인을 허용하는 정적 규칙이고, 작성자별 구분은 운영 규칙/자동 요청입니다.
+
 ## 각자 AI에게 그대로 전달할 시작 프롬프트
 
 ```text
@@ -21,6 +28,7 @@ git status/현재 브랜치/원격을 확인하고 최신 origin/main 및 열린
 공통 씬·Player·GameStart·Packages는 변경 전에 담당자와 조율하고 그 기록을 Issue에 남겨라.
 main 직접 push, 다른 작업 덮어쓰기, 범위 밖 리팩터링, 임의 Unity 업그레이드는 하지 마라.
 작은 초기 커밋과 Draft PR로 시작해 진행을 공유하고, 실제 테스트 결과와 미검증 항목을 기록해라.
+최종 승인자는 내 PR 작성 계정이 HIGHCHOI면 ghwls9896, 그 외면 HIGHCHOI다. 전원 승인을 요구하지 마라.
 인수인계는 개인 채팅 대신 해당 Issue/PR 및 docs/tasks/cc-번호.md에 남겨라.
 ```
 
@@ -29,23 +37,23 @@ AGENTS.md를 자동으로 읽는 도구도 작업 시작 시 읽었는지 확인
 ## 이미 각자 만들고 있던 작업 옮기기
 
 1. **먼저 작업을 보존합니다.** 현재 브랜치·미커밋 파일을 확인하고 자기 변경만 자신의 기능 브랜치에 커밋하거나 별도 백업합니다. 다른 에이전트 작업이 섞여 있으면 임의 stash/reset/clean하지 않습니다.
-2. 이번 협업 PR을 관리자가 먼저 검토·통합합니다. 팀원은 `git fetch origin` 후 자기 브랜치에 `git merge origin/main`으로 공통 규칙을 받습니다. main을 다른 기능 브랜치로 덮어쓰지 않습니다.
+2. 협업 PR #3은 main에 통합되었습니다. 팀원은 `git fetch origin` 후 자기 브랜치에 `git merge origin/main`으로 공통 규칙을 받습니다. main을 다른 기능 브랜치로 덮어쓰지 않습니다.
 3. 자기 기능에 Issue를 연결하고 task JSON에 **이미 수정한 파일까지** 기록합니다. 미공유 변경이 공유 파일을 건드렸다면 여기서 충돌을 먼저 공개합니다.
 4. 여러 기능이 섞인 커밋은 새 작업 폴더에서 기능별로 분리해 옮깁니다. 기존 브랜치/커밋은 보존합니다. 자기 코드만 정확히 나눌 수 없으면 전체 cherry-pick하지 말고 통합 담당자와 변경 덩어리를 검토합니다.
 5. 브랜치를 push하고 Draft PR을 열어 실제 진행 상태를 보여줍니다. 팀원에게서 받은 패치/파일도 같은 리뷰 경로를 거칩니다.
 
 기존 `Tools/` 경로는 대문자를 유지합니다. Windows/macOS에서 `tools/`와 별개로 취급되지 않으므로 새 도구도 `Tools/` 아래에 만듭니다.
 
-공유된 PR은 [협업 설정 #3](https://github.com/ghwls9896/CampusCommons/pull/3)과 [퀴즈 Draft #4](https://github.com/ghwls9896/CampusCommons/pull/4)입니다. 협업 PR을 먼저 통합합니다.
+공유된 PR은 [협업 설정 #3](https://github.com/ghwls9896/CampusCommons/pull/3)과 [퀴즈 Draft #4](https://github.com/ghwls9896/CampusCommons/pull/4)입니다. 협업 PR #3은 통합됐고 퀴즈 PR #4는 검토 중입니다.
 
 현재 알려진 작업은 [협업 설정 #1](https://github.com/ghwls9896/CampusCommons/issues/1), [PDF 퀴즈룸 #2](https://github.com/ghwls9896/CampusCommons/issues/2)입니다. 다른 팀원의 로컬 구현은 아직 이 저장소에서 확인되지 않았으므로 완료 상태를 임의로 기록하지 않았습니다. 각자 현재 작업 Issue/초기 Draft PR을 등록하면 전체 작업이 보입니다.
 
 ## 저장소 관리자 ghwls9896가 한 번 할 설정
 
-파일만 올려서는 main 보호가 켜지지 않습니다. 현재 HIGHCHOI는 Write로 push/PR 가능하지만 보호 설정을 바꿀 Admin 권한은 없습니다.
+2026-11-09 재확인: ghwls9896가 PR #3을 main에 합쳤고 branch API에서 `protected=true` 및 `team-checks` 필수 상태를 확인했습니다. 상세 보호 API는 현재 Write 계정에서 조회되지 않아 필수 승인 수·Code Owner 승인·관리자 우회 등 아래 항목이 모두 설정됐다고 단정할 수 없습니다. 기존 보호를 덮어쓰지 말고 관리자가 비교 확인합니다. HIGHCHOI는 Write이며 보호 설정용 Admin 권한은 없습니다.
 
-1. **Settings → Collaborators**에서 네 계정의 초대 수락 및 Write 이상 권한을 확인합니다. 2026-11-09 확인 시 HIGHCHOI/GongBeak는 Write, Yeni-sjs는 Read였습니다. 최신 상태를 다시 확인해야 합니다. Write가 없으면 CODEOWNERS의 해당 담당자가 리뷰 소유자로 동작하지 않습니다.
-2. 이 협업 PR을 먼저 리뷰하고 merge합니다. `team-checks`가 한 번 실행되어 표시되는지 확인합니다. bootstrap PR은 수동 리뷰가 필요하며 이후 PR부터 자동 체크를 요구합니다.
+1. **Settings → Collaborators**에서 네 계정의 초대 수락 및 Write 이상 권한을 확인합니다. 2026-11-09 확인 시 HIGHCHOI/GongBeak는 Write, Yeni-sjs는 Read였습니다. 최신 상태를 다시 확인해야 합니다. Yeni-sjs도 자기 작업 브랜치를 push하려면 Write가 필요합니다. 최종 리뷰어인 HIGHCHOI와 ghwls9896는 모두 Write 이상이어야 합니다.
+2. PR #3 통합과 `team-checks` 필수 설정은 확인했습니다. 이번 승인 담당 변경 PR을 ghwls9896가 검토·통합하면 자동 요청 규칙도 적용됩니다.
 3. **Settings → Branches → Add classic branch protection rule**, 대상 `main`에 다음을 설정합니다. 이미 Ruleset/보호 규칙이 있으면 중복 생성하지 말고 기존 규칙을 확인하고 보완합니다.
    - Require a pull request before merging; 승인 1명 이상
    - Dismiss stale approvals; Require review from Code Owners
