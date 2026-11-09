@@ -1,0 +1,20 @@
+{
+  "id": "cc-11",
+  "title": "탈출룸 스태미나와 인벤토리 HUD 및 픽셀 캐릭터 디자인",
+  "owner": "ghwls9896",
+  "branch": "codex/cc-11-escape-hud",
+  "issue": "https://github.com/ghwls9896/CampusCommons/issues/11",
+  "scope": [
+    "Assets/StudyImmersive/Scripts/EscapeGame.cs",
+    "Assets/StudyImmersive/Art/EscapePixels/",
+    "Assets/StudyImmersive/Art/EscapePixels.meta",
+    "docs/tasks/cc-11.json",
+    "docs/tasks/cc-11.md"
+  ],
+  "shared_files": [],
+  "depends_on": [],
+  "validation": [
+    "Unity 6000.4.5f1 컴파일과 탈출룸 Play Mode 검증",
+    "python Tools/team/check.py --base origin/main"
+  ]
+}
