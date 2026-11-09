@@ -1,0 +1,6 @@
+PASS
+backup=Assets/LibraryCharacter/Backups/GrandLibrary_before_escape_correction 1.unity
+restoredTexts=11
+classrooms=14
+plaquesMoved=28
+fontGlyphs=PASS

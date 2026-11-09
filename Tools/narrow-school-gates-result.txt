@@ -1,0 +1,2 @@
+PASS: 8 gates narrowed to 1.8 m, backed up to Assets/LibraryCharacter/Backups/GrandLibrary_before_gate_resize.unity
+Grid blocked nodes=56 removed links=60 reachable notes=20

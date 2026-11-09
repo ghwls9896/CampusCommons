@@ -1,0 +1,23 @@
+Coffee brewer and glass carafes pos=(-0.550, 1.477, 10.480) rot=(0.0, 0.0, 0.0) size=(0.762, 0.765, 0.780) center=(-0.550, 1.477, 10.870)
+  Coffee brewer and glass carafes local=(0.0, 0.0, 0.0) world=(0.0, 0.0, 0.0) material=Coffee brewer material
+Cup saucer 1 pos=(0.867, 1.096, 10.999) rot=(0.0, 0.0, 0.0) size=(0.165, 0.018, 0.165) center=(0.420, 1.104, 10.790)
+  tea_set_01_saucer_circular_03 local=(270.0, 0.0, 0.0) world=(270.0, 0.0, 0.0) material=Porcelain tea set material
+Coffee cup 1 pos=(0.587, 1.104, 10.737) rot=(0.0, 0.0, 0.0) size=(0.117, 0.073, 0.145) center=(0.420, 1.144, 10.790)
+  tea_set_01_cup_small_01 local=(270.0, 0.0, 0.0) world=(270.0, 0.0, 0.0) material=Porcelain tea set material
+Cup saucer 2 pos=(1.117, 1.096, 10.999) rot=(0.0, 0.0, 0.0) size=(0.165, 0.018, 0.165) center=(0.670, 1.104, 10.790)
+  tea_set_01_saucer_circular_03 local=(270.0, 0.0, 0.0) world=(270.0, 0.0, 0.0) material=Porcelain tea set material
+Coffee cup 2 pos=(0.789, 1.105, 10.705) rot=(0.0, 18.0, 0.0) size=(0.130, 0.061, 0.145) center=(0.670, 1.138, 10.790)
+  tea_set_01_cup_small_01 local=(270.0, 0.0, 0.0) world=(270.0, 18.0, 0.0) material=Porcelain tea set material
+Cup saucer 3 pos=(1.367, 1.096, 10.999) rot=(0.0, 0.0, 0.0) size=(0.165, 0.018, 0.165) center=(0.920, 1.104, 10.790)
+  tea_set_01_saucer_circular_03 local=(270.0, 0.0, 0.0) world=(270.0, 0.0, 0.0) material=Porcelain tea set material
+Coffee cup 3 pos=(1.001, 1.105, 10.680) rot=(0.0, 36.0, 0.0) size=(0.140, 0.057, 0.145) center=(0.920, 1.136, 10.790)
+  tea_set_01_cup_small_01 local=(270.0, 0.0, 0.0) world=(270.0, 36.0, 0.0) material=Porcelain tea set material
+Cafe sugar bowl pos=(1.141, 1.092, 10.781) rot=(0.0, 0.0, 0.0) size=(0.115, 0.113, 0.160) center=(1.250, 1.152, 10.850)
+  tea_set_01_sugar_cup_01 local=(270.0, 0.0, 0.0) world=(270.0, 0.0, 0.0) material=Porcelain tea set material
+  tea_set_01_sugar_cup_01_lid local=(270.0, 0.0, 0.0) world=(270.0, 0.0, 0.0) material=Porcelain tea set material
+Costume display hat 1 pos=(3.828, 1.080, 10.693) rot=(0.0, 342.0, 0.0) size=(0.360, 0.364, 0.227) center=(3.820, 1.077, 10.720)
+  Costume display hat 1 local=(0.0, 342.0, 0.0) world=(0.0, 342.0, 0.0) material=Costume hat material
+Costume display hat 2 pos=(4.290, 1.080, 10.693) rot=(0.0, 20.0, 0.0) size=(0.360, 0.364, 0.236) center=(4.300, 1.077, 10.720)
+  Costume display hat 2 local=(0.0, 20.0, 0.0) world=(0.0, 20.0, 0.0) material=Costume hat material
+Cafe standing menu pos=(-3.690, 0.202, 9.323) rot=(0.0, 352.0, 0.0) size=(0.566, 0.383, 0.820) center=(-3.750, 0.202, 9.700)
+  Cafe standing menu local=(0.0, 352.0, 0.0) world=(0.0, 352.0, 0.0) material=Chalkboard wood material,Chalkboard slate material

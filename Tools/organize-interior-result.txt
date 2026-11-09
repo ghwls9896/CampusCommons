@@ -1,0 +1,7 @@
+PASS
+Lounge Set 01 rug=(-8.17, 0.02, -5.00) furniture shift=(0.83, 0.00, 0.00)
+Lounge Set 02 rug=(-8.17, 0.02, 3.00) furniture shift=(-0.11, 0.00, -0.09)
+Lounge Set 03 rug=(9.83, 0.02, -5.00) furniture shift=(0.83, 0.00, 0.00)
+Lounge Set 04 rug=(9.83, 0.02, 3.00) furniture shift=(0.83, 0.00, 0.00)
+School hall tables=12, separate table mesh and 3 grounded frames each
+Seats preserved=56; backup=Assets/LibraryCharacter/Backups/GrandLibrary_before_organizing.unity

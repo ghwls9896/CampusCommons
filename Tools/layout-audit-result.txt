@@ -1,0 +1,139 @@
+SCENE dirty-before-backup=False dirty-now=False backup=Assets/LibraryCharacter/Backups/GrandLibrary_before_manual_layout_work.unity
+LAYOUT Lounge Furniture | parent=Interiors and School | active=True | pos=(0.000, 0.000, 0.000) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(0.00, 6.02, -4.22)/(22.72, 12.03, 25.04) | children=42
+LAYOUT Sofa 01 | parent=Lounge Furniture | active=True | pos=(-9.000, 0.000, -6.750) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-9.00, 0.45, -6.75)/(3.00, 0.90, 1.05) | children=1
+LAYOUT Coffee Table 01 | parent=Lounge Furniture | active=True | pos=(-9.000, 0.000, -5.000) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-9.00, 0.28, -5.00)/(1.50, 0.55, 1.50) | children=1
+LAYOUT Lounge Chair 01 | parent=Lounge Furniture | active=True | pos=(-10.650, 0.000, -4.250) | rot=(0.0, 125.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-10.65, 0.49, -4.25)/(1.42, 0.98, 1.39) | children=1
+LAYOUT Lounge Chair Seat 01 | parent=Lounge Furniture | active=True | pos=(-10.650, 0.610, -4.250) | rot=(0.0, 125.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=none | children=0
+LAYOUT Lounge Chair 02 | parent=Lounge Furniture | active=True | pos=(-7.350, 0.000, -4.250) | rot=(0.0, 235.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-7.35, 0.49, -4.25)/(1.42, 0.98, 1.39) | children=1
+LAYOUT Lounge Chair Seat 02 | parent=Lounge Furniture | active=True | pos=(-7.350, 0.610, -4.250) | rot=(0.0, 235.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=none | children=0
+LAYOUT Sofa Seat 01 | parent=Lounge Furniture | active=True | pos=(-9.800, 0.620, -6.750) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=none | children=0
+LAYOUT Sofa Seat 02 | parent=Lounge Furniture | active=True | pos=(-9.000, 0.620, -6.750) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=none | children=0
+LAYOUT Sofa Seat 03 | parent=Lounge Furniture | active=True | pos=(-8.200, 0.620, -6.750) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=none | children=0
+LAYOUT Sofa 02 | parent=Lounge Furniture | active=True | pos=(-9.000, 0.000, 1.250) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-8.09, 0.63, 1.63)/(3.00, 1.27, 0.79) | children=2
+LAYOUT Coffee Table 02 | parent=Lounge Furniture | active=True | pos=(-9.000, 0.000, 3.000) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-8.06, 0.28, 3.09)/(1.50, 0.55, 1.50) | children=1
+LAYOUT Lounge Chair 03 | parent=Lounge Furniture | active=True | pos=(-10.650, 0.000, 3.750) | rot=(0.0, 125.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-9.42, 0.49, 4.02)/(1.42, 0.98, 1.39) | children=1
+LAYOUT Lounge Chair Seat 03 | parent=Lounge Furniture | active=True | pos=(-10.650, 0.610, 3.750) | rot=(0.0, 125.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=none | children=0
+LAYOUT Lounge Chair 04 | parent=Lounge Furniture | active=True | pos=(-7.350, 0.000, 3.750) | rot=(0.0, 235.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-6.58, 0.49, 3.84)/(1.42, 0.98, 1.39) | children=1
+LAYOUT Lounge Chair Seat 04 | parent=Lounge Furniture | active=True | pos=(-7.350, 0.610, 3.750) | rot=(0.0, 235.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=none | children=0
+LAYOUT Sofa Seat 04 | parent=Lounge Furniture | active=True | pos=(-9.800, 0.620, 1.250) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=none | children=0
+LAYOUT Sofa Seat 05 | parent=Lounge Furniture | active=True | pos=(-9.000, 0.620, 1.250) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=none | children=0
+LAYOUT Sofa Seat 06 | parent=Lounge Furniture | active=True | pos=(-8.200, 0.620, 1.250) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=none | children=0
+LAYOUT Sofa 03 | parent=Lounge Furniture | active=True | pos=(9.000, 0.000, -6.750) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(9.00, 0.45, -6.75)/(3.00, 0.90, 1.05) | children=1
+LAYOUT Coffee Table 03 | parent=Lounge Furniture | active=True | pos=(9.000, 0.000, -5.000) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(9.00, 0.28, -5.00)/(1.50, 0.55, 1.50) | children=1
+LAYOUT Lounge Chair 05 | parent=Lounge Furniture | active=True | pos=(7.350, 0.000, -4.250) | rot=(0.0, 125.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(7.35, 0.49, -4.25)/(1.42, 0.98, 1.39) | children=1
+LAYOUT Lounge Chair Seat 05 | parent=Lounge Furniture | active=True | pos=(7.350, 0.610, -4.250) | rot=(0.0, 125.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=none | children=0
+LAYOUT Lounge Chair 06 | parent=Lounge Furniture | active=True | pos=(10.650, 0.000, -4.250) | rot=(0.0, 235.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(10.65, 0.49, -4.25)/(1.42, 0.98, 1.39) | children=1
+LAYOUT Lounge Chair Seat 06 | parent=Lounge Furniture | active=True | pos=(10.650, 0.610, -4.250) | rot=(0.0, 235.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=none | children=0
+LAYOUT Sofa Seat 07 | parent=Lounge Furniture | active=True | pos=(8.200, 0.620, -6.750) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=none | children=0
+LAYOUT Sofa Seat 08 | parent=Lounge Furniture | active=True | pos=(9.000, 0.620, -6.750) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=none | children=0
+LAYOUT Sofa Seat 09 | parent=Lounge Furniture | active=True | pos=(9.800, 0.620, -6.750) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=none | children=0
+LAYOUT Sofa 04 | parent=Lounge Furniture | active=True | pos=(9.000, 0.000, 1.250) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(9.00, 0.63, 1.25)/(3.00, 1.27, 0.79) | children=2
+LAYOUT Coffee Table 04 | parent=Lounge Furniture | active=True | pos=(9.000, 0.000, 3.000) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(9.00, 0.28, 3.00)/(1.50, 0.55, 1.50) | children=1
+LAYOUT Lounge Chair 07 | parent=Lounge Furniture | active=True | pos=(7.350, 0.000, 3.750) | rot=(0.0, 125.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(7.35, 0.49, 3.75)/(1.42, 0.98, 1.39) | children=1
+LAYOUT Lounge Chair Seat 07 | parent=Lounge Furniture | active=True | pos=(7.350, 0.610, 3.750) | rot=(0.0, 125.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=none | children=0
+LAYOUT Lounge Chair 08 | parent=Lounge Furniture | active=True | pos=(10.650, 0.000, 3.750) | rot=(0.0, 235.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(10.65, 0.49, 3.75)/(1.42, 0.98, 1.39) | children=1
+LAYOUT Lounge Chair Seat 08 | parent=Lounge Furniture | active=True | pos=(10.650, 0.610, 3.750) | rot=(0.0, 235.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=none | children=0
+LAYOUT Sofa Seat 10 | parent=Lounge Furniture | active=True | pos=(8.200, 0.620, 1.250) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=none | children=0
+LAYOUT Sofa Seat 11 | parent=Lounge Furniture | active=True | pos=(9.000, 0.620, 1.250) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=none | children=0
+LAYOUT Sofa Seat 12 | parent=Lounge Furniture | active=True | pos=(9.800, 0.620, 1.250) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=none | children=0
+LAYOUT Study Furniture | parent=Interiors and School | active=True | pos=(0.000, 0.000, 0.000) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(0.00, 0.71, -0.30)/(9.20, 1.41, 14.79) | children=60
+LAYOUT Study Table 01 | parent=Study Furniture | active=True | pos=(-3.400, 0.000, -0.300) | rot=(0.0, 0.0, 0.0) | scale=(0.94, 1.00, 1.05) | bounds=(-3.40, 0.38, -0.30)/(2.40, 0.75, 1.10) | children=1
+LAYOUT Study Chair 01 | parent=Study Furniture | active=True | pos=(-4.120, 0.000, -1.230) | rot=(0.0, 0.0, 0.0) | scale=(0.96, 1.00, 0.96) | bounds=(-4.12, 0.52, -1.23)/(0.54, 1.05, 0.62) | children=1
+LAYOUT Study Chair Seat 01 | parent=Study Furniture | active=True | pos=(-4.120, 0.500, -1.230) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=none | children=0
+LAYOUT Study Chair 02 | parent=Study Furniture | active=True | pos=(-4.120, 0.000, 0.630) | rot=(0.0, 180.0, 0.0) | scale=(0.96, 1.00, 0.96) | bounds=(-4.12, 0.52, 0.63)/(0.54, 1.05, 0.62) | children=1
+LAYOUT Study Chair Seat 02 | parent=Study Furniture | active=True | pos=(-4.120, 0.500, 0.630) | rot=(0.0, 180.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=none | children=0
+LAYOUT Study Chair 03 | parent=Study Furniture | active=True | pos=(-2.680, 0.000, -1.230) | rot=(0.0, 0.0, 0.0) | scale=(0.96, 1.00, 0.96) | bounds=(-2.68, 0.52, -1.23)/(0.54, 1.05, 0.62) | children=1
+LAYOUT Study Chair Seat 03 | parent=Study Furniture | active=True | pos=(-2.680, 0.500, -1.230) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=none | children=0
+LAYOUT Study Chair 04 | parent=Study Furniture | active=True | pos=(-2.680, 0.000, 0.630) | rot=(0.0, 180.0, 0.0) | scale=(0.96, 1.00, 0.96) | bounds=(-2.68, 0.52, 0.63)/(0.54, 1.05, 0.62) | children=1
+LAYOUT Study Chair Seat 04 | parent=Study Furniture | active=True | pos=(-2.680, 0.500, 0.630) | rot=(0.0, 180.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=none | children=0
+LAYOUT Desk Lamp 01 | parent=Study Furniture | active=True | pos=(-3.400, 0.760, -0.300) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-3.40, 1.09, -0.30)/(0.40, 0.65, 0.40) | children=1
+LAYOUT Study Table 02 | parent=Study Furniture | active=True | pos=(3.400, 0.000, -0.300) | rot=(0.0, 0.0, 0.0) | scale=(0.94, 1.00, 1.05) | bounds=(3.40, 0.38, -0.30)/(2.40, 0.75, 1.10) | children=1
+LAYOUT Study Chair 05 | parent=Study Furniture | active=True | pos=(2.680, 0.000, -1.230) | rot=(0.0, 0.0, 0.0) | scale=(0.96, 1.00, 0.96) | bounds=(2.68, 0.52, -1.23)/(0.54, 1.05, 0.62) | children=1
+LAYOUT Study Chair Seat 05 | parent=Study Furniture | active=True | pos=(2.680, 0.500, -1.230) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=none | children=0
+LAYOUT Study Chair 06 | parent=Study Furniture | active=True | pos=(2.680, 0.000, 0.630) | rot=(0.0, 180.0, 0.0) | scale=(0.96, 1.00, 0.96) | bounds=(2.68, 0.52, 0.63)/(0.54, 1.05, 0.62) | children=1
+LAYOUT Study Chair Seat 06 | parent=Study Furniture | active=True | pos=(2.680, 0.500, 0.630) | rot=(0.0, 180.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=none | children=0
+LAYOUT Study Chair 07 | parent=Study Furniture | active=True | pos=(4.120, 0.000, -1.230) | rot=(0.0, 0.0, 0.0) | scale=(0.96, 1.00, 0.96) | bounds=(4.12, 0.52, -1.23)/(0.54, 1.05, 0.62) | children=1
+LAYOUT Study Chair Seat 07 | parent=Study Furniture | active=True | pos=(4.120, 0.500, -1.230) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=none | children=0
+LAYOUT Study Chair 08 | parent=Study Furniture | active=True | pos=(4.120, 0.000, 0.630) | rot=(0.0, 180.0, 0.0) | scale=(0.96, 1.00, 0.96) | bounds=(4.12, 0.52, 0.63)/(0.54, 1.05, 0.62) | children=1
+LAYOUT Study Chair Seat 08 | parent=Study Furniture | active=True | pos=(4.120, 0.500, 0.630) | rot=(0.0, 180.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=none | children=0
+LAYOUT Desk Lamp 02 | parent=Study Furniture | active=True | pos=(3.400, 0.760, -0.300) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(3.40, 1.09, -0.30)/(0.40, 0.65, 0.40) | children=1
+LAYOUT Study Table 03 | parent=Study Furniture | active=True | pos=(-3.400, 0.000, -6.450) | rot=(0.0, 0.0, 0.0) | scale=(0.94, 1.00, 1.05) | bounds=(-3.40, 0.38, -6.45)/(2.40, 0.75, 1.10) | children=1
+LAYOUT Study Chair 09 | parent=Study Furniture | active=True | pos=(-4.120, 0.000, -7.380) | rot=(0.0, 0.0, 0.0) | scale=(0.96, 1.00, 0.96) | bounds=(-4.12, 0.52, -7.38)/(0.54, 1.05, 0.62) | children=1
+LAYOUT Study Chair Seat 09 | parent=Study Furniture | active=True | pos=(-4.120, 0.500, -7.380) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=none | children=0
+LAYOUT Study Chair 10 | parent=Study Furniture | active=True | pos=(-4.120, 0.000, -5.520) | rot=(0.0, 180.0, 0.0) | scale=(0.96, 1.00, 0.96) | bounds=(-4.12, 0.52, -5.52)/(0.54, 1.05, 0.62) | children=1
+LAYOUT Study Chair Seat 10 | parent=Study Furniture | active=True | pos=(-4.120, 0.500, -5.520) | rot=(0.0, 180.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=none | children=0
+LAYOUT Study Chair 11 | parent=Study Furniture | active=True | pos=(-2.680, 0.000, -7.380) | rot=(0.0, 0.0, 0.0) | scale=(0.96, 1.00, 0.96) | bounds=(-2.68, 0.52, -7.38)/(0.54, 1.05, 0.62) | children=1
+LAYOUT Study Chair Seat 11 | parent=Study Furniture | active=True | pos=(-2.680, 0.500, -7.380) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=none | children=0
+LAYOUT Study Chair 12 | parent=Study Furniture | active=True | pos=(-2.680, 0.000, -5.520) | rot=(0.0, 180.0, 0.0) | scale=(0.96, 1.00, 0.96) | bounds=(-2.68, 0.52, -5.52)/(0.54, 1.05, 0.62) | children=1
+LAYOUT Study Chair Seat 12 | parent=Study Furniture | active=True | pos=(-2.680, 0.500, -5.520) | rot=(0.0, 180.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=none | children=0
+LAYOUT Desk Lamp 03 | parent=Study Furniture | active=True | pos=(-3.400, 0.760, -6.450) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-3.40, 1.09, -6.45)/(0.40, 0.65, 0.40) | children=1
+LAYOUT Study Table 04 | parent=Study Furniture | active=True | pos=(3.400, 0.000, -6.450) | rot=(0.0, 0.0, 0.0) | scale=(0.94, 1.00, 1.05) | bounds=(3.40, 0.38, -6.45)/(2.40, 0.75, 1.10) | children=1
+LAYOUT Study Chair 13 | parent=Study Furniture | active=True | pos=(2.680, 0.000, -7.380) | rot=(0.0, 0.0, 0.0) | scale=(0.96, 1.00, 0.96) | bounds=(2.68, 0.52, -7.38)/(0.54, 1.05, 0.62) | children=1
+LAYOUT Study Chair Seat 13 | parent=Study Furniture | active=True | pos=(2.680, 0.500, -7.380) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=none | children=0
+LAYOUT Study Chair 14 | parent=Study Furniture | active=True | pos=(2.680, 0.000, -5.520) | rot=(0.0, 180.0, 0.0) | scale=(0.96, 1.00, 0.96) | bounds=(2.68, 0.52, -5.52)/(0.54, 1.05, 0.62) | children=1
+LAYOUT Study Chair Seat 14 | parent=Study Furniture | active=True | pos=(2.680, 0.500, -5.520) | rot=(0.0, 180.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=none | children=0
+LAYOUT Study Chair 15 | parent=Study Furniture | active=True | pos=(4.120, 0.000, -7.380) | rot=(0.0, 0.0, 0.0) | scale=(0.96, 1.00, 0.96) | bounds=(4.12, 0.52, -7.38)/(0.54, 1.05, 0.62) | children=1
+LAYOUT Study Chair Seat 15 | parent=Study Furniture | active=True | pos=(4.120, 0.500, -7.380) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=none | children=0
+LAYOUT Study Chair 16 | parent=Study Furniture | active=True | pos=(4.120, 0.000, -5.520) | rot=(0.0, 180.0, 0.0) | scale=(0.96, 1.00, 0.96) | bounds=(4.12, 0.52, -5.52)/(0.54, 1.05, 0.62) | children=1
+LAYOUT Study Chair Seat 16 | parent=Study Furniture | active=True | pos=(4.120, 0.500, -5.520) | rot=(0.0, 180.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=none | children=0
+LAYOUT Desk Lamp 04 | parent=Study Furniture | active=True | pos=(3.400, 0.760, -6.450) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(3.40, 1.09, -6.45)/(0.40, 0.65, 0.40) | children=1
+LAYOUT Study Table 05 | parent=Study Furniture | active=True | pos=(-3.400, 0.000, 5.850) | rot=(0.0, 0.0, 0.0) | scale=(0.94, 1.00, 1.05) | bounds=(-3.40, 0.38, 5.85)/(2.40, 0.75, 1.10) | children=1
+LAYOUT Study Chair 17 | parent=Study Furniture | active=True | pos=(-4.120, 0.000, 4.920) | rot=(0.0, 0.0, 0.0) | scale=(0.96, 1.00, 0.96) | bounds=(-4.12, 0.52, 4.92)/(0.54, 1.05, 0.62) | children=1
+LAYOUT Study Chair Seat 17 | parent=Study Furniture | active=True | pos=(-4.120, 0.500, 4.920) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=none | children=0
+LAYOUT Study Chair 18 | parent=Study Furniture | active=True | pos=(-4.120, 0.000, 6.780) | rot=(0.0, 180.0, 0.0) | scale=(0.96, 1.00, 0.96) | bounds=(-4.12, 0.52, 6.78)/(0.54, 1.05, 0.62) | children=1
+LAYOUT Study Chair Seat 18 | parent=Study Furniture | active=True | pos=(-4.120, 0.500, 6.780) | rot=(0.0, 180.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=none | children=0
+LAYOUT Study Chair 19 | parent=Study Furniture | active=True | pos=(-2.680, 0.000, 4.920) | rot=(0.0, 0.0, 0.0) | scale=(0.96, 1.00, 0.96) | bounds=(-2.68, 0.52, 4.92)/(0.54, 1.05, 0.62) | children=1
+LAYOUT Study Chair Seat 19 | parent=Study Furniture | active=True | pos=(-2.680, 0.500, 4.920) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=none | children=0
+LAYOUT Study Chair 20 | parent=Study Furniture | active=True | pos=(-2.680, 0.000, 6.780) | rot=(0.0, 180.0, 0.0) | scale=(0.96, 1.00, 0.96) | bounds=(-2.68, 0.52, 6.78)/(0.54, 1.05, 0.62) | children=1
+LAYOUT Study Chair Seat 20 | parent=Study Furniture | active=True | pos=(-2.680, 0.500, 6.780) | rot=(0.0, 180.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=none | children=0
+LAYOUT Desk Lamp 05 | parent=Study Furniture | active=True | pos=(-3.400, 0.760, 5.850) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-3.40, 1.09, 5.85)/(0.40, 0.65, 0.40) | children=1
+LAYOUT Study Table 06 | parent=Study Furniture | active=True | pos=(3.400, 0.000, 5.850) | rot=(0.0, 0.0, 0.0) | scale=(0.94, 1.00, 1.05) | bounds=(3.40, 0.38, 5.85)/(2.40, 0.75, 1.10) | children=1
+LAYOUT Study Chair 21 | parent=Study Furniture | active=True | pos=(2.680, 0.000, 4.920) | rot=(0.0, 0.0, 0.0) | scale=(0.96, 1.00, 0.96) | bounds=(2.68, 0.52, 4.92)/(0.54, 1.05, 0.62) | children=1
+LAYOUT Study Chair Seat 21 | parent=Study Furniture | active=True | pos=(2.680, 0.500, 4.920) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=none | children=0
+LAYOUT Study Chair 22 | parent=Study Furniture | active=True | pos=(2.680, 0.000, 6.780) | rot=(0.0, 180.0, 0.0) | scale=(0.96, 1.00, 0.96) | bounds=(2.68, 0.52, 6.78)/(0.54, 1.05, 0.62) | children=1
+LAYOUT Study Chair Seat 22 | parent=Study Furniture | active=True | pos=(2.680, 0.500, 6.780) | rot=(0.0, 180.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=none | children=0
+LAYOUT Study Chair 23 | parent=Study Furniture | active=True | pos=(4.120, 0.000, 4.920) | rot=(0.0, 0.0, 0.0) | scale=(0.96, 1.00, 0.96) | bounds=(4.12, 0.52, 4.92)/(0.54, 1.05, 0.62) | children=1
+LAYOUT Study Chair Seat 23 | parent=Study Furniture | active=True | pos=(4.120, 0.500, 4.920) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=none | children=0
+LAYOUT Study Chair 24 | parent=Study Furniture | active=True | pos=(4.120, 0.000, 6.780) | rot=(0.0, 180.0, 0.0) | scale=(0.96, 1.00, 0.96) | bounds=(4.12, 0.52, 6.78)/(0.54, 1.05, 0.62) | children=1
+LAYOUT Study Chair Seat 24 | parent=Study Furniture | active=True | pos=(4.120, 0.500, 6.780) | rot=(0.0, 180.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=none | children=0
+LAYOUT Desk Lamp 06 | parent=Study Furniture | active=True | pos=(3.400, 0.760, 5.850) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(3.40, 1.09, 5.85)/(0.40, 0.65, 0.40) | children=1
+LAYOUT Desk Plant 01 | parent=Desk Props | active=True | pos=(-4.400, 0.760, -0.220) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-4.40, 0.88, -0.22)/(0.18, 0.24, 0.18) | children=1
+LAYOUT Desk Plant 02 | parent=Desk Props | active=True | pos=(2.400, 0.760, -0.220) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(2.40, 0.88, -0.22)/(0.18, 0.24, 0.18) | children=1
+LAYOUT Desk Plant 03 | parent=Desk Props | active=True | pos=(-4.400, 0.760, -6.370) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-4.40, 0.88, -6.37)/(0.18, 0.24, 0.18) | children=1
+LAYOUT Desk Plant 04 | parent=Desk Props | active=True | pos=(2.400, 0.760, -6.370) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(2.40, 0.88, -6.37)/(0.18, 0.24, 0.18) | children=1
+LAYOUT Desk Plant 05 | parent=Desk Props | active=True | pos=(-4.400, 0.760, 5.930) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(-4.40, 0.88, 5.93)/(0.18, 0.24, 0.18) | children=1
+LAYOUT Desk Plant 06 | parent=Desk Props | active=True | pos=(2.400, 0.760, 5.930) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(2.40, 0.88, 5.93)/(0.18, 0.24, 0.18) | children=1
+LAYOUT Lounge Decorations | parent=ROOT | active=True | pos=(0.000, 0.000, 0.000) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(0.02, 0.89, -0.05)/(19.72, 1.78, 29.42) | children=14
+LAYOUT Study Rug 01 | parent=Lounge Decorations | active=False | pos=(-3.400, 0.012, -0.300) | rot=(0.0, 0.0, 0.0) | scale=(3.40, 0.00, 2.55) | bounds=none | children=0
+LAYOUT Study Rug 02 | parent=Lounge Decorations | active=False | pos=(3.400, 0.012, -0.300) | rot=(0.0, 0.0, 0.0) | scale=(3.40, 0.00, 2.55) | bounds=none | children=0
+LAYOUT Study Rug 03 | parent=Lounge Decorations | active=False | pos=(-3.400, 0.012, -6.450) | rot=(0.0, 0.0, 0.0) | scale=(3.40, 0.00, 2.55) | bounds=none | children=0
+LAYOUT Study Rug 04 | parent=Lounge Decorations | active=False | pos=(3.400, 0.012, -6.450) | rot=(0.0, 0.0, 0.0) | scale=(3.40, 0.00, 2.55) | bounds=none | children=0
+LAYOUT Study Rug 05 | parent=Lounge Decorations | active=False | pos=(-3.400, 0.012, 5.850) | rot=(0.0, 0.0, 0.0) | scale=(3.40, 0.00, 2.55) | bounds=none | children=0
+LAYOUT Study Rug 06 | parent=Lounge Decorations | active=False | pos=(3.400, 0.012, 5.850) | rot=(0.0, 0.0, 0.0) | scale=(3.40, 0.00, 2.55) | bounds=none | children=0
+LAYOUT Coffee Table Plant 01 | parent=Lounge Decorations | active=True | pos=(-9.000, 0.555, -5.000) | rot=(0.0, 0.0, 0.0) | scale=(0.90, 0.90, 0.90) | bounds=(-9.00, 0.66, -5.00)/(0.16, 0.22, 0.16) | children=1
+LAYOUT Coffee Table Plant 02 | parent=Lounge Decorations | active=True | pos=(-9.000, 0.555, 3.000) | rot=(0.0, 90.0, 0.0) | scale=(0.90, 0.90, 0.90) | bounds=(-8.10, 0.66, 2.48)/(0.15, 0.22, 0.17) | children=1
+LAYOUT Coffee Table Plant 03 | parent=Lounge Decorations | active=True | pos=(9.000, 0.555, -5.000) | rot=(0.0, 180.0, 0.0) | scale=(0.90, 0.90, 0.90) | bounds=(9.00, 0.66, -5.00)/(0.16, 0.22, 0.16) | children=1
+LAYOUT Coffee Table Plant 04 | parent=Lounge Decorations | active=True | pos=(9.000, 0.555, 3.000) | rot=(0.0, 270.0, 0.0) | scale=(0.90, 0.90, 0.90) | bounds=(9.00, 0.66, 3.00)/(0.16, 0.22, 0.16) | children=1
+LAYOUT Round rug beneath Study Table 01 | parent=Cafe and doorway update | active=True | pos=(-3.400, 0.022, -0.300) | rot=(0.0, 0.0, 0.0) | scale=(0.04, 0.04, 0.04) | bounds=(-3.40, 0.03, -0.30)/(3.28, 0.02, 3.28) | children=1
+LAYOUT Round rug beneath Study Table 02 | parent=Cafe and doorway update | active=True | pos=(3.400, 0.022, -0.300) | rot=(0.0, 0.0, 0.0) | scale=(0.04, 0.04, 0.04) | bounds=(3.40, 0.03, -0.30)/(3.28, 0.02, 3.28) | children=1
+LAYOUT Round rug beneath Study Table 03 | parent=Cafe and doorway update | active=True | pos=(-3.400, 0.022, -6.450) | rot=(0.0, 0.0, 0.0) | scale=(0.04, 0.04, 0.04) | bounds=(-3.40, 0.03, -6.45)/(3.28, 0.02, 3.28) | children=1
+LAYOUT Round rug beneath Study Table 04 | parent=Cafe and doorway update | active=True | pos=(3.400, 0.022, -6.450) | rot=(0.0, 0.0, 0.0) | scale=(0.04, 0.04, 0.04) | bounds=(3.40, 0.03, -6.45)/(3.28, 0.02, 3.28) | children=1
+LAYOUT Round rug beneath Study Table 05 | parent=Cafe and doorway update | active=True | pos=(-3.400, 0.022, 5.850) | rot=(0.0, 0.0, 0.0) | scale=(0.04, 0.04, 0.04) | bounds=(-3.40, 0.03, 5.85)/(3.28, 0.02, 3.28) | children=1
+LAYOUT Round rug beneath Study Table 06 | parent=Cafe and doorway update | active=True | pos=(3.400, 0.022, 5.850) | rot=(0.0, 0.0, 0.0) | scale=(0.04, 0.04, 0.04) | bounds=(3.40, 0.03, 5.85)/(3.28, 0.02, 3.28) | children=1
+LAYOUT Grey cafe rug | parent=Cafe and doorway update | active=True | pos=(0.000, 0.018, 8.800) | rot=(270.0, 0.0, 0.0) | scale=(2.30, 2.30, 0.12) | bounds=(0.00, 0.03, 8.80)/(3.87, 0.01, 3.23) | children=0
+LAYOUT Cafe and future shop | parent=Cafe and doorway update | active=True | pos=(0.000, 0.000, 0.000) | rot=(0.0, 0.0, 0.0) | scale=(1.00, 1.00, 1.00) | bounds=(0.30, 2.03, 10.38)/(8.92, 4.05, 2.07) | children=42
+TEXT Sign | value=EXIT | font=LegacyRuntime | pos=(473.76, 2.68, -33.13)
+TEXT Sign | value=EXIT | font=LegacyRuntime | pos=(473.74, 2.68, -33.13)
+TEXT MAFIA door label | value=MAFIA | font=LegacyRuntime | pos=(13.91, 3.53, -5.50)
+TEXT QUIZ door label | value=QUIZ | font=LegacyRuntime | pos=(13.91, 3.53, 0.00)
+TEXT ESCAPE door label | value=ESCAPE | font=LegacyRuntime | pos=(13.91, 3.53, 5.50)
+TEXT Cafe title | value=ATRIUM CAFE | font=LegacyRuntime | pos=(0.00, 2.96, 11.06)
+TEXT Menu heading | value=COFFEE | font=LegacyRuntime | pos=(1.85, 1.68, 10.76)
+TEXT Menu detail | value=CAFE | font=LegacyRuntime | pos=(1.85, 1.46, 10.76)
+TEXT Shop label | value=STYLE SHOP | font=LegacyRuntime | pos=(4.05, 1.21, 10.19)
+TEXT Cafe chalk menu lettering | value=COFFEE / TEA | font=LegacyRuntime | pos=(-3.71, 0.67, 9.40)
+HALL_MESH School Structure 017 | mesh=SCHOOL_017_SOLID | mat=Campus Desk Wood | triangles=432 | bounds=(509.88, 0.62, -29.19)/(27.75, 0.34, 16.63)
+HALL_MESH School Structure 037 | mesh=CampusSurface_SCHOOL_037_SOLID | mat=Campus Plain Wall,Campus Floor,Campus Ceiling | triangles=198 | bounds=(495.13, 0.79, -20.00)/(2.08, 1.25, 0.00)
+HALL_MESH School Structure 045 | mesh=SCHOOL_045_SOLID | mat=Campus Notice | triangles=110 | bounds=(517.50, 0.79, -20.00)/(2.33, 1.25, 0.00)
+HALL_MESH School Structure 051 | mesh=SCHOOL_051_SOLID | mat=Campus Wall | triangles=3399 | bounds=(509.50, 0.79, -20.00)/(30.83, 1.25, 0.00)
+HALL_MESH School Structure 053 | mesh=SCHOOL_053_SOLID | mat=Campus Window | triangles=330 | bounds=(507.50, 0.79, -20.00)/(2.33, 1.25, 0.00)

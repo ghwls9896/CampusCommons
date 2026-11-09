@@ -1,0 +1,31 @@
+# 도서관과 탈출 학교
+
+Unity에서 `Assets/StudyImmersive/Scenes/GrandLibrary_Living.unity`를 열고 Play를 누르세요. 라운지의 포탈을 통과하면 마피아룸, 1대1 퀴즈룸, 탈출 학교로 이동합니다. 탈출 학교에 도착하면 쉬움, 보통, 어려움, 타임어택을 선택합니다.
+
+## 탈출방 조작
+
+- `WASD`: 이동, `Shift`: 달리기, 마우스: 시점 이동
+- 화면 가운데 십자 표시로 문제지나 문을 가리키고 마우스 왼쪽 버튼을 클릭하거나 가까이에서 `E`를 누르세요.
+- 문제지마다 무작위 Python 코딩 문제 3개가 나오며, 보기를 클릭해 답합니다. 오답 한 개마다 몬스터가 빨라집니다. 문제를 푸는 동안 몬스터는 잠시 멈춥니다.
+- 쉬움은 문제지 3개, 보통과 타임어택은 5개, 어려움은 7개입니다. 타임어택은 3분입니다. 문제지는 이동 가능한 학교 전역의 20개 후보 위치에서 나누어 배치됩니다.
+- 문제지를 모두 풀면 `EXIT` 문에서 탈출할 수 있습니다. HUD에 탈출구까지의 직선거리가 표시됩니다.
+- 각 방에서 `Esc`를 누르면 나갈지 묻습니다. `예`는 로비로 돌아가고, `아니오`는 현재 방에 남습니다. 탈출방 확인창을 띄운 동안 몬스터와 타이머는 멈춥니다. 방 안에는 귀환 포탈이 없습니다.
+
+새 캐릭터는 2D 이미지가 항상 로컬 플레이어 카메라를 향하도록 세운 빌보드입니다. 학교 안에서는 경로를 따라 플레이어를 추격하며, 문이 닫혀 있으면 열고 지나갑니다. 네트워크 동기화는 아직 포함되지 않았습니다.
+
+## 씬과 스크립트
+
+Hierarchy의 주요 그룹은 `Building`, `Interiors and School`, `Portals`, `Lighting`, `Library Books`, `Bird Monster`, `School Doors` 등 영어 이름으로 정리했습니다. 책은 선반 안쪽에 맞췄으며, 탈출 학교의 초록색 원본 재질과 그림은 파란색·하늘색 중심의 학교 재질과 안내판으로 교체했습니다.
+
+- `Player.cs`: 라운지 플레이어 이동과 카메라
+- `Portal.cs`, `Seat.cs`, `GameStart.cs`: 포탈, 좌석, 플레이어 생성
+- `EscapeGame.cs`: 탈출방 진행과 입력, 문제 UI
+- `CodeQuestions.cs`: Python 코딩 문제와 정답
+- `Door.cs`, `Sheet.cs`: 여닫는 문과 문제지
+- `Monster.cs`, `SchoolGrid.cs`, `FaceCamera.cs`: 몬스터 추격 경로와 카메라를 향하는 2D 캐릭터
+
+이름 변경 시 Unity `.meta` GUID를 유지했습니다. 작업 전 열린 씬의 백업은 `Assets/LibraryCharacter/Backups`에 생성됩니다.
+
+## 에셋 출처
+
+책 모델과 표지·종이 텍스처는 [Poly Haven Book Encyclopedia Set 01](https://polyhaven.com/a/book_encyclopedia_set_01)의 CC0 에셋을 실시간 사용에 맞춰 단순화하고 4K 텍스처로 적용했습니다. 교실 문 텍스처는 사용자가 제공한 학교 파일에서 가져왔습니다. `Sprites/ScholarBird_Billboard.png`는 사용자가 제공한 캐릭터와 발디 이미지의 구도·스타일을 참조해 내장 이미지 생성 기능으로 제작한 투명 스프라이트입니다. 이미지 생성 프롬프트는 `Sprites/CharacterPrompt.txt`에 기록했습니다.

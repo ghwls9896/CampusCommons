@@ -1,0 +1,453 @@
+[
+  {
+    "id": "sofa_02",
+    "min": [
+      -0.9033163785934448,
+      -0.34005284309387207,
+      0.0002056425146292895
+    ],
+    "max": [
+      0.9038509726524353,
+      0.47769859433174133,
+      0.7096946835517883
+    ],
+    "size": [
+      1.8071672916412354,
+      0.817751407623291,
+      0.7094890475273132
+    ],
+    "objects": [
+      {
+        "name": "sofa_02_Base",
+        "vertices": 1183,
+        "materials": [
+          "sofa_02"
+        ]
+      },
+      {
+        "name": "sofa_02_Seat",
+        "vertices": 206,
+        "materials": [
+          "sofa_02"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "mid_century_lounge_chair",
+    "min": [
+      -0.5043071508407593,
+      -0.5289482474327087,
+      -8.54272030892389e-08
+    ],
+    "max": [
+      0.504307210445404,
+      0.6613625884056091,
+      1.1690846681594849
+    ],
+    "size": [
+      1.0086143016815186,
+      1.1903108358383179,
+      1.1690847873687744
+    ],
+    "objects": [
+      {
+        "name": "mid_century_lounge_chair",
+        "vertices": 3086,
+        "materials": [
+          "mid_century_lounge_chair"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "dining_chair_02",
+    "min": [
+      -0.21678538620471954,
+      -0.24539630115032196,
+      0.0012850371422246099
+    ],
+    "max": [
+      0.21678538620471954,
+      0.3310239613056183,
+      0.9746628403663635
+    ],
+    "size": [
+      0.4335707724094391,
+      0.576420247554779,
+      0.9733778238296509
+    ],
+    "objects": [
+      {
+        "name": "dining_chair_02",
+        "vertices": 11975,
+        "materials": [
+          "dining_chair_02"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "round_wooden_table_01",
+    "min": [
+      -0.6996744871139526,
+      -0.6996744871139526,
+      -0.0013185091083869338
+    ],
+    "max": [
+      0.6996744871139526,
+      0.6996746063232422,
+      1.0037031173706055
+    ],
+    "size": [
+      1.3993489742279053,
+      1.3993490934371948,
+      1.005021572113037
+    ],
+    "objects": [
+      {
+        "name": "round_wooden_table_01",
+        "vertices": 4065,
+        "materials": [
+          "round_wooden_table_01"
+        ]
+      },
+      {
+        "name": "round_wooden_table_01_bolts",
+        "vertices": 496,
+        "materials": [
+          "round_wooden_table_01"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "wooden_table_02",
+    "min": [
+      -0.5672082304954529,
+      -0.35301241278648376,
+      -0.00012521041207946837
+    ],
+    "max": [
+      0.5672084093093872,
+      0.3530125319957733,
+      0.7994177937507629
+    ],
+    "size": [
+      1.1344165802001953,
+      0.7060249447822571,
+      0.799543023109436
+    ],
+    "objects": [
+      {
+        "name": "wooden_table_02",
+        "vertices": 120,
+        "materials": [
+          "wooden_table_02"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "wooden_bookshelf_worn",
+    "min": [
+      -0.68697589635849,
+      -0.29065099358558655,
+      -7.230940468616609e-08
+    ],
+    "max": [
+      0.68697589635849,
+      0.2906511127948761,
+      2.0634419918060303
+    ],
+    "size": [
+      1.37395179271698,
+      0.5813021063804626,
+      2.0634419918060303
+    ],
+    "objects": [
+      {
+        "name": "wooden_bookshelf_worn",
+        "vertices": 5963,
+        "materials": [
+          "wooden_bookshelf_worn"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "modern_ceiling_lamp_01",
+    "min": [
+      -0.21579641103744507,
+      -0.21733307838439941,
+      0.2210921347141266
+    ],
+    "max": [
+      0.21585291624069214,
+      0.2143278419971466,
+      1.1726436614990234
+    ],
+    "size": [
+      0.4316493272781372,
+      0.431660920381546,
+      0.9515515565872192
+    ],
+    "objects": [
+      {
+        "name": "modern_ceiling_lamp_01",
+        "vertices": 2944,
+        "materials": [
+          "modern_ceiling_lamp_01_glass",
+          "modern_ceiling_lamp_01",
+          "modern_ceiling_globe"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "desk_lamp_arm_01",
+    "min": [
+      -0.29102280735969543,
+      -0.30476224422454834,
+      -0.0879937931895256
+    ],
+    "max": [
+      0.3262866139411926,
+      0.15540941059589386,
+      0.7910253405570984
+    ],
+    "size": [
+      0.6173094511032104,
+      0.460171639919281,
+      0.8790191411972046
+    ],
+    "objects": [
+      {
+        "name": "geo_middle_wire",
+        "vertices": 688,
+        "materials": [
+          "desk_lamp_arm_01",
+          "desk_lamp_arm_01_light"
+        ]
+      },
+      {
+        "name": "geo_top_wire",
+        "vertices": 1400,
+        "materials": [
+          "desk_lamp_arm_01",
+          "desk_lamp_arm_01_light"
+        ]
+      },
+      {
+        "name": "geo_top-pivot",
+        "vertices": 164,
+        "materials": [
+          "desk_lamp_arm_01",
+          "desk_lamp_arm_01_light"
+        ]
+      },
+      {
+        "name": "geo_arm_2_b",
+        "vertices": 192,
+        "materials": [
+          "desk_lamp_arm_01",
+          "desk_lamp_arm_01_light"
+        ]
+      },
+      {
+        "name": "geo_arm_1_a",
+        "vertices": 124,
+        "materials": [
+          "desk_lamp_arm_01",
+          "desk_lamp_arm_01_light"
+        ]
+      },
+      {
+        "name": "geo_pivot-holder",
+        "vertices": 604,
+        "materials": [
+          "desk_lamp_arm_01",
+          "desk_lamp_arm_01_light"
+        ]
+      },
+      {
+        "name": "geo_lower-spring_a_bottom-hook",
+        "vertices": 118,
+        "materials": [
+          "desk_lamp_arm_01",
+          "desk_lamp_arm_01_light"
+        ]
+      },
+      {
+        "name": "geo_lower-spring_b_top-hook",
+        "vertices": 130,
+        "materials": [
+          "desk_lamp_arm_01",
+          "desk_lamp_arm_01_light"
+        ]
+      },
+      {
+        "name": "geo_top-spring_a_top-hook",
+        "vertices": 124,
+        "materials": [
+          "desk_lamp_arm_01",
+          "desk_lamp_arm_01_light"
+        ]
+      },
+      {
+        "name": "geo_top-spring_a_bottom-hook",
+        "vertices": 124,
+        "materials": [
+          "desk_lamp_arm_01",
+          "desk_lamp_arm_01_light"
+        ]
+      },
+      {
+        "name": "geo_arm_1_c",
+        "vertices": 64,
+        "materials": [
+          "desk_lamp_arm_01",
+          "desk_lamp_arm_01_light"
+        ]
+      },
+      {
+        "name": "geo_lamp-base-pivot",
+        "vertices": 656,
+        "materials": [
+          "desk_lamp_arm_01",
+          "desk_lamp_arm_01_light"
+        ]
+      },
+      {
+        "name": "geo_lower-spring_a_top-hook",
+        "vertices": 130,
+        "materials": [
+          "desk_lamp_arm_01",
+          "desk_lamp_arm_01_light"
+        ]
+      },
+      {
+        "name": "geo_top-spring_b_bottom-hook",
+        "vertices": 124,
+        "materials": [
+          "desk_lamp_arm_01",
+          "desk_lamp_arm_01_light"
+        ]
+      },
+      {
+        "name": "geo_top-spring_b_top-hook",
+        "vertices": 124,
+        "materials": [
+          "desk_lamp_arm_01",
+          "desk_lamp_arm_01_light"
+        ]
+      },
+      {
+        "name": "geo_middle-pivot",
+        "vertices": 372,
+        "materials": [
+          "desk_lamp_arm_01",
+          "desk_lamp_arm_01_light"
+        ]
+      },
+      {
+        "name": "geo_arm_1_b",
+        "vertices": 64,
+        "materials": [
+          "desk_lamp_arm_01",
+          "desk_lamp_arm_01_light"
+        ]
+      },
+      {
+        "name": "geo_lower-spring_b",
+        "vertices": 132,
+        "materials": [
+          "desk_lamp_arm_01",
+          "desk_lamp_arm_01_light"
+        ]
+      },
+      {
+        "name": "geo_lower-spring_a",
+        "vertices": 132,
+        "materials": [
+          "desk_lamp_arm_01",
+          "desk_lamp_arm_01_light"
+        ]
+      },
+      {
+        "name": "geo_top-spring_a",
+        "vertices": 144,
+        "materials": [
+          "desk_lamp_arm_01",
+          "desk_lamp_arm_01_light"
+        ]
+      },
+      {
+        "name": "geo_lamp-head-button",
+        "vertices": 73,
+        "materials": [
+          "desk_lamp_arm_01",
+          "desk_lamp_arm_01_light"
+        ]
+      },
+      {
+        "name": "geo_lamp-head",
+        "vertices": 6964,
+        "materials": [
+          "desk_lamp_arm_01",
+          "desk_lamp_arm_01_light"
+        ]
+      },
+      {
+        "name": "geo_arm_2_a",
+        "vertices": 200,
+        "materials": [
+          "desk_lamp_arm_01",
+          "desk_lamp_arm_01_light"
+        ]
+      },
+      {
+        "name": "geo_base_pivot",
+        "vertices": 426,
+        "materials": [
+          "desk_lamp_arm_01",
+          "desk_lamp_arm_01_light"
+        ]
+      },
+      {
+        "name": "geo_lower-spring_top-bar",
+        "vertices": 132,
+        "materials": [
+          "desk_lamp_arm_01",
+          "desk_lamp_arm_01_light"
+        ]
+      },
+      {
+        "name": "geo_lower-spring_b_bottom-hook",
+        "vertices": 118,
+        "materials": [
+          "desk_lamp_arm_01",
+          "desk_lamp_arm_01_light"
+        ]
+      },
+      {
+        "name": "geo_top-spring_b",
+        "vertices": 144,
+        "materials": [
+          "desk_lamp_arm_01",
+          "desk_lamp_arm_01_light"
+        ]
+      },
+      {
+        "name": "cur_top_wire",
+        "vertices": 97,
+        "materials": []
+      },
+      {
+        "name": "cur_middle_wire",
+        "vertices": 33,
+        "materials": []
+      }
+    ]
+  }
+]

@@ -1,0 +1,1 @@
+PASS: text visible=272, occluded pixels=0; all three doors, physical door collision, destination returns, escape mode, and two-floor staircase.

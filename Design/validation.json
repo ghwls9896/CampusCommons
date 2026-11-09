@@ -1,0 +1,20 @@
+{
+  "result": "PASS",
+  "shapes": 521,
+  "seats": {
+    "Lounge": 21,
+    "Quiz": 12,
+    "Mafia": 10
+  },
+  "reachable_navigation_cells": 19254,
+  "grid_spacing_metres": 0.25,
+  "checks": [
+    "finite positive geometry",
+    "material references",
+    "seat counts",
+    "spawn clearance",
+    "both doorway routes",
+    "all seats reachable within interaction range"
+  ],
+  "limitation": "Geometry checks only. Unity compilation, Play Mode and multiplayer are not tested."
+}

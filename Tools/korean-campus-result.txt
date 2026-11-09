@@ -1,0 +1,4 @@
+PASS
+backup=Assets/LibraryCharacter/Backups/GrandLibrary_before_korean_signs_apply.unity
+classrooms=14
+noticeMeshes=3

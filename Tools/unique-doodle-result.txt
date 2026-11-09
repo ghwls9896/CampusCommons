@@ -1,0 +1,8 @@
+PASS
+uniqueBoards=5
+transformsPreserved=5
+Classroom Doodle Board 01 position=(486.290, 1.300, 35.000) scale=(3.500, 1.750, 1.842) drawing=Board_01
+Classroom Doodle Board 02 position=(513.710, 1.298, 35.000) scale=(3.490, 1.745, 1.837) drawing=Board_02
+Classroom Doodle Board 03 position=(486.290, 1.328, 16.250) scale=(3.140, 1.570, 1.653) drawing=Board_03
+Classroom Doodle Board 04 position=(491.210, 1.168, 1.250) scale=(4.000, 2.000, 2.105) drawing=Board_04
+Classroom Doodle Board 05 position=(516.210, 1.390, -12.486) scale=(3.050, 1.525, 1.605) drawing=Board_05

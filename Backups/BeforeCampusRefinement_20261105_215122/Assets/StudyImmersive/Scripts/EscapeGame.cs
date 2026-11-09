@@ -1,0 +1,330 @@
+using System;
+using System.Collections.Generic;
+using CampusCommons.GrandLibrary;
+using CampusCommons.LibraryCharacter;
+using UnityEngine;
+
+namespace CampusCommons.StudyImmersive
+{
+    /// <summary>Mode selection, school interactions, sheet collection, and return to the lobby.</summary>
+    [RequireComponent(typeof(BoxCollider))]
+    [UnityEngine.Scripting.APIUpdating.MovedFrom(true, "CampusCommons.StudyImmersive", null, "EscapeModeFlow")]
+    public class EscapeGame : MonoBehaviour
+    {
+        public enum Mode { Easy, Medium, Hard, TimeAttack }
+        public Vector3 schoolArrival;
+        public float schoolYaw;
+        public GameObject schoolReturnVisual;
+        public GameObject schoolReturnTrigger;
+        public GameObject notebookPrefab;
+        public Vector3[] notebookPositions;
+        public Vector3 lobbyReturn=new Vector3(11.5f,.08f,5.5f);
+        public float timeLimitSeconds=180;
+        public SchoolGrid schoolGrid;
+        public Monster monster;
+        public Door exitDoor;
+
+        Player player;
+        CharacterController body;
+        Camera view;
+        Transform avatar;
+        Door[] doors=Array.Empty<Door>();
+        readonly List<GameObject> notebooks=new List<GameObject>();
+        bool selecting,running,completed,timedOut,caught,quizOpen,quizFeedback,lastCorrect;
+        GameObject activeSheet;
+        CodeQuestions.Question[] quizQuestions;
+        int quizIndex;
+        Mode currentMode;
+        float yaw,pitch,falling,elapsed,rearmAt,noticeUntil;
+        int found,target;
+        string notice="";
+        GUIStyle title,text,choice,crosshair;
+        Font koreanFont;
+        bool korean;
+
+        public bool IsSelecting=>selecting;
+        public bool IsRunning=>running;
+        public bool Completed=>completed;
+        public bool TimedOut=>timedOut;
+        public bool Caught=>caught;
+        public bool IsEnded=>completed || timedOut || caught;
+        public bool IsAnswering=>quizOpen && running && !IsEnded;
+        public bool AwaitingNextQuestion=>quizFeedback;
+        public int QuestionNumber=>quizOpen?quizIndex+1:0;
+        public int CurrentCorrectAnswer=>quizOpen?quizQuestions[quizIndex].Correct:-1;
+        public bool LastAnswerCorrect=>lastCorrect;
+        public bool ReadyToExit=>running && !IsEnded && found>=target;
+        public int Found=>found;
+        public int Target=>target;
+        public float Remaining=>Mathf.Max(0,timeLimitSeconds-elapsed);
+        public Mode CurrentMode=>currentMode;
+        public int ActiveNotebookCount=>notebooks.FindAll(n=>n && n.activeSelf).Count;
+
+        void Awake()
+        {
+            if(schoolReturnVisual)schoolReturnVisual.SetActive(false);
+            if(schoolReturnTrigger)schoolReturnTrigger.SetActive(false);
+        }
+        void OnTriggerEnter(Collider other){var local=other.GetComponent<Player>();if(local)BeginSelection(local);}
+        void OnTriggerStay(Collider other)
+        {
+            if(selecting || running)return;var local=other.GetComponent<Player>();if(local)BeginSelection(local);
+        }
+        public bool BeginSelection(Player local)
+        {
+            if(!local || !local.enabled || local.currentSpace!=Portal.Space.Library || selecting || running || Time.time<rearmAt)return false;
+            var controller=local.GetComponent<CharacterController>();if(!controller || !controller.enabled)return false;
+            player=local;body=controller;view=Camera.main;
+            if(!view || notebookPositions==null || notebookPositions.Length<7 || !notebookPrefab)return false;
+            avatar=player.transform.Find("Student character");
+            selecting=true;player.enabled=false;Cursor.lockState=CursorLockMode.None;Cursor.visible=true;return true;
+        }
+        public bool ChooseMode(Mode mode)
+        {
+            if(!selecting || !player || !body || !view)return false;
+            currentMode=mode;target=mode==Mode.Easy?3:mode==Mode.Medium?5:mode==Mode.Hard?7:5;
+            found=0;elapsed=0;completed=false;timedOut=false;caught=false;quizOpen=false;quizFeedback=false;notice="";ClearNotebooks();
+            var points=schoolGrid && schoolGrid.sheetLocations!=null && schoolGrid.sheetLocations.Length>=target?schoolGrid.sheetLocations:notebookPositions;
+            if(points==null || points.Length<target)return false;
+            for(int i=0;i<target;i++)
+            {
+                // One nearby sheet and the rest sampled from different distances,
+                // so every mode uses the broader school rather than one classroom.
+                int index=0;
+                if(i>0)
+                {
+                    int lo=1+(i-1)*(points.Length-1)/(target-1);
+                    int hi=1+i*(points.Length-1)/(target-1);
+                    index=UnityEngine.Random.Range(lo,Mathf.Max(lo+1,hi));
+                }
+                var item=Instantiate(notebookPrefab,points[index],Quaternion.Euler(0,i*47,0));item.name="Question Sheet "+(i+1);
+                var sheet=item.GetComponent<Sheet>();if(sheet)sheet.game=this;notebooks.Add(item);
+            }
+            body.enabled=false;player.transform.position=schoolArrival;body.enabled=true;player.currentSpace=Portal.Space.Escape;
+            if(avatar)avatar.gameObject.SetActive(false);
+            yaw=schoolYaw;pitch=0;falling=-2;selecting=false;running=true;Physics.SyncTransforms();UpdateCamera();
+            doors=FindObjectsByType<Door>();if(monster)monster.Begin(this,player.transform,mode);
+            Cursor.lockState=CursorLockMode.Locked;Cursor.visible=false;return true;
+        }
+        void Update()
+        {
+            if(!selecting && !running)return;
+            if(Input.GetKeyDown(KeyCode.Escape)){ExitToLobby();return;}
+            if(!running || !player || !body || !view || IsEnded)return;
+            if(currentMode==Mode.TimeAttack)
+            {
+                elapsed+=Time.deltaTime;
+                if(elapsed>=timeLimitSeconds){elapsed=timeLimitSeconds;timedOut=true;return;}
+            }
+            if(IsAnswering)return;
+            yaw+=Input.GetAxisRaw("Mouse X")*2.5f;pitch=Mathf.Clamp(pitch-Input.GetAxisRaw("Mouse Y")*2.0f,-80,80);
+            float x=(Input.GetKey(KeyCode.D)||Input.GetKey(KeyCode.RightArrow)?1:0)-(Input.GetKey(KeyCode.A)||Input.GetKey(KeyCode.LeftArrow)?1:0);
+            float z=(Input.GetKey(KeyCode.W)||Input.GetKey(KeyCode.UpArrow)?1:0)-(Input.GetKey(KeyCode.S)||Input.GetKey(KeyCode.DownArrow)?1:0);
+            Vector3 dir=Quaternion.Euler(0,yaw,0)*Vector3.ClampMagnitude(new Vector3(x,0,z),1);
+            if(body.isGrounded && falling<0)falling=-2;falling+=Physics.gravity.y*Time.deltaTime;
+            body.Move((dir*(Input.GetKey(KeyCode.LeftShift)?5.2f:3.6f)+Vector3.up*falling)*Time.deltaTime);
+            if(player.transform.position.y< -5){body.enabled=false;player.transform.position=schoolArrival;body.enabled=true;falling=-2;}
+            UpdateCamera();
+            if(Input.GetMouseButtonDown(0))Interact(true);
+            if(Input.GetKeyDown(KeyCode.E))Interact(false);
+        }
+        void UpdateCamera()
+        {
+            if(!view || !player)return;view.transform.position=player.transform.position+Vector3.up*1.62f;view.transform.rotation=Quaternion.Euler(pitch,yaw,0);
+        }
+        public void AimAt(Vector3 targetPoint)
+        {
+            if(!view || !player)return;Vector3 delta=targetPoint-(player.transform.position+Vector3.up*1.62f);
+            if(delta.sqrMagnitude<.0001f)return;
+            yaw=Mathf.Atan2(delta.x,delta.z)*Mathf.Rad2Deg;
+            pitch=Mathf.Clamp(-Mathf.Atan2(delta.y,new Vector2(delta.x,delta.z).magnitude)*Mathf.Rad2Deg,-80,80);UpdateCamera();
+        }
+        public bool Interact(bool requireAim)
+        {
+            if(!running || IsEnded || IsAnswering || !view || !player)return false;
+            var ray=view.ViewportPointToRay(new Vector3(.5f,.5f,0));
+            var hits=Physics.RaycastAll(ray,2.25f,Physics.DefaultRaycastLayers,QueryTriggerInteraction.Collide);
+            Array.Sort(hits,(a,b)=>a.distance.CompareTo(b.distance));
+            foreach(var hit in hits)
+            {
+                var sheet=hit.collider.GetComponentInParent<Sheet>();if(sheet && sheet.game==this){sheet.Collect();return true;}
+                var door=hit.collider.GetComponentInParent<Door>();if(door){door.Interact();return true;}
+                if(!hit.collider.isTrigger)break;
+            }
+            if(requireAim)return false;
+            GameObject nearestSheet=null;Door nearestDoor=null;float best=1.7f;var origin=player.transform.position+Vector3.up*.8f;
+            foreach(var item in notebooks)
+            {
+                if(!item || !item.activeSelf)continue;float d=Vector3.Distance(origin,item.transform.position+Vector3.up*.8f);
+                if(d<best){best=d;nearestSheet=item;nearestDoor=null;}
+            }
+            foreach(var door in doors)
+            {
+                if(!door || !door.gameObject.activeInHierarchy)continue;
+                foreach(var c in door.GetComponentsInChildren<Collider>())
+                {
+                    float d=Vector3.Distance(origin,c.ClosestPoint(origin));
+                    if(d<best){best=d;nearestDoor=door;nearestSheet=null;}
+                }
+            }
+            if(nearestSheet)return OpenSheet(nearestSheet);
+            if(nearestDoor){nearestDoor.Interact();return true;}
+            return false;
+        }
+        public bool CollectNearest()
+        {
+            if(!running || IsEnded || IsAnswering || !player)return false;
+            GameObject best=null;float distance=1.7f;var center=player.transform.position+Vector3.up*.8f;
+            foreach(var item in notebooks)
+            {
+                if(!item || !item.activeSelf)continue;float d=Vector3.Distance(center,item.transform.position+Vector3.up*.8f);
+                if(d<distance){best=item;distance=d;}
+            }
+            return best && OpenSheet(best);
+        }
+        public bool OpenSheet(GameObject item)
+        {
+            if(!running || IsEnded || IsAnswering || !item || !item.activeSelf || !notebooks.Contains(item))return false;
+            activeSheet=item;quizQuestions=CodeQuestions.RandomThree();quizIndex=0;quizFeedback=false;quizOpen=true;
+            Cursor.lockState=CursorLockMode.None;Cursor.visible=true;return true;
+        }
+        public bool SubmitAnswer(int answer)
+        {
+            if(!IsAnswering || quizFeedback || answer<0 || answer>=quizQuestions[quizIndex].Options.Length)return false;
+            lastCorrect=answer==quizQuestions[quizIndex].Correct;quizFeedback=true;
+            if(!lastCorrect && monster)monster.SpeedUp();return true;
+        }
+        public bool ContinueQuestion()
+        {
+            if(!IsAnswering || !quizFeedback)return false;
+            quizFeedback=false;quizIndex++;
+            if(quizIndex<quizQuestions.Length)return true;
+            quizOpen=false;var item=activeSheet;activeSheet=null;Cursor.lockState=CursorLockMode.Locked;Cursor.visible=false;
+            return CollectSheet(item);
+        }
+        public bool CollectSheet(GameObject item)
+        {
+            if(!running || IsEnded || IsAnswering || !item || !item.activeSelf || !notebooks.Contains(item))return false;
+            item.SetActive(false);found++;
+            if(found>=target)
+            {
+                if(exitDoor)Notice("문제지를 모두 찾았습니다. 탈출구를 찾으세요!");
+                else completed=true;
+            }
+            else Notice("문제지를 수집했습니다.");
+            return true;
+        }
+        public void Notice(string message){notice=message;noticeUntil=Time.time+3f;}
+        public void CaughtByMonster(){if(running && !IsEnded)caught=true;}
+        public void CompleteEscape(){if(ReadyToExit)completed=true;}
+        public void ExitToLobby()
+        {
+            if(!selecting && !running)return;selecting=false;running=false;quizOpen=false;activeSheet=null;ClearNotebooks();if(monster)monster.End();
+            if(player && body)
+            {
+                body.enabled=false;player.transform.position=lobbyReturn;body.enabled=true;player.currentSpace=Portal.Space.Library;
+                if(avatar)avatar.gameObject.SetActive(true);
+                if(view){view.transform.position=lobbyReturn+new Vector3(4,2,-2);view.transform.LookAt(lobbyReturn+Vector3.up*1.35f);}
+                player.enabled=true;Physics.SyncTransforms();
+            }
+            rearmAt=Time.time+1.3f;Cursor.lockState=CursorLockMode.None;Cursor.visible=true;
+        }
+        void ClearNotebooks(){foreach(var item in notebooks)if(item)Destroy(item);notebooks.Clear();}
+        void OnDisable(){if(selecting || running)ExitToLobby();}
+        void Styles()
+        {
+            if(title!=null)return;
+            title=new GUIStyle(GUI.skin.label){fontSize=27,fontStyle=FontStyle.Bold};title.normal.textColor=new Color(.97f,.91f,.80f);
+            text=new GUIStyle(GUI.skin.label){fontSize=16,wordWrap=true};text.normal.textColor=new Color(.93f,.9f,.83f);
+            choice=new GUIStyle(GUI.skin.button){fontSize=19,fontStyle=FontStyle.Bold,wordWrap=true};
+            crosshair=new GUIStyle(GUI.skin.label){fontSize=25,alignment=TextAnchor.MiddleCenter,fontStyle=FontStyle.Bold};crosshair.normal.textColor=Color.white;
+            try
+            {
+                if(Array.Exists(Font.GetOSInstalledFontNames(),n=>n.Equals("Malgun Gothic",StringComparison.OrdinalIgnoreCase) || n=="맑은 고딕"))
+                {koreanFont=Font.CreateDynamicFontFromOSFont("Malgun Gothic",28);if(koreanFont){title.font=koreanFont;text.font=koreanFont;choice.font=koreanFont;korean=true;}}
+            }
+            catch(Exception){korean=false;}
+        }
+        string L(string ko,string en)=>korean?ko:en;
+        static void Panel(Rect area,float alpha=.93f){Color old=GUI.color;GUI.color=new Color(.10f,.08f,.065f,alpha);GUI.DrawTexture(area,Texture2D.whiteTexture);GUI.color=old;}
+        void OnGUI()
+        {
+            if(!selecting && !running)return;Styles();var old=GUI.matrix;float s=Mathf.Min(Screen.width/1280f,Screen.height/720f);
+            GUI.matrix=Matrix4x4.TRS(new Vector3((Screen.width-1280*s)*.5f,(Screen.height-720*s)*.5f,0),Quaternion.identity,Vector3.one*s);
+            if(selecting)
+            {
+                Panel(new Rect(355,112,570,490));GUI.Label(new Rect(389,136,500,45),L("탈출방 모드 선택","ESCAPE ROOM"),title);
+                GUI.Label(new Rect(389,183,500,48),L("문제지를 찾아 코딩 문제를 풀고 탈출하세요.","Find the sheets, answer coding questions, and escape."),text);
+                if(GUI.Button(new Rect(390,248,235,82),L("쉬움\n문제지 3개","EASY\n3 sheets"),choice))ChooseMode(Mode.Easy);
+                if(GUI.Button(new Rect(655,248,235,82),L("보통\n문제지 5개","MEDIUM\n5 sheets"),choice))ChooseMode(Mode.Medium);
+                if(GUI.Button(new Rect(390,350,235,82),L("어려움\n문제지 7개","HARD\n7 sheets"),choice))ChooseMode(Mode.Hard);
+                if(GUI.Button(new Rect(655,350,235,82),L("타임어택\n문제지 5개 / 3분","TIME ATTACK\n5 sheets / 3 min"),choice))ChooseMode(Mode.TimeAttack);
+                GUI.Label(new Rect(390,480,500,65),L("WASD: 이동  |  마우스: 시점  |  클릭/E: 상호작용\nESC: 라운지로 돌아가기","WASD: move  |  Mouse: look  |  Click/E: interact\nESC: return to the lounge"),text);
+            }
+            else
+            {
+                Panel(new Rect(20,20,450,90),.86f);
+                string mode=currentMode==Mode.Easy?L("쉬움","EASY"):currentMode==Mode.Medium?L("보통","MEDIUM"):currentMode==Mode.Hard?L("어려움","HARD"):L("타임어택","TIME ATTACK");
+                GUI.Label(new Rect(35,28,415,32),L("탈출방  /  ","ESCAPE  /  ")+mode,title);
+                string timer=currentMode==Mode.TimeAttack?L("      남은 시간  ","      TIME  ")+TimeSpan.FromSeconds(Mathf.CeilToInt(Remaining)).ToString(@"mm\:ss"):"";
+                GUI.Label(new Rect(37,70,410,28),L("문제지  ","SHEETS  ")+found+" / "+target+timer,text);
+                Panel(new Rect(20,656,830,45),.86f);
+                GUI.Label(new Rect(35,666,800,26),L("WASD 이동   마우스 시점   클릭/E 수집·문   ESC 라운지로","WASD move   Mouse look   Click/E interact   ESC return"),text);
+                if(IsEnded)
+                {
+                    Panel(new Rect(385,265,510,145));string status=completed?L("탈출 성공!","ESCAPED!"):timedOut?L("시간 종료","TIME IS UP"):L("몬스터에게 잡혔습니다","CAUGHT BY THE MONSTER");
+                    GUI.Label(new Rect(420,287,460,40),status,title);GUI.Label(new Rect(420,341,460,42),L("ESC를 눌러 라운지로 돌아가세요.","Press ESC to return to the lounge."),text);
+                }
+                else if(IsAnswering)
+                {
+                    var q=quizQuestions[quizIndex];Panel(new Rect(270,112,740,500),.97f);
+                    GUI.Label(new Rect(305,132,670,40),L("코딩 문제  ","CODING QUESTION  ")+(quizIndex+1)+" / 3",title);
+                    GUI.Label(new Rect(308,185,660,150),q.Prompt,text);
+                    if(!quizFeedback)
+                    {
+                        for(int i=0;i<q.Options.Length;i++)
+                        {
+                            float x=308+(i%2)*335,y=345+(i/2)*77;
+                            if(GUI.Button(new Rect(x,y,310,61),q.Options[i],choice))SubmitAnswer(i);
+                        }
+                    }
+                    else
+                    {
+                        string result=lastCorrect?L("정답입니다!","Correct!"):L("오답입니다. 몬스터가 빨라졌습니다.","Incorrect. The monster is faster.");
+                        GUI.Label(new Rect(310,350,645,32),result,text);
+                        if(!lastCorrect)GUI.Label(new Rect(310,389,645,30),L("정답:  ","Correct answer:  ")+q.Options[q.Correct],text);
+                        if(GUI.Button(new Rect(725,485,235,65),quizIndex==2?L("문제지 수집","COLLECT SHEET"):L("다음 문제","NEXT QUESTION"),choice))ContinueQuestion();
+                    }
+                }
+                else
+                {
+                    GUI.Label(new Rect(622,342,36,36),"+",crosshair);
+                    if(ReadyToExit && exitDoor)
+                    {
+                        float distance=Vector3.Distance(player.transform.position,exitDoor.transform.position);
+                        Panel(new Rect(450,120,380,40),.86f);GUI.Label(new Rect(465,128,350,25),L("탈출구를 찾으세요  ","FIND THE EXIT  ")+Mathf.RoundToInt(distance)+"m",text);
+                    }
+                    if(Time.time<noticeUntil){Panel(new Rect(390,555,500,48),.88f);GUI.Label(new Rect(405,565,475,28),korean?notice:"Sheet collected. Keep moving!",text);}
+                    else if(NearestDistance()<1.7f){Panel(new Rect(475,555,330,48),.87f);GUI.Label(new Rect(490,565,300,28),L("클릭 / E   문제지 열기","CLICK / E   OPEN SHEET"),text);}
+                    else
+                    {
+                        var door=NearbyDoor();if(door){Panel(new Rect(475,555,330,48),.87f);GUI.Label(new Rect(490,565,300,28),korean?door.Hint:"CLICK / E   USE DOOR",text);}
+                    }
+                }
+            }
+            GUI.matrix=old;
+        }
+        float NearestDistance()
+        {
+            float result=float.PositiveInfinity;if(!player)return result;Vector3 p=player.transform.position+Vector3.up*.8f;
+            foreach(var n in notebooks)if(n && n.activeSelf)result=Mathf.Min(result,Vector3.Distance(p,n.transform.position+Vector3.up*.8f));return result;
+        }
+        Door NearbyDoor()
+        {
+            if(!player)return null;var point=player.transform.position+Vector3.up*.8f;Door result=null;float best=1.55f;
+            foreach(var door in doors)if(door)foreach(var c in door.GetComponentsInChildren<Collider>())
+            {float distance=Vector3.Distance(point,c.ClosestPoint(point));if(distance<best){best=distance;result=door;}}
+            return result;
+        }
+    }
+}

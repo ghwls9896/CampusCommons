@@ -1,0 +1,5 @@
+PASS
+Unity 6000.4.5f1
+Play Mode: player spawn, grounded capsule movement, 43 seats, sit/stand occupancy, both doorways.
+Input gestures and remote multiplayer were not tested.
+Editor Search startup exception observed separately: True

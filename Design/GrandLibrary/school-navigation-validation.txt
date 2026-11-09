@@ -1,0 +1,4 @@
+Reachable cells: 12037
+Bounds x: 469.5 to 540
+Bounds z: -47 to 47
+Grid: 0.5m; player radius: 0.29m
