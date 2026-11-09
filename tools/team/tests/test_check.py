@@ -69,6 +69,25 @@ class ScopeTests(unittest.TestCase):
         path='Assets/QuizRoom/Q.cs.meta'
         self.assertTrue(any('orphan' in e for e in self.inspect([('D',path[:-5])],{path:b'guid: '+b'a'*32})))
 
+    def test_hidden_assets_follow_unity_streaming_exception(self):
+        self.assertTrue(check.ignored_by_unity('Assets/QuizRoom/.gitkeep'))
+        self.assertTrue(check.ignored_by_unity('Assets/QuizRoom/backup~/Q.cs'))
+        self.assertTrue(check.ignored_by_unity('Assets/QuizRoom/cvs/Q.cs'))
+        self.assertTrue(check.ignored_by_unity('Assets/QuizRoom/draft.tmp'))
+        self.assertFalse(check.ignored_by_unity('Assets/StreamingAssets/.config'))
+        self.assertFalse(check.ignored_by_unity('Assets/QuizRoom/Q.cs'))
+
+    def test_existing_directory_cannot_lose_meta(self):
+        path='Assets/QuizRoom.meta'
+        head={'Assets/QuizRoom/Q.cs':b'code', 'Assets/QuizRoom/Q.cs.meta':b'guid: '+b'a'*32}
+        self.assertTrue(any('lost .meta' in e for e in self.inspect([('D',path)],head)))
+
+    def test_empty_folder_metadata_and_ignored_dotfiles_are_valid(self):
+        head={'Assets/QuizRoom.meta':b'folderAsset: yes\nguid: '+b'a'*32}
+        self.assertEqual(self.inspect([('A','Assets/QuizRoom.meta')],head),[])
+        head['Assets/QuizRoom/.gitkeep']=b''
+        self.assertEqual(self.inspect([('A',p) for p in head],head),[])
+
     def test_conflicts_and_secret_files_fail_but_example_is_allowed(self):
         for name, data in [('backend/a.py',b'<<<<<<< HEAD\na\n=======\nb\n>>>>>>> branch'),
                            ('backend/.env',b'PASSWORD=x'),('backend/account.json',b'{"private_key":"secret"}')]:

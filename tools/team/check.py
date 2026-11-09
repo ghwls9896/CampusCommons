@@ -73,6 +73,15 @@ def pr_errors(body, task):
     return [] if expected in body.splitlines() else [f'PR description must contain a line: {expected}']
 
 
+def ignored_by_unity(path):
+    # Unity 6000.4 SpecialFolders: dot names are imported in StreamingAssets.
+    parts = PurePosixPath(path).parts[1:]
+    streaming = path.startswith('Assets/StreamingAssets/')
+    return (any(p.endswith('~') or p == 'cvs' for p in parts)
+            or path.endswith('.tmp')
+            or (not streaming and any(p.startswith('.') for p in parts)))
+
+
 def change_errors(task, changes, head, base):
     errors = []
     own_notes = {f'docs/tasks/{task["id"]}.json', f'docs/tasks/{task["id"]}.md'}
@@ -103,7 +112,7 @@ def change_errors(task, changes, head, base):
                 errors.append(f'Possible private key: {path}')
         if not path.startswith('Assets/'):
             continue
-        if status == 'A' and not path.endswith('.meta'):
+        if status == 'A' and not path.endswith('.meta') and not ignored_by_unity(path):
             if path + '.meta' not in head:
                 errors.append(f'New Unity asset missing .meta: {path}')
             for parent in PurePosixPath(path).parents:
@@ -122,11 +131,11 @@ def change_errors(task, changes, head, base):
             if old and match and old[1].lower() != match[1].lower():
                 errors.append(f'Existing GUID changed: {path}')
             asset = path[:-5]
-            if asset not in head and not any(p.startswith(asset + '/') for p in head):
+            if asset not in head and not any(p.startswith(asset + '/') for p in head) and not re.search(rb'^folderAsset: yes\s*$', data, re.MULTILINE):
                 errors.append(f'Unity .meta has orphan target: {path}')
     # Also catch a removed .meta beside a still-present asset.
     for status, path in changes:
-        if status == 'D' and path.endswith('.meta') and path[:-5] in head:
+        if status == 'D' and path.endswith('.meta') and (path[:-5] in head or any(p.startswith(path[:-5] + '/') for p in head)):
             errors.append(f'Existing asset lost .meta: {path[:-5]}')
     return sorted(set(errors))
 
