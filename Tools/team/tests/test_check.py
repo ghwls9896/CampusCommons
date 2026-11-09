@@ -77,6 +77,12 @@ class ScopeTests(unittest.TestCase):
         self.assertFalse(check.ignored_by_unity('Assets/StreamingAssets/.config'))
         self.assertFalse(check.ignored_by_unity('Assets/QuizRoom/Q.cs'))
 
+    def test_ignored_file_still_requires_visible_parent_metadata(self):
+        head={'Assets/QuizRoom/.gitkeep':b''}
+        self.assertTrue(any('directory missing .meta' in e for e in self.inspect([('A',p) for p in head],head)))
+        head={'Assets/QuizRoom/Sub.meta':b'folderAsset: yes\nguid: '+b'a'*32}
+        self.assertTrue(any('directory missing .meta' in e for e in self.inspect([('A',p) for p in head],head)))
+
     def test_existing_directory_cannot_lose_meta(self):
         path='Assets/QuizRoom.meta'
         head={'Assets/QuizRoom/Q.cs':b'code', 'Assets/QuizRoom/Q.cs.meta':b'guid: '+b'a'*32}

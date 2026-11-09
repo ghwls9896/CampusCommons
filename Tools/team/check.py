@@ -125,14 +125,14 @@ def change_errors(task, changes, head, base):
                 errors.append(f'Possible private key: {path}')
         if not path.startswith('Assets/'):
             continue
-        if status == 'A' and not path.endswith('.meta') and not ignored_by_unity(path):
-            if path + '.meta' not in head:
+        if status == 'A':
+            if not path.endswith('.meta') and not ignored_by_unity(path) and path + '.meta' not in head:
                 errors.append(f'New Unity asset missing .meta: {path}')
             for parent in PurePosixPath(path).parents:
                 folder = str(parent)
                 if folder in ('.', 'Assets'):
                     break
-                if folder not in base_dirs and folder + '.meta' not in head:
+                if folder not in base_dirs and not ignored_by_unity(folder) and folder + '.meta' not in head:
                     errors.append(f'New Unity directory missing .meta: {folder}')
         if path.endswith('.meta'):
             match = GUID.search(data)
