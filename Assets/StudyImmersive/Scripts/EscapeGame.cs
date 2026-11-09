@@ -12,6 +12,11 @@ namespace CampusCommons.StudyImmersive
     public class EscapeGame : MonoBehaviour
     {
         public enum Mode { Easy, Medium, Hard, TimeAttack }
+        public enum InventoryItem { Empty, Soda, Padlock, ExcuseNote }
+        const int InventorySlots=3;
+        const float MaxStamina=100f;
+        const float SprintDrainPerSecond=12.5f;
+        const float StaminaRecoveryPerSecond=15f;
         public Vector3 schoolArrival;
         public float schoolYaw;
         public GameObject schoolReturnVisual;
@@ -58,6 +63,9 @@ namespace CampusCommons.StudyImmersive
         Quaternion jumpCameraRotation;
         AudioSource jumpAudio;
         int found,target;
+        readonly InventoryItem[] inventory=new InventoryItem[InventorySlots];
+        float stamina=MaxStamina;
+        bool sprintExhausted;
         string notice="";
         string noticeEnglish="";
         GUIStyle title,text,choice,crosshair;
@@ -86,6 +94,19 @@ namespace CampusCommons.StudyImmersive
         public float Remaining=>Mathf.Max(0,timeLimitSeconds-elapsed);
         public Mode CurrentMode=>currentMode;
         public int ActiveNotebookCount=>notebooks.FindAll(n=>n && n.activeSelf).Count;
+        public float Stamina=>stamina;
+        public InventoryItem ItemAt(int slot)=>slot>=0 && slot<inventory.Length?inventory[slot]:InventoryItem.Empty;
+        public bool AddItem(InventoryItem item)
+        {
+            if(item==InventoryItem.Empty)return false;
+            for(int i=0;i<inventory.Length;i++)if(inventory[i]==InventoryItem.Empty){inventory[i]=item;return true;}
+            return false;
+        }
+        public bool RemoveItem(int slot)
+        {
+            if(slot<0 || slot>=inventory.Length || inventory[slot]==InventoryItem.Empty)return false;
+            inventory[slot]=InventoryItem.Empty;return true;
+        }
 
         void Awake()
         {
@@ -122,6 +143,7 @@ namespace CampusCommons.StudyImmersive
         {
             if(!selecting || exitConfirm || !player || !body || !view)return false;
             currentMode=mode;target=mode==Mode.Easy?3:mode==Mode.Medium?5:mode==Mode.Hard?7:5;
+            stamina=MaxStamina;sprintExhausted=false;Array.Clear(inventory,0,inventory.Length);
             found=0;elapsed=0;panicElapsed=0;completed=false;timedOut=false;caught=false;jumpElapsed=0;quizOpen=false;quizFeedback=false;notice="";noticeEnglish="";ClearNotebooks();
             if(jumpAudio)jumpAudio.Stop();
             var points=schoolGrid && schoolGrid.sheetLocations!=null && schoolGrid.sheetLocations.Length>=target?schoolGrid.sheetLocations:notebookPositions;
@@ -181,11 +203,24 @@ namespace CampusCommons.StudyImmersive
             float z=(Input.GetKey(KeyCode.W)||Input.GetKey(KeyCode.UpArrow)?1:0)-(Input.GetKey(KeyCode.S)||Input.GetKey(KeyCode.DownArrow)?1:0);
             Vector3 dir=Quaternion.Euler(0,yaw,0)*Vector3.ClampMagnitude(new Vector3(x,0,z),1);
             if(body.isGrounded && falling<0)falling=-2;falling+=Physics.gravity.y*Time.deltaTime;
-            body.Move((dir*(Input.GetKey(KeyCode.LeftShift)?5.2f:3.6f)+Vector3.up*falling)*Time.deltaTime);
+            bool sprinting=UpdateStamina(Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift),dir.sqrMagnitude>.001f,Time.deltaTime);
+            body.Move((dir*(sprinting?5.2f:3.6f)+Vector3.up*falling)*Time.deltaTime);
             if(player.transform.position.y< -5){body.enabled=false;player.transform.position=schoolArrival;body.enabled=true;falling=-2;}
             UpdateCamera();
             if(Input.GetMouseButtonDown(0))Interact(true);
             if(Input.GetKeyDown(KeyCode.E))Interact(false);
+        }
+        bool UpdateStamina(bool sprintHeld,bool moving,float deltaTime)
+        {
+            if(!sprintHeld)sprintExhausted=false;
+            bool sprinting=sprintHeld && !sprintExhausted && moving && stamina>0f;
+            if(sprinting)
+            {
+                stamina=Mathf.Max(0f,stamina-SprintDrainPerSecond*deltaTime);
+                if(stamina<=0f)sprintExhausted=true;
+            }
+            else stamina=Mathf.Min(MaxStamina,stamina+StaminaRecoveryPerSecond*deltaTime);
+            return sprinting;
         }
         void UpdateCamera()
         {
@@ -385,11 +420,14 @@ namespace CampusCommons.StudyImmersive
             }
             else
             {
-                Panel(new Rect(20,20,450,90),.86f);
-                string mode=currentMode==Mode.Easy?L("쉬움","EASY"):currentMode==Mode.Medium?L("보통","MEDIUM"):currentMode==Mode.Hard?L("어려움","HARD"):L("타임어택","TIME ATTACK");
-                GUI.Label(new Rect(35,28,415,32),L("탈출방  /  ","ESCAPE  /  ")+mode,title);
-                string timer=currentMode==Mode.TimeAttack?L("      남은 시간  ","      TIME  ")+TimeSpan.FromSeconds(Mathf.CeilToInt(Remaining)).ToString(@"mm\:ss"):"";
-                GUI.Label(new Rect(37,70,410,28),L("문제지  ","SHEETS  ")+found+" / "+target+timer,text);
+                PixelBox(new Rect(20,20,240,48),new Color(.13f,.17f,.20f,.94f));
+                GUI.Label(new Rect(32,30,220,28),L("남은 문제지  ","SHEETS LEFT  ")+Mathf.Max(0,target-found),text);
+                if(currentMode==Mode.TimeAttack)
+                {
+                    PixelBox(new Rect(530,20,220,48),new Color(.13f,.17f,.20f,.94f));
+                    GUI.Label(new Rect(544,30,200,28),L("남은 시간  ","TIME  ")+TimeSpan.FromSeconds(Mathf.CeilToInt(Remaining)).ToString(@"mm\:ss"),text);
+                }
+                if(!IsEnded)DrawEscapeHud();
                 if(IsEnded)
                 {
                     Panel(new Rect(385,265,510,145));string status=completed?L("탈출 성공!","ESCAPED!"):timedOut?L("시간 종료","TIME IS UP"):L("몬스터에게 잡혔습니다","CAUGHT BY THE MONSTER");
@@ -430,6 +468,36 @@ namespace CampusCommons.StudyImmersive
                 }
             }
             GUI.matrix=old;
+        }
+        static void PixelFill(Rect rect,Color color)
+        {
+            Color previous=GUI.color;GUI.color=color;GUI.DrawTexture(rect,Texture2D.whiteTexture);GUI.color=previous;
+        }
+        static void PixelBox(Rect rect,Color inside)
+        {
+            PixelFill(rect,new Color(.04f,.05f,.06f,.96f));
+            PixelFill(new Rect(rect.x+3,rect.y+3,rect.width-6,rect.height-6),new Color(.65f,.68f,.61f,.95f));
+            PixelFill(new Rect(rect.x+6,rect.y+6,rect.width-12,rect.height-12),inside);
+        }
+        void DrawEscapeHud()
+        {
+            // Square borders and segmented bars match the retro classroom art without new scene objects.
+            PixelBox(new Rect(20,645,276,55),new Color(.13f,.17f,.20f,.94f));
+            GUI.Label(new Rect(31,651,85,30),L("스태미나","STAMINA"),text);
+            for(int i=0;i<10;i++)
+            {
+                bool lit=stamina/MaxStamina>(i/10f);
+                PixelFill(new Rect(118+i*16,662,13,17),lit?new Color(.93f,.78f,.22f):new Color(.25f,.25f,.22f));
+            }
+            for(int i=0;i<inventory.Length;i++)
+            {
+                float x=1032+i*77;
+                PixelBox(new Rect(x,20,70,70),new Color(.15f,.18f,.20f,.96f));
+                string item=inventory[i]==InventoryItem.Soda?L("음료","CAN"):
+                    inventory[i]==InventoryItem.Padlock?L("자물쇠","LOCK"):
+                    inventory[i]==InventoryItem.ExcuseNote?L("공결증","NOTE"):"";
+                GUI.Label(new Rect(x+8,34,58,28),item,text);
+            }
         }
         void DrawPanicTint()
         {
