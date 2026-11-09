@@ -1,0 +1,5 @@
+PASS
+path=Assets/LibraryCharacter/Backups/GrandLibrary_before_map_organization.unity
+dirty=True
+objects=4575
+prefabRoots=90

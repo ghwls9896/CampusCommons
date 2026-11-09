@@ -1,0 +1,328 @@
+[
+  {
+    "id": "potted_plant_02",
+    "size": [
+      0.7011570334434509,
+      0.6573866605758667,
+      0.841178834438324
+    ],
+    "objects": [
+      {
+        "name": "potted_plant_02_pot",
+        "vertices": 2594,
+        "materials": [
+          "potted_plant_02_pot"
+        ]
+      },
+      {
+        "name": "potted_plant_02_leaves",
+        "vertices": 6191,
+        "materials": [
+          "potted_plant_02_leaves"
+        ]
+      },
+      {
+        "name": "potted_plant_02_dirt",
+        "vertices": 27932,
+        "materials": [
+          "potted_plant_02_pot"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "potted_plant_04",
+    "size": [
+      0.16788631677627563,
+      0.18475142121315002,
+      0.26745766401290894
+    ],
+    "objects": [
+      {
+        "name": "potted_plant_04_ground",
+        "vertices": 847,
+        "materials": [
+          "potted_plant_04"
+        ]
+      },
+      {
+        "name": "potted_plant_04_dirt",
+        "vertices": 320,
+        "materials": [
+          "potted_plant_04"
+        ]
+      },
+      {
+        "name": "potted_plant_04_plant",
+        "vertices": 1927,
+        "materials": [
+          "potted_plant_04"
+        ]
+      },
+      {
+        "name": "potted_plant_04_pot",
+        "vertices": 1874,
+        "materials": [
+          "potted_plant_04"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "calathea_orbifolia_01",
+    "size": [
+      2.4915075302124023,
+      1.1935921907424927,
+      0.4242943525314331
+    ],
+    "objects": [
+      {
+        "name": "calathea_orbifolia_01_a",
+        "vertices": 3236,
+        "materials": [
+          "calathea_orbifolia_01"
+        ]
+      },
+      {
+        "name": "calathea_orbifolia_01_b",
+        "vertices": 1911,
+        "materials": [
+          "calathea_orbifolia_01"
+        ]
+      },
+      {
+        "name": "calathea_orbifolia_01_c",
+        "vertices": 1959,
+        "materials": [
+          "calathea_orbifolia_01"
+        ]
+      },
+      {
+        "name": "calathea_orbifolia_01_d",
+        "vertices": 1009,
+        "materials": [
+          "calathea_orbifolia_01"
+        ]
+      },
+      {
+        "name": "calathea_orbifolia_01_e",
+        "vertices": 1105,
+        "materials": [
+          "calathea_orbifolia_01"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "book_encyclopedia_set_01",
+    "size": [
+      0.5512974262237549,
+      0.16306237876415253,
+      0.23741821944713593
+    ],
+    "objects": [
+      {
+        "name": "book_encyclopedia_set_01_book01",
+        "vertices": 1744,
+        "materials": [
+          "book_encyclopedia_set_01_cover",
+          "book_encyclopedia_set_01_paper"
+        ]
+      },
+      {
+        "name": "book_encyclopedia_set_01_book02",
+        "vertices": 1730,
+        "materials": [
+          "book_encyclopedia_set_01_cover",
+          "book_encyclopedia_set_01_paper"
+        ]
+      },
+      {
+        "name": "book_encyclopedia_set_01_book03",
+        "vertices": 1730,
+        "materials": [
+          "book_encyclopedia_set_01_cover",
+          "book_encyclopedia_set_01_paper"
+        ]
+      },
+      {
+        "name": "book_encyclopedia_set_01_book04",
+        "vertices": 1730,
+        "materials": [
+          "book_encyclopedia_set_01_cover",
+          "book_encyclopedia_set_01_paper"
+        ]
+      },
+      {
+        "name": "book_encyclopedia_set_01_book05",
+        "vertices": 1730,
+        "materials": [
+          "book_encyclopedia_set_01_cover",
+          "book_encyclopedia_set_01_paper"
+        ]
+      },
+      {
+        "name": "book_encyclopedia_set_01_book06",
+        "vertices": 1730,
+        "materials": [
+          "book_encyclopedia_set_01_cover",
+          "book_encyclopedia_set_01_paper"
+        ]
+      },
+      {
+        "name": "book_encyclopedia_set_01_book07",
+        "vertices": 1730,
+        "materials": [
+          "book_encyclopedia_set_01_cover",
+          "book_encyclopedia_set_01_paper"
+        ]
+      },
+      {
+        "name": "book_encyclopedia_set_01_book08",
+        "vertices": 1730,
+        "materials": [
+          "book_encyclopedia_set_01_cover",
+          "book_encyclopedia_set_01_paper"
+        ]
+      },
+      {
+        "name": "book_encyclopedia_set_01_book09",
+        "vertices": 1730,
+        "materials": [
+          "book_encyclopedia_set_01_cover",
+          "book_encyclopedia_set_01_paper"
+        ]
+      },
+      {
+        "name": "book_encyclopedia_set_01_book10",
+        "vertices": 1730,
+        "materials": [
+          "book_encyclopedia_set_01_cover",
+          "book_encyclopedia_set_01_paper"
+        ]
+      },
+      {
+        "name": "book_encyclopedia_set_01_book11",
+        "vertices": 1730,
+        "materials": [
+          "book_encyclopedia_set_01_cover",
+          "book_encyclopedia_set_01_paper"
+        ]
+      },
+      {
+        "name": "book_encyclopedia_set_01_book12",
+        "vertices": 1730,
+        "materials": [
+          "book_encyclopedia_set_01_cover",
+          "book_encyclopedia_set_01_paper"
+        ]
+      },
+      {
+        "name": "book_encyclopedia_set_01_book13",
+        "vertices": 1730,
+        "materials": [
+          "book_encyclopedia_set_01_cover",
+          "book_encyclopedia_set_01_paper"
+        ]
+      },
+      {
+        "name": "book_encyclopedia_set_01_book14",
+        "vertices": 1730,
+        "materials": [
+          "book_encyclopedia_set_01_cover",
+          "book_encyclopedia_set_01_paper"
+        ]
+      },
+      {
+        "name": "book_encyclopedia_set_01_book15",
+        "vertices": 1730,
+        "materials": [
+          "book_encyclopedia_set_01_cover",
+          "book_encyclopedia_set_01_paper"
+        ]
+      },
+      {
+        "name": "book_encyclopedia_set_01_book16",
+        "vertices": 1730,
+        "materials": [
+          "book_encyclopedia_set_01_cover",
+          "book_encyclopedia_set_01_paper"
+        ]
+      },
+      {
+        "name": "book_encyclopedia_set_01_book17",
+        "vertices": 1730,
+        "materials": [
+          "book_encyclopedia_set_01_cover",
+          "book_encyclopedia_set_01_paper"
+        ]
+      },
+      {
+        "name": "book_encyclopedia_set_01_book18",
+        "vertices": 1730,
+        "materials": [
+          "book_encyclopedia_set_01_cover",
+          "book_encyclopedia_set_01_paper"
+        ]
+      },
+      {
+        "name": "book_encyclopedia_set_01_book19",
+        "vertices": 1730,
+        "materials": [
+          "book_encyclopedia_set_01_cover",
+          "book_encyclopedia_set_01_paper"
+        ]
+      },
+      {
+        "name": "book_encyclopedia_set_01_book20",
+        "vertices": 1730,
+        "materials": [
+          "book_encyclopedia_set_01_cover",
+          "book_encyclopedia_set_01_paper"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "binder_notebook",
+    "size": [
+      0.5840288400650024,
+      0.19995832443237305,
+      0.02528943493962288
+    ],
+    "objects": [
+      {
+        "name": "binder_notebook",
+        "vertices": 4849,
+        "materials": [
+          "binder_notebook"
+        ]
+      },
+      {
+        "name": "binder_notebook_closed",
+        "vertices": 4810,
+        "materials": [
+          "binder_notebook"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "sofa_03",
+    "size": [
+      2.73117733001709,
+      0.9250843524932861,
+      1.1182641983032227
+    ],
+    "objects": [
+      {
+        "name": "sofa_03",
+        "vertices": 4701,
+        "materials": [
+          "sofa_03",
+          "sofa_03_fringe"
+        ]
+      }
+    ]
+  }
+]

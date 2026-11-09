@@ -1,0 +1,5 @@
+PASS
+Unity 6000.4.5f1
+Owned skybox, trees, grass and ferns; 6 tables, 24 chairs and corrected mafia table; Walk into escape portal; mode menu; 3/5/7/5 notebooks; first-person camera and hidden avatar; hidden return portal; complete easy mode; time attack expiry; return and restore third person.
+Escape key input maps to the tested ExitToLobby method; real multiplayer and Baldi chase AI are not implemented.
+Editor Search exception: True

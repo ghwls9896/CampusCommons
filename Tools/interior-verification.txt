@@ -1,0 +1,5 @@
+LOUNGE 01 rug=(-8.17, 0.00, -5.00) table=(-8.17, 0.00, -5.00)
+LOUNGE 02 rug=(-8.17, 0.00, 3.00) table=(-8.17, 0.00, 3.00)
+LOUNGE 03 rug=(9.83, 0.00, -5.00) table=(9.83, 0.00, -5.00)
+LOUNGE 04 rug=(9.83, 0.00, 3.00) table=(9.83, 0.00, 3.00)
+PASS: six study sets, four lounge sets, 12 grounded tables, cafe group, modern depth-tested font, no missing scripts.

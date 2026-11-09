@@ -1,0 +1,43 @@
+backup=Assets/LibraryCharacter/Backups/GrandLibrary_before_korean_signs.unity dirty=True objects=4578
+TEXT Maps/Lobby/Entrances/Mafia Door/MAFIA door label active=True value=MAFIA pos=(13.910, 3.530, -5.500) rot=(0.0, 90.0, 0.0) fontSize=64 size=0.04 bounds=(0.00, 0.31, 0.84)
+TEXT Maps/Lobby/Entrances/Mafia Door/Old Sign active=False value=MAFIA pos=(13.840, 4.450, -5.500) rot=(0.0, 90.0, 0.0) fontSize=64 size=0.045 bounds=(0.00, 0.00, 0.00)
+TEXT Maps/Lobby/Entrances/Quiz Door/QUIZ door label active=True value=QUIZ pos=(13.910, 3.530, 0.000) rot=(0.0, 90.0, 0.0) fontSize=64 size=0.04 bounds=(0.00, 0.31, 0.62)
+TEXT Maps/Lobby/Entrances/Quiz Door/Old Sign active=False value=QUIZ  1 VS 1 pos=(13.840, 4.450, 0.000) rot=(0.0, 90.0, 0.0) fontSize=64 size=0.045 bounds=(0.00, 0.00, 0.00)
+TEXT Maps/Lobby/Entrances/Escape Door/ESCAPE door label active=True value=ESCAPE pos=(13.910, 3.530, 5.500) rot=(0.0, 90.0, 0.0) fontSize=64 size=0.04 bounds=(0.00, 0.31, 1.02)
+TEXT Maps/Lobby/Entrances/Escape Door/Old Sign active=False value=ESCAPE ROOM pos=(13.840, 4.450, 5.500) rot=(0.0, 90.0, 0.0) fontSize=64 size=0.045 bounds=(0.00, 0.00, 0.00)
+TEXT Maps/Lobby/Cafe Shop/Cafe Interior/Service Counter/Menu heading active=True value=COFFEE pos=(1.850, 1.680, 10.760) rot=(0.0, 0.0, 0.0) fontSize=64 size=0.018 bounds=(0.45, 0.14, 0.00)
+TEXT Maps/Lobby/Cafe Shop/Cafe Interior/Service Counter/Menu detail active=True value=CAFE pos=(1.850, 1.460, 10.760) rot=(0.0, 0.0, 0.0) fontSize=64 size=0.015 bounds=(0.26, 0.12, 0.00)
+TEXT Maps/Lobby/Cafe Shop/Cafe Interior/Costume Display/Shop label active=True value=STYLE SHOP pos=(4.050, 0.523, 10.190) rot=(0.0, 0.0, 0.0) fontSize=64 size=0.02 bounds=(0.80, 0.15, 0.00)
+TEXT Maps/Lobby/Cafe Shop/Cafe Interior/Cafe Sign/Cafe title active=True value=ATRIUM CAFE pos=(0.000, 2.521, 11.060) rot=(0.0, 0.0, 0.0) fontSize=64 size=0.047 bounds=(2.08, 0.36, 0.00)
+TEXT Maps/Lobby/Cafe Shop/Cafe Interior/Standing Menu/Cafe chalk menu lettering active=True value=COFFEE / TEA pos=(-3.708, 0.669, 9.405) rot=(10.0, 352.0, 0.0) fontSize=64 size=0.016 bounds=(0.40, 0.24, 0.10)
+MESH_SIGN Maps/Mafia Room/Architecture/SIGN_Mafia_LOUNGE active=True render=False bounds=(99.99, 4.45, -7.97)/(1.10, 0.20, 0.01)
+MESH_SIGN Maps/Mafia Room/Architecture/Mafia Wall Sign active=True render=True bounds=(100.01, 3.37, 8.62)/(6.15, 0.37, 0.01)
+MESH_SIGN Maps/Quiz Room/Architecture/SIGN_Quiz_LOUNGE active=True render=False bounds=(199.99, 4.45, -7.97)/(1.10, 0.20, 0.01)
+MESH_SIGN Maps/Quiz Room/Architecture/SIGN_Quiz_QUIZ  1  VS  1 active=True render=True bounds=(199.95, 2.93, 8.58)/(4.14, 0.58, 0.01)
+MESH_SIGN Maps/Quiz Room/Architecture/SIGN_Quiz_READY  /  THINK  /  ANSWER active=True render=True bounds=(200.01, 2.13, 8.57)/(3.23, 0.17, 0.01)
+TEXT Maps/Escape Room/Old Return Portal (Hidden)/LOUNGE sign active=False value=LOUNGE pos=(488.000, 1.920, 31.060) rot=(0.0, 180.0, 0.0) fontSize=64 size=0.035 bounds=(0.00, 0.00, 0.00)
+DOOR Maps/Escape Room/School Doors/Classroom Door 01 pos=(498.75, 0.00, 32.50) rot=(0.0, 270.0, 0.0) second=False
+DOOR Maps/Escape Room/School Doors/Classroom Door 02 pos=(501.25, 0.00, 36.25) rot=(0.0, 270.0, 0.0) second=False
+DOOR Maps/Escape Room/School Doors/Classroom Door 03 pos=(506.25, 0.00, -17.50) rot=(0.0, 0.0, 0.0) second=False
+DOOR Maps/Escape Room/School Doors/Exit Door pos=(473.75, 0.00, -33.75) rot=(0.0, 270.0, 0.0) second=False
+TEXT Maps/Escape Room/School Doors/Exit Door/Sign active=True value=EXIT pos=(473.760, 2.680, -33.125) rot=(0.0, 270.0, 0.0) fontSize=72 size=0.0045 bounds=(0.00, 0.04, 0.07)
+TEXT Maps/Escape Room/School Doors/Exit Door/Sign active=True value=EXIT pos=(473.740, 2.680, -33.125) rot=(0.0, 90.0, 0.0) fontSize=72 size=0.0045 bounds=(0.00, 0.04, 0.07)
+DOOR Maps/Escape Room/School Doors/Classroom Door 05 pos=(528.75, 0.00, -26.25) rot=(0.0, 270.0, 0.0) second=False
+DOOR Maps/Escape Room/School Doors/Classroom Door 06 pos=(473.75, 0.00, 1.25) rot=(0.0, 270.0, 0.0) second=False
+DOOR Maps/Escape Room/School Doors/Classroom Door 07 pos=(491.25, 0.00, -17.50) rot=(0.0, 270.0, 0.0) second=False
+DOOR Maps/Escape Room/School Doors/Classroom Door 08 pos=(483.75, 0.00, 32.50) rot=(0.0, 270.0, 0.0) second=False
+DOOR Maps/Escape Room/School Doors/Classroom Door 09 pos=(520.00, 0.00, 40.00) rot=(0.0, 0.0, 0.0) second=False
+DOOR Maps/Escape Room/School Doors/Classroom Door 10 pos=(506.25, 0.00, 10.00) rot=(0.0, 0.0, 0.0) second=False
+DOOR Maps/Escape Room/School Doors/Classroom Door 11 pos=(473.75, 0.00, 18.75) rot=(0.0, 270.0, 0.0) second=False
+DOOR Maps/Escape Room/School Doors/Classroom Door 12 pos=(526.25, 0.00, 0.00) rot=(0.0, 270.0, 0.0) second=False
+DOOR Maps/Escape Room/School Doors/Classroom Door 13 pos=(498.75, 0.00, 30.00) rot=(0.0, 0.0, 0.0) second=True
+DOOR Maps/Escape Room/School Doors/Classroom Door 14 pos=(483.75, 0.00, -42.50) rot=(0.0, 270.0, 0.0) second=True
+DOOR Maps/Escape Room/School Doors/Classroom Door 15 pos=(506.25, 0.00, -7.50) rot=(0.0, 270.0, 0.0) second=True
+DOOR Maps/Escape Room/School Doors/Classroom Door 16 pos=(513.75, 0.00, 25.00) rot=(0.0, 270.0, 0.0) second=False
+DOOR Maps/Escape Room/School Doors/Classroom Door 17 pos=(511.25, 0.00, 40.00) rot=(0.0, 270.0, 0.0) second=True
+DOOR Maps/Escape Room/School Doors/Classroom Door 18 pos=(488.75, 0.00, 40.00) rot=(0.0, 270.0, 0.0) second=True
+DOOR Maps/Escape Room/School Doors/Classroom Door 19 pos=(493.75, 0.00, 10.00) rot=(0.0, 0.0, 0.0) second=False
+DOOR Maps/Escape Room/School Doors/Classroom Door 20 pos=(493.75, 0.00, -32.50) rot=(0.0, 270.0, 0.0) second=True
+DOOR Maps/Escape Room/School Doors/Classroom Door 21 pos=(526.25, 0.00, -32.50) rot=(0.0, 270.0, 0.0) second=True
+DOOR Maps/Escape Room/School Doors/Classroom Door 22 pos=(491.25, 0.00, -7.50) rot=(0.0, 0.0, 0.0) second=True
+DOOR Maps/Escape Room/School Doors/Classroom Door 23 pos=(493.75, 0.00, 1.25) rot=(0.0, 270.0, 0.0) second=False

@@ -1,0 +1,8 @@
+LIB_Library__portal_escape__DETAIL   Center: (14.00, 2.12, 5.50), Extents: (0.05, 1.79, 1.33)
+LIB_Library__floor__SOLID   Center: (0.00, -0.19, 0.00), Extents: (20.40, 0.19, 20.40)
+LIB_Quiz__ivory__SOLID   Center: (200.00, 2.17, 0.00), Extents: (7.65, 2.53, 9.15)
+LIB_Mafia__portal_quiz__DETAIL   Center: (100.00, 2.12, -8.10), Extents: (1.33, 1.79, 0.05)
+LIB_Quiz__portal_quiz__DETAIL   Center: (200.00, 2.12, -8.10), Extents: (1.33, 1.79, 0.05)
+LIB_Mafia__wood_dark__SOLID   Center: (100.00, 2.17, 0.00), Extents: (9.65, 2.53, 9.15)
+LIB_Library__portal_quiz__DETAIL   Center: (14.00, 2.12, 0.00), Extents: (0.05, 1.79, 1.33)
+LIB_Library__portal_mafia__DETAIL   Center: (14.00, 2.12, -5.50), Extents: (0.05, 1.79, 1.33)

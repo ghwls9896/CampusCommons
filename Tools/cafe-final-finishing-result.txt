@@ -1,0 +1,1 @@
+PASS: coffee faces visitors; three lobby doors; 5 former portal surfaces hidden; menu added; backup=Assets/LibraryCharacter/Backups/GrandLibrary_before_cafe_finishing.unity
