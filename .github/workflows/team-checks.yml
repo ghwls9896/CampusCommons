@@ -25,10 +25,10 @@ jobs:
         with:
           python-version: '3.14'
       - name: Test collaboration checks
-        run: python -m unittest discover -s tools/team/tests -v
+        run: python -m unittest discover -s Tools/team/tests -v
       - name: Check PR scope and Unity file hygiene
         if: github.event_name == 'pull_request'
-        run: python tools/team/check.py --event "$GITHUB_EVENT_PATH"
+        run: python Tools/team/check.py --event "$GITHUB_EVENT_PATH"
       - name: Test backend when present (no API secrets)
         shell: bash
         run: |

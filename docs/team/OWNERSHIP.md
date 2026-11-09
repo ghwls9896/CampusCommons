@@ -21,7 +21,7 @@
 - 모든 `.unity`, `.prefab`: 특히 `Assets/StudyImmersive/Scenes/GrandLibrary_Living.unity`.
 - `Assets/GrandLibrary/Scripts/{Player,GameStart,Portal,LobbyDoor}.cs`.
 - `ProjectSettings/`, `Packages/`, `backend/app.py`, `render.yaml`.
-- 공통 팀 규칙 `AGENTS.md`, `.github/`, `tools/team/`.
+- 공통 팀 규칙 `AGENTS.md`, `.github/`, `Tools/team/`.
 
 1. Issue에 **파일 경로, 변경 의도, 작업자, 예상 인계 시점**을 적고 열린 PR의 변경 파일/작업 JSON을 확인합니다.
 2. 같은 씬/프리팹을 수정 중인 작업이 있으면 통합 담당자가 순서를 정합니다. 먼저 작업한 PR을 반영한 뒤 다음 작업을 시작합니다. 다른 영역 구현은 계속할 수 있습니다.

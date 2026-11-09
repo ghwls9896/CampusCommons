@@ -95,6 +95,11 @@ class ScopeTests(unittest.TestCase):
                 self.assertTrue(self.inspect([('A',name)],{name:data}))
         self.assertEqual(self.inspect([('A','backend/.env.example')],{'backend/.env.example':b'GEMINI_API_KEY=\n'}),[])
 
+    def test_case_colliding_directory_names_fail_for_new_change(self):
+        head={'Tools/world.py':b'pass','tools/team/helper.py':b'pass'}
+        data=task();data['scope']=['tools/team/']
+        self.assertTrue(any('case collision' in e for e in self.inspect([('A','tools/team/helper.py')],head,data=data)))
+
     def test_pr_body_task_must_match(self):
         self.assertEqual(check.pr_errors('Task: docs/tasks/cc-12.json\n\nBody',task()),[])
         self.assertTrue(check.pr_errors('Task: docs/tasks/cc-13.json',task()))

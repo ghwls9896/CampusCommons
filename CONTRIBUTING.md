@@ -37,8 +37,8 @@ gh pr create --draft --base main --title "[영역] 변경 결과" --body-file pr
 
 - 정확한 Unity 버전에서 컴파일 및 관련 Play Mode 검사를 수행합니다. 씬 편집자는 변경 전/후와 재현 경로를 PR에 남깁니다.
 - 백엔드가 있는 브랜치에서는 `cd backend`, 개발 의존성 설치 후 `python -m pytest -q`.
-- 협업 도구: `python -m unittest discover -s tools/team/tests -v`.
-- 명시한 파일만 stage/commit 후 저장소 루트에서 `python tools/team/check.py --base origin/main`.
+- 협업 도구: `python -m unittest discover -s Tools/team/tests -v`.
+- 명시한 파일만 stage/commit 후 저장소 루트에서 `python Tools/team/check.py --base origin/main`.
 - PR CI `team-checks`는 작업 명세/수정 범위/공유 파일 선언, 충돌 흔적, 신규 Unity .meta/GUID, 기본 비밀 파일 실수, 도구 테스트를 검사합니다. 백엔드가 있으면 서버 테스트도 실행합니다. **Unity 실행/시각적 품질/진짜 AI 응답/파일 독점권은 검사하지 않습니다.**
 
 CI 실패를 없애려고 검사나 다른 사람 코드를 지우지 않습니다. 범위가 틀렸으면 실제 작업과 맞추고 영향받는 담당자가 검토합니다.

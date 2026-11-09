@@ -8,6 +8,7 @@ from pathlib import Path, PurePosixPath
 import re
 import subprocess
 import sys
+import unicodedata
 
 REPO = 'https://github.com/ghwls9896/CampusCommons'
 OWNERS = {'HIGHCHOI', 'Yeni-sjs', 'ghwls9896', 'GongBeak'}
@@ -65,7 +66,7 @@ def in_scope(path, scope):
 
 def is_shared(path):
     return (path in SHARED or path.endswith(('.unity', '.prefab'))
-            or path.startswith(('ProjectSettings/', 'Packages/', '.github/', 'tools/team/')))
+            or path.startswith(('ProjectSettings/', 'Packages/', '.github/', 'Tools/team/')))
 
 
 def pr_errors(body, task):
@@ -86,6 +87,13 @@ def change_errors(task, changes, head, base):
     errors = []
     own_notes = {f'docs/tasks/{task["id"]}.json', f'docs/tasks/{task["id"]}.md'}
     guid_paths = {}
+    case_paths = {}
+    for path in head:
+        parts = PurePosixPath(path).parts
+        for depth in range(1, len(parts) + 1):
+            name = '/'.join(parts[:depth])
+            key = unicodedata.normalize('NFC', name).casefold()
+            case_paths.setdefault(key, set()).add(name)
     for path, data in head.items():
         if path.endswith('.meta'):
             match = GUID.search(data)
@@ -101,6 +109,11 @@ def change_errors(task, changes, head, base):
             if path.startswith('Assets/') and path + '.meta' in head:
                 errors.append(f'Deleted asset leaves orphan .meta: {path}.meta')
             continue
+        parts = PurePosixPath(path).parts
+        for depth in range(1, len(parts) + 1):
+            name = '/'.join(parts[:depth])
+            if len(case_paths.get(unicodedata.normalize('NFC', name).casefold(), set())) > 1:
+                errors.append(f'Cross-platform path case collision: {name}')
         data = head.get(path, b'')
         name = PurePosixPath(path).name
         if ((name == '.env' or name.startswith('.env.')) and name != '.env.example') or path.endswith(('.pem', '.p12', '.pfx', '.key')):

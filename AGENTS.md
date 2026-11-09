@@ -18,12 +18,13 @@
 - API·JSON 필드·이벤트·프리팹 연결을 바꾸면 생산자와 소비자 경로, 호환성, 적용 순서를 작업 Issue에 남긴다. 서로 다른 에이전트가 같은 인터페이스를 추측해 구현하지 않는다.
 - Unity 버전은 `ProjectSettings/ProjectVersion.txt`의 **6000.4.5f1**. 버전 변경은 별도 합의된 작업. 다른 에디터 검증은 임시 복사본에서 하고 실제 버전을 보고한다.
 - 현재 메인 씬은 `Assets/StudyImmersive/Scenes/GrandLibrary_Living.unity`. 씬/프리팹은 Unity 에디터로 편집하고 공유 씬 전체 재생성 메뉴를 임의 실행하지 않는다. 충돌 시 YAML을 추측하거나 파일 전체를 ours/theirs로 선택하지 않는다.
+- 경로 대소문자를 정확히 지킨다. 공용 도구 디렉터리는 `Tools/`이며 `tools/`를 따로 만들지 않는다. Windows/macOS에서 같은 이름이 되는 경로를 추가하지 않는다.
 - 에셋 생성/이동/삭제에는 `.meta`가 따라야 한다. 기존 GUID를 재발급하지 않는다. Force Text / Visible Meta Files를 유지한다. Library/Temp/Logs/Builds, 개인 경로, 키, 토큰, 실제 학습 PDF/사용자 DB는 커밋하지 않는다.
 - 변경 파일만 명시적으로 stage한다. 기존 CRLF 정규화 차이는 `git diff --ignore-space-at-eol`로 구분하고 무관한 파일을 포함하지 않는다. repo-wide `git add --renormalize .`는 별도 작업이다.
 
 ## 검증·공유·완료
 
-- 커밋 전 변경에 맞는 테스트를 실행한다. 커밋 후 `python tools/team/check.py --base origin/main`으로 제출할 커밋을 확인한다. 이 검사는 작업 폴더의 미커밋 수정은 검사하지 않는다.
+- 커밋 전 변경에 맞는 테스트를 실행한다. 커밋 후 `python Tools/team/check.py --base origin/main`으로 제출할 커밋을 확인한다. 이 검사는 작업 폴더의 미커밋 수정은 검사하지 않는다.
 - 게임 코드 변경은 정확한 Unity 버전에서 컴파일/관련 Play Mode 검증 결과를 PR에 붙인다. 못 돌린 검사, 다른 버전, 가짜 API 응답 사용은 정확히 적는다. CI 통과를 Unity 실행 성공으로 말하지 않는다.
 - 작업이 시작되면 범위/작업 명세가 들어간 작은 커밋을 push하고 Draft PR을 만든다. 완료 시 같은 PR을 갱신한다. PR마다 목표 하나, 연결 Issue, task JSON, 실제 검증, 미검증, 공통 파일 조율 및 의존 PR을 적는다.
 - 작성자 외 사람 1명 이상과 해당 영역 검토가 필요하다. AI 리뷰는 보조이며 사람의 GitHub 승인을 대신하지 않는다. 모든 검사와 대화가 해결된 후 통합 담당자가 main으로 Squash merge한다. 스스로 승인/자동 merge하지 않는다.

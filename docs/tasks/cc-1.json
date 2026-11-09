@@ -16,7 +16,7 @@
     "docs/team/",
     "docs/tasks/",
     "docs/superpowers/plans/",
-    "tools/team/"
+    "Tools/team/"
   ],
   "shared_files": [
     ".github/CODEOWNERS",
@@ -26,13 +26,13 @@
     ".github/pull_request_template.md",
     ".github/workflows/team-checks.yml",
     "AGENTS.md",
-    "tools/team/check.py",
-    "tools/team/tests/test_check.py"
+    "Tools/team/check.py",
+    "Tools/team/tests/test_check.py"
   ],
   "depends_on": [],
   "validation": [
-    "python -m unittest discover -s tools/team/tests -v",
-    "python tools/team/check.py --base origin/main",
+    "python -m unittest discover -s Tools/team/tests -v",
+    "python Tools/team/check.py --base origin/main",
     "원격 PR의 team-checks 실행 결과 확인; Unity 코드 변경 없음"
   ]
 }
