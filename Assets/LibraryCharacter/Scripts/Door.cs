@@ -13,6 +13,9 @@ namespace CampusCommons.LibraryCharacter
         public float openAngle=88;
         public float degreesPerSecond=260;
         bool open;
+        float lockUntil;
+        GameObject lockBarrier;
+        readonly System.Collections.Generic.List<GameObject> lockMarks=new System.Collections.Generic.List<GameObject>();
         Collider panel,secondPanel;
         Vector3 doorwayCenter;
         float doorwayWidth;
@@ -21,7 +24,8 @@ namespace CampusCommons.LibraryCharacter
         public float DoorwayWidth=>doorwayWidth;
         public bool IsFullyOpen=>open && hinge && Mathf.Abs(Mathf.DeltaAngle(hinge.localEulerAngles.y,openAngle))<3f &&
             (!secondHinge || Mathf.Abs(Mathf.DeltaAngle(secondHinge.localEulerAngles.y,-openAngle))<3f);
-        public string Hint=>open?"E / 클릭  문 닫기":"E / 클릭  문 열기";
+        public bool IsLocked=>lockBarrier && Time.time<lockUntil;
+        public string Hint=>IsLocked?"잠긴 문":open?"E / 클릭  문 닫기":"E / 클릭  문 열기";
         void Awake()
         {
             if(!hinge)hinge=transform;if(!game)game=FindAnyObjectByType<EscapeGame>();
@@ -36,6 +40,7 @@ namespace CampusCommons.LibraryCharacter
         }
         void Update()
         {
+            if(lockBarrier && Time.time>=lockUntil)Unlock();
             if(!hinge)return;float angle=Mathf.MoveTowardsAngle(hinge.localEulerAngles.y,open?openAngle:0,degreesPerSecond*Time.deltaTime);
             hinge.localRotation=Quaternion.Euler(0,angle,0);
             if(secondHinge)
@@ -46,7 +51,7 @@ namespace CampusCommons.LibraryCharacter
         }
         public void Interact()
         {
-            open=!open;
+            if(!IsLocked)open=!open;
         }
         public void RetireExitDesignation()
         {
@@ -54,7 +59,32 @@ namespace CampusCommons.LibraryCharacter
             foreach(var sign in GetComponentsInChildren<TextMesh>(true))
                 if(sign.text=="EXIT")sign.gameObject.SetActive(false);
         }
-        public void OpenForMonster(){open=true;}
+        public void OpenForMonster(){if(!IsLocked)open=true;}
+        public bool TryLock(float seconds,Sprite icon)
+        {
+            if(exitDoor || IsLocked || seconds<=0f || !hinge)return false;
+            open=false;lockUntil=Time.time+seconds;
+            lockBarrier=new GameObject("Temporary locked doorway");lockBarrier.transform.SetParent(transform,true);
+            lockBarrier.transform.SetPositionAndRotation(doorwayCenter,transform.rotation);
+            var wall=lockBarrier.AddComponent<BoxCollider>();wall.size=new Vector3(Mathf.Max(.7f,doorwayWidth),2.2f,.18f);
+            if(icon)
+            {
+                for(int side=-1;side<=1;side+=2)
+                {
+                    var mark=new GameObject("Padlock mark");mark.transform.SetParent(lockBarrier.transform,false);
+                    mark.transform.localPosition=new Vector3(0,0,.13f*side);
+                    mark.transform.localRotation=Quaternion.Euler(0,side<0?0f:180f,0);
+                    float scale=.38f/Mathf.Max(.01f,icon.rect.height/icon.pixelsPerUnit);mark.transform.localScale=Vector3.one*scale;
+                    mark.AddComponent<SpriteRenderer>().sprite=icon;lockMarks.Add(mark);
+                }
+            }
+            return true;
+        }
+        public void Unlock()
+        {
+            if(lockBarrier)Destroy(lockBarrier);lockBarrier=null;lockUntil=0f;
+            lockMarks.Clear();
+        }
         public void AddOpenPanels(System.Collections.Generic.List<Collider> result)
         {
             if(!IsFullyOpen)return;

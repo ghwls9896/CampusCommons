@@ -5,10 +5,6 @@
   "branch": "codex/cc-15-item-icons",
   "issue": "https://github.com/ghwls9896/CampusCommons/issues/15",
   "scope": [
-    "Assets/StudyImmersive/Art/EscapeItemIcons/",
-    "Assets/StudyImmersive/Art/EscapeItemIcons.meta",
-    "Assets/StudyImmersive/Art/EscapePixels/",
-    "Assets/StudyImmersive/Art/EscapePixels.meta",
     "Assets/StudyImmersive/Scripts/EscapeGame.cs",
     "Assets/StudyImmersive/Scripts/EscapeBarricade/",
     "Assets/StudyImmersive/Scripts/EscapeBarricade.meta",
@@ -23,7 +19,11 @@
     "docs/tasks/cc-13.json",
     "docs/tasks/cc-13.md",
     "docs/tasks/cc-15.json",
-    "docs/tasks/cc-15.md"
+    "docs/tasks/cc-15.md",
+    "Assets/StudyImmersive/Resources/EscapeItemIcons/",
+    "Assets/StudyImmersive/Resources/EscapeItemIcons.meta",
+    "Assets/StudyImmersive/Resources/EscapePixels/",
+    "Assets/StudyImmersive/Resources/EscapePixels.meta"
   ],
   "shared_files": [],
   "depends_on": [],

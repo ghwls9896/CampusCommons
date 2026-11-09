@@ -62,6 +62,7 @@ namespace CampusCommons.StudyImmersive
         Vector3 jumpCameraStart,jumpCameraEnd,jumpLookAt;
         Quaternion jumpCameraRotation;
         AudioSource jumpAudio;
+        AudioClip crowAnger;
         int found,target;
         readonly InventoryItem[] inventory=new InventoryItem[InventorySlots];
         float stamina=MaxStamina;
@@ -94,6 +95,15 @@ namespace CampusCommons.StudyImmersive
         public float Remaining=>Mathf.Max(0,timeLimitSeconds-elapsed);
         public Mode CurrentMode=>currentMode;
         public int ActiveNotebookCount=>notebooks.FindAll(n=>n && n.activeSelf).Count;
+        public EscapeWorld World{get;private set;}
+        public IEnumerable<Vector3> PendingSheetPositions
+        {
+            get { foreach(var sheet in notebooks)if(sheet && sheet.activeSelf)yield return sheet.transform.position; }
+        }
+        public IEnumerable<Vector3> ExitPositions
+        {
+            get { foreach(var elevator in elevators)if(elevator)yield return elevator.transform.position; }
+        }
         public float Stamina=>stamina;
         public InventoryItem ItemAt(int slot)=>slot>=0 && slot<inventory.Length?inventory[slot]:InventoryItem.Empty;
         public bool AddItem(InventoryItem item)
@@ -114,6 +124,7 @@ namespace CampusCommons.StudyImmersive
             if(schoolReturnTrigger)schoolReturnTrigger.SetActive(false);
             if(!jumpScareImage)jumpScareImage=Resources.Load<Texture2D>("CrowJumpscare");
             if(!jumpScareSound)jumpScareSound=Resources.Load<AudioClip>("CrowJumpscare");
+            crowAnger=Resources.Load<AudioClip>("CrowAlert");
             jumpAudio=gameObject.AddComponent<AudioSource>();jumpAudio.playOnAwake=false;jumpAudio.spatialBlend=0;
             if(schoolGrid)
             {
@@ -182,6 +193,7 @@ namespace CampusCommons.StudyImmersive
             if(avatar)avatar.gameObject.SetActive(false);
             yaw=schoolYaw;pitch=0;falling=-2;selecting=false;running=true;Physics.SyncTransforms();UpdateCamera();
             doors=FindObjectsByType<Door>();if(monster)monster.Begin(this,player.transform,mode);
+            World=EscapeWorld.Create(this,player.transform,schoolGrid,doors);
             Cursor.lockState=CursorLockMode.Locked;Cursor.visible=false;return true;
         }
         void Update()
@@ -198,13 +210,16 @@ namespace CampusCommons.StudyImmersive
                 if(elapsed>=timeLimitSeconds){elapsed=timeLimitSeconds;timedOut=true;return;}
             }
             if(IsAnswering)return;
+            if(World)World.HandleInventoryKeys();
+            if(World && World.BlocksMovement)return;
             yaw+=Input.GetAxisRaw("Mouse X")*2.5f;pitch=Mathf.Clamp(pitch-Input.GetAxisRaw("Mouse Y")*2.0f,-80,80);
             float x=(Input.GetKey(KeyCode.D)||Input.GetKey(KeyCode.RightArrow)?1:0)-(Input.GetKey(KeyCode.A)||Input.GetKey(KeyCode.LeftArrow)?1:0);
             float z=(Input.GetKey(KeyCode.W)||Input.GetKey(KeyCode.UpArrow)?1:0)-(Input.GetKey(KeyCode.S)||Input.GetKey(KeyCode.DownArrow)?1:0);
             Vector3 dir=Quaternion.Euler(0,yaw,0)*Vector3.ClampMagnitude(new Vector3(x,0,z),1);
             if(body.isGrounded && falling<0)falling=-2;falling+=Physics.gravity.y*Time.deltaTime;
             bool sprinting=UpdateStamina(Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift),dir.sqrMagnitude>.001f,Time.deltaTime);
-            body.Move((dir*(sprinting?5.2f:3.6f)+Vector3.up*falling)*Time.deltaTime);
+            float boost=World && World.HasSpeedBoost?1.35f:1f;
+            body.Move((dir*((sprinting?5.2f:3.6f)*boost)+Vector3.up*falling)*Time.deltaTime);
             if(player.transform.position.y< -5){body.enabled=false;player.transform.position=schoolArrival;body.enabled=true;falling=-2;}
             UpdateCamera();
             if(Input.GetMouseButtonDown(0))Interact(true);
@@ -247,7 +262,8 @@ namespace CampusCommons.StudyImmersive
         }
         public bool Interact(bool requireAim)
         {
-            if(!running || IsEnded || IsAnswering || exitConfirm || !view || !player)return false;
+            if(!running || IsEnded || IsAnswering || exitConfirm || !view || !player || (World && World.BlocksMovement))return false;
+            if(World && World.TryInteract(requireAim))return true;
             var ray=view.ViewportPointToRay(new Vector3(.5f,.5f,0));
             var hits=Physics.RaycastAll(ray,2.25f,Physics.DefaultRaycastLayers,QueryTriggerInteraction.Collide);
             Array.Sort(hits,(a,b)=>a.distance.CompareTo(b.distance));
@@ -306,7 +322,12 @@ namespace CampusCommons.StudyImmersive
         {
             if(!IsAnswering || quizFeedback || answer<0 || answer>=quizQuestions[quizIndex].Options.Length)return false;
             lastCorrect=answer==quizQuestions[quizIndex].Correct;quizFeedback=true;
-            if(!lastCorrect && monster)monster.SpeedUp();return true;
+            if(!lastCorrect && monster)
+            {
+                bool first=!monster.IsAwakened;monster.SpeedUp();
+                if(first && jumpAudio && crowAnger)jumpAudio.PlayOneShot(crowAnger,1f);
+            }
+            return true;
         }
         public bool ContinueQuestion()
         {
@@ -362,13 +383,14 @@ namespace CampusCommons.StudyImmersive
         public bool CancelExit()
         {
             if(!exitConfirm)return false;exitConfirm=false;if(jumpAudio)jumpAudio.UnPause();
-            bool useMouse=selecting || IsAnswering || IsEnded;
+            bool useMouse=selecting || IsAnswering || IsEnded || (World && World.BlocksMovement);
             Cursor.lockState=useMouse?CursorLockMode.None:CursorLockMode.Locked;Cursor.visible=useMouse;return true;
         }
         public bool ConfirmExit(){if(!exitConfirm)return false;ExitToLobby();return true;}
         public void ExitToLobby()
         {
             if(!selecting && !running)return;selecting=false;running=false;exitConfirm=false;quizOpen=false;activeSheet=null;ClearNotebooks();if(monster)monster.End();if(jumpAudio)jumpAudio.Stop();
+            if(World){World.Shutdown();Destroy(World.gameObject);World=null;}
             if(player && body)
             {
                 body.enabled=false;player.transform.position=lobbyReturn;body.enabled=true;player.currentSpace=Portal.Space.Library;
@@ -428,6 +450,10 @@ namespace CampusCommons.StudyImmersive
                     GUI.Label(new Rect(544,30,200,28),L("남은 시간  ","TIME  ")+TimeSpan.FromSeconds(Mathf.CeilToInt(Remaining)).ToString(@"mm\:ss"),text);
                 }
                 if(!IsEnded)DrawEscapeHud();
+                if(World && World.BlocksMovement && !IsEnded)
+                {
+                    World.DrawProfessor(title,text,choice,korean);GUI.matrix=old;return;
+                }
                 if(IsEnded)
                 {
                     Panel(new Rect(385,265,510,145));string status=completed?L("탈출 성공!","ESCAPED!"):timedOut?L("시간 종료","TIME IS UP"):L("몬스터에게 잡혔습니다","CAUGHT BY THE MONSTER");
@@ -458,6 +484,7 @@ namespace CampusCommons.StudyImmersive
                 {
                     GUI.Label(new Rect(622,342,36,36),"+",crosshair);
                     if(Time.time<noticeUntil){Panel(new Rect(365,555,550,48),.88f);GUI.Label(new Rect(380,565,520,28),korean?notice:noticeEnglish,text);}
+                    else if(World && World.NearbyHint!=null){Panel(new Rect(420,555,440,48),.87f);GUI.Label(new Rect(435,565,410,28),World.NearbyHint,text);}
                     else if(NearestDistance()<1.7f){Panel(new Rect(475,555,330,48),.87f);GUI.Label(new Rect(490,565,300,28),L("클릭 / E   문제지 열기","CLICK / E   OPEN SHEET"),text);}
                     else
                     {
@@ -496,8 +523,12 @@ namespace CampusCommons.StudyImmersive
                 string item=inventory[i]==InventoryItem.Soda?L("음료","CAN"):
                     inventory[i]==InventoryItem.Padlock?L("자물쇠","LOCK"):
                     inventory[i]==InventoryItem.ExcuseNote?L("공결증","NOTE"):"";
-                GUI.Label(new Rect(x+8,34,58,28),item,text);
+                var icon=World?World.ItemTexture(inventory[i]):null;
+                if(icon)GUI.DrawTexture(new Rect(x+12,29,46,46),icon,ScaleMode.ScaleToFit,true);
+                else GUI.Label(new Rect(x+8,34,58,28),item,text);
+                GUI.Label(new Rect(x+7,66,20,20),(i+1).ToString(),text);
             }
+            if(World)World.DrawStatus(text,korean);
         }
         void DrawPanicTint()
         {
