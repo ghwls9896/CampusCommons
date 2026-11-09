@@ -1,0 +1,19 @@
+{
+  "id": "cc-13",
+  "title": "탈출룸 복도용 노랑 검정 공사 가림벽",
+  "owner": "ghwls9896",
+  "branch": "codex/cc-13-barricade",
+  "issue": "https://github.com/ghwls9896/CampusCommons/issues/13",
+  "scope": [
+    "Assets/StudyImmersive/Scripts/EscapeBarricade/",
+    "Assets/StudyImmersive/Scripts/EscapeBarricade.meta",
+    "docs/tasks/cc-13.json",
+    "docs/tasks/cc-13.md"
+  ],
+  "shared_files": [],
+  "depends_on": [],
+  "validation": [
+    "Unity 6000.4.5f1에서 생성·충돌·폭 조정 검증",
+    "python Tools/team/check.py --base origin/main"
+  ]
+}
