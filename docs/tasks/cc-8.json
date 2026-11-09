@@ -1,0 +1,20 @@
+{
+  "id": "cc-8",
+  "title": "이메일 계정·닉네임·개인 경험치 DB 설계",
+  "owner": "HIGHCHOI",
+  "branch": "codex/cc-8-account-progression",
+  "issue": "https://github.com/ghwls9896/CampusCommons/issues/8",
+  "scope": [
+    "docs/account/",
+    "docs/superpowers/specs/2026-11-09-account-progression-design.md",
+    "docs/superpowers/plans/2026-11-09-account-progression.md"
+  ],
+  "shared_files": [],
+  "depends_on": [],
+  "validation": [
+    "설계의 요구/권한/중복·동시 지급/무료 운영 조건 검토",
+    "python3 -m unittest discover -s Tools/team/tests -q",
+    "커밋 후 python3 Tools/team/check.py --base origin/main",
+    "이번 제출은 문서만; 실제 Auth/DB/Unity 검증은 구현 단계"
+  ]
+}
