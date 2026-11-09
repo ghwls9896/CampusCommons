@@ -13,7 +13,7 @@ API 키는 **Render 서버 환경변수에만** 넣습니다. Unity, GitHub, 채
 
 ## 2. Render: 무료 서버 배포
 
-먼저 이 변경사항이 포함된 브랜치를 GitHub 저장소에 올려야 Render가 읽을 수 있습니다. 로컬 브랜치명은 `codex/pdf-quiz-room`이며, main에 합쳤다면 main을 선택하면 됩니다.
+구현은 GitHub의 `codex/pdf-quiz-room` 브랜치와 [Draft PR #4](https://github.com/ghwls9896/CampusCommons/pull/4)로 공유되어 있습니다. 팀 리뷰 후 main에 합쳤다면 main을 배포 대상으로 선택합니다. 검토 중 기능을 테스트할 때는 해당 기능 브랜치를 선택합니다.
 
 1. [Render](https://dashboard.render.com/)에 가입하고 GitHub 계정을 연결합니다.
 2. **New → Blueprint**에서 `ghwls9896/CampusCommons` 저장소와 위 브랜치를 선택합니다. 루트의 `render.yaml`이 Python Web Service 한 개를 구성합니다. 반드시 인스턴스가 **Free**인지 확인합니다.
@@ -73,7 +73,7 @@ python3 -m venv .venv
 서버 실행 시 셸에서 환경변수 2개를 설정하고 `.venv/bin/uvicorn app:app --host 127.0.0.1 --port 8000 --workers 1`을 실행합니다. `.env.example`은 설정 예시이며 자동으로 읽지 않습니다. 로컬 HTTP 서버는 API 개발용이고 Unity는 HTTPS 서버 주소만 허용합니다.
 
 - 서버 테스트는 PDF·스키마·API 오류·동시 요청·한도 처리를 가짜 Gemini 응답으로 검증합니다. 실제 모델 호출이 아닙니다.
-- `tools/tests/QuizSessionTests.cs`는 순수 C# 채점/진행/검증 테스트입니다. `QuizData.cs`, `QuizConnection.cs`와 함께 컴파일해 실행합니다.
+- `Tools/tests/QuizSessionTests.cs`는 순수 C# 채점/진행/검증 테스트입니다. `QuizData.cs`, `QuizConnection.cs`와 함께 컴파일해 실행합니다.
 - `CampusCommons.Quiz.Editor.QuizRoomTest.Run`은 Unity Editor 배치 `-executeMethod` 진입점입니다. 실제 씬에서 입장·풀이·퇴장 상태를 검증합니다.
 - 최종 연결 확인: 실제 API 키를 서버에 설정한 뒤 짧은 학습 PDF로 3문항 생성 → 제출 → 해설 → 결과까지 확인합니다. 빈 PDF·암호 PDF·잘못된 참가 코드도 화면에서 확인합니다. 키가 없는 환경에서 이 실제 AI 검증을 통과했다고 주장하지 않습니다.
 

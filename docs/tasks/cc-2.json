@@ -19,7 +19,7 @@
     "docs/superpowers/specs/2026-11-09-pdf-quiz-design.md",
     "docs/superpowers/plans/2026-11-09-pdf-quiz.md",
     "docs/superpowers/plans/2026-11-09-pdf-quiz-progress.md",
-    "tools/tests/QuizSessionTests.cs"
+    "Tools/tests/QuizSessionTests.cs"
   ],
   "shared_files": [
     "Assets/GrandLibrary/Scripts/GameStart.cs",

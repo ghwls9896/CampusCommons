@@ -9,7 +9,7 @@
 ## Completion evidence
 
 - Backend: Python 3.14.2, `cd backend && .venv/bin/python -m pytest -q`: 26 passed. Initial tests failed before implementation; additional upload/generation timeout tests observed RED then GREEN. One dependency deprecation warning from Starlette's httpx TestClient adapter.
-- Pure C#: Unity-bundled mcs compiled tools/tests/QuizSessionTests.cs plus QuizData.cs/QuizConnection.cs; mono output `QUIZ_SESSION_PASS 20 checks`.
+- Pure C#: Unity-bundled mcs compiled Tools/tests/QuizSessionTests.cs plus QuizData.cs/QuizConnection.cs; mono output `QUIZ_SESSION_PASS 20 checks`.
 - Unity import: installed 6000.6.0f1 in disposable /private/tmp/CampusCommons-quiz-validation, exit 0, no C# compile errors. Original project remains 6000.4.5f1.
 - Unity playmode: `-executeMethod CampusCommons.Quiz.Editor.QuizRoomTest.Run`, exit 0, `PDF_QUIZ_ROOM_PASS`. Verifies scene attachment, real portal entry, cursor, fixture quiz flow, exit cancel, reset and pending-request disposal. Runtime errors fail the test; known editor-only SearchDatabase indexing exception is explicitly excluded. Test request is unsent, so this is cleanup coverage, not an actual delayed-network cancellation test.
 - Real local uvicorn HTTP smoke: `/healthz` returned 200 and an unconfigured quiz endpoint returned the expected structured 503.
