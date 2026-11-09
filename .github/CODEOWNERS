@@ -1,24 +1,5 @@
-# Requires each listed collaborator to have Write access. Last match wins.
-# Multiple owners mean OR, not AND. Shared-file coordination is documented separately.
-* @ghwls9896 @HIGHCHOI
-/Assets/MafiaRoom/ @Yeni-sjs @ghwls9896
-/Assets/MafiaRoom.meta @Yeni-sjs @ghwls9896
-/Assets/QuizRoom/ @HIGHCHOI @ghwls9896
-/Assets/QuizRoom.meta @HIGHCHOI @ghwls9896
-/Assets/Webcam/ @HIGHCHOI @ghwls9896
-/Assets/Webcam.meta @HIGHCHOI @ghwls9896
-/Assets/Account/ @HIGHCHOI @ghwls9896
-/Assets/Account.meta @HIGHCHOI @ghwls9896
-/backend/ @HIGHCHOI @ghwls9896
-/render.yaml @HIGHCHOI @ghwls9896
-/Assets/Characters/ @GongBeak @ghwls9896
-/Assets/Characters.meta @GongBeak @ghwls9896
-/Assets/GrandLibrary/Scripts/Player.cs @GongBeak @ghwls9896
-/Assets/GrandLibrary/Scripts/Player.cs.meta @GongBeak @ghwls9896
-/Assets/StudyImmersive/ @ghwls9896 @HIGHCHOI
-/Assets/LibraryCharacter/ @ghwls9896 @HIGHCHOI
-/ProjectSettings/ @ghwls9896 @HIGHCHOI
-/Packages/ @ghwls9896 @HIGHCHOI
-/AGENTS.md @ghwls9896 @HIGHCHOI
-/.github/ @ghwls9896 @HIGHCHOI
-/Tools/team/ @ghwls9896 @HIGHCHOI
+# Final reviewers. Implementation ownership remains in docs/team/OWNERSHIP.md.
+# PR by HIGHCHOI -> ghwls9896; every other PR -> HIGHCHOI.
+# CODEOWNERS is static and means either owner, not both approvals.
+# review-routing.yml requests the intended reviewer; team policy determines who approves.
+* @HIGHCHOI @ghwls9896

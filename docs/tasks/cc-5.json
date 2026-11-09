@@ -1,0 +1,26 @@
+{
+  "id": "cc-5",
+  "title": "작성자별 최종 승인 담당과 자동 리뷰 요청",
+  "owner": "HIGHCHOI",
+  "branch": "codex/review-routing",
+  "issue": "https://github.com/ghwls9896/CampusCommons/issues/5",
+  "scope": [
+    "AGENTS.md",
+    "CONTRIBUTING.md",
+    ".github/CODEOWNERS",
+    ".github/workflows/review-routing.yml",
+    "docs/team/OWNERSHIP.md",
+    "docs/team/START_HERE.md"
+  ],
+  "shared_files": [
+    "AGENTS.md",
+    ".github/CODEOWNERS",
+    ".github/workflows/review-routing.yml"
+  ],
+  "depends_on": [],
+  "validation": [
+    "기존 협업 검사 16 tests",
+    "실제 workflow script를 모의 GitHub 클라이언트로 실행해 작성자별 요청·중복·Draft 확인",
+    "PR team-checks 확인; pull_request_target의 실제 자동 요청은 main 통합 후 검증"
+  ]
+}
