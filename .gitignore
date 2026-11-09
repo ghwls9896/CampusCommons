@@ -19,8 +19,10 @@
 *.suo
 *.tmp
 
-# PDF quiz backend: local environments, credentials and uploaded study material
-backend/.venv/
+# Isolated agent workspaces and local secrets
+/.worktrees/
+/worktrees/
+**/.venv/
 **/__pycache__/
 **/.pytest_cache/
 .env

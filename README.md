@@ -1,5 +1,9 @@
 # Campus Commons — 학생 교류 공간
 
+## 팀 협업부터 시작하기
+
+모든 팀원과 AI 에이전트는 [공통 지침](AGENTS.md), [개발 절차](CONTRIBUTING.md), [담당표](docs/team/OWNERSHIP.md)를 먼저 읽습니다. 기존 작업을 새 규칙으로 옮기는 방법과 복사할 에이전트 시작 프롬프트는 [팀 시작 안내](docs/team/START_HERE.md)에 있습니다. **main 직접 수정 대신 작업 Issue → 독립 브랜치/폴더 → PR → 검토 후 통합**으로 진행합니다.
+
 ## 팀원 시작하기
 
 1. 저장소를 클론한 뒤 Unity Hub에서 이 폴더를 프로젝트로 추가합니다.

@@ -1,0 +1,5 @@
+# Final reviewers. Implementation ownership remains in docs/team/OWNERSHIP.md.
+# PR by HIGHCHOI -> ghwls9896; every other PR -> HIGHCHOI.
+# CODEOWNERS is static and means either owner, not both approvals.
+# review-routing.yml requests the intended reviewer; team policy determines who approves.
+* @HIGHCHOI @ghwls9896

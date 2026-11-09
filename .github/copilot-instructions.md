@@ -1,0 +1,1 @@
+Before making repository changes, read and follow the root AGENTS.md, CONTRIBUTING.md, docs/team/OWNERSHIP.md, and the current docs/tasks/cc-<issue>.json. Use one task branch/worktree, respect the declared scope, coordinate shared Unity files, and report actual tests. These files are the single source of team rules.
