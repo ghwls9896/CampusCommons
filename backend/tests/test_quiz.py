@@ -201,3 +201,40 @@ def test_generation_deadline_releases_slot_after_timeout():
             response = client.post('/v1/quizzes', content=pdf(), headers=HEADERS)
             assert response.status_code == 504
             assert response.json()['error']['code'] == 'generation_timeout'
+
+
+def test_inspection_reports_real_pages_including_over_limit_without_generating():
+    async def must_not_generate(*args):
+        pytest.fail('PDF inspection must not invoke Gemini')
+    with client_for(must_not_generate) as client:
+        for pages, allowed in [(1, True), (80, True), (81, False)]:
+            data = pdf(pages)
+            response = client.post('/v1/pdfs/inspect', content=data, headers=HEADERS)
+            assert response.status_code == 200
+            assert response.json() == {
+                'size_bytes': len(data), 'page_count': pages,
+                'max_size_bytes': 1024 * 1024, 'max_pages': 80,
+                'within_limits': allowed,
+            }
+            assert response.headers['cache-control'] == 'no-store'
+
+
+def test_inspection_checks_auth_type_size_and_pdf_structure():
+    with client_for(max_pdf_bytes=1024 * 1024) as client:
+        assert client.post('/v1/pdfs/inspect', content=pdf()).status_code == 401
+        assert client.post('/v1/pdfs/inspect', content=pdf(), headers={**HEADERS, 'content-type': 'text/plain'}).status_code == 415
+        for data, code in [(b'broken', 'invalid_pdf'), (pdf(encrypted=True), 'encrypted_pdf'), (pdf(0), 'invalid_pdf')]:
+            response = client.post('/v1/pdfs/inspect', content=data, headers=HEADERS)
+            assert response.status_code == 422
+            assert response.json()['error']['code'] == code
+    with client_for(max_pdf_bytes=20) as client:
+        assert client.post('/v1/pdfs/inspect', content=pdf(), headers=HEADERS).status_code == 413
+
+
+def test_inspection_does_not_spend_generation_budget():
+    with client_for(daily_limit=1) as client:
+        for _ in range(3):
+            assert client.post('/v1/pdfs/inspect', content=pdf(), headers=HEADERS).status_code == 200
+        assert client.post('/v1/quizzes', content=pdf(), headers=HEADERS).status_code == 200
+        assert client.post('/v1/quizzes', content=pdf(), headers=HEADERS).status_code == 429
+        assert client.post('/v1/pdfs/inspect', content=pdf(), headers=HEADERS).status_code == 200

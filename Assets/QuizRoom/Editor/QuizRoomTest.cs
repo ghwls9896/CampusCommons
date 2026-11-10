@@ -72,6 +72,13 @@ namespace CampusCommons.Quiz.Editor
                 if(step==1)
                 {
                     Check(room.BlocksMovement && Cursor.visible && Cursor.lockState==CursorLockMode.None,"Quiz must release cursor and block movement");
+                    var document=(QuizDocument)typeof(QuizRoom).GetField("document",Private).GetValue(room);
+                    document.Select("/tmp/분할정복.pdf",2048);
+                    Check(document.Name=="분할정복.pdf","Decomposed Korean filename was not composed");
+                    document.ApplyInspection(new QuizPdfInspection {size_bytes=2048,page_count=81,max_pages=80,max_size_bytes=10485760,within_limits=false});
+                    typeof(QuizRoom).GetMethod("Generate",Private).Invoke(room,null);
+                    Check(!document.CanGenerate && !(bool)typeof(QuizRoom).GetField("working",Private).GetValue(room),"Page limit must prevent generating");
+                    document.Reset();
                     session=(QuizSession)typeof(QuizRoom).GetField("session",Private).GetValue(room);
                     session.Begin(Fixture()); Check(session.Submit(0),"Answer failed");
                     Check(player.RequestRoomExit() && player.CancelRoomExit(),"Exit cancellation failed");

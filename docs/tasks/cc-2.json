@@ -19,7 +19,10 @@
     "docs/superpowers/specs/2026-11-09-pdf-quiz-design.md",
     "docs/superpowers/plans/2026-11-09-pdf-quiz.md",
     "docs/superpowers/plans/2026-11-09-pdf-quiz-progress.md",
-    "Tools/tests/QuizSessionTests.cs"
+    "Tools/tests/QuizSessionTests.cs",
+    "Tools/tests/QuizDocumentTests.cs",
+    "docs/superpowers/specs/2026-11-10-quiz-ui-design.md",
+    "docs/superpowers/plans/2026-11-10-quiz-ui.md"
   ],
   "shared_files": [
     "Assets/GrandLibrary/Scripts/GameStart.cs",
@@ -35,6 +38,7 @@
     "C# 27 checks 및 협업 도구 16 tests",
     "임시 Unity6000.6 컴파일/실제 씬 lifecycle 통과; 원본6000.4.5 유지",
     "Render Free + 별도 Gemini 무료 Flash-Lite로 실제 PDF 선택/3문항 생성/정오답/해설/최종2/3/초기화 통과",
-    "Render Hobby/카드 미등록/현재 청구액0 확인; Windows/macOS standalone 빌드는 아직 미검증"
+    "Render Hobby/카드 미등록/현재 청구액0 확인; Windows/macOS standalone 빌드는 아직 미검증",
+    "UI 개선: 백엔드29 tests 및 문서 검사 C#16 checks, NFC 한글·메타데이터·제한 경계 검증"
   ]
 }

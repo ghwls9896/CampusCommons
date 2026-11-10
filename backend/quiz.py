@@ -51,7 +51,7 @@ class Generation(BaseModel):
     questions: list[Question] = Field(max_length=3)
 
 
-def validate_pdf(data: bytes) -> int:
+def pdf_page_count(data: bytes) -> int:
     if not data.startswith(b'%PDF-'):
         raise QuizError('invalid_pdf', '올바른 PDF 파일을 선택해 주세요.')
     try:
@@ -59,8 +59,6 @@ def validate_pdf(data: bytes) -> int:
         if reader.is_encrypted:
             raise QuizError('encrypted_pdf', '암호가 없는 PDF로 다시 저장한 뒤 선택해 주세요.')
         pages = len(reader.pages)
-        if pages > 80:
-            raise QuizError('too_many_pages', '학습할 범위를 80페이지 이하의 PDF로 나눠 주세요.')
         if pages == 0:
             raise ValueError('empty PDF')
         return pages
@@ -68,6 +66,13 @@ def validate_pdf(data: bytes) -> int:
         raise
     except Exception as exc:
         raise QuizError('invalid_pdf', 'PDF를 읽을 수 없습니다. 파일을 다시 저장해 주세요.') from exc
+
+
+def validate_pdf(data: bytes) -> int:
+    pages = pdf_page_count(data)
+    if pages > 80:
+        raise QuizError('too_many_pages', f'선택한 PDF는 {pages}페이지로, 80페이지 제한을 초과했습니다.', 422)
+    return pages
 
 
 def validate_quiz(data: dict, page_count: int) -> dict:

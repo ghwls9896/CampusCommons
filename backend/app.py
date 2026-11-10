@@ -9,7 +9,7 @@ import httpx
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
-from quiz import QuizError, generate_quiz, validate_pdf
+from quiz import QuizError, generate_quiz, pdf_page_count, validate_pdf
 
 
 @dataclass(frozen=True)
@@ -51,6 +51,14 @@ def create_app(settings: Settings | None = None, generator=generate_quiz) -> Fas
 
     @api.post('/v1/quizzes')
     async def quizzes(request: Request):
+        return await process_pdf(request, inspect_only=False)
+
+    @api.post('/v1/pdfs/inspect')
+    async def inspect_pdf(request: Request):
+        # Inspect locally on the server: no Gemini request and no generation budget.
+        return await process_pdf(request, inspect_only=True)
+
+    async def process_pdf(request: Request, inspect_only: bool):
         nonlocal busy, budget_day, used
         if not settings.api_key or not settings.access_token:
             raise QuizError('server_configuration', '관리자가 서버의 API 키와 참가 코드를 설정해야 합니다.', 503)
@@ -72,6 +80,13 @@ def create_app(settings: Settings | None = None, generator=generate_quiz) -> Fas
                         data.extend(chunk)
             except TimeoutError as exc:
                 raise QuizError('upload_timeout', 'PDF 업로드 시간이 초과되었습니다. 연결을 확인하고 다시 시도해 주세요.', 408) from exc
+            if inspect_only:
+                pages = await asyncio.to_thread(pdf_page_count, bytes(data))
+                return JSONResponse({
+                    'size_bytes': len(data), 'page_count': pages,
+                    'max_size_bytes': settings.max_pdf_bytes, 'max_pages': 80,
+                    'within_limits': pages <= 80,
+                }, headers={'Cache-Control': 'no-store'})
             pages = await asyncio.to_thread(validate_pdf, bytes(data))
             day = datetime.now(timezone.utc).date().isoformat()
             if budget_day != day:
