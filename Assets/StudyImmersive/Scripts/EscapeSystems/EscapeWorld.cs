@@ -22,7 +22,8 @@ namespace CampusCommons.StudyImmersive
             public readonly List<Vector3> route=new List<Vector3>();
             public int next;
             public float replan;
-            public bool pursuing;
+            public bool pursuing,hasDestination;
+            public Vector3 destination;
             public AudioSource audio;
             public AudioClip ambient;
             public float ambientWait;
@@ -255,7 +256,8 @@ namespace CampusCommons.StudyImmersive
                     if(professor!=null && pursuing && (!professor.pursuing || professor.replan<=dt))
                     {
                         professor.route.Clear();professor.next=0;professor.replan=.5f;
-                        map.FindPath(professor.root.transform.position,player.position,professor.route,CanTraverse);
+                        professor.destination=player.position;professor.hasDestination=true;
+                        if(!map.FindPath(professor.root.transform.position,professor.destination,professor.route,CanTraverse))ReplanPatrol(professor,false);
                     }
                     if(professor!=null)professor.pursuing=pursuing;
                     MovePatrol(professor,4f,dt);
@@ -289,7 +291,7 @@ namespace CampusCommons.StudyImmersive
                 var other=npc==professor?worker:professor;
                 if(npc.audio.isPlaying || (other!=null && other.audio && other.audio.isPlaying && Horizontal(npc.root.transform.position,other.root.transform.position)<11f))
                 {npc.ambientWait=1f;return;}
-                npc.audio.pitch=Random.Range(.97f,1.03f);npc.audio.PlayOneShot(npc.ambient,.55f);npc.ambientWait=Random.Range(7f,12f);
+                npc.audio.pitch=Random.Range(.97f,1.03f);npc.audio.PlayOneShot(npc.ambient,.55f);npc.ambientWait=Random.Range(5.5f,9f);
             }
         }
         static float Horizontal(Vector3 a,Vector3 b){a.y=b.y=0;return Vector3.Distance(a,b);}
@@ -307,20 +309,51 @@ namespace CampusCommons.StudyImmersive
                 if(hit.collider && hit.collider.transform!=player && !hit.collider.transform.IsChildOf(player))return false;
             return true;
         }
+        bool ReplanPatrol(Patrol npc,bool keepDestination)
+        {
+            npc.route.Clear();npc.next=0;
+            if(keepDestination && npc.hasDestination && map.FindPath(npc.root.transform.position,npc.destination,npc.route,CanTraverse) && npc.route.Count>0)
+            {npc.replan=4f;return true;}
+            npc.route.Clear();npc.hasDestination=false;
+            var candidates=new List<int>();
+            for(int i=0;i<map.links.Length;i++)
+            {
+                if(map.links[i]==0)continue;float distance=Horizontal(map.Position(i),npc.root.transform.position);
+                if(distance>=2f && distance<=12f)candidates.Add(i);
+            }
+            for(int i=candidates.Count-1;i>0;i--){int j=Random.Range(0,i+1);int swap=candidates[i];candidates[i]=candidates[j];candidates[j]=swap;}
+            int attempts=0;
+            foreach(int candidate in candidates)
+            {
+                if(attempts++>=96)break;
+                Vector3 point=map.Position(candidate);
+                if(map.FindPath(npc.root.transform.position,point,npc.route,CanTraverse) && npc.route.Count>0)
+                {npc.destination=point;npc.hasDestination=true;npc.replan=4f;return true;}
+            }
+            npc.route.Clear();npc.replan=.5f;return false;
+        }
+        bool RouteBlocked(Patrol npc)
+        {
+            Vector3 from=npc.root.transform.position;
+            for(int i=npc.next;i<npc.route.Count;i++)
+            {
+                Vector3 to=npc.route[i];if(IsEdgeBlocked(from,to))return true;from=to;
+            }
+            return false;
+        }
         void MovePatrol(Patrol npc,float speed,float dt)
         {
             if(npc==null || !npc.root || !npc.body || !map)return;
             npc.replan-=dt;
-            if(npc.next>=npc.route.Count || npc.replan<=0f)
+            while(npc.next<npc.route.Count && Horizontal(npc.root.transform.position,npc.route[npc.next])<.18f)npc.next++;
+            if(npc.next<npc.route.Count && RouteBlocked(npc))
             {
-                npc.route.Clear();npc.next=0;npc.replan=4f;
-                for(int i=0;i<25;i++)
-                {
-                    int index=Random.Range(0,map.links.Length);if(map.links[index]==0)continue;
-                    Vector3 point=map.Position(index);
-                    if(Horizontal(point,npc.root.transform.position)>12f || Horizontal(point,npc.root.transform.position)<2f)continue;
-                    if(map.FindPath(npc.root.transform.position,point,npc.route,CanTraverse) && npc.route.Count>0)break;
-                }
+                if(!ReplanPatrol(npc,true)){npc.body.Move(Vector3.down*2f*dt);return;}
+            }
+            else if(npc.next>=npc.route.Count || npc.replan<=0f)
+            {
+                bool keep=npc.next<npc.route.Count && npc.hasDestination;
+                if(!ReplanPatrol(npc,keep)){npc.body.Move(Vector3.down*2f*dt);return;}
             }
             while(npc.next<npc.route.Count && Horizontal(npc.root.transform.position,npc.route[npc.next])<.18f)npc.next++;
             if(npc.next>=npc.route.Count){npc.body.Move(Vector3.down*2f*dt);return;}
@@ -330,7 +363,11 @@ namespace CampusCommons.StudyImmersive
                 if(!door || door.IsFullyOpen || door.DistanceFrom(npc.root.transform.position)>1.1f)continue;
                 Vector3 toward=door.NearestPoint(npc.root.transform.position)-npc.root.transform.position;toward.y=0;
                 if(toward.sqrMagnitude>.01f && Vector3.Dot(delta.normalized,toward.normalized)<.1f)continue;
-                if(door.IsLocked){npc.route.Clear();npc.replan=0;return;}
+                if(door.IsLocked)
+                {
+                    if(!IsEdgeBlocked(npc.root.transform.position,npc.route[npc.next]))continue;
+                    ReplanPatrol(npc,true);return;
+                }
                 door.OpenForMonster();if(!door.IsFullyOpen)return;
             }
             var before=npc.root.transform.position;npc.body.Move(delta.normalized*Mathf.Min(speed*dt,delta.magnitude)+Vector3.down*2f*dt);
@@ -458,7 +495,8 @@ namespace CampusCommons.StudyImmersive
                 Vector3 direction=player.position-professor.root.transform.position;direction.y=0;
                 if(direction.sqrMagnitude<.01f)direction=player.forward;
                 professor.route.Clear();professor.next=0;professor.replan=4f;professor.pursuing=false;
-                if(!map.FindPath(professor.root.transform.position,player.position+direction.normalized*5f,professor.route,CanTraverse))professor.replan=0;
+                professor.destination=player.position+direction.normalized*5f;professor.hasDestination=true;
+                if(!map.FindPath(professor.root.transform.position,professor.destination,professor.route,CanTraverse))ReplanPatrol(professor,false);
             }
             if(game && game.IsRunning && !game.IsAnswering && !game.IsExitConfirmOpen){Cursor.lockState=CursorLockMode.Locked;Cursor.visible=false;}
         }
