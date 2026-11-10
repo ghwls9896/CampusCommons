@@ -23,6 +23,9 @@ namespace CampusCommons.StudyImmersive
             public int next;
             public float replan;
             public bool pursuing;
+            public AudioSource audio;
+            public AudioClip ambient;
+            public float ambientWait;
         }
         EscapeGame game;
         Transform player;
@@ -224,7 +227,12 @@ namespace CampusCommons.StudyImmersive
             if(name=="Professor") { var playerBody=player.GetComponent<CharacterController>();if(playerBody)Physics.IgnoreCollision(body,playerBody,true); }
             var picture=new GameObject("Character sprite");picture.layer=2;picture.transform.SetParent(root.transform,false);picture.transform.localPosition=Vector3.up*.95f;
             CreateBillboard(picture.transform,sprite,height,"Artwork");
-            return new Patrol{root=root,body=body};
+            var sound=root.AddComponent<AudioSource>();sound.playOnAwake=false;sound.spatialBlend=1f;
+            sound.rolloffMode=AudioRolloffMode.Linear;sound.minDistance=1.5f;sound.maxDistance=11f;sound.dopplerLevel=0f;sound.volume=.5f;
+            bool isProfessor=name=="Professor";
+            return new Patrol{root=root,body=body,audio=sound,
+                ambient=Resources.Load<AudioClip>(isProfessor?"EscapeSounds/ProfessorMurmur":"EscapeSounds/WorkerTool"),
+                ambientWait=Random.Range(isProfessor?3f:6f,isProfessor?5f:8f)};
         }
         void Update()
         {
@@ -237,6 +245,8 @@ namespace CampusCommons.StudyImmersive
                 reviewRemaining=Mathf.Max(0,reviewRemaining-dt);
                 if(reviewRemaining<=0f)ReleaseProfessor();
             }
+            UpdatePatrolAmbient(professor,dt);
+            UpdatePatrolAmbient(worker,dt);
             if(!game.IsAnswering)
             {
                 if(!BlocksMovement)
@@ -268,6 +278,18 @@ namespace CampusCommons.StudyImmersive
                         if(cell<0 || !TryPlaceSafeBarrier(map.Position(cell)))barrierCountdown=Random.Range(4f,7f);
                     }
                 }
+            }
+        }
+        void UpdatePatrolAmbient(Patrol npc,float dt)
+        {
+            if(npc==null || !npc.audio || !npc.ambient)return;
+            npc.ambientWait-=dt;
+            if(npc.ambientWait<=0f)
+            {
+                var other=npc==professor?worker:professor;
+                if(npc.audio.isPlaying || (other!=null && other.audio && other.audio.isPlaying && Horizontal(npc.root.transform.position,other.root.transform.position)<11f))
+                {npc.ambientWait=1f;return;}
+                npc.audio.pitch=Random.Range(.97f,1.03f);npc.audio.PlayOneShot(npc.ambient,.55f);npc.ambientWait=Random.Range(7f,12f);
             }
         }
         static float Horizontal(Vector3 a,Vector3 b){a.y=b.y=0;return Vector3.Distance(a,b);}
@@ -312,7 +334,8 @@ namespace CampusCommons.StudyImmersive
                 door.OpenForMonster();if(!door.IsFullyOpen)return;
             }
             var before=npc.root.transform.position;npc.body.Move(delta.normalized*Mathf.Min(speed*dt,delta.magnitude)+Vector3.down*2f*dt);
-            if(Horizontal(before,npc.root.transform.position)<.001f && dt>0)npc.replan-=dt*3f;
+            float walked=Horizontal(before,npc.root.transform.position);
+            if(walked<.001f && dt>0)npc.replan-=dt*3f;
         }
         bool CanTraverse(Vector3 a,Vector3 b)=>!IsEdgeBlocked(a,b);
         static bool Crosses(Vector3 a,Vector3 b,Vector3 center,Quaternion rotation,float width)
@@ -441,8 +464,7 @@ namespace CampusCommons.StudyImmersive
         }
         public void DrawStatus(GUIStyle text,bool korean)
         {
-            GUI.Label(new Rect(1034,93,225,25),(korean?"동전 ":"COINS ")+coins,text);
-            if(speedRemaining>0f)GUI.Label(new Rect(1034,119,225,25),(korean?"속도 증가 ":"SPEED ")+Mathf.CeilToInt(speedRemaining),text);
+            if(speedRemaining>0f)GUI.Label(new Rect(1040,104,205,25),(korean?"속도 증가 ":"SPEED ")+Mathf.CeilToInt(speedRemaining),text);
         }
         public void DrawProfessor(GUIStyle title,GUIStyle text,GUIStyle button,bool korean)
         {

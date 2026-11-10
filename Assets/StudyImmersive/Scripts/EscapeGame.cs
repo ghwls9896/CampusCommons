@@ -528,6 +528,12 @@ namespace CampusCommons.StudyImmersive
         void DrawEscapeHud()
         {
             // Square borders and segmented bars match the retro classroom art without new scene objects.
+            if(World)
+            {
+                PixelBox(new Rect(20,76,160,42),new Color(.13f,.17f,.20f,.96f));
+                GUI.Label(new Rect(32,85,140,25),L("동전  ","COINS  ")+World.Coins,text);
+                if(World.HasSpeedBoost)PixelBox(new Rect(1028,95,230,42),new Color(.13f,.17f,.20f,.96f));
+            }
             PixelBox(new Rect(20,645,276,55),new Color(.13f,.17f,.20f,.94f));
             GUI.Label(new Rect(31,651,85,30),L("스태미나","STAMINA"),text);
             for(int i=0;i<10;i++)
