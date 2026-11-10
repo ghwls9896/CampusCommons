@@ -10,7 +10,7 @@
 
 **Spec:** docs/superpowers/specs/2026-11-09-account-progression-design.md
 
-상태: 구현 전 검토용 초안. 문서에 제안으로 표시된 닉네임·성장 곡선·세션 정책은 검토 후 구현한다. 실제 DB/메일 계정 설정 및 게임 보상 연동은 아직 수행하지 않았다.
+상태: 사용자 계획 승인 후 구현 진행. DB/Edge/세션/실제 씬 검증 결과와 환경 제약은 docs/tasks/cc-8.md. Docker 미실행으로 DB는 native PostgreSQL에서 검증하고, 공유 파일 통합 대신 모듈 내부 runtime bootstrap을 사용했다. 운영 DB/메일 설정과 실제 보상 연동은 별도.
 
 ## Global Constraints
 - Unity 버전6000.4.5f1 유지.
@@ -19,7 +19,7 @@
 - 비밀번호·토큰 PlayerPrefs 저장 금지, service_role/secret key는 서버만 보관.
 - 초기 XP0/레벨1, 최소 누적 XP=50*(L-1)*L 제안. 실보상 원천 계약은 후속 단계.
 - GameStart/Player/씬/Packages는 공유 조율과 task scope 갱신 후 별도 통합 PR에서 수정.
-- 현재 PR은 문서 전용. 아래 파일은 향후 구현 예정 경로이며 지금 만들지 않는다.
+- 사용자 승인으로 이 PR에서 계정 코드·DB를 구현한다. 공유 Player/GameStart/씬 직접 수정은 피하고 runtime bootstrap으로 연결한다.
 
 ## Review Focus
 - 이메일 미확인/재전송 제한/복구코드 만료 시 게임 입장 차단과 재시도 안내.

@@ -1,6 +1,6 @@
 # 계정·개인 성장 데이터 설계 — CC-8
 
-상태: 사용자 요구와 서비스 선택 확인 완료, 세부 정책은 아래 제안. 구현 전 검토용.
+상태: 2026-11-10 사용자 계획 승인 후 구현. 실제 설정/검증은 docs/tasks/cc-8.md 기준.
 날짜: 2026-11-09 / 담당 HIGHCHOI / Issue #8
 기준: origin/main fc5d8c7 / 브랜치 codex/cc-8-account-progression
 
@@ -55,7 +55,7 @@ privileged 보상 함수는 외부 노출 schema의 무제한 SECURITY DEFINER R
 중요한 한계: 현재 퀴즈 정답·탈출 판정과 웹캠 결과는 클라이언트에 있다. JWT/RLS/서버 지급량만으로 결과 위조가 막히지 않는다. 초기 계정 단계에서는 XP0 저장·조회와 테스트 보상으로 검증한다. 실제 보상은 서버가 소유·검증하는 활동 결과가 준비된 기능만 활성화한다. 웹캠 로컬 추론은 검증된 학습 증명으로 간주하지 않는다.
 
 ## 코드 경계와 통합 순서
-이 PR은 설계 문서/작업 명세만 제출한다. 향후 Assets/Account/, supabase/, Tools/account/를 먼저 독립 구현하고 실제 수정 경로를 task scope에 추가한다.
+Assets/Account/, supabase/, Tools/account/를 독립 구현하고 실제 수정 경로를 task scope에 반영했다. 공유 Player/GameStart/씬 직접 수정 대신 sceneLoaded hook으로 입력을 차단·해제한다. 기존/새 Player와 로그인 후 아바타/카메라 생성은 실제 씬 테스트로 검증한다.
 Unity는 기존 UnityWebRequest/JsonUtility 패턴을 우선한다. 필요한 패키지는 별도 선언한다. Unity 버전6000.4.5f1 유지.
 현재 GameStart.Awake는 바로 Player를 생성한다. 테스트용 계정 화면에서 먼저 검증하고, 최종 통합에서 GameStart가 인증/프로필 준비 후 Player를 활성화하도록 작은 변경을 한다. 씬에 이미 Player가 있는 경우도 이동/카메라/포털/HUD가 인증 전 작동하지 않아야 한다. 다른 MonoBehaviour의 입력도 통합 검증한다.
 PR #4도 GameStart/Player/Packages를 수정하므로 별도 통합 Issue/PR에서 최신 main과 담당자 확인 후 연결한다. Issue #7 웹캠 코드를 이 브랜치에 합치지 않는다. 이 task 선언은 공유 파일 잠금이나 변경 승인 의미가 아니다.
