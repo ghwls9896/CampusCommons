@@ -1,20 +1,30 @@
 {
   "id": "cc-8",
-  "title": "이메일 계정·닉네임·개인 경험치 DB 설계",
+  "title": "이메일 회원가입·로그인 및 개인 성장 DB 구현",
   "owner": "HIGHCHOI",
   "branch": "codex/cc-8-account-progression",
   "issue": "https://github.com/ghwls9896/CampusCommons/issues/8",
   "scope": [
     "docs/account/",
     "docs/superpowers/specs/2026-11-09-account-progression-design.md",
-    "docs/superpowers/plans/2026-11-09-account-progression.md"
+    "docs/superpowers/plans/2026-11-09-account-progression.md",
+    "Assets/Account/",
+    "Assets/Account.meta",
+    "supabase/",
+    "Tools/account/",
+    "Packages/manifest.json",
+    "Packages/packages-lock.json"
   ],
-  "shared_files": [],
+  "shared_files": [
+    "Packages/manifest.json",
+    "Packages/packages-lock.json"
+  ],
   "depends_on": [],
   "validation": [
-    "설계의 요구/권한/중복·동시 지급/무료 운영 조건 검토",
-    "python3 -m unittest discover -s Tools/team/tests -q",
-    "커밋 후 python3 Tools/team/check.py --base origin/main",
-    "이번 제출은 문서만; 실제 Auth/DB/Unity 검증은 구현 단계"
+    "PostgreSQL 실제 역할·RLS·원자적/중복 보상 및 동시성 검사",
+    "Deno Edge Functions 인증·권한·입력 검증",
+    "C# 인증/세션/계정 전환 검사",
+    "Unity 임시6000.6 컴파일/Play Mode; 원본6000.4.5 유지",
+    "팀 협업 테스트 및 제출 범위 검사"
   ]
 }
