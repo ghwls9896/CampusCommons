@@ -16,7 +16,7 @@ from quiz import QuizError, generate_quiz, validate_pdf
 class Settings:
     api_key: str = ''
     access_token: str = ''
-    model: str = 'gemini-3.8-flash'
+    model: str = 'gemini-3.5-flash-lite'
     daily_limit: int = 30
     max_pdf_bytes: int = 10 * 1024 * 1024
     upload_timeout: float = 30
@@ -26,7 +26,7 @@ class Settings:
     def from_env(cls):
         return cls(api_key=os.getenv('GEMINI_API_KEY', '').strip(),
                    access_token=os.getenv('QUIZ_ACCESS_TOKEN', '').strip(),
-                   model=os.getenv('GEMINI_MODEL', 'gemini-3.8-flash').strip(),
+                   model=os.getenv('GEMINI_MODEL', 'gemini-3.5-flash-lite').strip(),
                    daily_limit=max(1, int(os.getenv('DAILY_GENERATION_LIMIT', '30'))))
 
 

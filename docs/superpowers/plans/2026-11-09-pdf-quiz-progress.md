@@ -20,3 +20,13 @@
 ## User setup remaining
 
 Push/apply feature using a write-authorized GitHub account; obtain free Gemini key; create Render Free service from render.yaml; set server-only key and share the generated quiz access token; enter server HTTPS URL and token in Unity. Follow docs/QUIZ_ROOM_SETUP.md and verify a real study PDF end to end.
+
+## Live free deployment and user testing — 2026-11-10
+
+- Later verified state supersedes the initial Read-only/offline-account notes above. PR #4 is shared under HIGHCHOI Write access; main collaboration changes are merged into the feature branch.
+- Independent CampusCommons Google project and dedicated API key created with explicit user approval. Free tier confirmed; Gemini key stored only on Render.
+- Render Free https://campuscommons-quiz.onrender.com is live. Billing shows Hobby, no card on file, current service/pipeline charges$0.00. Auto deploy disabled.
+- Player setup simplified to PDF picker and generate. Operator-only ignored Resources/QuizConnection.json carries the endpoint and demo access code; it never contains the Gemini key.
+- Gemini3.8 basic/LOW requests timed out with ReadTimeout. Manual selection of free gemini-3.5-flash-lite produced actual PDF-based questions; repository deployment defaults now match that working model.
+- Unity6000.6.0f1 disposable preview: actual native PDF picker → Render/Gemini generated3levels → two correct/one intentionally wrong submission → answer/explanation/page quotes → final2/3 → reset to empty picker all manually verified. This is separate from the fixture lifecycle test, which also passed on final UI code.
+- Backend26, C#27, team16, scope34 checks and PR CI passed. Original6000.4.5f1/standalone builds remain unverified. User's real study PDF and human review/merge remain their next steps.

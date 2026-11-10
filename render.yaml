@@ -15,6 +15,6 @@ services:
       - key: QUIZ_ACCESS_TOKEN
         generateValue: true
       - key: GEMINI_MODEL
-        value: gemini-3.8-flash
+        value: gemini-3.5-flash-lite
       - key: DAILY_GENERATION_LIMIT
         value: 30

@@ -1,26 +1,31 @@
 # CC-2 퀴즈룸 인수인계
 
+- 상태: 실제 무료 배포 및 Unity 전체 풀이 확인 완료. PR #4 최종 사람 리뷰/통합 대기이며 main에는 아직 미통합입니다.
 - Issue: https://github.com/ghwls9896/CampusCommons/issues/2
-- 사람 담당: HIGHCHOI / 브랜치: codex/pdf-quiz-room
-- 핵심 구현 커밋: 30873a0. 이후 협업용 task JSON과 이 문서를 추가했습니다.
-- 상태: 원격 브랜치와 Draft PR #4 게시. 공통 파일 사람 리뷰 및 실제 계정 생성 검증 대기. https://github.com/ghwls9896/CampusCommons/pull/4
-- 완료: PDF 선택/업로드, Gemini 서버 호출, 레벨별 3문항, 제출 후 해설/근거 페이지/점수, Render Free 배포 설정.
-- 공유 파일: Player.cs의 퀴즈 입력 차단/HUD, GameStart.cs의 컴포넌트 부착, UnityWebRequest 패키지. Issue #2에 조율 범위를 기록했고 GongBeak/ghwls9896의 승인이나 다른 로컬 작업과 충돌 없음은 아직 확인하지 않았습니다. 파일 잠금을 획득한 상태가 아닙니다.
-- 계약: POST /v1/quizzes의 snake_case JSON을 QuizData.cs와 backend/quiz.py가 공유. Gemini 키는 서버에만 보관.
-- 검증: backend 26 tests, C# 20 checks, 임시 Unity 6000.6.0f1 컴파일 및 QuizRoomTest. 원본은6000.4.5f1 유지. 네트워크 취소 검사는 미전송 요청 정리 범위만 포함.
-- 미검증: 실제 Gemini 응답/무료 등급, Render 배포, Unity6000.4.5 및 Windows/macOS standalone 빌드.
-- 다음 행동: 협업 설정 Issue #1의 PR을 먼저 통합 → 깨끗한 퀴즈 작업 폴더에서 origin/main을 merge → team-checks와 관련 Unity 검사 → 공통 파일 리뷰 → 실제 계정 설정 후 PDF 생성 확인.
-- 외부 설정: GEMINI_API_KEY, QUIZ_ACCESS_TOKEN, GEMINI_MODEL. 비밀값은 docs/QUIZ_ROOM_SETUP.md에 따라 Render에서 설정.
-- main 또는 다른 기능 브랜치에 자동으로 합치지 않았습니다. 미관련 EscapeGame.cs CRLF-only 변경은 이 작업에 포함하지 않았습니다.
+- PR: https://github.com/ghwls9896/CampusCommons/pull/4
+- 사람 담당: HIGHCHOI / 브랜치: codex/pdf-quiz-room / 최종 리뷰어: ghwls9896
+- 기준 main fc5d8c7을 2f80bcc에서 통합했습니다. UI/LOW 요청 구현은472d58a, 이후 저장소 기본 모델/배포 설정을 실제 검증한 무료 Flash-Lite로 통일했습니다. 최종 커밋은 PR head에서 확인합니다.
 
-- 협업 전환: 최신 main(eb786c2)의 공간/조명 변경을 통합합니다. 기존 테스트 증거는 핵심 구현 시점 기준이며, 최신 main 통합 후 Unity 검사는 별도로 필요합니다. Tools/ 대소문자를 최신 저장소와 통일했습니다. 협업 PR #3을 먼저 main에 합친 뒤 새 검사를 이 브랜치에도 반영합니다.
+## 최종 동작과 설정
 
-## 실제 테스트 준비 및 화면 수정 (2026-11-10)
+- 플레이어: PDF 선택 → 문제 만들기 → 레벨1/2/3 각1문항 → 정답·해설·근거 페이지 → 최종 점수. 서버/키/참가 코드/파일 경로 입력을 표시하지 않습니다.
+- 운영자: ignored Assets/QuizRoom/Resources/QuizConnection.json에 HTTPS 주소와 데모 접근 코드만 넣습니다. Gemini 키는 Render 환경변수에만 있습니다. 설정이 포함된 게임 빌드를 공유하며 개발 checkout의 설정은 별도로 전달합니다.
+- 빌드에 포함된 데모 코드는 추출할 수 있어 계정 인증/비밀 보관 수단이 아닙니다. 서버의 기존 토큰 검사·동시 생성 제한·일일 한도는 유지합니다.
+- 별도 CampusCommons Google 프로젝트(무료 등급)와 https://campuscommons-quiz.onrender.com Render Free를 사용합니다. 실제 운영 GEMINI_MODEL은 gemini-3.5-flash-lite입니다. 유료 fallback/자동 재시도는 없습니다.
+- Render Billing에서 Hobby, No card on file, 서비스/빌드 현재 청구액$0.00 확인. 카드/유료 플랜/DB/GPU를 추가하지 않았습니다. 자동 배포는 껐습니다.
 
-- 최신 협업 main(fc5d8c7)을 2f80bcc에서 통합했고 .gitignore 충돌은 두 쪽의 제외 규칙을 유지해 해결했습니다.
-- 사용자 요청으로 플레이어의 서버 주소/참가 코드/경로 입력을 제거했습니다. PDF 선택 → 문제 만들기만 표시하며 서버에는 자동 연결합니다. Editor는 OS 파일 선택창, standalone은 드라이브/전체 목록 페이지 이동을 지원하는 탐색기를 사용합니다.
-- 운영자는 git-ignored `Assets/QuizRoom/Resources/QuizConnection.json`에 Render 주소와 데모 접근 코드를 넣습니다. Gemini 키는 Render에만 있습니다. 빌드에 포함되는 데모 코드는 사용자 인증/비밀 보관 수단이 아닙니다.
-- 별도 CampusCommons Google 프로젝트(무료 등급)와 Render Free 서버 https://campuscommons-quiz.onrender.com 배포 완료. 결제 수단/유료 플랜을 추가하지 않았고 자동 배포는 껐습니다.
-- 검증: C# 27 checks, backend 26 tests, 팀 도구 16 tests 통과. 임시 Unity6000.6.0f1 최종 코드 컴파일 및 실제 씬 입장/풀이/퇴장 `PDF_QUIZ_ROOM_PASS`. 알려진 Editor SearchDatabase 인덱싱 예외는 게임 런타임 오류와 구분합니다. 원본6000.4.5f1 유지.
-- 별도 UI/연결 코드 검토에서 발견한 폴더 접근 실패/다른 드라이브/300개 이후 파일 선택 문제를 수정했고 정적 재검토에 중요 잔여 지적은 없습니다. Windows/macOS standalone 빌드 검증은 아직 남아 있습니다.
-- 실제 서버 healthz는200. 직접 만든 2쪽 학습 PDF의 첫 실제 생성 요청은 Gemini 응답 timeout(504)으로 실패했습니다. 무료 모델의 LOW thinking 요청과 안전한 timeout 유형 로그를 추가해 재배포 후 재검증합니다. 실제 생성 성공으로 보고하지 않습니다.
+## 검증과 제한
+
+- backend26 tests, C#27 checks, 협업16 tests 및 scope34개 경로 검사와 원격 Team checks 통과.
+- 임시 Unity6000.6.0f1에서 최종 UI 컴파일/실제 씬 lifecycle 통과. 알려진 Editor SearchDatabase 인덱싱 예외는 런타임 오류와 구분했습니다. 원본 프로젝트6000.4.5f1 유지.
+- 2026-11-10 직접 만든2쪽 학습 PDF를 실제 Unity 파일 선택창으로 열어 Render/Gemini 3문항 생성 → 레벨1/2 정답 → 레벨3 의도한 오답 → 각 해설/페이지 근거 → 최종2/3 → 새 PDF 초기화까지 수동 확인했습니다. 가짜 문제 주입이 아닌 실제 API 응답입니다.
+- 초기3.8 Flash의 기본/LOW 요청은 ReadTimeout504가 재현되어 무료 Flash-Lite로 변경한 뒤 성공했습니다. 기록/설정에 실제 검증한 모델을 사용합니다.
+- 별도 리뷰에서 파일 탐색의 접근 실패/다른 드라이브/긴 목록 문제를 고쳤고 재검토에 중요 잔여 지적이 없습니다. Windows/macOS standalone 및 정확한6000.4.5f1 검증은 아직 남았습니다.
+- 테스트 화면은 /private/tmp/CampusCommons-quiz-validation에서 실행 중이며 사용자 PDF 선택 시작 화면으로 복귀했습니다. 사용자의 실제 학습 자료 자체를 대신 골라 업로드하지 않았습니다.
+
+## 경계와 다음 행동
+
+- 공통 접점: Player.cs의 퀴즈 입력/HUD 차단, GameStart.cs의 컴포넌트 부착, UnityWebRequest 패키지. 씬 구조는 변경하지 않았습니다. 기술 조율/최종 리뷰는 지정 담당 절차를 따릅니다.
+- 계약: POST /v1/quizzes의 snake_case JSON을 QuizData.cs와 backend/quiz.py가 공유합니다.
+- 기존 EscapeGame.cs CRLF-only 변경, 실제 설정/키/접근 코드/학습 PDF는 커밋에서 제외했습니다. 공유 파일 편집은 종료했고 이후 겹치는 작업은 PR #4와 조율합니다.
+- 다음: 사용자 실제 학습 PDF 확인 → ghwls9896 최종 PR 리뷰/merge → 원래 Unity/standalone 추가 검증. 실제 상태는 Issue/PR을 기준으로 확인합니다.

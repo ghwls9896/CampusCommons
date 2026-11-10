@@ -6,7 +6,7 @@ Unity 데스크톱(Windows/macOS)에서 퀴즈룸 입장 → PDF 선택 → 문�
 
 1. [Google AI Studio](https://aistudio.google.com/api-keys)에 Google 계정으로 로그인합니다.
 2. 다른 서비스와 분리한 **CampusCommons 전용 새 프로젝트**를 만들고 그 안에 퀴즈 서버용 키를 생성합니다. 프로젝트의 **무료 등급** 표시를 확인하고 결제 계정/카드를 연결하지 않습니다.
-3. [모델별 요금표](https://ai.google.dev/gemini-api/docs/pricing)에서 사용할 모델의 무료 등급을 확인합니다. 기본값은 `gemini-3.8-flash`입니다(2026-11-09 공식 문서 기준). 제공 모델·무료 한도는 변경될 수 있습니다. 해당 계정에 제공되지 않으면 PDF와 structured output을 지원하는 무료 모델로 Render의 `GEMINI_MODEL`만 변경합니다.
+3. [모델별 요금표](https://ai.google.dev/gemini-api/docs/pricing)에서 사용할 모델의 무료 등급을 확인합니다. 기본값은 `gemini-3.5-flash-lite`입니다. 2026-11-10 실제 무료 프로젝트에서 Render → Gemini → Unity의 PDF 3문항 생성/풀이를 확인한 모델입니다. 제공 모델·무료 한도는 변경될 수 있습니다. 해당 계정에 제공되지 않으면 PDF와 structured output을 지원하는 무료 모델로 Render의 `GEMINI_MODEL`만 변경합니다. 유료 모델로 자동 전환하거나 자동 재시도하지 않습니다.
 4. [AI Studio의 사용량 및 한도](https://aistudio.google.com/usage)에서 프로젝트 한도를 확인합니다. 모든 플레이어가 이 프로젝트의 한도를 함께 사용합니다. 분당 요청·입력 토큰·일일 요청 중 하나라도 소진되면 생성이 실패할 수 있습니다.
 
 API 키는 **Render 서버 환경변수에만** 넣습니다. Unity, GitHub, 채팅, 스크린샷에 넣지 마세요. 무료 Gemini에 보낸 내용은 Google의 제품 개선에 사용될 수 있으므로 본인이 공유할 수 있는 학습 자료를 사용합니다. [Gemini 이용 약관](https://ai.google.dev/gemini-api/terms)
@@ -34,7 +34,7 @@ Blueprint를 쓸 수 없거나 저장소가 보이지 않으면 저장소 관리
 | `PYTHON_VERSION` | `3.14.2` |
 | `GEMINI_API_KEY` | AI Studio에서 만든 비밀 키 |
 | `QUIZ_ACCESS_TOKEN` | 직접 만든 긴 무작위 코드(공백 없는 ASCII, 128자 이내) |
-| `GEMINI_MODEL` | `gemini-3.8-flash` |
+| `GEMINI_MODEL` | `gemini-3.5-flash-lite` |
 | `DAILY_GENERATION_LIMIT` | `30` |
 
 데이터베이스·디스크·GPU 서버는 필요하지 않습니다. Render는 API 중계만 하고 AI 추론은 Gemini에서 수행합니다. 무료 서버는 15분 미사용 시 잠들며 다음 연결에 약 1분이 걸릴 수 있습니다. 월 750시간은 워크스페이스 전체가 공유합니다. 결제 수단이 있으면 대역폭·빌드 사용량 초과에 요금이 생길 수 있으므로 무료 사용만 원하면 결제와 사용량 설정을 확인하세요. [Render 무료 정책](https://render.com/docs/free)
