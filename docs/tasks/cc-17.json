@@ -1,6 +1,6 @@
 {
   "id": "cc-17",
-  "title": "탈출룸 NPC 효과음과 동전 표시 개선",
+  "title": "탈출룸 NPC 효과음·잠긴 경로와 동전 표시 개선",
   "owner": "ghwls9896",
   "branch": "codex/cc-17-npc-sounds",
   "issue": "https://github.com/ghwls9896/CampusCommons/issues/17",
@@ -10,9 +10,17 @@
     "Assets/StudyImmersive/Resources/EscapeSounds/",
     "Assets/StudyImmersive/Resources/EscapeSounds.meta",
     "docs/tasks/cc-17.json",
-    "docs/tasks/cc-17.md"
+    "docs/tasks/cc-17.md",
+    "Assets/StudyImmersive/Scripts/EscapeSystems/Editor/EscapeNpcLockedRouteVerification.cs",
+    "Assets/StudyImmersive/Scripts/EscapeSystems/Editor/EscapeNpcLockedRouteVerification.cs.meta"
   ],
   "shared_files": [],
-  "depends_on": ["https://github.com/ghwls9896/CampusCommons/pull/16"],
-  "validation": ["Unity 6000.4.5f1 Play Mode 게임 진행·구매, NPC 오디오 거리 및 겹침 검증", "python Tools/team/check.py --base origin/main"]
+  "depends_on": [
+    "https://github.com/ghwls9896/CampusCommons/pull/16"
+  ],
+  "validation": [
+    "Unity 6000.4.5f1 Play Mode 게임 진행·구매, NPC 오디오 거리 및 겹침 검증",
+    "python Tools/team/check.py --base origin/main",
+    "Unity 6000.4.5f1 교수·시설관리 NPC의 잠긴 경로 우회 및 대체 목적지 검증"
+  ]
 }
