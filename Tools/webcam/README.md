@@ -67,6 +67,7 @@ PYTORCH_ENABLE_MPS_FALLBACK=1 "$QEV_WORK_DIR/.venv/bin/python" Tools/webcam/live
 - 추론이 1초를 넘으면 요청을 쌓지 않고 완료 직후 새 프레임을 촬영한다. 따라서 모든 PC에서 1 Hz를 보장하지 않는다.
 - 미리보기는 최대 1280×720을 요청하고, 분석 사진은 비율을 유지해 **긴 변 512 px**로 축소한다. 정확도 우선 모델의 최대 픽셀 예산 1,638,400은 유지하되, 실제 입력은 그보다 작다. 작은 글씨·멀리 있는 폰은 놓칠 수 있다.
 - MPS에서는 원래 가중치 정밀도인 BF16으로 backbone을 실행하고 판정 헤드는 FP32를 유지한다. 양자화나 조기 종료는 사용하지 않는다.
+- MPS 로딩은 CPU에서 네이티브 체크포인트 검증을 마친 후 backbone만 BF16으로 바꾸고 GPU로 옮긴다. GPU에 FP32 본체와 변환 버퍼를 만들지 않으며 로드 후 미사용 할당 캐시를 한 번 반납한다. 매 프레임 캐시를 비우지 않는다.
 - 브라우저 → **127.0.0.1의 로컬 Python 프로세스** → 모델 순서다. 원격 서버·DB 없이 동작하며 JPEG와 결과는 메모리에서만 처리한다. 사진·동영상·평가를 파일에 기록하지 않는다.
 - 모델 준비 후 실행은 Hugging Face 오프라인 모드다. 외부 API나 분석 서비스, 원격 이미지 링크를 사용하지 않는다.
 
@@ -88,6 +89,16 @@ python3 Tools/team/check.py --base origin/main
 
 ```sh
 QEV_SMOKE_FIXTURES="$FIXTURE_DIR" python3 -m unittest discover -s Tools/webcam/tests -p test_qev_runtime.py -v
+```
+
+원래 공개 JPEG의 SHA256이 측정 기록과 같은 경우, 준비된 Python 환경에서 MPS 메모리 회귀 검사도 실행할 수 있다.
+이 검사는 M4/고정 라이브러리 환경용이며 GPU driver 할당과 기존 점수의 동등성을 확인한다. 전체 프로세스 footprint나 모든 PC의 최소 사양 검사는 아니다.
+
+```sh
+HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 PYTORCH_ENABLE_MPS_FALLBACK=1 \
+QEV_MEMORY_TEST=1 QEV_MODEL_DIR="$QEV_WORK_DIR/model" \
+QEV_CACHE_DIR="$QEV_WORK_DIR/hf-cache/hub" QEV_SMOKE_FIXTURES="$FIXTURE_DIR" \
+"$QEV_WORK_DIR/.venv/bin/python" -m unittest discover -s Tools/webcam/tests -p test_qev_memory.py -v
 ```
 
 `probe.py`와 관련 테스트는 이전 llama.cpp 후보 조사 도구다. 라이브 QEV 실행 경로에서는 사용하지 않으며, 이전 도구의 `unknown`은 이 화면의 범주가 아니다.

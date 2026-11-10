@@ -1,5 +1,15 @@
 # QEV local webcam test before Unity integration
 
+## Memory optimization, 2026-11-10
+
+Keep the original BF16 backbone, FP32 trained heads, full24 accurate computation,
+five choices, image resolution and one-second target. Native QEV validates/loads
+on CPU, then the backbone is converted to BF16 before the entire module moves to
+MPS. Release unused MPS allocator cache once at startup. Do not monkey-patch the
+upstream loader, add quantization or clear GPU caches on every frame. CUDA/CPU
+loading behavior remains as before. Check pinned public scores for exact equality
+and measure live footprint separately from Metal driver allocations and peak.
+
 ## User-requested fifth state, 2026-11-10
 
 Add `drowsy` (졸음 의심) alongside studying/phone/other/away in the same model,

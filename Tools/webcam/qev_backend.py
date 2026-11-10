@@ -5,6 +5,7 @@ ff55034b2f488e03fab774dc380b08d67a93071b, using its prompt, trained readout,
 condition head and calibration. See QEV-NOTICE.txt. No generated text is used.
 """
 from io import BytesIO
+import gc
 import math
 from pathlib import Path
 import time
@@ -105,12 +106,17 @@ class QEVBackend:
         if device not in ('mps', 'cuda', 'cpu'):
             raise ValueError('device must be auto, mps, cuda or cpu')
         torch.set_num_threads(4)
-        model = QEV.load(Path(model_dir), device=device, cache_dir=str(cache_dir),
+        # Native QEV selects FP32 outside CUDA. Stage on CPU so the MPS allocator
+        # never needs the FP32 backbone alongside the final BF16 weights.
+        load_device = 'cpu' if device == 'mps' else device
+        model = QEV.load(Path(model_dir), device=load_device, cache_dir=str(cache_dir),
                          local_files_only=True, mode='accurate', early_exit=False)
         if device == 'mps':
-            # The upstream loader uses FP32 outside CUDA. M4 supports the original
-            # BF16 backbone precision; keep trained scoring heads in FP32.
+            # Cast before the GPU transfer, keeping the trained scoring heads FP32.
             model.encoder.model.to(dtype=torch.bfloat16)
+            model.to(device='mps')
+            gc.collect()
+            torch.mps.empty_cache()
         return cls(model, device)
 
     def classify(self, data):

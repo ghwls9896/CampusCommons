@@ -1,5 +1,38 @@
 # QEV-0.8B 자원 실측 — 2026-11-10
 
+## 현재: MPS 로딩 메모리 최적화 적용
+
+**아래 기존 4.9 GiB 수치는 최적화 전 기록이다.** 현재 MPS 버전은 네이티브 QEV의
+체크포인트·헤드·모드 검증을 CPU에서 마친 뒤 backbone만 BF16으로 변환하고, 전체 모듈을 MPS로 옮긴다.
+마지막으로 사용하지 않는 MPS 할당 캐시를 한 번 반납한다.
+학습된 헤드는 FP32, backbone은 원본 BF16, accurate 전체24층·해상도·1초·다섯 범주는 같다.
+가중치 양자화·모델 변경·외부 라이브러리 함수 패치는 없다.
+
+| 실제 로컬 서버 측정 | 이전 | 적용 후 |
+|---|---|---|
+| 반복 판정 후 프로세스 footprint | 4.9 GiB | **2.9 GiB** (약41% 감소) |
+| 프로세스 peak | 4.9 GiB | **3.8 GiB** (CPU 초기 로딩 중의 일시 점유 포함) |
+| 준비된 모델의 분석 시간 | 0.792–0.808초 | **0.763–0.798초** |
+| 비교 사진 | 공개 5종 × 2회 | 같은 사진/프롬프트, 선택과 네이티브 점수 최대 차이 **0.0** |
+
+[원시 실측 및 비교 실험](results/qev-m4-memory-optimization.json).
+캐시만 비우는 실험은 약3.9 GiB였다. BF16을 직접 올리는 별도 실험은 약2.3 GiB였지만,
+그 실험은 상류 loader 함수를 일시 변경했으므로 운영 코드에는 반영하지 않았다.
+현재는 원래 QEV API를 사용하는 CPU→BF16→MPS 경로를 선택했다.
+CPU 검증 후 backbone을 다시 읽는 실험은 safetensors 로딩 스레드에서 대기하여 중단했고 채택하지 않았다.
+
+공개 사진의 동등성은 일반적인 웹캠 정확도 보장이 아니다. Unity와 동시 실행한 메모리·FPS는 미검증이다.
+footprint와 GPU driver 할당은 별도 수치이며 두 값을 합산하지 않는다.
+
+실제 MPS 회귀 검사 `test_native_scores_preserved_with_driver_memory_below_three_gib`는
+이전 loader에서 Metal driver 할당4,528,062,464 bytes로 실패했고, 현재 loader에서는
+동일한 공개 점수를 유지하며3 GiB 예산 이하로 통과했다. 일반 실행은 Python16통과+선택2생략,
+화면 테스트9통과, 팀16통과다. 팀 검사 중 `test_real_git_diff_handles_unicode_and_spaces`는
+시스템 Git의 Xcode 라이선스 shim 때문에 한 번 실패했으며, 기존 Homebrew Git을 PATH로 지정한 재실행에서 통과했다.
+시스템 설정이나 라이선스 동의는 변경하지 않았다.
+
+## 최적화 전 측정 조건
+
 Apple M4 / 통합 메모리 32 GB에서 현재 로컬 테스트 프로그램을 측정했다.
 accurate, 24층, BF16 backbone/FP32 heads, 긴 변 512px 입력을 유지했다.
 졸음 의심을 추가해도 같은 가중치와 한 번의 forward를 사용한다. 새 모델 다운로드는 없다.
