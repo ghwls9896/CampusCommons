@@ -45,9 +45,9 @@ namespace CampusCommons.Quiz.Editor
         {
             var data=new QuizSet { questions=new QuizQuestion[3] };
             for(int i=0;i<3;i++) data.questions[i]=new QuizQuestion {
-                level=i+1,prompt="테스트 자료의 핵심 개념은 무엇인가요? "+i,
-                options=new[]{"정답 보기","다른 개념","관련 없는 개념","반대 개념"},
-                correct_index=0,explanation="테스트 해설입니다. 원문의 핵심 개념을 확인합니다.",source_page=1,source_quote="핵심 개념"
+                level=i+1,answer_type=new[]{"multiple_choice","short_answer","written"}[i],model_answer="핵심 개념",grading_criteria=i==0?new string[0]:new[]{"핵심 개념"},prompt="테스트 자료의 핵심 개념은 무엇인가요? "+i,
+                options=i==0?new[]{"정답 보기","다른 개념","관련 없는 개념","반대 개념"}:new string[0],
+                correct_index=i==0?0:-1,explanation="테스트 해설입니다. 원문의 핵심 개념을 확인합니다.",source_page=1,source_quote="핵심 개념"
             };
             return data;
         }
@@ -75,16 +75,21 @@ namespace CampusCommons.Quiz.Editor
                     var document=(QuizDocument)typeof(QuizRoom).GetField("document",Private).GetValue(room);
                     document.Select("/tmp/분할정복.pdf",2048);
                     Check(document.Name=="분할정복.pdf","Decomposed Korean filename was not composed");
-                    document.ApplyInspection(new QuizPdfInspection {size_bytes=2048,page_count=81,max_pages=80,max_size_bytes=10485760,within_limits=false});
+                    document.ApplyInspection(new QuizPdfInspection {size_bytes=2048,page_count=120,max_pages=1000,max_selected_pages=1000,supports_page_ranges=true,max_size_bytes=10485760,within_limits=true});
+                    document.SetRange("81","100");Check(document.CanGenerate,"Large PDF range must be selectable");
+                    document.SetRange("100","81");
                     typeof(QuizRoom).GetMethod("Generate",Private).Invoke(room,null);
-                    Check(!document.CanGenerate && !(bool)typeof(QuizRoom).GetField("working",Private).GetValue(room),"Page limit must prevent generating");
+                    Check(!document.CanGenerate && !(bool)typeof(QuizRoom).GetField("working",Private).GetValue(room),"Invalid range must prevent generating");
                     document.Reset();
                     session=(QuizSession)typeof(QuizRoom).GetField("session",Private).GetValue(room);
-                    session.Begin(Fixture()); Check(session.Submit(0),"Answer failed");
+                    double now=Time.realtimeSinceStartupAsDouble;
+                    session.Begin(Fixture(),now);Check(session.SubmitChoice(0,now+1),"Choice answer failed");
                     Check(player.RequestRoomExit() && player.CancelRoomExit(),"Exit cancellation failed");
-                    Check(session.Submitted && session.Score==1,"Cancel exit lost answer");
-                    Check(session.Next() && session.Submit(1) && session.Next() && session.Submit(0) && session.Next(),"Three-level flow failed");
-                    Check(session.Finished && session.Score==2,"Result wrong");
+                    Check(session.Current.level==2 && session.Responses[0]=="정답 보기","Cancel exit lost answer");
+                    Check(session.SubmitText("입력한 단답",2,now+2),"Short answer did not advance");
+                    Check(session.Tick(now+22,-1,"입력한 서술형 답"),"Written timeout did not advance");
+                    Check(session.Finished && session.ApplyGrades(new QuizGradeSet {grades=new[]{new QuizGrade {level=2,correct=false,feedback="핵심이 다릅니다"},new QuizGrade {level=3,correct=true,feedback="핵심 일치"}}}),"Final grading failed");
+                    Check(session.Score==2 && !session.NeedsGrading,"Final result wrong");
                     step=2;changed=Time.time;return;
                 }
                 if(step==2)

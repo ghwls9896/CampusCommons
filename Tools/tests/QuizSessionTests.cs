@@ -9,26 +9,37 @@ public static class QuizSessionTests
     {
         var data = new QuizSet { questions = new QuizQuestion[3] };
         for (int i = 0; i < 3; i++) data.questions[i] = new QuizQuestion {
-            level = i + 1, prompt = "문제 " + i, options = new[] { "가", "나", "다", "라" },
-            correct_index = i, explanation = "해설", source_page = i + 1, source_quote = "근거"
+            level = i + 1, prompt = "문제 " + i, answer_type = new[]{"multiple_choice","short_answer","written"}[i],
+            options = i==0?new[] { "가", "나", "다", "라" }:new string[0], model_answer="가", grading_criteria=i==0?new string[0]:new[]{"핵심 의미"},
+            correct_index = i==0?0:-1, explanation = "해설", source_page = i + 1, source_quote = "근거"
         };
         return data;
     }
     public static int Main()
     {
         var session = new QuizSession();
-        Check(!session.Submit(0) && !session.Next(), "Cannot answer before loading");
-        session.Begin(Set());
-        Check(session.Current.level == 1 && !session.Submitted && session.Score == 0, "Starts at level one");
-        Check(!session.Next() && !session.Submit(4), "Cannot skip or submit out of range");
-        Check(session.Submit(0) && session.Submitted && session.Score == 1, "Grade first answer");
-        Check(!session.Submit(1) && session.Score == 1, "Double click must not regrade");
-        Check(session.Next() && session.Current.level == 2 && !session.Submitted, "Advance and hide next answer");
-        Check(session.Submit(0) && session.Score == 1, "Wrong answer does not score");
-        Check(session.Next() && session.Submit(2) && session.Score == 2, "Third question grades");
-        Check(session.Next() && session.Finished && !session.Submit(2) && !session.Next(), "Finish once");
-        Check(session.Answers[0] == 0 && session.Answers[1] == 0 && session.Answers[2] == 2, "Keep answers for review");
-        session.Reset(); Check(session.Current == null && !session.Finished && session.Score == 0, "Leave clears state");
+        Check(!session.SubmitChoice(0,0),"Cannot answer before loading");
+        session.Begin(Set(),100);
+        Check(session.TimeLimit==10 && session.Remaining(100)==10,"First deadline10 seconds");
+        Check(!session.Tick(109.99),"Wait until deadline");
+        Check(session.SubmitChoice(0,109) && session.Index==1 && !session.Finished,"Submit immediately advances");
+        Check(session.TimeLimit==15 && session.Responses[0]=="가" && !session.SubmitChoice(0,109),"No repeated choice submission");
+        Check(session.SubmitText("선입선출",2,110) && session.Index==2,"Short answer immediately advances");
+        Check(!session.SubmitText("double click",2,110),"Stale level cannot answer next question");
+        Check(session.TimeLimit==20 && session.Tick(130,-1,"스택은 후입선출, 큐는 선입선출"),"20 second timeout submits current draft");
+        Check(session.Finished && session.Responses[2].Contains("큐") && session.TimedOut[2],"Keep auto-submitted draft for final review");
+        Check(session.NeedsGrading && !session.Tick(200),"AI grading only after final question");
+        Check(session.ApplyGrades(new QuizGradeSet { grades=new[]{new QuizGrade {level=2,correct=true,feedback="동일 의미"},new QuizGrade {level=3,correct=false,feedback="핵심 누락"}}}),"Apply semantic grades");
+        Check(session.Score==2 && !session.NeedsGrading,"Final aggregate score");
+        session.Begin(Set(),0);
+        Check(session.SubmitChoice(0,10) && session.Index==1 && session.TimedOut[0],"Deadline submit auto-records current choice");
+        Check(session.Tick(25) && session.Index==2 && session.Responses[1]=="","15 second empty timeout");
+        Check(session.Tick(45) && session.Finished && session.Score==1 && !session.NeedsGrading,"All blank timeouts finish once without AI");
+        session.Begin(Set(),0);Check(session.Tick(10,0) && session.Score==1,"Previously selected choice auto-submits at timeout");
+        session.Begin(Set(),0);session.SubmitChoice(0,1);
+        Check(session.SubmitText("마감 직전 입력한 답",2,16) && session.Index==2 && session.TimedOut[1] && session.Responses[1]=="마감 직전 입력한 답","Deadline edge preserves draft and reports transition for UI reset");
+        Check(!session.SubmitText("같은 버튼의 두 번째 클릭",2,16) && session.Index==2,"Deadline transition cannot skip written question");
+        session.Reset(); Check(session.Current==null && !session.Finished && session.Score==0,"Leave clears state");
         var bad = Set(); bad.questions[1].level = 1;
         Check(!bad.IsValid(out _), "Duplicate level rejected");
         bad = Set(); bad.questions[0].options[1] = "가";

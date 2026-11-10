@@ -10,7 +10,7 @@ namespace CampusCommons.Quiz
         internal static readonly Color Muted = new Color(.43f,.48f,.55f);
         internal static readonly Color Navy = new Color(.15f,.24f,.37f);
         internal static readonly Color Green = new Color(.12f,.43f,.34f);
-        internal readonly GUIStyle Title, Heading, Body, Small, Caption, FileName;
+        internal readonly GUIStyle Title, Heading, Body, Small, Caption, FileName, Input;
         internal readonly GUIStyle Panel, Card, WhiteCard, ErrorCard, SuccessCard, Shadow;
         internal readonly GUIStyle Primary, Secondary, Quiet, Choice, SelectedChoice, CorrectChoice, WrongChoice;
         internal readonly GUIStyle Step, ActiveStep, Warning, Positive;
@@ -46,6 +46,8 @@ namespace CampusCommons.Quiz
             }
             Step = Label(font,14,Muted,true); ActiveStep=Label(font,14,Navy,true);
             Warning=Label(font,16,new Color(.66f,.21f,.18f)); Positive=Label(font,17,Green,true);
+            Input=Button(font,Color.white,Ink,new Color(.99f,.99f,1));Input.fontStyle=FontStyle.Normal;Input.fontSize=20;Input.alignment=TextAnchor.UpperLeft;Input.padding=new RectOffset(16,16,12,12);
+            Skin.settings.cursorColor=Navy;Skin.settings.selectionColor=new Color(.72f,.82f,.95f);
             dot=Rounded(Color.white,16);
         }
         static GUIStyle Label(Font font,int size,Color color,bool bold=false)
