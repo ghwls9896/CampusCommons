@@ -131402,8 +131402,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c414675f810d69428f7a2a7d37e6d9b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CampusCommons.StudyImmersive.EscapeModeFlow
-  schoolArrival: {x: 475, y: 0.08, z: 41}
-  schoolYaw: 90
+  schoolArrival: {x: 500, y: 0.08, z: 46}
+  schoolYaw: 180
   schoolReturnVisual: {fileID: 1461752274}
   schoolReturnTrigger: {fileID: 229463150}
   notebookPrefab: {fileID: 2323790298623347091, guid: 4c6292a26dfb9c7448e953b27fc05648, type: 3}

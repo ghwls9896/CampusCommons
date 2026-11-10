@@ -39,15 +39,16 @@ namespace CampusCommons.LibraryCharacter
         readonly RaycastHit[] castBuffer=new RaycastHit[64];
         int next;
         float wakeRemaining,repathRemaining,searchRemaining,lostSightRemaining,pauseAtPoint,stuckTime,footDistance,gait,roomSearchRemaining;
-        bool running,hasGoal;
+        bool running,hasGoal,awakened;
         Door lastInvestigatedDoor;
         AudioSource steps,alert;
         Behaviour state;
         public float Speed{get;private set;}
         public Behaviour State=>state;
-        public bool IsFinalHunt=>running && game && game.ReadyToExit;
+        public bool IsAwakened=>running && awakened;
+        public bool IsFinalHunt=>running && awakened && game && game.ReadyToExit;
         public float CurrentMoveSpeed=>Speed*(IsFinalHunt?Mathf.Max(1f,finalSpeedMultiplier):1f);
-        public bool IsChasing=>running && state==Behaviour.Chase && wakeRemaining<=0 && game && game.IsRunning && !game.IsEnded && !game.IsAnswering && !game.IsExitConfirmOpen;
+        public bool IsChasing=>running && awakened && state==Behaviour.Chase && wakeRemaining<=0 && game && game.IsRunning && !game.IsEnded && !game.IsAnswering && !game.IsExitConfirmOpen;
 
         void Awake()
         {
@@ -68,19 +69,47 @@ namespace CampusCommons.LibraryCharacter
         }
         public void Begin(EscapeGame owner,Transform player,EscapeGame.Mode mode)
         {
-            game=owner;target=player;running=true;path.Clear();next=0;hasGoal=false;waitingDoor=null;
+            game=owner;target=player;running=true;awakened=false;path.Clear();next=0;hasGoal=false;waitingDoor=null;
             Speed=mode==EscapeGame.Mode.Easy?2.65f:mode==EscapeGame.Mode.Medium?3.1f:mode==EscapeGame.Mode.Hard?3.5f:3.25f;
-            body.enabled=false;transform.position=spawn;body.enabled=true;if(picture)picture.gameObject.SetActive(true);
-            heading=player?player.position-spawn:Vector3.forward;heading.y=0;
+            body.enabled=false;transform.position=InitialPosition(player);if(picture)picture.gameObject.SetActive(true);
+            heading=player?player.position-transform.position:Vector3.forward;heading.y=0;
             if(heading.sqrMagnitude<.01f)heading=Vector3.forward;heading.Normalize();
             doors=FindObjectsByType<Door>();wakeRemaining=graceSeconds;repathRemaining=0;pauseAtPoint=0;
             stuckTime=0;footDistance=0;gait=0;lostSightRemaining=0;roomSearchRemaining=3f;lastInvestigatedDoor=null;
             state=Behaviour.Patrol;StopSounds();ResetPicture();
         }
-        public void SpeedUp(){if(running)Speed=Mathf.Min(maxSpeed,Speed+speedIncrease);}
+        Vector3 InitialPosition(Transform player)
+        {
+            if(!player || !map)return spawn;
+            Vector3 forward=Camera.main?Camera.main.transform.forward:player.forward;forward.y=0;
+            if(forward.sqrMagnitude<.01f)forward=Vector3.forward;forward.Normalize();
+            var route=new List<Vector3>();
+            for(float distance=5f;distance>=2.5f;distance-=.5f)
+            {
+                Vector3 wanted=player.position+forward*distance;int cell=map.NearestCell(wanted);if(cell<0)continue;
+                Vector3 point=map.Position(cell);point.y=player.position.y;
+                Vector3 delta=point-player.position;delta.y=0;
+                if(delta.magnitude<2.3f || Vector3.Dot(delta.normalized,forward)<.94f)continue;
+                if(!map.FindPath(player.position,point,route) || !HasClearSight(player.position+Vector3.up*1.2f,point+Vector3.up*1.2f))continue;
+                return point;
+            }
+            return spawn;
+        }
+        public void SpeedUp()
+        {
+            if(!running)return;
+            Speed=Mathf.Min(maxSpeed,Speed+speedIncrease);
+            if(!awakened)
+            {
+                awakened=true;wakeRemaining=0;
+                if(body)body.enabled=true;if(picture)picture.gameObject.SetActive(true);
+                SetState(Behaviour.Chase);
+                if(target){lastSeen=target.position;goal=lastSeen;hasGoal=true;lostSightRemaining=8f;}
+            }
+        }
         public void End()
         {
-            running=false;target=null;path.Clear();hasGoal=false;waitingDoor=null;StopSounds();ResetPicture();
+            running=false;awakened=false;target=null;path.Clear();hasGoal=false;waitingDoor=null;StopSounds();ResetPicture();
             if(body)body.enabled=false;if(picture)picture.gameObject.SetActive(false);
         }
         void OnDisable(){StopSounds();ResetPicture();}
@@ -113,6 +142,7 @@ namespace CampusCommons.LibraryCharacter
         {
             if(!running || !game || !target || !body || !body.enabled || !game.IsRunning || game.IsEnded || game.IsAnswering || game.IsExitConfirmOpen)
             {StopSounds();ResetPicture();return;}
+            if(!awakened){StopSounds();ResetPicture();return;}
             float dt=Time.deltaTime;
             if(IsFinalHunt)wakeRemaining=0;
             if(wakeRemaining>0){wakeRemaining=Mathf.Max(0,wakeRemaining-dt);ResetPicture();return;}
@@ -226,12 +256,13 @@ namespace CampusCommons.LibraryCharacter
         {
             next=0;openPanels.Clear();Physics.SyncTransforms();
             if(doors!=null)foreach(var door in doors)if(door)door.AddOpenPanels(openPanels);
-            if(!map || !map.FindPath(transform.position,goal,path,openPanels.Count>0?CanTraverse:null))
+            if(!map || !map.FindPath(transform.position,goal,path,CanTraverse))
             {path.Clear();return false;}
             return true;
         }
         bool CanTraverse(Vector3 from,Vector3 to)
         {
+            if(game && game.World && game.World.IsEdgeBlocked(from,to))return false;
             // Most grid edges are nowhere near a door. Limit physics queries to
             // the moving leaves, and let closed leaves be opened on approach.
             Bounds edge=new Bounds((from+to)*.5f+Vector3.up*.9f,new Vector3(Mathf.Abs(to.x-from.x)+.7f,1.8f,Mathf.Abs(to.z-from.z)+.7f));
@@ -250,6 +281,7 @@ namespace CampusCommons.LibraryCharacter
         {
             if(waitingDoor)
             {
+                if(waitingDoor.IsLocked){waitingDoor=null;path.Clear();repathRemaining=0;return;}
                 waitingDoor.OpenForMonster();
                 if(!waitingDoor.IsFullyOpen){body.Move(Vector3.down*2f*dt);ResetPicture();return;}
                 waitingDoor=null;repathRemaining=0;
@@ -271,6 +303,11 @@ namespace CampusCommons.LibraryCharacter
             if(doors!=null)foreach(var door in doors)
             {
                 if(!door || door.IsFullyOpen || door.DistanceFrom(transform.position)>1.35f)continue;
+                if(door.IsLocked)
+                {
+                    if(!LockedDoorBlocksSegment(door,transform.position,path[next]))continue;
+                    path.Clear();repathRemaining=0;return;
+                }
                 Vector3 toward=door.NearestPoint(transform.position)-transform.position;toward.y=0;
                 if(toward.sqrMagnitude>.01f && Vector3.Dot(direction,toward.normalized)<.1f)continue;
                 door.OpenForMonster();waitingDoor=door;body.Move(Vector3.down*2f*dt);ResetPicture();return;
@@ -288,6 +325,16 @@ namespace CampusCommons.LibraryCharacter
                 stuckTime+=dt;ResetPicture();
                 if(stuckTime>.65f){stuckTime=0;repathRemaining=0;if(state!=Behaviour.Chase && path.Count==0)hasGoal=false;}
             }
+        }
+        static bool LockedDoorBlocksSegment(Door door,Vector3 from,Vector3 to)
+        {
+            Quaternion inverse=Quaternion.Inverse(door.transform.rotation);
+            Vector3 a=inverse*(from-door.DoorwayCenter),b=inverse*(to-door.DoorwayCenter);
+            // Ignore doors that this segment is moving away from or past sideways.
+            if(Mathf.Abs(b.z)>=Mathf.Abs(a.z) || (Mathf.Sign(a.z)==Mathf.Sign(b.z) && Mathf.Abs(b.z)>.32f))return false;
+            float denominator=a.z-b.z;
+            float t=Mathf.Abs(denominator)<.0001f?1f:Mathf.Clamp01(a.z/denominator);
+            return Mathf.Abs(Mathf.Lerp(a.x,b.x,t))<=door.DoorwayWidth*.5f+.3f;
         }
         void AnimateAndSound(float distance)
         {
