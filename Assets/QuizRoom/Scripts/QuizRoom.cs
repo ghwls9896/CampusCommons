@@ -15,19 +15,29 @@ namespace CampusCommons.Quiz
         readonly QuizSession session = new QuizSession();
         Player player;
         UnityWebRequest request;
-        bool entered, working, settingsOpen = true, browsing;
+        bool entered, working, browsing, configured;
         string server = "", token = "", path = "", directory = "", message = "";
         string[] folders = new string[0], files = new string[0];
-        int selected = -1;
+        int selected = -1, browserPage;
         Vector2 scroll, fileScroll;
-        GUIStyle heading, body, button, field, small;
+        GUIStyle heading, body, button, small;
         public bool BlocksMovement => enabled && player && player.currentSpace == Portal.Space.Quiz;
 
         void Awake()
         {
             player = GetComponent<Player>();
-            server = PlayerPrefs.GetString("Quiz.Server", "");
-            // The shared demo code is kept only in memory, never the Gemini API key.
+            // Operator-provided deployment settings; never store a Gemini key in the client.
+            var config = Resources.Load<TextAsset>("QuizConnection");
+            if (config)
+            {
+                try
+                {
+                    var deployment = JsonUtility.FromJson<QuizDeployment>(config.text);
+                    configured = deployment != null && deployment.IsValid();
+                    if (configured) { server = deployment.server_url; token = deployment.access_token; }
+                }
+                catch (ArgumentException) { configured = false; }
+            }
             directory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             if (string.IsNullOrEmpty(directory)) directory = Application.persistentDataPath;
         }
@@ -36,7 +46,8 @@ namespace CampusCommons.Quiz
             if (BlocksMovement && !entered)
             {
                 entered = true;
-                if (QuizConnection.IsValidUrl(server, out _)) StartCoroutine(Warmup());
+                if (configured && QuizConnection.IsValidUrl(server, out _)) StartCoroutine(Warmup());
+                else message = "퀴즈 서비스를 준비 중입니다. 잠시 후 다시 이용해 주세요.";
             }
             else if (!BlocksMovement && entered) ClearRoom();
         }
@@ -57,19 +68,16 @@ namespace CampusCommons.Quiz
         }
         IEnumerator Warmup()
         {
-            working = true; message = "서버에 연결 중… 무료 서버가 잠들어 있으면 약 1분이 걸릴 수 있습니다.";
+            working = true; message = "학습을 준비하고 있어요. 첫 연결은 약 1분이 걸릴 수 있어요.";
             request = UnityWebRequest.Get(server.TrimEnd('/') + "/healthz");
             request.timeout = 90;
             yield return request.SendWebRequest();
-            message = request.result == UnityWebRequest.Result.Success ? "연결되었습니다. PDF를 선택해 주세요." : "연결하지 못했습니다. 서버 주소와 배포 상태를 확인한 뒤 다시 연결해 주세요.";
+            message = request.result == UnityWebRequest.Result.Success ? "" : "연결이 지연되고 있어요. PDF를 고른 뒤 다시 시도해 주세요.";
             request.Dispose(); request = null; working = false;
         }
         void Generate()
         {
-            if (!QuizConnection.IsValidUrl(server, out message)) { settingsOpen = true; return; }
-            if (string.IsNullOrWhiteSpace(token)) { message = "관리자에게 받은 참가 코드를 입력해 주세요."; settingsOpen = true; return; }
-            if (token.Length > 128 || Array.Exists(token.ToCharArray(), c => c < 33 || c > 126))
-            { message = "참가 코드는 공백 없는 영문·숫자·기호 128자 이내로 입력해 주세요."; return; }
+            if (!configured) { message = "퀴즈 서비스를 준비 중입니다. 잠시 후 다시 이용해 주세요."; return; }
             byte[] pdf;
             try
             {
@@ -89,12 +97,11 @@ namespace CampusCommons.Quiz
             }
             catch (Exception e) when (e is IOException || e is UnauthorizedAccessException || e is ArgumentException || e is NotSupportedException)
             { message = "파일을 열 수 없습니다. PDF 경로·권한·크기(10MB 이하)를 확인해 주세요."; return; }
-            PlayerPrefs.SetString("Quiz.Server", server); PlayerPrefs.Save();
             StartCoroutine(CreateQuiz(pdf));
         }
         IEnumerator CreateQuiz(byte[] pdf)
         {
-            working = true; settingsOpen = browsing = false;
+            working = true; browsing = false;
             message = "PDF를 읽고 레벨별 문제를 만들고 있어요. 최대 3분 정도 기다려 주세요.";
             request = new UnityWebRequest(server.TrimEnd('/') + "/v1/quizzes", "POST");
             request.uploadHandler = new UploadHandlerRaw(pdf);
@@ -119,7 +126,10 @@ namespace CampusCommons.Quiz
                 try
                 {
                     var error = JsonUtility.FromJson<QuizErrorEnvelope>(request.downloadHandler.text);
-                    if (error != null && error.error != null && !string.IsNullOrWhiteSpace(error.error.message)) message = error.error.message;
+                    if (error != null && error.error != null && !string.IsNullOrWhiteSpace(error.error.message))
+                        message = error.error.code == "unauthorized" || error.error.code == "server_configuration"
+                            ? "퀴즈 서비스에 연결할 수 없어요. 잠시 후 다시 이용해 주세요."
+                            : error.error.message;
                 }
                 catch (ArgumentException) { }
             }
@@ -127,6 +137,8 @@ namespace CampusCommons.Quiz
         }
         void Browse(string location)
         {
+            browsing = true; browserPage = 0; fileScroll = Vector2.zero;
+            folders = files = new string[0];
             try
             {
                 var dir = new DirectoryInfo(location);
@@ -135,10 +147,19 @@ namespace CampusCommons.Quiz
                 Array.Sort(entries, (a,b) => StringComparer.OrdinalIgnoreCase.Compare(a.Name,b.Name));
                 folders = Array.ConvertAll(dirs, d => d.FullName);
                 files = Array.ConvertAll(Array.FindAll(entries, f => f.Extension.Equals(".pdf",StringComparison.OrdinalIgnoreCase)), f => f.FullName);
-                directory = dir.FullName; browsing = true; fileScroll = Vector2.zero;
+                directory = dir.FullName;
             }
             catch (Exception e) when (e is IOException || e is UnauthorizedAccessException || e is ArgumentException || e is NotSupportedException)
-            { message = "이 폴더에 접근할 수 없습니다. 다른 폴더나 PDF 전체 경로를 입력해 주세요."; }
+            { message = "이 폴더에 접근할 수 없습니다. 홈이나 다른 드라이브를 선택해 주세요."; }
+        }
+        void ChoosePdf()
+        {
+#if UNITY_EDITOR
+            string chosen = UnityEditor.EditorUtility.OpenFilePanel("공부한 PDF 선택", directory, "pdf");
+            if (!string.IsNullOrEmpty(chosen)) { path = chosen; directory = Path.GetDirectoryName(chosen); }
+#else
+            Browse(directory);
+#endif
         }
         void Styles()
         {
@@ -148,7 +169,6 @@ namespace CampusCommons.Quiz
             heading = new GUIStyle(body) { fontSize = 28, fontStyle = FontStyle.Bold };
             small = new GUIStyle(body) { fontSize = 15 };
             button = new GUIStyle(GUI.skin.button) { font = font, fontSize = 18, wordWrap = true, richText = false, padding = new RectOffset(12,12,10,10) };
-            field = new GUIStyle(GUI.skin.textField) { font = font, fontSize = 18 };
         }
         bool Button(string label) => GUILayout.Button(label, button, GUILayout.MinHeight(42));
         void OnGUI()
@@ -157,8 +177,10 @@ namespace CampusCommons.Quiz
             Styles(); var matrix = GUI.matrix; var color = GUI.color;
             float scale = Mathf.Min(Screen.width / 1100f, Screen.height / 760f);
             GUI.matrix = Matrix4x4.TRS(new Vector3((Screen.width-1100*scale)/2,(Screen.height-760*scale)/2,0), Quaternion.identity, Vector3.one*scale);
-            GUI.color = new Color(.055f,.09f,.12f,.98f); GUI.DrawTexture(new Rect(20,20,1060,720),Texture2D.whiteTexture); GUI.color = color;
-            GUILayout.BeginArea(new Rect(45,35,1010,690));
+            float panelHeight = session.Data == null && !browsing ? 430 : 720;
+            float panelTop = (760 - panelHeight) / 2;
+            GUI.color = new Color(.055f,.09f,.12f,.98f); GUI.DrawTexture(new Rect(20,panelTop,1060,panelHeight),Texture2D.whiteTexture); GUI.color = color;
+            GUILayout.BeginArea(new Rect(45,panelTop+15,1010,panelHeight-30));
             GUILayout.BeginHorizontal(); GUILayout.Label("PDF 퀴즈룸",heading);
             if (GUILayout.Button("나가기 · ESC",button,GUILayout.Width(170))) player.RequestRoomExit();
             GUILayout.EndHorizontal();
@@ -168,32 +190,23 @@ namespace CampusCommons.Quiz
             else if (session.Finished) DrawResults();
             else DrawQuestion();
             GUILayout.Space(12);
-            GUILayout.Label("AI가 만든 문제와 해설은 틀릴 수 있어요. 표시된 PDF 페이지와 함께 확인해 주세요.",small);
             GUILayout.EndScrollView(); GUILayout.EndArea(); GUI.matrix = matrix; GUI.color = color;
         }
         void DrawSetup()
         {
             GUI.enabled = !working;
-            if (Button(settingsOpen ? "연결 설정 접기" : "연결 설정")) settingsOpen = !settingsOpen;
-            if (settingsOpen)
-            {
-                GUILayout.Label("서버 주소 (관리자가 배포한 HTTPS 주소)",small);
-                server = GUILayout.TextField(server,256,field).Trim();
-                GUILayout.Label("참가 코드 (Gemini API 키를 입력하지 마세요)",small);
-                token = GUILayout.PasswordField(token,'●',128,field);
-                if (Button("서버 연결 확인"))
-                {
-                    if (QuizConnection.IsValidUrl(server,out message))
-                    { PlayerPrefs.SetString("Quiz.Server",server); PlayerPrefs.Save(); StartCoroutine(Warmup()); }
-                }
-            }
-            GUILayout.Space(12); GUILayout.Label("공부한 PDF 선택 · 최대 10MB / 80페이지",body);
-            path = GUILayout.TextField(path,2048,field);
-            if (Button("폴더에서 PDF 찾기")) Browse(directory);
+            GUILayout.Space(24);
+            GUILayout.Label("공부한 PDF로 복습해 보세요",heading);
+            GUILayout.Label("PDF 한 개 · 최대 10MB / 80페이지",small);
+            GUILayout.Space(16);
+            if (!string.IsNullOrEmpty(path)) GUILayout.Label(Path.GetFileName(path),body);
+            if (Button(string.IsNullOrEmpty(path) ? "PDF 선택하기" : "다른 PDF 선택하기")) ChoosePdf();
             if (browsing) DrawBrowser();
-            GUILayout.Label("문제 생성을 누르면 선택한 PDF가 서버와 Google Gemini에 전송됩니다. 공유 가능한 학습 자료를 사용해 주세요.",small);
-            if (Button("레벨 1 · 2 · 3 문제 만들기")) Generate();
+            GUILayout.Space(16);
+            GUI.enabled = !working && configured && !string.IsNullOrEmpty(path);
+            if (Button("문제 만들기")) Generate();
             GUI.enabled = true;
+            GUILayout.Label("선택한 PDF는 문제 생성을 위해 서버와 Google Gemini로 전송됩니다.",small);
             if (!string.IsNullOrEmpty(message)) GUILayout.Label(message,body);
             if (working && Button("요청 취소")) CancelRequest();
         }
@@ -205,11 +218,28 @@ namespace CampusCommons.Quiz
             if (Button("상위 폴더")) { var parent = Directory.GetParent(directory); if (parent != null) Browse(parent.FullName); }
             if (Button("닫기")) browsing = false;
             GUILayout.EndHorizontal();
+            GUILayout.BeginHorizontal();
+            foreach (string drive in Directory.GetLogicalDrives())
+                if (Button(drive)) { Browse(drive); break; }
+            GUILayout.EndHorizontal();
             GUILayout.Label(directory,small);
+            const int pageSize = 100;
+            int pageCount = Math.Max(1, (folders.Length + files.Length + pageSize - 1) / pageSize);
+            browserPage = Math.Min(browserPage, pageCount - 1);
+            GUILayout.BeginHorizontal();
+            if (browserPage > 0 && Button("이전 목록")) { browserPage--; fileScroll = Vector2.zero; }
+            GUILayout.Label((browserPage+1) + " / " + pageCount,small);
+            if (browserPage+1 < pageCount && Button("다음 목록")) { browserPage++; fileScroll = Vector2.zero; }
+            GUILayout.EndHorizontal();
             fileScroll = GUILayout.BeginScrollView(fileScroll,GUILayout.Height(190));
-            // Cap visible entries; a full path can always be pasted into the input above.
-            for (int i=0;i<Math.Min(folders.Length,300);i++) if (Button("[폴더] " + Path.GetFileName(folders[i]))) { Browse(folders[i]); break; }
-            for (int i=0;i<Math.Min(files.Length,300);i++) if (Button(Path.GetFileName(files[i]))) { path=files[i]; browsing=false; break; }
+            for (int i=browserPage*pageSize;i<Math.Min(folders.Length+files.Length,(browserPage+1)*pageSize);i++)
+            {
+                if (i < folders.Length)
+                {
+                    if (Button("[폴더] " + Path.GetFileName(folders[i]))) { Browse(folders[i]); break; }
+                }
+                else if (Button(Path.GetFileName(files[i-folders.Length]))) { path=files[i-folders.Length]; browsing=false; break; }
+            }
             if (files.Length==0) GUILayout.Label("이 폴더에는 PDF가 없습니다.",small);
             GUILayout.EndScrollView();
         }

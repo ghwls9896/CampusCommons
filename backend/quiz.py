@@ -2,11 +2,14 @@
 import base64
 import io
 import json
+import logging
 import re
 
 import httpx
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
 from pypdf import PdfReader
+
+logger = logging.getLogger(__name__)
 
 
 class QuizError(Exception):
@@ -113,13 +116,17 @@ async def generate_quiz(data: bytes, pages: int, api_key: str, model: str,
             'responseFormat': {'text': {'mimeType': 'APPLICATION_JSON', 'schema': Generation.model_json_schema()}},
         },
     }
+    if model.startswith('gemini-3'):
+        body['generationConfig']['thinkingConfig'] = {'thinkingLevel': 'low'}
     try:
         response = await client.post(
             f'https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent',
             headers={'x-goog-api-key': api_key}, json=body, timeout=150)
     except httpx.TimeoutException as exc:
+        logger.warning('Gemini request timed out (%s)', type(exc).__name__)
         raise QuizError('generation_timeout', 'AI 응답이 오래 걸립니다. 잠시 후 다시 생성해 주세요.', 504) from exc
     except httpx.RequestError as exc:
+        logger.warning('Gemini connection failed (%s)', type(exc).__name__)
         raise QuizError('provider_unavailable', 'AI 서비스에 연결하지 못했습니다. 잠시 후 다시 시도해 주세요.', 502) from exc
     if response.status_code == 429:
         raise QuizError('quota_exceeded', 'Gemini 무료 요청 또는 토큰 한도에 도달했습니다. 잠시 후 다시 시도하거나 관리자에게 문의해 주세요.', 429)

@@ -5,7 +5,7 @@ Unity 데스크톱(Windows/macOS)에서 퀴즈룸 입장 → PDF 선택 → 문�
 ## 1. Google AI Studio: API 키 만들기
 
 1. [Google AI Studio](https://aistudio.google.com/api-keys)에 Google 계정으로 로그인합니다.
-2. 무료 등급 프로젝트를 만들거나 선택하고 API 키를 생성합니다. 무료로 테스트하려면 유료 결제를 연결하지 않습니다.
+2. 다른 서비스와 분리한 **CampusCommons 전용 새 프로젝트**를 만들고 그 안에 퀴즈 서버용 키를 생성합니다. 프로젝트의 **무료 등급** 표시를 확인하고 결제 계정/카드를 연결하지 않습니다.
 3. [모델별 요금표](https://ai.google.dev/gemini-api/docs/pricing)에서 사용할 모델의 무료 등급을 확인합니다. 기본값은 `gemini-3.8-flash`입니다(2026-11-09 공식 문서 기준). 제공 모델·무료 한도는 변경될 수 있습니다. 해당 계정에 제공되지 않으면 PDF와 structured output을 지원하는 무료 모델로 Render의 `GEMINI_MODEL`만 변경합니다.
 4. [AI Studio의 사용량 및 한도](https://aistudio.google.com/usage)에서 프로젝트 한도를 확인합니다. 모든 플레이어가 이 프로젝트의 한도를 함께 사용합니다. 분당 요청·입력 토큰·일일 요청 중 하나라도 소진되면 생성이 실패할 수 있습니다.
 
@@ -18,7 +18,7 @@ API 키는 **Render 서버 환경변수에만** 넣습니다. Unity, GitHub, 채
 1. [Render](https://dashboard.render.com/)에 가입하고 GitHub 계정을 연결합니다.
 2. **New → Blueprint**에서 `ghwls9896/CampusCommons` 저장소와 위 브랜치를 선택합니다. 루트의 `render.yaml`이 Python Web Service 한 개를 구성합니다. 반드시 인스턴스가 **Free**인지 확인합니다.
 3. `GEMINI_API_KEY`에 AI Studio 키를 입력합니다. `QUIZ_ACCESS_TOKEN`은 Blueprint가 무작위로 생성합니다.
-4. 배포 후 서비스 **Environment**에서 `QUIZ_ACCESS_TOKEN`을 확인합니다. 이것이 팀원에게 전달할 **참가 코드**입니다. Gemini API 키와 다릅니다. 참가 코드는 접근을 제한하는 데모용 공유 코드이며 사용자 로그인 기능은 아닙니다.
+4. 배포 후 서비스 **Environment**에서 `QUIZ_ACCESS_TOKEN`을 확인합니다. 운영자가 아래 Unity 배포 설정에 넣을 **데모 접근 코드**입니다. Gemini API 키와 다릅니다. 플레이어에게 입력을 요구하지 않습니다.
 5. 서비스 상단의 `https://이름.onrender.com` 주소를 복사합니다. 브라우저에서 `/healthz`를 붙여 `{"status":"ok"}`가 나오는지 확인합니다. 이 검사는 서버 실행만 확인하며 Gemini 인증·한도를 검증하지 않습니다.
 
 Blueprint를 쓸 수 없거나 저장소가 보이지 않으면 저장소 관리자가 GitHub 앱 접근을 허용해야 합니다. 공개 저장소는 **New → Web Service → Public Git Repository**로 연결할 수도 있습니다. 수동 설정은 다음과 같습니다.
@@ -39,17 +39,23 @@ Blueprint를 쓸 수 없거나 저장소가 보이지 않으면 저장소 관리
 
 데이터베이스·디스크·GPU 서버는 필요하지 않습니다. Render는 API 중계만 하고 AI 추론은 Gemini에서 수행합니다. 무료 서버는 15분 미사용 시 잠들며 다음 연결에 약 1분이 걸릴 수 있습니다. 월 750시간은 워크스페이스 전체가 공유합니다. 결제 수단이 있으면 대역폭·빌드 사용량 초과에 요금이 생길 수 있으므로 무료 사용만 원하면 결제와 사용량 설정을 확인하세요. [Render 무료 정책](https://render.com/docs/free)
 
-## 3. Unity에서 사용
+## 3. 운영자가 한 번 할 Unity 연결 설정
+
+`Assets/QuizRoom/Resources/QuizConnection.example.json`을 같은 폴더의 `QuizConnection.json`으로 복사합니다. `server_url`에는 실제 Render HTTPS 주소, `access_token`에는 Render의 `QUIZ_ACCESS_TOKEN` 값을 넣습니다. **GEMINI_API_KEY는 넣지 않습니다.** 실제 설정 파일과 해당 `.meta`는 Git에서 제외합니다.
+
+이 설정은 게임 빌드에 포함되므로 플레이어는 PDF만 선택하면 됩니다. 데모 접근 코드는 배포 파일에서 추출 가능하며 계정 인증이나 비밀 보관 수단이 아닙니다. 서버의 기존 토큰 검사·생성 한도는 유지하며 추후 로그인 도입 시 사용자 세션으로 대체합니다. 새로 clone한 개발자는 운영자에게 설정을 별도로 받아야 하고, 설정 없는 빌드에서는 서비스 준비 중 안내가 표시됩니다.
+
+## 4. 플레이어 사용
 
 1. 저장소를 Unity Hub에 추가하고 프로젝트 버전 **6000.4.5f1**로 엽니다.
 2. `Assets/StudyImmersive/Scenes/GrandLibrary_Living.unity`를 열고 Play합니다.
 3. 로비에서 퀴즈룸으로 들어갑니다. 새 UI는 GameStart가 플레이어에 자동으로 연결하므로 씬 오브젝트를 직접 추가할 필요가 없습니다.
-4. **연결 설정**에 Render 주소와 참가 코드를 입력하고 **서버 연결 확인**을 누릅니다. 주소는 이 기기에 저장되고 참가 코드는 실행 중에만 보관됩니다.
-5. **폴더에서 PDF 찾기**로 선택하거나 PDF 전체 경로를 붙여 넣습니다. 업로드할 내용을 확인하고 **레벨 1 · 2 · 3 문제 만들기**를 누릅니다.
+4. 서버에는 자동으로 연결됩니다. 서버 주소/참가 코드/API 키 입력칸은 표시하지 않습니다.
+5. **PDF 선택하기**로 파일을 고르고 **문제 만들기**를 누릅니다. Unity Editor에서는 운영체제 파일 선택창, 데스크톱 빌드에서는 게임 내 파일 탐색기를 사용합니다.
 6. 보기를 고르고 **답 제출**을 누르면 정답·해설·근거 페이지가 나옵니다. **다음 레벨**로 이동하여 총 3문항을 풉니다. 결과에서 전체 문항을 다시 볼 수 있습니다.
 7. ESC 또는 **나가기**에서 확인하면 로비로 돌아가며 문제·파일 선택을 초기화합니다. 나가기 취소는 현재 풀이를 유지합니다. 요청 취소·방 나가기는 클라이언트 응답 수신을 중단하지만 이미 시작된 Gemini 호출은 한도를 소모할 수 있습니다.
 
-다른 팀원도 동일한 서버 주소와 참가 코드로 사용할 수 있습니다. 각자 Render나 AI Studio에 가입할 필요는 없습니다. 이번 구현은 Unity 데스크톱용이며 WebGL·모바일 파일 선택은 포함하지 않습니다.
+다른 팀원도 설정이 포함된 같은 게임 빌드로 사용할 수 있습니다. 각자 Render나 AI Studio에 가입할 필요는 없습니다. 이번 구현은 Unity 데스크톱용이며 WebGL·모바일 파일 선택은 포함하지 않습니다.
 
 ## 제한과 오류 대응
 

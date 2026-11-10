@@ -29,3 +29,7 @@
 .env.*
 !.env.example
 backend/*.pdf
+
+# Operator-provided quiz endpoint and demo access code; never commit live values.
+/Assets/QuizRoom/Resources/QuizConnection.json
+/Assets/QuizRoom/Resources/QuizConnection.json.meta

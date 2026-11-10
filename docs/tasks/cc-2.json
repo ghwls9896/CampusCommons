@@ -29,13 +29,12 @@
     "backend/app.py",
     "render.yaml"
   ],
-  "depends_on": [
-    "https://github.com/ghwls9896/CampusCommons/issues/1"
-  ],
+  "depends_on": [],
   "validation": [
-    "백엔드 pytest: 26 passed (가짜 upstream)",
-    "C# QuizSessionTests: 20 checks passed",
-    "임시 Unity 6000.6 컴파일 및 QuizRoomTest 통과; 원본6000.4유지",
-    "실제 Gemini/Render/standalone 빌드는 아직 미검증"
+    "백엔드 pytest 26 tests (가짜 upstream; LOW thinking 요청 계약 포함)",
+    "C# 27 checks 및 협업 도구 16 tests",
+    "임시 Unity6000.6 컴파일/실제 씬 lifecycle 통과; 원본6000.4.5 유지",
+    "Render Free healthz200; 첫 실제 Gemini 호출504, LOW thinking 재배포 검증 진행 중",
+    "Windows/macOS standalone 빌드는 아직 미검증"
   ]
 }

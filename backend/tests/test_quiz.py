@@ -77,6 +77,7 @@ def test_gemini_contract_sends_pdf_and_schema_without_key_in_url():
         body = json.loads(request.content)
         assert body['contents'][0]['parts'][0]['inlineData']['mimeType'] == 'application/pdf'
         assert body['generationConfig']['responseFormat']['text']['schema']['type'] == 'object'
+        assert body['generationConfig'].get('thinkingConfig', {}).get('thinkingLevel') == 'low'
         return httpx.Response(200, json={'candidates': [{'finishReason': 'STOP', 'content': {
             'parts': [{'text': json.dumps(result())}]}}]})
 

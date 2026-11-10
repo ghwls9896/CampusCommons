@@ -43,6 +43,20 @@ public static class QuizSessionTests
         Check(!QuizConnection.IsValidUrl("http://example.com", out _), "Remote HTTP refused");
         Check(!QuizConnection.IsValidUrl("https://user:password@example.com", out _), "Credentials in URL refused");
         Check(!QuizConnection.IsValidUrl("https://example.com?key=secret", out _), "Query in base URL refused");
+        var deployment = new QuizDeployment { server_url = "https://example.onrender.com", access_token = "team-test-code" };
+        Check(deployment.IsValid(), "Bundled deployment can connect without player input");
+        deployment.access_token = "";
+        Check(!deployment.IsValid(), "Missing deployment code must not send an anonymous request");
+        deployment.access_token = "code\r\nInjected: header";
+        Check(!deployment.IsValid(), "Deployment code cannot inject a request header");
+        deployment.access_token = new string('x', 129);
+        Check(!deployment.IsValid(), "Overlong deployment code rejected");
+        deployment.access_token = "AQ.provider-key-do-not-ship";
+        Check(!deployment.IsValid(), "Gemini auth key must never be used as a client access code");
+        deployment.access_token = "AIza-provider-key-do-not-ship";
+        Check(!deployment.IsValid(), "Gemini standard key must never be used as a client access code");
+        deployment.access_token = "team-test-code"; deployment.server_url = "http://example.com";
+        Check(!deployment.IsValid(), "Configured endpoint must still enforce HTTPS");
         Console.WriteLine("QUIZ_SESSION_PASS " + checks + " checks"); return 0;
     }
 }
