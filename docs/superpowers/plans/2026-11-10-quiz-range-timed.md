@@ -17,7 +17,7 @@
 - [x] Write failing C# document-range and10/15/20-second session tests; implement contract/state.
 - [x] Connect white UI range fields, typed inputs, timer, immediate transitions and concise final review.
 - [x] Validate full test suites, disposable Unity and fresh code review; fix important findings.
-- [ ] Update task/API/handoff, push same PR, deploy and verify live synthetic flow; leave Unity ready.
+- [x] Update task/API/handoff, push same PR, deploy and verify live synthetic flow; leave Unity ready.
 
 Evidence: backend50, session35, document21, team16 checks pass; disposable Unity6000.6 lifecycle PASS. Review found deadline submission race and cross-page PDF cloning through links/article beads; both reproduced in failing tests and fixed. AI-only range copies remove navigation annotations/article-thread references; original PDF unchanged.
 
@@ -27,4 +27,6 @@ Note fidelity: selected-page FreeText/highlight/ink annotations are copied after
 - [x] Weighted10-point typed-answer rubrics, bounded partial marks and derived totals; backend52 tests.
 - [x] Record each elapsed solve time, clamp timeout duration and show total; C#37 session checks.
 - [x] Circular seconds countdown plus existing progress bar, final points/duration/rubric breakdown.
-- [ ] Recheck Unity, deploy matched scoring contract and validate live partial grading.
+- [x] Recheck Unity, deploy matched scoring contract and validate live partial grading.
+
+Final:6434643 deployed Live; actual range2..2 generation and10/0 semantic scores passed; partial rubric returned[4,0,0] ->4/10. Native version remains unchanged; disposable6000.6 preview ready for user PDF selection.
