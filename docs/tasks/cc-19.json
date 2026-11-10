@@ -1,0 +1,29 @@
+
+{
+  "id": "cc-19",
+  "title": "3D 아바타 커스터마이징 및 애니메이션 통합",
+  "owner": "GongBeak",
+  "branch": "feat/cc-19-avatar-customization",
+  "issue": "https://github.com/ghwls9896/CampusCommons/issues/19",
+  "scope": [
+    "Assets/TeamAvatar/",
+    "Assets/TeamAvatar.meta",
+    "Assets/GrandLibrary/Scripts/Player.cs",
+    "docs/tasks/cc-19.json",
+    "docs/tasks/cc-19.md",
+    "docs/AVATAR_SETUP.md"
+  ],
+  "shared_files": [
+    "Assets/GrandLibrary/Scripts/Player.cs"
+  ],
+  "depends_on": [],
+  "validation": [
+    "Unity 6000.4.5f1 컴파일 확인",
+    "남녀 캐릭터 및 C키 커스터마이징 확인",
+    "걷기, 달리기, 손 흔들기 확인",
+    "E키 착석 및 일어서기 확인",
+    "실시간 미리보기 확인",
+    "기존 카메라 및 포털 기능 확인",
+    "python Tools/team/check.py --base origin/main"
+  ]
+}
