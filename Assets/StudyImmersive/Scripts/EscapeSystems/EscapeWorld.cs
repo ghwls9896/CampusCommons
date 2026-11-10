@@ -21,7 +21,7 @@ namespace CampusCommons.StudyImmersive
             public CharacterController body;
             public readonly List<Vector3> route=new List<Vector3>();
             public int next;
-            public float replan;
+            public float replan,stuckTime;
             public bool pursuing,hasDestination;
             public Vector3 destination;
             public AudioSource audio;
@@ -83,6 +83,7 @@ namespace CampusCommons.StudyImmersive
             // Put the professor in a nearby visible part of the school so players can find them.
             professor=SpawnPatrol("Professor",professorSprite,2.0f,true);
             worker=SpawnPatrol("Maintenance Worker",workerSprite,2.0f,false);
+            if(professor?.body && worker?.body)Physics.IgnoreCollision(professor.body,worker.body);
             var machines=EscapeSpawnPoint.FindAll(EscapeSpawnPoint.Kind.Vending);
             if(machines.Count>0)foreach(var marker in machines)SpawnVending(marker.transform.position,marker.transform.rotation);
             else
@@ -248,6 +249,12 @@ namespace CampusCommons.StudyImmersive
                 ambient=Resources.Load<AudioClip>(isProfessor?"EscapeSounds/ProfessorMurmur":"EscapeSounds/WorkerTool"),
                 ambientWait=Random.Range(isProfessor?3f:6f,isProfessor?5f:8f)};
         }
+        public void IgnoreMonsterPatrolCollisions(CharacterController monsterBody)
+        {
+            if(!monsterBody || !monsterBody.enabled)return;
+            if(professor?.body)Physics.IgnoreCollision(monsterBody,professor.body);
+            if(worker?.body)Physics.IgnoreCollision(monsterBody,worker.body);
+        }
         void Update()
         {
             if(!game || !game.IsRunning || game.IsEnded || game.IsExitConfirmOpen)return;
@@ -384,10 +391,17 @@ namespace CampusCommons.StudyImmersive
                 door.OpenForMonster();if(!door.IsFullyOpen)return;
             }
             var before=npc.root.transform.position;npc.body.Move(delta.normalized*Mathf.Min(speed*dt,delta.magnitude)+Vector3.down*2f*dt);
-            float walked=Horizontal(before,npc.root.transform.position);
-            if(walked<.001f && dt>0)npc.replan-=dt*3f;
+            float progress=Horizontal(before,npc.route[npc.next])-Horizontal(npc.root.transform.position,npc.route[npc.next]);
+            if(dt>0 && progress<Mathf.Min(speed*dt,delta.magnitude)*.08f)npc.stuckTime+=dt;
+            else npc.stuckTime=0f;
+            if(npc.stuckTime>.7f){npc.stuckTime=0f;ReplanPatrol(npc,false);}
         }
-        bool CanTraverse(Vector3 a,Vector3 b)=>!IsEdgeBlocked(a,b);
+        bool CanTraverse(Vector3 a,Vector3 b)
+        {
+            if(IsEdgeBlocked(a,b))return false;
+            foreach(var door in doors)if(door && door.OpenLeafBlocks(a,b,.29f))return false;
+            return true;
+        }
         static bool Crosses(Vector3 a,Vector3 b,Vector3 center,Quaternion rotation,float width)
         {
             var inverse=Quaternion.Inverse(rotation);Vector3 x=inverse*(a-center),y=inverse*(b-center);

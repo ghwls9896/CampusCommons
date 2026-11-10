@@ -31,7 +31,9 @@
     "Assets/TeamAvatar.meta",
     "Assets/StudyImmersive/Scripts/EscapeSystems/EscapeSpawnPoint.cs",
     "Assets/StudyImmersive/Scripts/EscapeSystems/EscapeSpawnPoint.cs.meta",
-    "docs/AVATAR_SETUP.md"
+    "docs/AVATAR_SETUP.md",
+    "Assets/StudyImmersive/Scripts/EscapeSystems/Editor/EscapeOpenDoorRouteVerification.cs",
+    "Assets/StudyImmersive/Scripts/EscapeSystems/Editor/EscapeOpenDoorRouteVerification.cs.meta"
   ],
   "shared_files": [
     "Assets/StudyImmersive/Scenes/GrandLibrary_Living.unity",
@@ -48,6 +50,7 @@
     "Unity 6000.4.5f1 교수·시설관리 NPC의 잠긴 경로 우회 및 대체 목적지 검증",
     "Unity 6000.4.5f1 문 소리 10m 청각·NPC 배치 설정 및 회귀 검사",
     "Unity 6000.4.5f1 아바타 에셋 설치 전 기본 캐릭터 컴파일 및 로비 이동",
-    "Unity 6000.4.5f1 에셋 설치 후 아바타 UI와 성별 변경 및 1·3인칭 전환"
+    "Unity 6000.4.5f1 에셋 설치 후 아바타 UI와 성별 변경 및 1·3인칭 전환",
+    "Unity 6000.4.5f1 열린 문짝 경로 우회, NPC 간 충돌과 막힌 자리 탈출 회귀 검사"
   ]
 }

@@ -30,16 +30,14 @@ namespace CampusCommons.LibraryCharacter
         CharacterController body;
         EscapeGame game;
         Transform target;
-        Vector3 spawn,heading,lastSeen,goal,heardPosition,picturePosition,pictureScale;
+        Vector3 spawn,heading,lastSeen,goal,heardPosition,picturePosition,pictureScale,blockedFrom,blockedTo;
         Door[] doors;
         Door waitingDoor;
         readonly List<Vector3> path=new List<Vector3>();
         readonly List<Vector3> roomRoute=new List<Vector3>();
         readonly List<Collider> openPanels=new List<Collider>();
-        readonly Collider[] overlapBuffer=new Collider[64];
-        readonly RaycastHit[] castBuffer=new RaycastHit[64];
         int next;
-        float wakeRemaining,repathRemaining,searchRemaining,lostSightRemaining,pauseAtPoint,stuckTime,footDistance,gait,roomSearchRemaining,hearingRemaining;
+        float wakeRemaining,repathRemaining,searchRemaining,lostSightRemaining,pauseAtPoint,stuckTime,footDistance,gait,roomSearchRemaining,hearingRemaining,blockedUntil;
         bool running,hasGoal,awakened;
         Door lastInvestigatedDoor;
         AudioSource steps,alert;
@@ -77,7 +75,7 @@ namespace CampusCommons.LibraryCharacter
             heading=player?player.position-transform.position:Vector3.forward;heading.y=0;
             if(heading.sqrMagnitude<.01f)heading=Vector3.forward;heading.Normalize();
             doors=FindObjectsByType<Door>();wakeRemaining=graceSeconds;repathRemaining=0;pauseAtPoint=0;
-            stuckTime=0;footDistance=0;gait=0;lostSightRemaining=0;roomSearchRemaining=3f;lastInvestigatedDoor=null;
+            stuckTime=0;blockedUntil=0;footDistance=0;gait=0;lostSightRemaining=0;roomSearchRemaining=3f;lastInvestigatedDoor=null;
             state=Behaviour.Patrol;StopSounds();ResetPicture();
         }
         Vector3 InitialPosition(Transform player)
@@ -114,6 +112,7 @@ namespace CampusCommons.LibraryCharacter
             {
                 awakened=true;wakeRemaining=0;
                 if(body)body.enabled=true;if(picture)picture.gameObject.SetActive(true);
+                if(game && game.World)game.World.IgnoreMonsterPatrolCollisions(body);
                 SetState(Behaviour.Chase);
                 if(target){lastSeen=target.position;goal=lastSeen;hasGoal=true;lostSightRemaining=8f;}
             }
@@ -297,19 +296,10 @@ namespace CampusCommons.LibraryCharacter
         }
         bool CanTraverse(Vector3 from,Vector3 to)
         {
+            if(Time.time<blockedUntil && ((HorizontalDistance(from,blockedFrom)<.1f && HorizontalDistance(to,blockedTo)<.1f) ||
+                (HorizontalDistance(from,blockedTo)<.1f && HorizontalDistance(to,blockedFrom)<.1f)))return false;
             if(game && game.World && game.World.IsEdgeBlocked(from,to))return false;
-            // Most grid edges are nowhere near a door. Limit physics queries to
-            // the moving leaves, and let closed leaves be opened on approach.
-            Bounds edge=new Bounds((from+to)*.5f+Vector3.up*.9f,new Vector3(Mathf.Abs(to.x-from.x)+.7f,1.8f,Mathf.Abs(to.z-from.z)+.7f));
-            bool nearby=false;foreach(var panel in openPanels)if(panel && panel.bounds.Intersects(edge)){nearby=true;break;}
-            if(!nearby)return true;
-            const float radius=.29f;
-            Vector3 bottom=from+Vector3.up*.36f,top=from+Vector3.up*1.48f;
-            int n=Physics.OverlapCapsuleNonAlloc(bottom,top,radius,overlapBuffer,Physics.DefaultRaycastLayers,QueryTriggerInteraction.Ignore);
-            for(int i=0;i<n;i++)if(openPanels.Contains(overlapBuffer[i]))return false;
-            Vector3 delta=to-from;
-            n=Physics.CapsuleCastNonAlloc(bottom,top,radius,delta.normalized,castBuffer,delta.magnitude,Physics.DefaultRaycastLayers,QueryTriggerInteraction.Ignore);
-            for(int i=0;i<n;i++)if(openPanels.Contains(castBuffer[i].collider))return false;
+            if(doors!=null)foreach(var door in doors)if(door && door.OpenLeafBlocks(from,to,.29f))return false;
             return true;
         }
         void MoveAlongPath(float dt)
@@ -361,12 +351,17 @@ namespace CampusCommons.LibraryCharacter
             Vector3 moved=transform.position-before;moved.y=0;float distance=moved.magnitude;
             if(distance>.001f)
             {
-                heading=moved.normalized;stuckTime=0;AnimateAndSound(distance);
+                heading=moved.normalized;AnimateAndSound(distance);
             }
-            else
+            else ResetPicture();
+            float progress=HorizontalDistance(before,path[next])-HorizontalDistance(transform.position,path[next]);
+            if(dt>0 && progress<Mathf.Min(speed*dt,remaining)*.08f)stuckTime+=dt;
+            else stuckTime=0f;
+            if(stuckTime>.65f)
             {
-                stuckTime+=dt;ResetPicture();
-                if(stuckTime>.65f){stuckTime=0;repathRemaining=0;if(state!=Behaviour.Chase && path.Count==0)hasGoal=false;}
+                stuckTime=0;int cell=map?map.NearestCell(transform.position):-1;
+                if(cell>=0 && next<path.Count){blockedFrom=map.Position(cell);blockedTo=path[next];blockedUntil=Time.time+2f;}
+                path.Clear();repathRemaining=0;
             }
         }
         static bool LockedDoorBlocksSegment(Door door,Vector3 from,Vector3 to)

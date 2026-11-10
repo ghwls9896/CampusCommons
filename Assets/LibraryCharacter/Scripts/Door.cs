@@ -118,6 +118,31 @@ namespace CampusCommons.LibraryCharacter
             if(panel && panel.enabled)result.Add(panel);
             if(secondPanel && secondPanel.enabled)result.Add(secondPanel);
         }
+        // A fully open leaf can still occupy an adjacent grid edge.
+        public bool OpenLeafBlocks(Vector3 from,Vector3 to,float radius)
+        {
+            if(!IsFullyOpen)return false;
+            return LeafBlocks(panel,from,to,radius) || LeafBlocks(secondPanel,from,to,radius);
+        }
+        static bool LeafBlocks(Collider leaf,Vector3 from,Vector3 to,float radius)
+        {
+            if(!leaf || !leaf.enabled)return false;
+            var bounds=leaf.bounds;var area=bounds;area.Expand(radius*2f+.05f);
+            from.y=to.y=bounds.center.y;
+            var edge=new Bounds((from+to)*.5f,new Vector3(Mathf.Abs(to.x-from.x),.1f,Mathf.Abs(to.z-from.z)));
+            if(!area.Intersects(edge))return false;
+            float start=Vector3.Distance(from,leaf.ClosestPoint(from));
+            float end=Vector3.Distance(to,leaf.ClosestPoint(to));
+            // An actor already touching a leaf must be able to step away.
+            if(start<radius && end>start+.02f)return false;
+            float clearance=radius+.025f;
+            for(int i=0;i<=4;i++)
+            {
+                var point=Vector3.Lerp(from,to,i*.25f);
+                if((point-leaf.ClosestPoint(point)).sqrMagnitude<clearance*clearance)return true;
+            }
+            return false;
+        }
         public Vector3 NearestPoint(Vector3 position)
         {
             if(!panel && hinge)panel=hinge.GetComponentInChildren<Collider>();
