@@ -1,6 +1,6 @@
 {
   "id": "cc-17",
-  "title": "탈출룸 NPC 효과음·잠긴 경로와 동전 표시 개선",
+  "title": "탈출룸 NPC·문 소리, 경로와 편집 배치",
   "owner": "ghwls9896",
   "branch": "codex/cc-17-npc-sounds",
   "issue": "https://github.com/ghwls9896/CampusCommons/issues/17",
@@ -12,7 +12,17 @@
     "docs/tasks/cc-17.json",
     "docs/tasks/cc-17.md",
     "Assets/StudyImmersive/Scripts/EscapeSystems/Editor/EscapeNpcLockedRouteVerification.cs",
-    "Assets/StudyImmersive/Scripts/EscapeSystems/Editor/EscapeNpcLockedRouteVerification.cs.meta"
+    "Assets/StudyImmersive/Scripts/EscapeSystems/Editor/EscapeNpcLockedRouteVerification.cs.meta",
+    "Assets/LibraryCharacter/Scripts/Door.cs",
+    "Assets/LibraryCharacter/Scripts/Monster.cs",
+    "Assets/StudyImmersive/Scripts/EscapeSystems/EscapePlacementSettings.cs",
+    "Assets/StudyImmersive/Scripts/EscapeSystems/EscapePlacementSettings.cs.meta",
+    "Assets/StudyImmersive/Scripts/EscapeSystems/Editor/EscapePlacementEditor.cs",
+    "Assets/StudyImmersive/Scripts/EscapeSystems/Editor/EscapePlacementEditor.cs.meta",
+    "Assets/StudyImmersive/Scripts/EscapeSystems/Editor/EscapeDoorHearingVerification.cs",
+    "Assets/StudyImmersive/Scripts/EscapeSystems/Editor/EscapeDoorHearingVerification.cs.meta",
+    "Assets/StudyImmersive/Resources/EscapePlacementSettings.asset",
+    "Assets/StudyImmersive/Resources/EscapePlacementSettings.asset.meta"
   ],
   "shared_files": [],
   "depends_on": [
@@ -21,6 +31,7 @@
   "validation": [
     "Unity 6000.4.5f1 Play Mode 게임 진행·구매, NPC 오디오 거리 및 겹침 검증",
     "python Tools/team/check.py --base origin/main",
-    "Unity 6000.4.5f1 교수·시설관리 NPC의 잠긴 경로 우회 및 대체 목적지 검증"
+    "Unity 6000.4.5f1 교수·시설관리 NPC의 잠긴 경로 우회 및 대체 목적지 검증",
+    "Unity 6000.4.5f1 문 소리 10m 청각·NPC 배치 설정 및 회귀 검사"
   ]
 }
