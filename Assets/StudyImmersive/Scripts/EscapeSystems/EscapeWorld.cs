@@ -22,6 +22,7 @@ namespace CampusCommons.StudyImmersive
             public readonly List<Vector3> route=new List<Vector3>();
             public int next;
             public float replan;
+            public bool pursuing;
         }
         EscapeGame game;
         Transform player;
@@ -34,6 +35,7 @@ namespace CampusCommons.StudyImmersive
         readonly List<ConstructionBarrier> barriers=new List<ConstructionBarrier>();
         Patrol professor,worker;
         GameObject vending;
+        readonly List<GameObject> vendingMachines=new List<GameObject>();
         int coins;
         float speedRemaining,professorCooldown,reviewRemaining,barrierCountdown;
         bool professorQuestion;
@@ -51,7 +53,7 @@ namespace CampusCommons.StudyImmersive
             {
                 foreach(var pickup in pickups)if(pickup.root && NearAndVisible(pickup.root.transform.position,false,1.65f))
                     return pickup.coin?"E / 클릭  동전 줍기":"E / 클릭  아이템 줍기";
-                if(vending && NearAndVisible(vending.transform.position+Vector3.up*.8f,false,1.8f))return "E / 클릭  캔음료 구매 (동전 1개)";
+                foreach(var machine in vendingMachines)if(machine && NearAndVisible(machine.transform.position+Vector3.up*.8f,false,1.8f))return "E / 클릭  캔음료 구매 (동전 1개)";
                 return null;
             }
         }
@@ -72,13 +74,17 @@ namespace CampusCommons.StudyImmersive
             workerSprite=Resources.Load<Sprite>("EscapePixels/MaintenanceWorker");
             if(!map || !player)return;
             usedPositions.Add(player.position);
+            if(game.monster)usedPositions.Add(game.monster.transform.position);
             foreach(var p in game.PendingSheetPositions)usedPositions.Add(p);
-            SpawnVending();
-            for(int i=0;i<6;i++)SpawnPickup(EscapeGame.InventoryItem.Empty,true);
-            for(int i=0;i<2;i++)SpawnPickup(EscapeGame.InventoryItem.Padlock,false);
-            for(int i=0;i<2;i++)SpawnPickup(EscapeGame.InventoryItem.ExcuseNote,false);
-            professor=SpawnPatrol("Professor",professorSprite,2.0f);
-            worker=SpawnPatrol("Maintenance Worker",workerSprite,2.0f);
+            // Put the professor in a nearby visible part of the school so players can find them.
+            professor=SpawnPatrol("Professor",professorSprite,2.0f,true);
+            worker=SpawnPatrol("Maintenance Worker",workerSprite,2.0f,false);
+            SpawnVending(new Vector3(504f,0,41f));
+            SpawnVending(new Vector3(482f,0,33.5f));
+            SpawnVending(new Vector3(527.5f,0,29f));
+            for(int i=0;i<3;i++)SpawnPickup(EscapeGame.InventoryItem.Empty,true);
+            SpawnPickup(EscapeGame.InventoryItem.Padlock,false);
+            SpawnPickup(EscapeGame.InventoryItem.ExcuseNote,false);
             barrierCountdown=Random.Range(18f,28f);
         }
         Sprite ItemSprite(EscapeGame.InventoryItem item)
@@ -87,7 +93,7 @@ namespace CampusCommons.StudyImmersive
         }
         public Texture2D ItemTexture(EscapeGame.InventoryItem item){var sprite=ItemSprite(item);return sprite?sprite.texture:null;}
         Vector3 Flat(Vector3 p){p.y=0;return p;}
-        bool TryPoint(float minFromPlayer,out Vector3 result)
+        bool TryPoint(float minFromPlayer,out Vector3 result,float separation=1.8f)
         {
             result=Vector3.zero;if(!map || map.links==null || map.links.Length==0)return false;
             var route=new List<Vector3>();
@@ -96,7 +102,7 @@ namespace CampusCommons.StudyImmersive
                 int index=Random.Range(0,map.links.Length);if(map.links[index]==0)continue;
                 var candidate=map.Position(index);float dist=Vector3.Distance(Flat(candidate),Flat(player.position));
                 if(dist<minFromPlayer || dist>45f)continue;
-                bool tooClose=false;foreach(var used in usedPositions)if(Vector3.Distance(Flat(candidate),Flat(used))<1.8f){tooClose=true;break;}
+                bool tooClose=false;foreach(var used in usedPositions)if(Vector3.Distance(Flat(candidate),Flat(used))<separation){tooClose=true;break;}
                 if(tooClose || !map.FindPath(player.position,candidate,route))continue;
                 result=candidate;usedPositions.Add(candidate);return true;
             }
@@ -115,41 +121,64 @@ namespace CampusCommons.StudyImmersive
             var collider=obj.GetComponent<Collider>();if(collider)Destroy(collider);
             return obj;
         }
-        void SpawnVending()
+        bool TryVendingPoint(Vector3 anchor,out Vector3 position,out Vector3 towardWall)
         {
-            if(!TryPoint(5f,out Vector3 p))return;
-            vending=new GameObject("Soda vending machine");vending.layer=2;vending.transform.SetParent(transform,false);
-            Vector3 wallDirection=Vector3.zero;float nearest=3.1f;
-            foreach(var direction in new[]{Vector3.right,Vector3.left,Vector3.forward,Vector3.back})
-                if(WallDistance(p,direction,out float distance) && distance>.6f && distance<nearest)
-                {nearest=distance;wallDirection=direction;}
-            if(wallDirection!=Vector3.zero)
+            position=Vector3.zero;towardWall=Vector3.zero;var route=new List<Vector3>();var candidates=new List<int>();
+            for(int i=0;i<map.links.Length;i++)if(map.links[i]!=0 && Horizontal(map.Position(i),anchor)<=2.5f)candidates.Add(i);
+            candidates.Sort((a,b)=>{int cmp=Horizontal(map.Position(a),anchor).CompareTo(Horizontal(map.Position(b),anchor));return cmp!=0?cmp:a.CompareTo(b);});
+            foreach(int index in candidates)
             {
-                vending.transform.position=p+wallDirection*Mathf.Max(0f,nearest-.25f);
-                vending.transform.rotation=Quaternion.LookRotation(wallDirection,Vector3.up);
+                Vector3 point=map.Position(index);
+                if(!map.FindPath(player.position,point,route))continue;
+                foreach(var direction in new[]{Vector3.right,Vector3.left,Vector3.forward,Vector3.back})
+                {
+                    bool backfaces=Physics.queriesHitBackfaces;RaycastHit[] hits;
+                    try{Physics.queriesHitBackfaces=true;hits=Physics.RaycastAll(point+Vector3.up*1.1f,direction,2f,Physics.DefaultRaycastLayers,QueryTriggerInteraction.Ignore);}
+                    finally{Physics.queriesHitBackfaces=backfaces;}
+                    Array.Sort(hits,(a,b)=>a.distance.CompareTo(b.distance));
+                    if(hits.Length==0)continue;var hit=hits[0];
+                    if(!hit.collider || !hit.collider.name.StartsWith("School Structure") || hit.distance<.65f || Mathf.Abs(Vector3.Dot(hit.normal,direction))<.9f)continue;
+                    // A corridor has a nearby opposing wall and enough space left to walk past.
+                    if(!WallDistance(point,-direction,out float opposite) || hit.distance+opposite<2.5f || hit.distance+opposite>5f)continue;
+                    Vector3 place=point+direction*(hit.distance-.24f);
+                    bool nearDoor=false;foreach(var door in doors)if(door && door.DistanceFrom(place)<1.4f){nearDoor=true;break;}
+                    if(nearDoor)continue;
+                    position=place;towardWall=direction;usedPositions.Add(position);return true;
+                }
             }
-            else vending.transform.position=p;
-            usedPositions.Add(vending.transform.position);
-            var blue=Material(new Color(.08f,.22f,.48f));var grey=Material(new Color(.30f,.33f,.36f));
-            var pale=Material(new Color(.74f,.84f,.88f));
+            return false;
+        }
+        void SpawnVending(Vector3 anchor)
+        {
+            if(!TryVendingPoint(anchor,out Vector3 p,out Vector3 wallDirection)){Debug.LogWarning("No safe vending position near "+anchor);return;}
+            vending=new GameObject("Soda vending machine");vendingMachines.Add(vending);vending.layer=2;vending.transform.SetParent(transform,false);
+            vending.transform.position=p;vending.transform.rotation=Quaternion.LookRotation(wallDirection,Vector3.up);
+            var blue=Material(new Color(.08f,.22f,.48f));
             Cube(vending.transform,"Machine",new Vector3(0,.9f,0),new Vector3(.85f,1.8f,.42f),blue);
-            Cube(vending.transform,"Display",new Vector3(0,1.24f,-.22f),new Vector3(.66f,.62f,.03f),pale);
-            Cube(vending.transform,"Dispenser",new Vector3(0,.43f,-.22f),new Vector3(.50f,.22f,.03f),grey);
-            if(soda)
+            var image=Resources.Load<Texture2D>("EscapePixels/VendingMachinePhoto");
+            if(image)
             {
-                var preview=new GameObject("Soda preview");preview.layer=2;preview.transform.SetParent(vending.transform,false);
-                preview.transform.localPosition=new Vector3(0,1.24f,-.245f);
-                preview.transform.localScale=Vector3.one*(.48f/Mathf.Max(.01f,soda.rect.height/soda.pixelsPerUnit));
-                preview.AddComponent<SpriteRenderer>().sprite=soda;
+                var shader=Shader.Find("Unlit/Texture");if(!shader)shader=Shader.Find("Standard");
+                var material=new Material(shader);material.mainTexture=image;materials.Add(material);
+                var face=GameObject.CreatePrimitive(PrimitiveType.Quad);face.name="Photographic vending front";face.layer=2;
+                face.transform.SetParent(vending.transform,false);face.transform.localPosition=new Vector3(0,.9f,-.216f);
+                face.transform.localRotation=Quaternion.identity;face.transform.localScale=new Vector3(.85f,1.8f,1f);
+                face.GetComponent<Renderer>().sharedMaterial=material;Destroy(face.GetComponent<Collider>());
+                // Use the supplied university artwork itself, preserving its Korean name exactly.
+                var logo=Resources.Load<Texture2D>("EscapePixels/KIT_WordmarkVending");
+                if(logo)
+                {
+                    var logoMaterial=new Material(shader);logoMaterial.mainTexture=logo;materials.Add(logoMaterial);
+                    var decal=GameObject.CreatePrimitive(PrimitiveType.Quad);decal.name="KIT university logo";decal.layer=2;
+                    decal.transform.SetParent(vending.transform,false);decal.transform.localPosition=new Vector3(-.12f,.65f,-.219f);
+                    decal.transform.localRotation=Quaternion.identity;decal.transform.localScale=new Vector3(.47f,.11f,1f);
+                    decal.GetComponent<Renderer>().sharedMaterial=logoMaterial;Destroy(decal.GetComponent<Collider>());
+                }
             }
-            var label=new GameObject("Vending label");label.transform.SetParent(vending.transform,false);label.transform.localPosition=new Vector3(0,1.68f,-.245f);
-            label.transform.localRotation=Quaternion.identity;label.transform.localScale=Vector3.one*.020f;
-            var text=label.AddComponent<TextMesh>();text.text="음료";text.font=Resources.Load<Font>("KIT/NotoSansKR");text.fontSize=38;text.anchor=TextAnchor.MiddleCenter;text.color=Color.white;
-            if(text.font)text.GetComponent<MeshRenderer>().sharedMaterial=text.font.material;
         }
         void SpawnPickup(EscapeGame.InventoryItem item,bool coin)
         {
-            if(!TryPoint(3f,out Vector3 p))return;
+            if(!TryPoint(5f,out Vector3 p,5f))return;
             var root=new GameObject(coin?"Coin":item.ToString());root.layer=2;root.transform.SetParent(transform,false);root.transform.position=p+Vector3.up*.70f;
             if(coin)
             {
@@ -166,11 +195,33 @@ namespace CampusCommons.StudyImmersive
             var renderer=child.AddComponent<SpriteRenderer>();renderer.sprite=sprite;child.AddComponent<FaceCamera>();
             float scale=height/Mathf.Max(.01f,sprite.rect.height/sprite.pixelsPerUnit);child.transform.localScale=Vector3.one*scale;
         }
-        Patrol SpawnPatrol(string name,Sprite sprite,float height)
+        bool TryVisiblePatrolPoint(out Vector3 result)
         {
-            if(!TryPoint(8f,out Vector3 p))return null;
+            result=Vector3.zero;var route=new List<Vector3>();var candidates=new List<Vector3>();
+            for(int index=0;index<map.links.Length;index++)
+            {
+                if(map.links[index]==0)continue;var point=map.Position(index);float distance=Horizontal(point,player.position);
+                if(distance>=6f && distance<=12f)candidates.Add(point);
+            }
+            for(int i=candidates.Count-1;i>0;i--){int j=Random.Range(0,i+1);var temp=candidates[i];candidates[i]=candidates[j];candidates[j]=temp;}
+            foreach(var point in candidates)
+            {
+                Vector3 eye=player.position+Vector3.up*1.2f,target=point+Vector3.up*1.2f;
+                if(Physics.Linecast(eye,target,Physics.DefaultRaycastLayers,QueryTriggerInteraction.Ignore))continue;
+                if(!map.FindPath(player.position,point,route))continue;
+                result=point;usedPositions.Add(point);return true;
+            }
+            foreach(var point in candidates)if(map.FindPath(player.position,point,route))
+            {result=point;usedPositions.Add(point);return true;}
+            return TryPoint(6f,out result);
+        }
+        Patrol SpawnPatrol(string name,Sprite sprite,float height,bool visible)
+        {
+            if(!sprite){Debug.LogWarning("Escape patrol sprite missing: "+name);return null;}
+            Vector3 p;if(!(visible?TryVisiblePatrolPoint(out p):TryPoint(8f,out p)))return null;
             var root=new GameObject(name);root.layer=2;root.transform.SetParent(transform,false);root.transform.position=p+Vector3.up*.08f;
             var body=root.AddComponent<CharacterController>();body.height=1.8f;body.radius=.27f;body.center=Vector3.up*.9f;
+            if(name=="Professor") { var playerBody=player.GetComponent<CharacterController>();if(playerBody)Physics.IgnoreCollision(body,playerBody,true); }
             var picture=new GameObject("Character sprite");picture.layer=2;picture.transform.SetParent(root.transform,false);picture.transform.localPosition=Vector3.up*.95f;
             CreateBillboard(picture.transform,sprite,height,"Artwork");
             return new Patrol{root=root,body=body};
@@ -188,8 +239,18 @@ namespace CampusCommons.StudyImmersive
             }
             if(!game.IsAnswering)
             {
-                if(!BlocksMovement)MovePatrol(professor,3.4f,dt);
-                MovePatrol(worker,3f,dt);
+                if(!BlocksMovement)
+                {
+                    bool pursuing=professorCooldown<=0f && CanSeePlayer(5f);
+                    if(professor!=null && pursuing && (!professor.pursuing || professor.replan<=dt))
+                    {
+                        professor.route.Clear();professor.next=0;professor.replan=.5f;
+                        map.FindPath(professor.root.transform.position,player.position,professor.route,CanTraverse);
+                    }
+                    if(professor!=null)professor.pursuing=pursuing;
+                    MovePatrol(professor,4f,dt);
+                }
+                MovePatrol(worker,3.6f,dt);
                 if(!BlocksMovement && professorCooldown<=0 && CanMeetProfessor())BeginProfessorQuestion();
                 barrierCountdown-=dt;
                 if(barrierCountdown<=0f)
@@ -210,11 +271,12 @@ namespace CampusCommons.StudyImmersive
             }
         }
         static float Horizontal(Vector3 a,Vector3 b){a.y=b.y=0;return Vector3.Distance(a,b);}
-        bool CanMeetProfessor()
+        bool CanMeetProfessor()=>CanSeePlayer(1.25f);
+        bool CanSeePlayer(float range)
         {
             if(professor==null || !professor.root || !player)return false;
             Vector3 origin=professor.root.transform.position+Vector3.up*1.1f,target=player.position+Vector3.up*1.1f;
-            if(Horizontal(origin,target)>=1.25f || Mathf.Abs(origin.y-target.y)>1.2f)return false;
+            if(Horizontal(origin,target)>=range || Mathf.Abs(origin.y-target.y)>1.2f)return false;
             Vector3 delta=target-origin;if(delta.sqrMagnitude<.0001f)return true;
             bool previous=Physics.queriesHitBackfaces;RaycastHit[] hits;
             try{Physics.queriesHitBackfaces=true;hits=Physics.RaycastAll(origin,delta.normalized,delta.magnitude,Physics.DefaultRaycastLayers,QueryTriggerInteraction.Ignore);}
@@ -345,7 +407,7 @@ namespace CampusCommons.StudyImmersive
                 else {game.Notice("인벤토리가 가득 찼습니다.","Inventory is full.");return true;}
                 pickups.Remove(nearest);Destroy(nearest.root);return true;
             }
-            if(vending && NearAndVisible(vending.transform.position+Vector3.up*.8f,requireAim,1.8f))
+            foreach(var machine in vendingMachines)if(machine && NearAndVisible(machine.transform.position+Vector3.up*.8f,requireAim,1.8f))
             {
                 if(coins<1)game.Notice("동전이 필요합니다.","A coin is required.");
                 else if(game.AddItem(EscapeGame.InventoryItem.Soda)){coins--;game.Notice("캔음료를 뽑았습니다.","Soda acquired.");}
@@ -367,7 +429,14 @@ namespace CampusCommons.StudyImmersive
         }
         void ReleaseProfessor()
         {
-            professorQuestion=false;reviewRemaining=0;professorCooldown=25f;question=null;
+            professorQuestion=false;reviewRemaining=0;professorCooldown=20f;question=null;
+            if(professor!=null && professor.root && player && map)
+            {
+                Vector3 direction=player.position-professor.root.transform.position;direction.y=0;
+                if(direction.sqrMagnitude<.01f)direction=player.forward;
+                professor.route.Clear();professor.next=0;professor.replan=4f;professor.pursuing=false;
+                if(!map.FindPath(professor.root.transform.position,player.position+direction.normalized*5f,professor.route,CanTraverse))professor.replan=0;
+            }
             if(game && game.IsRunning && !game.IsAnswering && !game.IsExitConfirmOpen){Cursor.lockState=CursorLockMode.Locked;Cursor.visible=false;}
         }
         public void DrawStatus(GUIStyle text,bool korean)

@@ -82,8 +82,14 @@ namespace CampusCommons.LibraryCharacter
         }
         public void Unlock()
         {
-            if(lockBarrier)Destroy(lockBarrier);lockBarrier=null;lockUntil=0f;
+            if(lockBarrier){lockBarrier.SetActive(false);Destroy(lockBarrier);}lockBarrier=null;lockUntil=0f;
             lockMarks.Clear();
+        }
+        public void ResetForNewRound()
+        {
+            Unlock();open=false;
+            if(hinge)hinge.localRotation=Quaternion.identity;
+            if(secondHinge)secondHinge.localRotation=Quaternion.identity;
         }
         public void AddOpenPanels(System.Collections.Generic.List<Collider> result)
         {

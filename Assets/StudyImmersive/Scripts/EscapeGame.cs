@@ -45,12 +45,14 @@ namespace CampusCommons.StudyImmersive
         ElevatorExit[] elevators=Array.Empty<ElevatorExit>();
         readonly List<GameObject> notebooks=new List<GameObject>();
         // Teacher desks in the five furnished classrooms, relative to Escape School.
-        // Each has two separated positions on the tabletop for modes requiring six sheets.
+        // Each has two separated positions on the tabletop for modes requiring more than five sheets.
         static readonly Vector3[] classroomDesks={
             new Vector3(-12.25f,.788f,35f),new Vector3(10.5f,.788f,35f),
             new Vector3(-10.5f,.788f,16.25f),new Vector3(-10f,.788f,1.25f),
             new Vector3(14.75f,.788f,-12.5f)
         };
+        // Additional enclosed rooms without classroom desks, in Escape School coordinates.
+        static readonly Vector3[] otherRoomLocations={new Vector3(32f,0,-26f),new Vector3(22.5f,0,0f)};
         bool selecting,running,completed,timedOut,caught,quizOpen,quizFeedback,lastCorrect,exitConfirm;
         GameObject activeSheet;
         CodeQuestions.Question[] quizQuestions;
@@ -153,36 +155,39 @@ namespace CampusCommons.StudyImmersive
         public bool ChooseMode(Mode mode)
         {
             if(!selecting || exitConfirm || !player || !body || !view)return false;
+            ResetRoundState();
             currentMode=mode;target=mode==Mode.Easy?3:mode==Mode.Medium?5:mode==Mode.Hard?7:5;
-            stamina=MaxStamina;sprintExhausted=false;Array.Clear(inventory,0,inventory.Length);
-            found=0;elapsed=0;panicElapsed=0;completed=false;timedOut=false;caught=false;jumpElapsed=0;quizOpen=false;quizFeedback=false;notice="";noticeEnglish="";ClearNotebooks();
+            ClearNotebooks();
+            doors=FindObjectsByType<Door>();ResetSchoolDoors();
             if(jumpAudio)jumpAudio.Stop();
             var points=schoolGrid && schoolGrid.sheetLocations!=null && schoolGrid.sheetLocations.Length>=target?schoolGrid.sheetLocations:notebookPositions;
             if(points==null || points.Length<target)return false;
             var school=schoolRoot?schoolRoot.Find("Escape School"):null;
             if(!school){var foundSchool=GameObject.Find("Escape School");if(foundSchool)school=foundSchool.transform;}
-            var deskOrder=new int[classroomDesks.Length];var firstSide=new int[classroomDesks.Length];
+            if(!school){Debug.LogWarning("Escape School missing; cannot place question sheets in rooms.");return false;}
+            var deskOrder=new int[classroomDesks.Length+otherRoomLocations.Length];var firstSide=new int[deskOrder.Length];
             for(int i=0;i<deskOrder.Length;i++){deskOrder[i]=i;firstSide[i]=UnityEngine.Random.value<.5f?-1:1;}
             for(int i=deskOrder.Length-1;i>0;i--){int j=UnityEngine.Random.Range(0,i+1);int temp=deskOrder[i];deskOrder[i]=deskOrder[j];deskOrder[j]=temp;}
             for(int i=0;i<target;i++)
             {
                 Vector3 position=points[0];
                 Quaternion rotation=Quaternion.identity;
-                bool onDesk=i>0 && school;
+                bool onDesk=school;
                 if(onDesk)
                 {
-                    int deskIndex=deskOrder[(i-1)%deskOrder.Length];
-                    int side=(i-1)<deskOrder.Length?firstSide[deskIndex]:-firstSide[deskIndex];
-                    position=school.TransformPoint(classroomDesks[deskIndex]+Vector3.forward*(.45f*side));
-                    rotation=school.rotation*Quaternion.Euler(0,90,0);
-                }
-                else if(i>0)
-                {
-                    // Legacy scenes without the furnished school keep their original spawn set.
-                    int lo=1+(i-1)*(points.Length-1)/(target-1);
-                    int hi=1+i*(points.Length-1)/(target-1);
-                    position=points[UnityEngine.Random.Range(lo,Mathf.Max(lo+1,hi))];
-                    rotation=Quaternion.Euler(0,i*47,0);
+                    int deskIndex=deskOrder[i%deskOrder.Length];
+                    if(deskIndex<classroomDesks.Length)
+                    {
+                        int side=i<deskOrder.Length?firstSide[deskIndex]:-firstSide[deskIndex];
+                        position=school.TransformPoint(classroomDesks[deskIndex]+Vector3.forward*(.45f*side));
+                        rotation=school.rotation*Quaternion.Euler(0,90,0);
+                    }
+                    else
+                    {
+                        onDesk=false;
+                        position=school.TransformPoint(otherRoomLocations[deskIndex-classroomDesks.Length]);
+                        rotation=school.rotation;
+                    }
                 }
                 var item=Instantiate(notebookPrefab,position,rotation);item.name="Question Sheet "+(i+1);
                 if(schoolRoot)item.transform.SetParent(schoolRoot,true);
@@ -192,7 +197,7 @@ namespace CampusCommons.StudyImmersive
             body.enabled=false;player.transform.position=schoolArrival;body.enabled=true;player.currentSpace=Portal.Space.Escape;
             if(avatar)avatar.gameObject.SetActive(false);
             yaw=schoolYaw;pitch=0;falling=-2;selecting=false;running=true;Physics.SyncTransforms();UpdateCamera();
-            doors=FindObjectsByType<Door>();if(monster)monster.Begin(this,player.transform,mode);
+            if(monster)monster.Begin(this,player.transform,mode);
             World=EscapeWorld.Create(this,player.transform,schoolGrid,doors);
             Cursor.lockState=CursorLockMode.Locked;Cursor.visible=false;return true;
         }
@@ -390,7 +395,9 @@ namespace CampusCommons.StudyImmersive
         public void ExitToLobby()
         {
             if(!selecting && !running)return;selecting=false;running=false;exitConfirm=false;quizOpen=false;activeSheet=null;ClearNotebooks();if(monster)monster.End();if(jumpAudio)jumpAudio.Stop();
-            if(World){World.Shutdown();Destroy(World.gameObject);World=null;}
+            if(World){World.Shutdown();World.gameObject.SetActive(false);Destroy(World.gameObject);World=null;}
+            ResetSchoolDoors();
+            ResetRoundState();
             if(player && body)
             {
                 body.enabled=false;player.transform.position=lobbyReturn;body.enabled=true;player.currentSpace=Portal.Space.Library;
@@ -398,7 +405,19 @@ namespace CampusCommons.StudyImmersive
             }
             rearmAt=Time.time+1.3f;Cursor.lockState=CursorLockMode.None;Cursor.visible=true;
         }
-        void ClearNotebooks(){foreach(var item in notebooks)if(item)Destroy(item);notebooks.Clear();}
+        void ResetRoundState()
+        {
+            stamina=MaxStamina;sprintExhausted=false;Array.Clear(inventory,0,inventory.Length);
+            found=0;target=0;elapsed=0;panicElapsed=0;completed=false;timedOut=false;caught=false;
+            jumpElapsed=0;quizOpen=false;quizFeedback=false;lastCorrect=false;quizIndex=0;quizQuestions=null;activeSheet=null;
+            noticeUntil=0;notice="";noticeEnglish="";
+        }
+        void ResetSchoolDoors()
+        {
+            foreach(var door in doors)if(door)door.ResetForNewRound();
+            Physics.SyncTransforms();
+        }
+        void ClearNotebooks(){foreach(var item in notebooks)if(item){item.SetActive(false);Destroy(item);}notebooks.Clear();}
         void OnDisable(){if(selecting || running)ExitToLobby();}
         void Styles()
         {
