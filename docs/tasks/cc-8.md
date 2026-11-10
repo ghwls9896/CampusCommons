@@ -29,7 +29,7 @@ Assets/Account/, supabase/, Tools/account/, 계정 문서·task, UnityWebRequest
 - 전체 변경 별도 코드 검토 후 만료된 오프라인 세션의 입력 허용과 비동기 닉네임 자동 입력 문제를 각각 재현 후 수정. 최종 ACCOUNT_FLOW_PASS 및 세션23/Edge9 검사 통과. 최신 서버 named key/legacy key 양쪽 호환.
 
 ## 설정·미검증
-- 연결된 Supabase 프로젝트 없음. hosted DB/함수 배포·실제 메일·외부 PC 로그인은 사용자 설정 후 확인 필요.
+- campuscommons hosted DB/함수·Unity 공개 연결값·Auth 정책·SMTP·코드 메일 템플릿 적용. 실제 수신/확인 상태는 아래 후속 기록과 docs/account/DEPLOYMENT.md 참고.
 - 설정 순서: docs/account/SETUP.md. CLI3.0은 db push --remote 명시. Auth/SMTP Dashboard 설정은 local config가 자동 반영하지 않음.
 - 기본 SMTP는 외부 학생에게 발송할 수 없음. 일반 사용자 가입확인/복구에는 custom SMTP와 발신 인증 필요.
 - Docker 미실행: 전체 Supabase 로컬 Auth 스택 대신 실제 PostgreSQL14+역할 helper로 DB 검사. hosted PG/Advisor는 별도 확인.
@@ -37,7 +37,7 @@ Assets/Account/, supabase/, Tools/account/, 계정 문서·task, UnityWebRequest
 - 실제 퀴즈/탈출/웹캠 보상은 아직 비활성. 서버가 결과를 검증하는 원천별 계약 후 ACCOUNT_REWARD_SOURCES에 해당 source만 활성화. 클라이언트 성공 플래그로 지급하지 않음.
 - 운영 백업 export·복구 리허설은 실제 프로젝트 생성 후 운영자가 수행.
 
-다음 행동: 최종 코드 검토/CI → Supabase 무료 프로젝트·Auth/메일·migration/functions 설정 → 실제 이메일 두 계정·지정 Unity 버전 확인 → 사람 리뷰/통합.
+다음 행동: 사용자가 쓸 비밀번호 직접 설정·Unity 실제 Auth 화면 → 두 계정·지정 Unity 버전 확인 → 사람 리뷰/통합.
 
 ## Supabase 배포 진행 — 2026-11-10
 
@@ -55,3 +55,10 @@ Assets/Account/, supabase/, Tools/account/, 계정 문서·task, UnityWebRequest
 ### 배포 후속 완료 — 2026-11-10
 Auth 최소12자/OTP600초·6자리 저장, Unity 공개 URL/key 연결, EC 키용 레거시 게이트 해제(사용자 승인)/함수 내부 Auth 검증 유지 완료. 실제 미로그인·위조 토큰 접근 거절 및 hosted Advisor 확인. 자세한 현황은 docs/account/DEPLOYMENT.md.
 SMTP 일반값을 채운 Chrome 화면을 사용자에게 인계. 발신 Gmail/앱 비밀번호 입력·저장 후에만 메일 템플릿 및 실제 가입/복구 검사를 진행할 수 있음.
+
+### SMTP·코드 메일 적용 — 2026-11-10
+사용자가 SMTP 자격정보 직접 저장 후 새로고침으로 저장 상태 확인. Confirm sign up/Reset password에 저장소의 한국어 `{{ .Token }}` 본문 및 제목 저장 성공·미리보기 확인. 사용자 지정 수신 주소로 실제 signup HTTP200, 확인 전 세션 미발급 확인. 코드 확인 및 실제 로그인/DB 검증은 진행 중이며 주소·임시 비밀번호·OTP·토큰을 저장소에 기록하지 않음.
+
+### 실제 메일·Auth·DB 확인 — 2026-11-10
+가입 메일 수신·코드 확인200·비밀번호 로그인200·ES256 JWT·계정 함수 read/enter/read200·XP0/레벨1 확인. 임시 검사 도구의 닉네임 필드 오판(last_nickname과 API nickname 혼동)은 SQL의 저장 값·account_read 응답 일치=true로 대조했으며 제품 코드 문제는 아님. 인증된 클라이언트 XP 직접 수정403, 미검증 보상409, refresh200/logout204/로그아웃 refresh 재사용400 확인. 복구 메일 요청200 및 사용자 수신 확인. 검사 프로세스 종료, 비밀값·주소는 저장소에 기록하지 않음.
+사용자는 테스트 계정을 직접 쓸 때 Unity의 비밀번호 찾기로 본인 비밀번호를 설정해야 함. 지정 Unity 버전·standalone·다른 PC/두 계정 검증과 사람 리뷰는 남아 있어 Draft 유지. 최신 코드 커밋48df1f2, 이번 후속 변경은 배포 기록 문서만 포함.

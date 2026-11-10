@@ -2,7 +2,7 @@
 
 이 브랜치 `codex/cc-8-account-progression`의 계정 모듈은 메인 씬에서 자동으로 시작합니다. 이메일+비밀번호 → 이메일 코드 확인 → 입장 닉네임 → 로비 순서이며, 로그아웃하면 게임 입력과 계정 캐시를 지웁니다. 초기 경험치는 0, 레벨은 1입니다. 토큰/비밀번호는 디스크나 PlayerPrefs에 저장하지 않습니다.
 
-현재 campuscommons 프로젝트의 DB/함수/기본 인증 정책과 Unity 공개 연결값은 적용됐습니다. SMTP 자격정보 입력과 코드 메일 템플릿·실가입 검증이 남아 있습니다. 실제 진행 현황은 DEPLOYMENT.md를 참고하세요. 아래 절차는 새 환경 재설정용입니다. DB 스키마는 `supabase/migrations/20261109081917_account_progression.sql`, 메일 본문은 `supabase/templates/`, 함수는 `supabase/functions/`에 있습니다.
+현재 campuscommons 프로젝트의 DB/함수/기본 인증 정책과 Unity 공개 연결값, 사용자 입력 SMTP, 가입확인·복구 코드 메일 템플릿은 적용됐습니다. 실제 메일 수신·가입 확인·로그인·닉네임/초기 성장 DB 및 세션 갱신/로그아웃을 확인했습니다. 사용자가 쓸 비밀번호 설정과 지정 Unity 버전의 실제 화면 검증 등 남은 항목은 DEPLOYMENT.md를 참고하세요. 아래 절차는 새 환경 재설정용입니다. DB 스키마는 `supabase/migrations/20261109081917_account_progression.sql`, 메일 본문은 `supabase/templates/`, 함수는 `supabase/functions/`에 있습니다.
 
 ## 1. 무료 프로젝트 만들기
 
@@ -70,7 +70,7 @@ Dashboard의 Security/Performance Advisor에서 경고를 확인합니다. migra
 3. 메뉴 **Campus → 계정 → Supabase 연결 설정**에서 Project URL과 Publishable key를 입력하고 저장합니다.
 4. `Assets/StudyImmersive/Scenes/GrandLibrary_Living.unity`를 열고 Play합니다.
 
-공개 연결값은 `Assets/Account/Resources/AccountConnection.json`에 저장되어 빌드에도 들어갑니다. 비밀이 아니므로 클라이언트에 포함될 수 있으며, 안전성은 key를 숨기는 대신 Auth/RLS/서버 권한으로 지킵니다. 기본 파일은 빈 값이어서 설정 전에는 입장을 허용하지 않습니다. HTTP 주소나 secret/service_role key는 설정 창에서 거부합니다. Play 중 연결값을 바꿨다면 Play를 재시작합니다.
+공개 연결값은 `Assets/Account/Resources/AccountConnection.json`에 저장되어 빌드에도 들어갑니다. 비밀이 아니므로 클라이언트에 포함될 수 있으며, 안전성은 Auth/RLS/서버 권한으로 지킵니다. 현재 파일에는 campuscommons 프로젝트의 공개 연결값이 들어 있습니다. 새 환경에서 값을 비우면 설정 전에는 입장을 허용하지 않습니다. HTTP 주소나 secret/service_role key는 설정 창에서 거부합니다. Play 중 연결값을 바꿨다면 Play를 재시작합니다.
 
 ## 6. 실제 사용자 확인
 
