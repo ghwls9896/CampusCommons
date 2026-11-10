@@ -1,5 +1,21 @@
 # QEV local webcam test before Unity integration
 
+## User-requested fifth state, 2026-11-10
+
+Add `drowsy` (졸음 의심) alongside studying/phone/other/away in the same model,
+response schema and manual UI. Use visible closed eyes with a relaxed/slumped
+posture or a head resting on arms/the desk as evidence; looking down to read or
+write alone is not drowsiness evidence. This is appearance-based suspicion, not
+confirmed sleep or a temporal eye-closure measurement. Keep accurate/full depth,
+1-second target, local memory-only handling and the existing camera lifecycle.
+No additional model download or medical inference is involved. Inspect actual
+process/disk costs and public-fixture timing; do not call CPU-only RSS the total
+GPU-inclusive footprint or call inference busy time a GPU utilization percentage.
+
+The API producer and browser consumer change together from four to five score
+keys; the user refreshes old tabs. Unity has no consumer in this phase. This
+specific follow-up supersedes the four-choice requirement below.
+
 ## User-approved update, 2026-11-10
 
 The user selected **ken-jo/QEV-0.8B**, accurate mode, a **1,000 ms start-to-start

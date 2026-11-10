@@ -2,7 +2,7 @@
 const byId = id => document.getElementById(id);
 const video = byId('video');
 const token = document.querySelector('meta[name="session-token"]').content;
-const labels = {studying:'공부중', phone:'휴대폰 사용중', other:'다른 활동중', away:'자리 비움'};
+const labels = {studying:'공부중', phone:'휴대폰 사용중', other:'다른 활동중', away:'자리 비움', drowsy:'졸음 의심'};
 const INTERVAL_MS = 1000;
 let stream = null, generation = 0, timer = null, request = null, snapshotURL = null;
 let correct = 0, incorrect = 0;
@@ -78,7 +78,7 @@ async function analyze(run) {
     snapshotURL = URL.createObjectURL(blob);
     byId('snapshot').src = snapshotURL;
     byId('snapshot').hidden = false;
-    if (!Object.hasOwn(labels, result.state)) throw new Error('모델이 네 범주 중 하나를 반환하지 않았습니다.');
+    if (!Object.hasOwn(labels, result.state)) throw new Error('모델이 다섯 범주 중 하나를 반환하지 않았습니다.');
     byId('verdict').textContent = labels[result.state];
     showScores(result.probabilities);
     byId('reason').textContent = `QEV accurate · ${Math.round(result.confidence * 100)}% 선택 점수`;

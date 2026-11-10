@@ -1,7 +1,7 @@
 """Opt-in real-model smoke test with public fixtures, never the user's camera.
 
-QEV_SMOKE_FIXTURES must contain reading.jpg, phone.jpg, other.jpg and away.jpg.
-Start live.py first. These four examples are regression checks, not an accuracy set.
+QEV_SMOKE_FIXTURES must contain reading.jpg, phone.jpg, other.jpg, away.jpg and drowsy.jpg.
+Start live.py first. These five examples are regression checks, not an accuracy set.
 """
 import json
 import os
@@ -17,20 +17,21 @@ from probe import local_endpoint
 
 @unittest.skipUnless(os.environ.get('QEV_SMOKE_FIXTURES'), 'opt-in public-image/model test')
 class RealQEVTests(unittest.TestCase):
-    def test_four_public_activity_examples(self):
+    def test_five_public_activity_examples(self):
         endpoint = local_endpoint(os.environ.get('QEV_SMOKE_URL', 'http://127.0.0.1:8770'))
         with urlopen(endpoint, timeout=5) as response:
             page = response.read().decode()
         token = re.search('name="session-token" content="([^"]+)"', page).group(1)
         root = Path(os.environ['QEV_SMOKE_FIXTURES'])
         for name, expected in [('reading', 'studying'), ('phone', 'phone'),
-                               ('other', 'other'), ('away', 'away')]:
+                               ('other', 'other'), ('away', 'away'), ('drowsy', 'drowsy')]:
             with self.subTest(image=name):
                 request = Request(endpoint + '/api/infer', data=(root / f'{name}.jpg').read_bytes(),
                     headers={'Origin': endpoint, 'X-Session-Token': token, 'Content-Type': 'image/jpeg'})
                 with urlopen(request, timeout=60) as response:
                     result = json.load(response)
                 self.assertEqual(result['mode'], 'accurate')
+                self.assertEqual(set(result['probabilities']), {'studying', 'phone', 'other', 'away', 'drowsy'})
                 self.assertEqual(result['state'], expected)
 
 

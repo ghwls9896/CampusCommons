@@ -41,7 +41,9 @@ function browser({pendingPermission = false} = {}) {
     get stopped(){return stopped;}, get accesses(){return accesses;},
     clock(value){now = value;},
     respond(index, state = 'phone') {inference[index].reply.resolve({ok:true, json:async () => ({
-      ok:true, state, probabilities:{studying:.1, phone:.7, other:.1, away:.1}, confidence:.7,
+      ok:true, state, probabilities:state === 'drowsy'
+        ? {studying:.1, phone:.05, other:.1, away:.05, drowsy:.7}
+        : {studying:.1, phone:.7, other:.05, away:.1, drowsy:.05}, confidence:.7,
       seconds:.2, mode:'accurate', device:'test'})});}};
 }
 
@@ -49,6 +51,15 @@ test('loading the page does not access the camera', async () => {
   const b = browser(); await settle();
   assert.equal(b.accesses, 0);
   assert.equal(b.inference.length, 0);
+});
+
+test('drowsy inference displays its label and fifth score', async () => {
+  const b = browser(); await settle();
+  await b.el('start').listeners.click(); await settle();
+  b.respond(0, 'drowsy'); await settle();
+  assert.equal(b.el('verdict').textContent, '졸음 의심');
+  assert.equal(b.el('bar-drowsy').value, .7);
+  assert.equal(b.el('pct-drowsy').textContent, '70%');
 });
 
 test('one-second start-to-start scheduling subtracts inference time', async () => {

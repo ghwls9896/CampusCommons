@@ -142,7 +142,7 @@ class InMemoryBackend:
     def classify(self, data):
         self.frames.append(data)
         return {'ok': True, 'state': 'studying', 'probabilities': {
-            'studying': .7, 'phone': .1, 'other': .1, 'away': .1},
+            'studying': .7, 'phone': .1, 'other': .05, 'away': .1, 'drowsy': .05},
             'confidence': .7, 'seconds': .01, 'mode': 'accurate', 'device': self.device}
 
 

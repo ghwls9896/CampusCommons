@@ -12,7 +12,7 @@
 <main>
   <header><span class="eyebrow">CAMPUS COMMONS / LOCAL LAB</span><span class="badge">내 PC에서만 실행</span></header>
   <h1>내 웹캠으로 직접 확인하기</h1>
-  <p class="intro">QEV-0.8B 정확도 우선 모드로 네 가지 행동을 직접 시험해 보세요.<br>공부중 · 휴대폰 사용중 · 다른 활동중 · 자리 비움</p>
+  <p class="intro">QEV-0.8B 정확도 우선 모드로 다섯 가지 상태를 직접 시험해 보세요.<br>공부중 · 휴대폰 사용중 · 다른 활동중 · 자리 비움 · 졸음 의심</p>
   <div class="layout">
     <section class="camera-panel" aria-label="카메라">
       <div class="camera-wrap">
@@ -27,18 +27,19 @@
       <span class="eyebrow">최근 판정</span>
       <h2 id="verdict" aria-live="polite">시작 전</h2>
       <p id="progress" role="status">__MODEL_LABEL__</p>
-      <div class="evidence"><img id="snapshot" alt="최근 판정에 사용한 사진" hidden><p id="reason">판정한 사진과 네 범주의 점수가 여기에 표시됩니다.</p></div>
-      <div class="scores" aria-label="네 범주의 모델 선택 점수">
+      <div class="evidence"><img id="snapshot" alt="최근 판정에 사용한 사진" hidden><p id="reason">판정한 사진과 다섯 범주의 점수가 여기에 표시됩니다.</p></div>
+      <div class="scores" aria-label="다섯 범주의 모델 선택 점수">
         <label>공부중 <span id="pct-studying">0%</span><progress id="bar-studying" max="1" value="0"></progress></label>
         <label>휴대폰 사용중 <span id="pct-phone">0%</span><progress id="bar-phone" max="1" value="0"></progress></label>
         <label>다른 활동중 <span id="pct-other">0%</span><progress id="bar-other" max="1" value="0"></progress></label>
         <label>자리 비움 <span id="pct-away">0%</span><progress id="bar-away" max="1" value="0"></progress></label>
+        <label>졸음 의심 <span id="pct-drowsy">0%</span><progress id="bar-drowsy" max="1" value="0"></progress></label>
       </div>
       <p id="timing" class="muted">아직 분석하지 않았습니다.</p>
       <div class="feedback"><span>이 판정이 맞나요?</span><div><button id="correct" class="secondary" disabled>맞음</button><button id="incorrect" class="secondary" disabled>틀림</button></div><p id="score" class="muted">이번 화면에서 평가한 판정: 0개</p></div>
     </section>
   </div>
-  <footer><strong>영상 저장 없음 · 외부 전송 없음</strong><p>사진은 이 PC의 모델에만 전달됩니다. 중지하거나 다른 탭으로 이동하면 카메라가 꺼집니다. 평가 횟수는 새로고침하면 초기화됩니다.</p><p>Unity 로비 연동 전 테스트 화면입니다. 네 범주 중 가장 높은 점수를 표시하며, 실제 집중도나 모니터의 내용은 판정하지 못합니다. 선택 점수는 실제 정확도가 아닙니다.</p></footer>
+  <footer><strong>영상 저장 없음 · 외부 전송 없음</strong><p>사진은 이 PC의 모델에만 전달됩니다. 중지하거나 다른 탭으로 이동하면 카메라가 꺼집니다. 평가 횟수는 새로고침하면 초기화됩니다.</p><p>Unity 로비 연동 전 테스트 화면입니다. 다섯 범주 중 가장 높은 점수를 표시하며, 실제 집중도나 모니터의 내용은 판정하지 못합니다. 졸음 의심은 눈 감음·엎드림 등 보이는 모습의 추정이며 수면 여부를 확정하지 않습니다. 선택 점수는 실제 정확도가 아닙니다.</p></footer>
 </main>
 </body>
 </html>
