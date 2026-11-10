@@ -2,7 +2,7 @@
 
 이 브랜치 `codex/cc-8-account-progression`의 계정 모듈은 메인 씬에서 자동으로 시작합니다. 이메일+비밀번호 → 이메일 코드 확인 → 입장 닉네임 → 로비 순서이며, 로그아웃하면 게임 입력과 계정 캐시를 지웁니다. 초기 경험치는 0, 레벨은 1입니다. 토큰/비밀번호는 디스크나 PlayerPrefs에 저장하지 않습니다.
 
-현재 연결된 Supabase 프로젝트가 없어 실제 서비스 생성/배포·외부 메일 수신은 수행하지 않았습니다. 아래 1~6을 운영자가 설정하면 실서비스 테스트를 할 수 있습니다. DB 스키마는 `supabase/migrations/20261109081917_account_progression.sql`, 메일 본문은 `supabase/templates/`, 함수는 `supabase/functions/`에 있습니다.
+현재 campuscommons 프로젝트의 DB/함수/기본 인증 정책과 Unity 공개 연결값은 적용됐습니다. SMTP 자격정보 입력과 코드 메일 템플릿·실가입 검증이 남아 있습니다. 실제 진행 현황은 DEPLOYMENT.md를 참고하세요. 아래 절차는 새 환경 재설정용입니다. DB 스키마는 `supabase/migrations/20261109081917_account_progression.sql`, 메일 본문은 `supabase/templates/`, 함수는 `supabase/functions/`에 있습니다.
 
 ## 1. 무료 프로젝트 만들기
 
@@ -57,7 +57,7 @@ migration은 profiles/player_progress/xp_events 및 private 내부 함수·활�
 
 Integrations → Data API에서 Data API가 켜져 있고 **public** schema가 노출되는지 확인합니다. **private schema는 노출하지 않습니다.** client는 DB의 성장 행을 수정할 권한이 없습니다. 서버 전용 public RPC wrapper에도 anon/authenticated EXECUTE 권한이 없습니다.
 
-함수는 기본 환경변수 `SUPABASE_URL`과 `SUPABASE_PUBLISHABLE_KEYS`/`SUPABASE_SECRET_KEYS`의 default key를 우선 사용합니다. 이전 환경에서는 `SUPABASE_ANON_KEY`/`SUPABASE_SERVICE_ROLE_KEY`로 호환됩니다. 이 값들은 Supabase가 서버 환경에 제공합니다. 클라이언트로 복사하지 않습니다. 두 함수의 Verify JWT 설정을 활성 상태로 유지합니다. 함수 자체에서도 Auth `/user`로 토큰·이메일 확인 상태·익명 계정 여부를 검증합니다. [공식 환경변수 안내](https://supabase.com/docs/guides/functions/secrets)
+함수는 기본 환경변수 `SUPABASE_URL`과 `SUPABASE_PUBLISHABLE_KEYS`/`SUPABASE_SECRET_KEYS`의 default key를 우선 사용합니다. 이전 환경에서는 `SUPABASE_ANON_KEY`/`SUPABASE_SERVICE_ROLE_KEY`로 호환됩니다. 이 값들은 Supabase가 서버 환경에 제공합니다. 클라이언트로 복사하지 않습니다. 두 함수는 EC 서명키와 호환되도록 Dashboard의 **Verify JWT with legacy secret**을 끄고, 함수 코드의 Auth `/user` 검증으로 토큰·이메일 확인 상태·익명 계정 여부를 강제합니다. `config.toml`의 verify_jwt=false는 이 레거시 게이트만 해제하며 함수 내부 인증을 제거하는 설정이 아닙니다. [공식 환경변수 안내](https://supabase.com/docs/guides/functions/secrets)
 
 **`ACCOUNT_REWARD_SOURCES`는 처음에는 설정하지 않습니다.** 현재 로컬 게임 결과를 검증 없이 경험치로 바꾸지 않기 위해 실제 보상은 기본 비활성입니다. 서버가 완료를 검증한 activity_runs만 지급할 수 있으며, 기능별 계약을 완료한 다음 해당 source만 활성화합니다.
 

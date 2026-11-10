@@ -430,7 +430,9 @@ subject = "Campus Commons 비밀번호 재설정 코드"
 content_path = "./supabase/templates/recovery.html"
 
 [functions.account]
-verify_jwt = true
+# Auth /user verifies every caller; supports EC signing keys.
+verify_jwt = false
 
 [functions.progression]
-verify_jwt = true
+# Auth /user verifies every caller; supports EC signing keys.
+verify_jwt = false

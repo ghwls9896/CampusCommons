@@ -38,3 +38,20 @@ Assets/Account/, supabase/, Tools/account/, 계정 문서·task, UnityWebRequest
 - 운영 백업 export·복구 리허설은 실제 프로젝트 생성 후 운영자가 수행.
 
 다음 행동: 최종 코드 검토/CI → Supabase 무료 프로젝트·Auth/메일·migration/functions 설정 → 실제 이메일 두 계정·지정 Unity 버전 확인 → 사람 리뷰/통합.
+
+## Supabase 배포 진행 — 2026-11-10
+
+사용자가 생성하고 Chrome에 연 campuscommons 프로젝트(ref gumkrzpnzaaxqlpswwvn)에 후속 설정을 위임함.
+- 연결 Supabase MCP는 이 프로젝트 권한이 없어 로그인된 Chrome Dashboard로 진행.
+- 기존 public 테이블이 비어 있음을 확인한 후 migration을 트랜잭션으로 적용. profiles/player_progress/xp_events의 rowsecurity=true, account_read/enter/award 함수 생성 확인.
+- supabase_migrations.schema_migrations에 20261109081917/account_progression 적용 이력 기록 및 RLS 보호 확인. 같은 초기 migration을 다시 실행하지 않음.
+- account와 progression Edge Functions를 배포해 각각 Settings 화면 확인. 공유 소스 파일을 단일 index.ts로 결합한 동일 코드. Verify JWT with legacy secret은 기본 ON 유지.
+- 프로젝트 URL: https://gumkrzpnzaaxqlpswwvn.supabase.co
+- Allow signup/Email provider/Confirm email 활성, anonymous 비활성 상태 확인.
+- 최소 비밀번호12/OTP600초·6자리 입력 단계에서 Chrome의 다른 확장 UI가 자동조작을 차단. 저장 여부는 확인하지 못함.
+- 남음: 인증 정책 저장 확인, 메일 템플릿·SMTP, 공개 key 조회·Unity 연결값 저장, 실제 가입/로그인 검증, 새 JWT 서명키와 Edge gateway 호환성 확인.
+- 중단 원인: 다른 확장 프로그램 UI가 열려 Chrome 자동조작 차단. 사용자가 해당 UI를 닫으면 같은 Supabase 탭에서 계속.
+
+### 배포 후속 완료 — 2026-11-10
+Auth 최소12자/OTP600초·6자리 저장, Unity 공개 URL/key 연결, EC 키용 레거시 게이트 해제(사용자 승인)/함수 내부 Auth 검증 유지 완료. 실제 미로그인·위조 토큰 접근 거절 및 hosted Advisor 확인. 자세한 현황은 docs/account/DEPLOYMENT.md.
+SMTP 일반값을 채운 Chrome 화면을 사용자에게 인계. 발신 Gmail/앱 비밀번호 입력·저장 후에만 메일 템플릿 및 실제 가입/복구 검사를 진행할 수 있음.
