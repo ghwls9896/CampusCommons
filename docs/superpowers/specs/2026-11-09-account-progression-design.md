@@ -57,8 +57,8 @@ privileged 보상 함수는 외부 노출 schema의 무제한 SECURITY DEFINER R
 ## 코드 경계와 통합 순서
 Assets/Account/, supabase/, Tools/account/를 독립 구현하고 실제 수정 경로를 task scope에 반영했다. 공유 Player/GameStart/씬 직접 수정 대신 sceneLoaded hook으로 입력을 차단·해제한다. 기존/새 Player와 로그인 후 아바타/카메라 생성은 실제 씬 테스트로 검증한다.
 Unity는 기존 UnityWebRequest/JsonUtility 패턴을 우선한다. 필요한 패키지는 별도 선언한다. Unity 버전6000.4.5f1 유지.
-현재 GameStart.Awake는 바로 Player를 생성한다. 테스트용 계정 화면에서 먼저 검증하고, 최종 통합에서 GameStart가 인증/프로필 준비 후 Player를 활성화하도록 작은 변경을 한다. 씬에 이미 Player가 있는 경우도 이동/카메라/포털/HUD가 인증 전 작동하지 않아야 한다. 다른 MonoBehaviour의 입력도 통합 검증한다.
-PR #4도 GameStart/Player/Packages를 수정하므로 별도 통합 Issue/PR에서 최신 main과 담당자 확인 후 연결한다. Issue #7 웹캠 코드를 이 브랜치에 합치지 않는다. 이 task 선언은 공유 파일 잠금이나 변경 승인 의미가 아니다.
+현재 GameStart.Awake는 바로 Player를 생성한다. 계정 모듈의 sceneLoaded callback은 Awake 이후/Start 이전에 기존·생성된 Player와 CharacterController를 차단하고 인증·닉네임 저장 후 활성화한다. 로그아웃에는 퀴즈 해제와 탈출 종료 후 차단한다. 메인 씬 자체는 변경하지 않고 실제 씬의 아바타/카메라 생성·입력 차단을 검증한다.
+PR #4도 GameStart/Player/Packages를 수정하므로 이번 구현은 그 코드·씬을 직접 수정하지 않는다. 공통 변경은 UnityWebRequest 패키지 추가뿐이며 최종 통합 때 중복을 확인한다. 후속 공유 파일 수정이 필요하면 별도 조율한다. Issue #7 웹캠 코드를 이 브랜치에 합치지 않는다. 이 task 선언은 공유 파일 잠금이나 변경 승인 의미가 아니다.
 
 ## 완료 기준과 단계
 1. DB migration·RLS·초기화·성장 계산·멱등 트랜잭션을 로컬 실제 PostgreSQL 역할로 검증.

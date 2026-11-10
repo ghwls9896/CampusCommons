@@ -14,7 +14,9 @@ namespace CampusCommons.Account
   public string UserId=>User?.id;
   public AccountProfile Profile {get;private set;}
   public bool RecoveryPending {get;private set;}
-  public bool IsAuthenticated=>User!=null&&!string.IsNullOrEmpty(access)&&!RecoveryPending;
+  public bool HasSession=>User!=null&&!string.IsNullOrEmpty(access);
+  public bool TokenExpired=>HasSession&&expires<=DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+  public bool IsAuthenticated=>HasSession&&!RecoveryPending&&!TokenExpired;
   public event Action Changed;
   public AccountSession(IAccountTransport transport){this.transport=transport;}
   public void Clear()
@@ -78,10 +80,10 @@ namespace CampusCommons.Account
   }
   async Task<AccountProfile> ProfileCall(object body,CancellationToken ct)
   {
-   if(!IsAuthenticated)throw new AccountException(401,"not_signed_in");int g=generation;
+   if(!HasSession||RecoveryPending)throw new AccountException(401,"not_signed_in");int g=generation;
    using(var linked=CancellationTokenSource.CreateLinkedTokenSource(ct,lifetime.Token))
    {
-    await EnsureFreshAsync(linked.Token);Current(g,linked.Token);
+    await EnsureFreshAsync(linked.Token);Current(g,linked.Token);if(!IsAuthenticated)throw new AccountException(401,"not_signed_in");
     AccountProfile result;
     try{result=await transport.SendAsync<AccountProfile>("POST","/functions/v1/account",body,access,linked.Token);}
     catch(AccountException e){if(g==generation&&(e.Status==401||e.Status==403))Clear();throw;}

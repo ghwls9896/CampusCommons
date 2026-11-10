@@ -21,11 +21,12 @@ Assets/Account/, supabase/, Tools/account/, 계정 문서·task, UnityWebRequest
 
 ## 검증 (2026-11-10)
 - 실제 임시 PostgreSQL14: 미인증/타인/미확인 계정 접근 거절, 초기화, 닉네임, 레벨 경계, 중복16회·동시 지급·응답 유실 재시도·overflow 롤백 통과.
-- Edge Functions: Deno2.9.6 테스트8개, 두 entrypoint type check 통과. Auth/REST upstream은 fixture 응답.
-- C# 순수 세션 테스트21 checks: 계정 전환 지연응답/세션 갱신 중복/복구 제한/로그아웃·해제/닉네임 검증.
-- 임시 Unity6000.6.0f1: 스크립트 컴파일 및 실제 GrandLibrary_Living 씬의 ACCOUNT_FLOW_PASS. 기존 Player의 초기 입력 차단, 로그인 후 아바타/카메라 생성, 닉네임 저장, XP 유지, 로그아웃 차단 검증. Supabase 응답은 fixture.
+- Edge Functions: Deno2.9.6 테스트9개, 두 entrypoint type check 통과. Auth/REST upstream은 fixture 응답.
+- C# 순수 세션 테스트23 checks: 계정 전환 지연응답/세션 갱신 중복/복구 제한/로그아웃·해제/닉네임 검증.
+- 임시 Unity6000.6.0f1: 스크립트 컴파일 및 실제 GrandLibrary_Living 씬의 ACCOUNT_FLOW_PASS. 기존 Player의 초기 입력 차단, 로그인 후 아바타/카메라 생성, 닉네임 저장, XP 유지, 로그아웃 차단 검증. 비동기 이전 닉네임 자동 입력·만료 후 오프라인 차단 회귀 검사 추가. Supabase 응답은 fixture.
 - 알려진 Unity Editor SearchDatabase 시작 예외는 테스트에서 editor-only로 구분. 게임 런타임 오류는 통과 조건에 포함.
-- 기존 협업 테스트16개 통과. 최종 제출 범위와 원격 CI는 커밋 후 결과로 갱신.
+- 기존 협업 테스트16개 및 제출 범위44개 경로 검사 통과. 후속 회귀 수정 커밋은 동일 검사를 다시 실행.
+- 전체 변경 별도 코드 검토 후 만료된 오프라인 세션의 입력 허용과 비동기 닉네임 자동 입력 문제를 각각 재현 후 수정. 최종 ACCOUNT_FLOW_PASS 및 세션23/Edge9 검사 통과. 최신 서버 named key/legacy key 양쪽 호환.
 
 ## 설정·미검증
 - 연결된 Supabase 프로젝트 없음. hosted DB/함수 배포·실제 메일·외부 PC 로그인은 사용자 설정 후 확인 필요.

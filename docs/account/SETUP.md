@@ -57,7 +57,7 @@ migration은 profiles/player_progress/xp_events 및 private 내부 함수·활�
 
 Integrations → Data API에서 Data API가 켜져 있고 **public** schema가 노출되는지 확인합니다. **private schema는 노출하지 않습니다.** client는 DB의 성장 행을 수정할 권한이 없습니다. 서버 전용 public RPC wrapper에도 anon/authenticated EXECUTE 권한이 없습니다.
 
-함수의 `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`는 Supabase가 서버 환경에 제공하는 기본 변수입니다. 클라이언트로 복사하지 않습니다. 두 함수의 Verify JWT 설정을 활성 상태로 유지합니다. 함수 자체에서도 Auth `/user`로 토큰·이메일 확인 상태·익명 계정 여부를 검증합니다. [공식 환경변수 안내](https://supabase.com/docs/guides/functions/secrets)
+함수는 기본 환경변수 `SUPABASE_URL`과 `SUPABASE_PUBLISHABLE_KEYS`/`SUPABASE_SECRET_KEYS`의 default key를 우선 사용합니다. 이전 환경에서는 `SUPABASE_ANON_KEY`/`SUPABASE_SERVICE_ROLE_KEY`로 호환됩니다. 이 값들은 Supabase가 서버 환경에 제공합니다. 클라이언트로 복사하지 않습니다. 두 함수의 Verify JWT 설정을 활성 상태로 유지합니다. 함수 자체에서도 Auth `/user`로 토큰·이메일 확인 상태·익명 계정 여부를 검증합니다. [공식 환경변수 안내](https://supabase.com/docs/guides/functions/secrets)
 
 **`ACCOUNT_REWARD_SOURCES`는 처음에는 설정하지 않습니다.** 현재 로컬 게임 결과를 검증 없이 경험치로 바꾸지 않기 위해 실제 보상은 기본 비활성입니다. 서버가 완료를 검증한 activity_runs만 지급할 수 있으며, 기능별 계약을 완료한 다음 해당 source만 활성화합니다.
 

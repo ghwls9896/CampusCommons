@@ -1,5 +1,5 @@
 import { handler, type Dependencies } from '../_shared/handler.ts';
-import { supabaseDependencies } from '../_shared/supabase.ts';
+import { supabaseDependencies, configurationFromEnvironment } from '../_shared/supabase.ts';
 function eq(a: unknown,b: unknown) { if(JSON.stringify(a)!==JSON.stringify(b)) throw Error(`${JSON.stringify(a)} != ${JSON.stringify(b)}`); }
 const uid='11111111-1111-4111-8111-111111111111';
 function fixture() {
@@ -54,4 +54,12 @@ Deno.test('auth sends bearer to Auth, service key only to RPC, no untrusted host
  eq(await deps.authenticate(req({})),uid);await deps.rpc('account_read',{p_user_id:uid});
  eq(calls[0].url,'https://project.supabase.co/auth/v1/user');eq(calls[0].headers.get('authorization'),'Bearer valid');eq(calls[0].headers.get('apikey'),'public');
  eq(calls[1].headers.get('authorization'),'Bearer server');eq(calls[1].headers.get('apikey'),'server');
+});
+
+Deno.test('current named publishable/secret keys work without treating secret as a JWT',async()=>{
+ const env:Record<string,string>={SUPABASE_URL:'https://project.supabase.co',SUPABASE_PUBLISHABLE_KEYS:'{"default":"sb_publishable_test"}',SUPABASE_SECRET_KEYS:'{"default":"sb_secret_test"}'};
+ const config=configurationFromEnvironment(k=>env[k]);eq(config.publicKey,'sb_publishable_test');eq(config.serverKey,'sb_secret_test');
+ const deps=supabaseDependencies(config,async(_input,init)=>{const h=new Headers(init?.headers);eq(h.get('apikey'),'sb_secret_test');eq(h.has('authorization'),false);return Response.json({level:1});});
+ await deps.rpc('account_read',{p_user_id:uid});
+ const legacy=configurationFromEnvironment(k=>({SUPABASE_ANON_KEY:'anon',SUPABASE_SERVICE_ROLE_KEY:'server'} as Record<string,string>)[k]);eq(legacy.publicKey,'anon');eq(legacy.serverKey,'server');
 });

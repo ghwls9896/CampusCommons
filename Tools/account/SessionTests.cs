@@ -41,6 +41,10 @@ public static class SessionTests
   f.Reply=(p,b)=>Task.FromResult<object>(Profile("other"));try{await s.ReadProfileAsync();Check(false,"mismatched profile");}catch(AccountException){Check(s.Profile==null,"mismatched response rejected");}
   f.Reply=(p,b)=>Task.FromResult<object>(Auth("a",1));await s.SignInAsync("a@example.test","password12345");
   f.Reply=(p,b)=>{throw new AccountException(401,"invalid_token");};try{await s.EnsureFreshAsync();}catch(AccountException){}Check(!s.IsAuthenticated,"terminal refresh error clears auth");
+  f.Reply=(p,b)=>Task.FromResult<object>(Auth("a",DateTimeOffset.UtcNow.ToUnixTimeSeconds()+30));await s.SignInAsync("a@example.test","password12345");
+  f.Reply=(p,b)=>{throw new AccountException(503,"connection_failed");};try{await s.EnsureFreshAsync();}catch(AccountException){}Check(s.IsAuthenticated,"transient failure before expiry retains valid auth");
+  f.Reply=(p,b)=>Task.FromResult<object>(Auth("a",1));await s.SignInAsync("a@example.test","password12345");
+  f.Reply=(p,b)=>{throw new AccountException(503,"connection_failed");};try{await s.EnsureFreshAsync();}catch(AccountException){}Check(!s.IsAuthenticated,"expired offline token cannot authorize world");
   s.Dispose();Check(f.Disposed,"session disposal owns transport cleanup");
   Check(AccountRules.Nickname("  가나다  ")=="가나다","nickname NFC trim");
   foreach(var name in new[]{"a","<b>닉</b>","닉\n네임","닉\u202E네임",new string('가',13)}){try{AccountRules.Nickname(name);Check(false,"invalid nickname");}catch(AccountException){Check(true,"nickname rejected");}}

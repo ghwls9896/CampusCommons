@@ -5,7 +5,7 @@ namespace CampusCommons.Account
 {
  public sealed class AccountView : MonoBehaviour
  {
-  AccountGate gate;string email="",password="",confirm="",code="",nickname="";Vector2 scroll;AccountSession observed;
+  AccountGate gate;string email="",password="",confirm="",code="",nickname="";Vector2 scroll;AccountSession observed;AccountProfile observedProfile;
   GUIStyle heading,label,field,button,notice;AccountGate.Screen last;
   void Awake(){gate=GetComponent<AccountGate>();}
   void Styles()
@@ -21,6 +21,8 @@ namespace CampusCommons.Account
   {
    if(gate.Session!=observed){if(observed!=null)observed.Changed-=ClearWhenSignedOut;observed=gate.Session;if(observed!=null)observed.Changed+=ClearWhenSignedOut;}
    if(last!=gate.Page){password=confirm=code="";if(gate.Page==AccountGate.Screen.Nickname)nickname=gate.Session.Profile?.nickname??"";last=gate.Page;}
+   // The profile arrives after the screen transition during real HTTP requests.
+   if(gate.Session.Profile!=observedProfile){observedProfile=gate.Session.Profile;if(gate.Page==AccountGate.Screen.Nickname)nickname=observedProfile?.nickname??"";}
   }
   void ClearWhenSignedOut(){if(!gate.Session.IsAuthenticated&&!gate.Session.RecoveryPending){password=confirm=code=nickname="";}}
   void OnDestroy(){if(observed!=null)observed.Changed-=ClearWhenSignedOut;}

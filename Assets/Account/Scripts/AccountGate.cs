@@ -63,6 +63,7 @@ namespace CampusCommons.Account
   }
   async void Update()
   {
+   if(Ready&&Session.TokenExpired){Revoke();Page=Screen.Nickname;Message="로그인 유효 시간이 지났습니다. 연결을 확인하고 내 정보를 다시 불러오거나 다시 로그인해 주세요.";}
    if(!Ready||Busy||Time.unscaledTime<refreshAt)return;refreshAt=Time.unscaledTime+20;
    try{await Session.EnsureFreshAsync();}catch(AccountException e){Message=Describe(e);if(!Session.IsAuthenticated){Revoke();Page=Screen.Login;}}catch(OperationCanceledException){}
    catch{Message="서버 연결을 확인해 주세요.";}
