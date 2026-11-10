@@ -10,7 +10,7 @@ namespace CampusCommons.Quiz
         internal static readonly Color Muted = new Color(.43f,.48f,.55f);
         internal static readonly Color Navy = new Color(.15f,.24f,.37f);
         internal static readonly Color Green = new Color(.12f,.43f,.34f);
-        internal readonly GUIStyle Title, Heading, Body, Small, Caption, FileName, Input;
+        internal readonly GUIStyle Title, Heading, Body, Small, Caption, FileName, Input, TimerNumber, TimerCaption;
         internal readonly GUIStyle Panel, Card, WhiteCard, ErrorCard, SuccessCard, Shadow;
         internal readonly GUIStyle Primary, Secondary, Quiet, Choice, SelectedChoice, CorrectChoice, WrongChoice;
         internal readonly GUIStyle Step, ActiveStep, Warning, Positive;
@@ -29,6 +29,8 @@ namespace CampusCommons.Quiz
             Title = Label(font,24,Ink,true); Heading = Label(font,32,Ink,true);
             Body = Label(font,18,Ink); Small = Label(font,15,Muted); Caption = Label(font,13,Muted,true);
             FileName = Label(font,21,Ink,true);
+            TimerNumber=Label(font,27,Ink,true);TimerNumber.alignment=TextAnchor.MiddleCenter;
+            TimerCaption=Label(font,11,Muted);TimerCaption.alignment=TextAnchor.MiddleCenter;
             Panel = Box(Color.white,22,0); Shadow = Box(new Color(0,0,0,.11f),22,0);
             Card = Box(new Color(.96f,.97f,.98f),14,24);
             WhiteCard = Box(Color.white,14,22);
@@ -86,6 +88,20 @@ namespace CampusCommons.Quiz
                 var c=color; c.a*=Mathf.Clamp01(radius-distance+.5f); pixels[y*size+x]=c;
             }
             texture.SetPixels(pixels);texture.Apply(false,true);textures.Add(texture);return texture;
+        }
+        internal void Countdown(Rect rect,double remaining,int limit)
+        {
+            var before=GUI.color;float fraction=Mathf.Clamp01((float)(remaining/limit));
+            Color active=remaining<=3?new Color(.77f,.25f,.20f):Navy;
+            for(int i=0;i<60;i++) {
+                float angle=(i*6-90)*Mathf.Deg2Rad;
+                GUI.color=i<60*fraction?active:new Color(.89f,.91f,.94f);
+                GUI.DrawTexture(new Rect(rect.center.x+Mathf.Cos(angle)*34-1.8f,rect.center.y+Mathf.Sin(angle)*34-1.8f,3.6f,3.6f),dot);
+            }
+            GUI.color=Color.white;
+            GUI.Label(new Rect(rect.x,rect.y+16,rect.width,33),System.Math.Ceiling(remaining).ToString("00"),TimerNumber);
+            GUI.Label(new Rect(rect.x,rect.y+48,rect.width,18),"남은 시간",TimerCaption);
+            GUI.color=before;
         }
         internal void Spinner(Rect rect,float time)
         {

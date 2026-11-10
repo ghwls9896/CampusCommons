@@ -45,7 +45,7 @@ namespace CampusCommons.Quiz.Editor
         {
             var data=new QuizSet { questions=new QuizQuestion[3] };
             for(int i=0;i<3;i++) data.questions[i]=new QuizQuestion {
-                level=i+1,answer_type=new[]{"multiple_choice","short_answer","written"}[i],model_answer="핵심 개념",grading_criteria=i==0?new string[0]:new[]{"핵심 개념"},prompt="테스트 자료의 핵심 개념은 무엇인가요? "+i,
+                level=i+1,answer_type=new[]{"multiple_choice","short_answer","written"}[i],model_answer="핵심 개념",grading_criteria=i==0?new QuizGradingCriterion[0]:new[]{new QuizGradingCriterion {description="핵심 개념",max_points=10}},prompt="테스트 자료의 핵심 개념은 무엇인가요? "+i,
                 options=i==0?new[]{"정답 보기","다른 개념","관련 없는 개념","반대 개념"}:new string[0],
                 correct_index=i==0?0:-1,explanation="테스트 해설입니다. 원문의 핵심 개념을 확인합니다.",source_page=1,source_quote="핵심 개념"
             };
@@ -88,8 +88,8 @@ namespace CampusCommons.Quiz.Editor
                     Check(session.Current.level==2 && session.Responses[0]=="정답 보기","Cancel exit lost answer");
                     Check(session.SubmitText("입력한 단답",2,now+2),"Short answer did not advance");
                     Check(session.Tick(now+22,-1,"입력한 서술형 답"),"Written timeout did not advance");
-                    Check(session.Finished && session.ApplyGrades(new QuizGradeSet {grades=new[]{new QuizGrade {level=2,correct=false,feedback="핵심이 다릅니다"},new QuizGrade {level=3,correct=true,feedback="핵심 일치"}}}),"Final grading failed");
-                    Check(session.Score==2 && !session.NeedsGrading,"Final result wrong");
+                    Check(session.Finished && session.ApplyGrades(new QuizGradeSet {grades=new[]{new QuizGrade {level=2,score=4,criterion_scores=new[]{4},feedback="핵심 일부 충족"},new QuizGrade {level=3,score=8,criterion_scores=new[]{8},feedback="핵심 대부분 충족"}}}),"Final grading failed");
+                    Check(session.Score==22 && !session.NeedsGrading,"Final result wrong");
                     step=2;changed=Time.time;return;
                 }
                 if(step==2)

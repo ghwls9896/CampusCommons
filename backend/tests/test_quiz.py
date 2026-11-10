@@ -28,7 +28,7 @@ def result():
         {'level': i, 'prompt': f'레벨 {i}의 문제는?',
          'answer_type': ['multiple_choice', 'short_answer', 'written'][i-1],
          'options': ['가', '나', '다', '라'] if i == 1 else [], 'correct_index': 0 if i == 1 else -1,
-         'model_answer': '가' if i == 1 else '자료의 핵심 개념', 'grading_criteria': [] if i == 1 else ['핵심 개념의 의미를 설명'],
+         'model_answer': '가' if i == 1 else '자료의 핵심 개념', 'grading_criteria': [] if i == 1 else [{'description':'핵심 개념의 의미를 설명','max_points':10}],
          'explanation': '제시된 자료의 개념에 따른 해설입니다.',
          'source_page': i, 'source_quote': '자료의 근거 문장'}
         for i in (1, 2, 3)]}
@@ -117,7 +117,7 @@ def client_for(generator=None, grader=None, **overrides):
     async def default_generator(data, pages, *args):
         return validate_quiz(result(), pages)
     async def default_grader(answers, *args):
-        return {'grades': [{'level': a.level, 'correct': bool(a.answer.strip()), 'feedback': '핵심 의미 확인'} for a in answers]}
+        return {'grades': [{'level': a.level, 'criterion_scores': [c.max_points if a.answer.strip() else 0 for c in a.grading_criteria], 'feedback': '핵심 의미 확인'} for a in answers]}
     return TestClient(create_app(Settings(**config), generator or default_generator, grader or default_grader))
 
 
@@ -303,8 +303,8 @@ def test_mixed_question_contract_rejects_wrong_format(mutate):
 
 def submissions():
     return {'answers': [
-        {'level': 2, 'prompt': '큐의 처리 순서는?', 'model_answer': '선입선출', 'grading_criteria': ['먼저 온 요청부터 처리'], 'answer': '먼저 들어온 것이 먼저 나온다'},
-        {'level': 3, 'prompt': '스택과 큐를 비교하세요.', 'model_answer': '스택은 후입선출, 큐는 선입선출', 'grading_criteria': ['스택 후입선출', '큐 선입선출'], 'answer': '둘 다 항상 같은 순서로 처리한다'},
+        {'level': 2, 'prompt': '큐의 처리 순서는?', 'model_answer': '선입선출', 'grading_criteria': [{'description':'먼저 온 요청부터 처리','max_points':10}], 'answer': '먼저 들어온 것이 먼저 나온다'},
+        {'level': 3, 'prompt': '스택과 큐를 비교하세요.', 'model_answer': '스택은 후입선출, 큐는 선입선출', 'grading_criteria': [{'description':'스택 후입선출과 큐 선입선출을 비교','max_points':10}], 'answer': '둘 다 항상 같은 순서로 처리한다'},
     ]}
 
 
@@ -312,12 +312,12 @@ def test_grade_endpoint_auth_validation_and_semantic_result():
     data=submissions()
     async def grade(answers,*args):
         assert [a.level for a in answers] == [2,3]
-        return {'grades': [{'level': 2, 'correct': True, 'feedback': '같은 의미입니다.'}, {'level': 3, 'correct': False, 'feedback': '처리 순서가 다릅니다.'}]}
+        return {'grades': [{'level': 2, 'criterion_scores': [10], 'feedback': '같은 의미입니다.'}, {'level': 3, 'criterion_scores': [0], 'feedback': '처리 순서가 다릅니다.'}]}
     with client_for(grader=grade) as client:
         assert client.post('/v1/quizzes/grade', json=data).status_code == 401
         response=client.post('/v1/quizzes/grade',json=data,headers={'X-Quiz-Token':'team-code'})
         assert response.status_code == 200
-        assert [g['correct'] for g in response.json()['grades']] == [True,False]
+        assert [g['score'] for g in response.json()['grades']] == [10,0]
         assert response.headers['cache-control'] == 'no-store'
         data['answers'][1]['level']=2
         assert client.post('/v1/quizzes/grade',json=data,headers={'X-Quiz-Token':'team-code'}).status_code == 422
@@ -330,7 +330,7 @@ def test_blank_grading_needs_no_provider_and_ai_grading_shares_budget():
     with client_for(grader=must_not_grade,daily_limit=1) as client:
         response=client.post('/v1/quizzes/grade',json=blank,headers={'X-Quiz-Token':'team-code'})
         assert response.status_code==200
-        assert [g['correct'] for g in response.json()['grades']] == [False,False]
+        assert [g['score'] for g in response.json()['grades']] == [0,0]
         assert client.post('/v1/quizzes',content=pdf(),headers=HEADERS).status_code==200
         assert client.post('/v1/quizzes/grade',json=submissions(),headers={'X-Quiz-Token':'team-code'}).status_code==429
 
@@ -344,16 +344,16 @@ def test_semantic_grader_provider_contract_and_empty_answer_override():
         assert 'inlineData' not in str(body)
         assert '모범답안' in body['systemInstruction']['parts'][0]['text']
         assert body['generationConfig']['responseFormat']['text']['schema']['type']=='object'
-        return httpx.Response(200,json={'candidates':[{'finishReason':'STOP','content':{'parts':[{'text':json.dumps({'grades':[{'level':2,'correct':True,'feedback':'동일한 의미입니다.'},{'level':3,'correct':True,'feedback':'제출 성공'}]})}]}}]})
+        return httpx.Response(200,json={'candidates':[{'finishReason':'STOP','content':{'parts':[{'text':json.dumps({'grades':[{'level':2,'criterion_scores':[10],'feedback':'동일한 의미입니다.'},{'level':3,'criterion_scores':[10],'feedback':'제출 성공'}]})}]}}]})
     async def run():
         async with httpx.AsyncClient(transport=httpx.MockTransport(upstream)) as client:
             return await grade_answers(answers,'secret','gemini-3.5-flash-lite',client)
-    assert [g['correct'] for g in asyncio.run(run())['grades']]==[True,False]
+    assert [g['score'] for g in asyncio.run(run())['grades']]==[10,0]
 
 
 def test_invalid_grade_and_grading_timeout_release_busy_slot():
     async def invalid(*args):
-        return {'grades':[{'level':2,'correct':True,'feedback':'ok'},{'level':2,'correct':True,'feedback':'ok'}]}
+        return {'grades':[{'level':2,'criterion_scores':[10],'feedback':'ok'},{'level':2,'criterion_scores':[10],'feedback':'ok'}]}
     with client_for(grader=invalid) as client:
         assert client.post('/v1/quizzes/grade',json=submissions(),headers={'X-Quiz-Token':'team-code'}).status_code==502
         assert client.post('/v1/pdfs/inspect',content=pdf(),headers=HEADERS).status_code==200
@@ -429,3 +429,24 @@ def test_range_keeps_shared_note_appearance_resource_shared():
     first=notes[0].get_object()['/AP'].raw_get('/N')
     assert all(note.get_object()['/AP'].raw_get('/N')==first for note in notes)
     assert len(selected)<1024*1024
+
+
+def test_partial_credit_is_sum_of_bounded_rubric_marks():
+    from quiz import AnswerSubmission, validate_grades
+    data=submissions()
+    data['answers'][1]['grading_criteria']=[{'description':'스택의 원리','max_points':4},{'description':'큐와 비교','max_points':6}]
+    answers=[AnswerSubmission.model_validate(a) for a in data['answers']]
+    graded=validate_grades({'grades':[{'level':2,'criterion_scores':[7],'feedback':'핵심은 맞지만 용어가 모호합니다.'},
+        {'level':3,'criterion_scores':[4,2],'feedback':'스택은 정확하고 큐 설명은 일부 부족합니다.'}]},answers)
+    assert [g['score'] for g in graded['grades']]==[7,6]
+    with pytest.raises(QuizError):
+        validate_grades({'grades':[{'level':2,'criterion_scores':[10],'feedback':'ok'},
+            {'level':3,'criterion_scores':[5,2],'feedback':'ok'}]},answers)
+    with pytest.raises(QuizError):
+        validate_grades({'grades':[{'level':2,'criterion_scores':[10],'feedback':'ok'},
+            {'level':3,'criterion_scores':[4],'feedback':'ok'}]},answers)
+
+
+def test_typed_question_rubrics_must_total_ten_points():
+    payload=result();payload['questions'][2]['grading_criteria'][0]['max_points']=9
+    with pytest.raises(QuizError): validate_quiz(payload,3)

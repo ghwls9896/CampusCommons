@@ -132,7 +132,7 @@ def create_app(settings: Settings | None = None, generator=generate_quiz, grader
             except (ValidationError, ValueError) as exc:
                 raise QuizError('invalid_answers', '채점할 답안을 확인해 주세요.') from exc
             if not any(a.answer.strip() for a in answers):
-                result = {'grades': [{'level': a.level, 'correct': False, 'feedback': '제출된 답이 없습니다.'} for a in answers]}
+                result = {'grades': [{'level': a.level, 'criterion_scores': [0]*len(a.grading_criteria), 'feedback': '제출된 답이 없습니다.'} for a in answers]}
             else:
                 use_budget()
                 async with httpx.AsyncClient() as client:

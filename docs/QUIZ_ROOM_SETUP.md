@@ -64,7 +64,7 @@ Blueprint를 쓸 수 없거나 저장소가 보이지 않으면 저장소 관리
 - 앱의 한도 카운터는 메모리에 있어 재시작·절전 후 초기화됩니다. 과금 차단 수단이 아닙니다. 무료 사용은 공급자 프로젝트의 무료 등급 설정으로 관리합니다. 여러 worker를 실행하면 한도가 분산되므로 반드시 `--workers 1`로 운영합니다.
 - 무료 한도 오류는 Google 프로젝트의 실제 한도/재설정 시각을 확인합니다. 자동 재시도와 유료 모델 전환은 없습니다.
 - PDF의 페이지 수·형식과 응답 구조를 검증하지만 정답의 사실성이나 인용문 일치까지 보장하지 않습니다. 학습자는 원문을 함께 확인해야 합니다.
-- 문제와 PDF는 앱 서버의 메모리에서만 처리하고 파일/DB에 저장하지 않습니다. Gemini의 데이터 처리는 Google 정책을 따릅니다. 점수는 방을 나가거나 게임을 종료하면 사라집니다.
+- 문제와 PDF는 앱 서버의 메모리에서만 처리하고 파일/DB에 저장하지 않습니다. Gemini의 데이터 처리는 Google 정책을 따릅니다. 각 단계는10점 만점(총30점)이며 객관식은10/0점, 단답형·서술형은 부분 점수를 받을 수 있습니다. 단계별 실제 풀이 시간도 기록하되 속도를 점수에 섞지는 않습니다. 점수·풀이 기록은 방을 나가거나 게임을 종료하면 사라집니다.
 - 현재 공유 코드 방식은 소규모 팀 테스트용입니다. 공개 서비스와 향후 1:1 대결에는 사용자 인증, 영속 한도, 서버 채점, 매칭/동기화가 별도로 필요합니다.
 
 ## 개발 및 검증
@@ -89,7 +89,7 @@ API: `POST /v1/quizzes?start_page=81&end_page=100`, 헤더 `Content-Type: applic
 
 서버는 선택한 페이지만 새 PDF로 추출해 Gemini에 전달합니다. 생성 응답은 `questions`와 `page_range: {start_page,end_page,total_pages}`를 포함하고 `source_page`는 원본 PDF 번호입니다. 질문은 `answer_type`(multiple_choice/short_answer/written), `model_answer`, `grading_criteria`를 포함합니다. 객관식만 보기4개와 correct_index0~3을 가지며 단답/서술형은 options=[], correct_index=-1입니다. 새 클라이언트와 서버의 질문 계약을 함께 배포해야 합니다.
 
-최종 채점은 `POST /v1/quizzes/grade`, JSON body `answers`에 level2/3 각각의 prompt/model_answer/grading_criteria/answer를 포함합니다. `grades`의 level/correct/feedback를 반환합니다. 빈 답은 오답이며 모두 빈 답이면 Gemini를 호출하지 않습니다. 이 경로도 토큰·동시 요청·본문 크기·시간 제한이 있고 실제 AI 호출은 일일 한도에 집계됩니다. 점수는1인 복습용이며 XP 지급 근거가 아닙니다.
+최종 채점은 `POST /v1/quizzes/grade`, JSON body `answers`에 level2/3 각각의 prompt/model_answer/grading_criteria/answer를 포함합니다. `grading_criteria`는 description/max_points 쌍이며 각 문제의 배점 합계는10입니다. AI는 같은 순서의 criterion_scores와 짧은 feedback을 반환하고 서버는 각 항목 점수가 배점을 넘지 않는지 검사한 뒤 합계 score(0~10)를 계산합니다. `grades`의 level/score/criterion_scores/feedback를 반환합니다. 빈 답은 오답이며 모두 빈 답이면 Gemini를 호출하지 않습니다. 이 경로도 토큰·동시 요청·본문 크기·시간 제한이 있고 실제 AI 호출은 일일 한도에 집계됩니다. 점수는1인 복습용이며 XP 지급 근거가 아닙니다.
 
 
 환경변수를 설정한 터미널에서 실제 배포 API를 직접 확인할 때는 다음과 같이 호출할 수 있습니다. 이 호출은 Gemini 한도를 사용합니다.
@@ -100,3 +100,5 @@ curl --fail-with-body "$QUIZ_SERVER_URL/v1/quizzes" \
   -H "X-Quiz-Token: $QUIZ_ACCESS_TOKEN" \
   --data-binary @study.pdf
 ```
+
+활성 문제는 원형 초 단위 카운트다운과 남은 시간 막대를 표시하며 마지막3초는 빨간색으로 바뀝니다. 최종 화면은 단계별 점수/10, 총점/30, 기준별 점수와 이유, 각 문제 풀이 시간 및 총 시간을 표시합니다.

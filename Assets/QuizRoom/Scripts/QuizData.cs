@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace CampusCommons.Quiz
 {
+    [Serializable] public class QuizGradingCriterion {public string description;public int max_points;}
     [Serializable] public class QuizQuestion
     {
         public int level;
@@ -11,7 +12,7 @@ namespace CampusCommons.Quiz
         public string[] options;
         public int correct_index;
         public string model_answer;
-        public string[] grading_criteria;
+        public QuizGradingCriterion[] grading_criteria;
         public string explanation;
         public int source_page;
         public string source_quote;
@@ -38,15 +39,23 @@ namespace CampusCommons.Quiz
                     if(q.options.Length!=4 || q.correct_index<0 || q.correct_index>3) return false;
                     var choices=new HashSet<string>();
                     foreach(var option in q.options) if(string.IsNullOrWhiteSpace(option) || !choices.Add(option.Trim())) return false;
-                } else if(q.options.Length!=0 || q.correct_index!=-1 || q.grading_criteria.Length==0) return false;
+                } else {
+                    if(q.options.Length!=0 || q.correct_index!=-1 || q.grading_criteria.Length==0) return false;
+                    int total=0;
+                    foreach(var criterion in q.grading_criteria) {
+                        if(criterion==null || string.IsNullOrWhiteSpace(criterion.description) || criterion.max_points<1 || criterion.max_points>10) return false;
+                        total+=criterion.max_points;
+                    }
+                    if(total!=10) return false;
+                }
             }
             error=null;return true;
         }
     }
-    [Serializable] public class QuizGrade {public int level;public bool correct;public string feedback;}
+    [Serializable] public class QuizGrade {public int level,score;public int[] criterion_scores;public string feedback;}
     [Serializable] public class QuizGradeSet {public QuizGrade[] grades;}
     [Serializable] public class QuizAnswerSubmission {
-        public int level;public string prompt,model_answer,answer;public string[] grading_criteria;
+        public int level;public string prompt,model_answer,answer;public QuizGradingCriterion[] grading_criteria;
     }
     [Serializable] public class QuizGradingRequest {public QuizAnswerSubmission[] answers;}
 
@@ -58,12 +67,15 @@ namespace CampusCommons.Quiz
         public bool Finished {get;private set;}
         public string[] Responses {get;private set;}=new[]{"","",""};
         public bool[] TimedOut {get;private set;}=new bool[3];
-        public bool?[] Correct {get;private set;}=new bool?[3];
+        public int?[] Points {get;private set;}=new int?[3];
+        public double[] ElapsedSeconds {get;private set;}=new double[3];
+        public int[][] CriterionScores {get;private set;}=new int[3][];
+        public double TotalElapsed=>ElapsedSeconds[0]+ElapsedSeconds[1]+ElapsedSeconds[2];
         public string[] GradingFeedback {get;private set;}=new[]{"","",""};
         public QuizQuestion Current=>Data==null || Finished?null:Data.questions[Index];
         public int TimeLimit=>new[]{10,15,20}[Index];
-        public int Score {get {int count=0;foreach(var answer in Correct) if(answer==true) count++;return count;}}
-        public bool NeedsGrading=>Finished && (!Correct[1].HasValue || !Correct[2].HasValue);
+        public int Score {get {int count=0;foreach(var points in Points) count+=points??0;return count;}}
+        public bool NeedsGrading=>Finished && (!Points[1].HasValue || !Points[2].HasValue);
         public double Remaining(double now)=>Current==null?0:Math.Max(0,TimeLimit-(now-startedAt));
         public void Begin(QuizSet data,double now)
         {
@@ -89,14 +101,14 @@ namespace CampusCommons.Quiz
         }
         void Record(int choice,string draft,bool timedOut,double now)
         {
-            var q=Current;TimedOut[Index]=timedOut;
+            var q=Current;TimedOut[Index]=timedOut;ElapsedSeconds[Index]=Math.Max(0,Math.Min(TimeLimit,now-startedAt));
             if(Index==0) {
                 Responses[0]=choice>=0 && choice<4?q.options[choice]:"";
-                Correct[0]=choice>=0 && choice==q.correct_index;
+                Points[0]=choice>=0 && choice==q.correct_index?10:0;
             } else {
                 string text=QuizText.Display(draft).Trim();int limit=Index==1?300:1000;
                 Responses[Index]=text.Length>limit?text.Substring(0,limit):text;
-                Correct[Index]=Responses[Index].Length==0?(bool?)false:null;
+                Points[Index]=Responses[Index].Length==0?(int?)0:null;
             }
             if(Index==2) Finished=true;else {Index++;startedAt=now;}
         }
@@ -116,13 +128,20 @@ namespace CampusCommons.Quiz
             var third=Array.Find(result.grades,g=>g!=null && g.level==3);
             if(second==null || third==null || string.IsNullOrWhiteSpace(second.feedback) || string.IsNullOrWhiteSpace(third.feedback)) return false;
             foreach(var grade in new[]{second,third}) {
-                int i=grade.level-1;Correct[i]=Responses[i].Length>0 && grade.correct;GradingFeedback[i]=grade.feedback;
+                var rubric=Data.questions[grade.level-1].grading_criteria;
+                if(grade.score<0 || grade.score>10 || grade.criterion_scores==null || grade.criterion_scores.Length!=rubric.Length) return false;
+                int sum=0;
+                for(int j=0;j<rubric.Length;j++) {int mark=grade.criterion_scores[j];if(mark<0 || mark>rubric[j].max_points) return false;sum+=mark;}
+                if(sum!=grade.score) return false;
+            }
+            foreach(var grade in new[]{second,third}) {
+                int i=grade.level-1;Points[i]=Responses[i].Length>0?grade.score:0;GradingFeedback[i]=grade.feedback;CriterionScores[i]=grade.criterion_scores;
             }
             return true;
         }
         public void Reset()
         {
-            Data=null;Index=0;Finished=false;startedAt=0;Responses=new[]{"","",""};TimedOut=new bool[3];Correct=new bool?[3];GradingFeedback=new[]{"","",""};
+            Data=null;Index=0;Finished=false;startedAt=0;Responses=new[]{"","",""};TimedOut=new bool[3];Points=new int?[3];ElapsedSeconds=new double[3];CriterionScores=new int[3][];GradingFeedback=new[]{"","",""};
         }
     }
 }

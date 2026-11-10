@@ -22,3 +22,9 @@
 Evidence: backend50, session35, document21, team16 checks pass; disposable Unity6000.6 lifecycle PASS. Review found deadline submission race and cross-page PDF cloning through links/article beads; both reproduced in failing tests and fixed. AI-only range copies remove navigation annotations/article-thread references; original PDF unchanged.
 
 Note fidelity: selected-page FreeText/highlight/ink annotations are copied after removing navigation/page backreferences; linked excluded pages are not retained. The FreeText text and appearance stream regression passes.
+
+## Follow-up implementation
+- [x] Weighted10-point typed-answer rubrics, bounded partial marks and derived totals; backend52 tests.
+- [x] Record each elapsed solve time, clamp timeout duration and show total; C#37 session checks.
+- [x] Circular seconds countdown plus existing progress bar, final points/duration/rubric breakdown.
+- [ ] Recheck Unity, deploy matched scoring contract and validate live partial grading.

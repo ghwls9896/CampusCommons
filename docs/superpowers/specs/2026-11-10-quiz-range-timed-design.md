@@ -13,3 +13,7 @@ Scope: QuizRoom scripts/editor test, backend, Tools/tests, cc-2 docs; preserve P
 Validation: backend real PDF range extraction and source remapping, invalid range/auth/quota/grading outputs, 81+ page source; C# range/contract/deadline/timeout/automatic advance/end-only results/grading tests; Unity compile and scene lifecycle plus visual range and timer checks; live approved synthetic sample only.
 
 References: https://ai.google.dev/gemini-api/docs/document-processing (PDF request up to1000 pages; context/rate limits still apply).
+
+## Follow-up: partial credit and solve duration
+
+User requested10-point scores, especially for typed answers, and measured solve speed with a clear timer. Questions now carry weighted grading_criteria {description,max_points}, totaling10 for each typed question. Gemini returns criterion_scores and short feedback; server bounds each mark and derives the total. Objective scores10/0. Final screen shows each score out of10, total out of30, rubric marks/reason, and each/total elapsed time. Speed does not change answer quality points. Durations are monotonic, clamped to10/15/20 when timed out. The active UI adds a circular countdown with remaining seconds and keeps the progress bar.

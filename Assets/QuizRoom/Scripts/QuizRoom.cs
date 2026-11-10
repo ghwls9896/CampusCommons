@@ -329,9 +329,12 @@ namespace CampusCommons.Quiz
         {
             var q=session.Current;if(q==null) return;
             double remaining=session.Remaining(Time.realtimeSinceStartupAsDouble);
-            GUILayout.BeginHorizontal();Label(q.level+"단계 · "+new[]{"객관식","단답형","서술형"}[q.level-1],theme.Caption);
-            GUILayout.FlexibleSpace();Label("남은 시간  "+Math.Ceiling(remaining).ToString("00")+"초",remaining<=3?theme.Warning:theme.ActiveStep);GUILayout.EndHorizontal();
-            GUILayout.Space(12);var track=GUILayoutUtility.GetRect(10,5,GUILayout.ExpandWidth(true));
+            GUILayout.BeginHorizontal();GUILayout.BeginVertical();
+            Label(q.level+"단계 · "+new[]{"객관식","단답형","서술형"}[q.level-1],theme.Caption);GUILayout.Space(7);
+            Label("제한 "+session.TimeLimit+"초 · 10점 만점",theme.Small);GUILayout.EndVertical();
+            GUILayout.FlexibleSpace();var clock=GUILayoutUtility.GetRect(82,80,GUILayout.Width(82),GUILayout.Height(80));
+            theme.Countdown(clock,remaining,session.TimeLimit);GUILayout.EndHorizontal();
+            GUILayout.Space(8);var track=GUILayoutUtility.GetRect(10,5,GUILayout.ExpandWidth(true));
             GUI.color=new Color(.90f,.92f,.94f);GUI.DrawTexture(track,Texture2D.whiteTexture);
             GUI.color=remaining<=3?new Color(.77f,.25f,.20f):QuizTheme.Navy;
             GUI.DrawTexture(new Rect(track.x,track.y,track.width*(float)(remaining/session.TimeLimit),5),Texture2D.whiteTexture);GUI.color=Color.white;
@@ -359,7 +362,8 @@ namespace CampusCommons.Quiz
         void DrawResults()
         {
             Label("복습을 마쳤어요.",theme.Heading);GUILayout.Space(8);
-            Label(session.NeedsGrading?"단답형 · 서술형 채점 중":"3문제 중 "+session.Score+"문제 정답",theme.Positive);GUILayout.Space(16);
+            Label(session.NeedsGrading?(working?"단답형 · 서술형 채점 중":"단답형 · 서술형 채점 대기"):"총 "+session.Score+" / 30점",theme.Positive);GUILayout.Space(6);
+            Label("총 풀이 시간 "+session.TotalElapsed.ToString("0.0")+"초",theme.Small);GUILayout.Space(16);
             if(working && phase==WorkPhase.Grading) {DrawActivity();GUILayout.Space(16);}
             else if(session.NeedsGrading) {
                 if(message.Length>0) {Notice(message);GUILayout.Space(10);}
@@ -367,13 +371,18 @@ namespace CampusCommons.Quiz
             }
             for(int i=0;i<3;i++) {
                 var q=session.Data.questions[i];GUILayout.BeginVertical(theme.Card);
-                string verdict=session.Correct[i].HasValue?(session.Correct[i]==true?"정답":"다시 보기"):"채점 대기";
+                string verdict=session.Points[i].HasValue?session.Points[i]+" / 10점":"채점 대기";
                 Label((i+1)+"단계 · "+new[]{"객관식","단답형","서술형"}[i]+" · "+verdict+(session.TimedOut[i]?" · 시간 종료":""),theme.Caption);GUILayout.Space(10);
                 Label("내 답  "+(session.Responses[i].Length==0?"미응답":session.Responses[i]),theme.Small);GUILayout.Space(8);
                 Label("정답  "+q.model_answer,theme.Body);GUILayout.Space(8);
                 Label(q.explanation,theme.Small);GUILayout.Space(8);
-                Label("PDF "+q.source_page+"페이지",theme.Caption);
-                if(session.GradingFeedback[i].Length>0 && session.Correct[i]==false && session.Responses[i].Length>0) {GUILayout.Space(6);Label(session.GradingFeedback[i],theme.Small);}
+                Label("풀이 "+session.ElapsedSeconds[i].ToString("0.0")+"초 / 제한 "+new[]{10,15,20}[i]+"초  ·  PDF "+q.source_page+"페이지",theme.Caption);
+                if(i>0 && session.CriterionScores[i]!=null) {
+                    var breakdown=new string[q.grading_criteria.Length];
+                    for(int j=0;j<breakdown.Length;j++) breakdown[j]=q.grading_criteria[j].description+" "+session.CriterionScores[i][j]+"/"+q.grading_criteria[j].max_points+"점";
+                    GUILayout.Space(7);Label(string.Join(" · ",breakdown),theme.Small);
+                }
+                if(session.GradingFeedback[i].Length>0 && session.Responses[i].Length>0) {GUILayout.Space(6);Label(session.GradingFeedback[i],theme.Small);}
                 GUILayout.EndVertical();GUILayout.Space(12);
             }
             if(Button("새 PDF로 다시 학습하기",theme.Primary,GUILayout.Height(50))) {
