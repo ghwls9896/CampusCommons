@@ -1,11 +1,11 @@
 {
   "id": "cc-7",
-  "title": "소형 VLM의 로컬 실행 조건과 행동 추정 가능성 검증",
+  "title": "QEV-0.8B accurate 모드의 1초 간격 로컬 웹캠 테스트",
   "owner": "HIGHCHOI",
   "branch": "codex/webcam-study",
   "issue": "https://github.com/ghwls9896/CampusCommons/issues/7",
   "scope": ["Tools/webcam/", "docs/webcam/", "docs/superpowers/specs/2026-11-09-local-vlm-design.md", "docs/superpowers/plans/2026-11-09-local-vlm.md"],
   "shared_files": [],
   "depends_on": [],
-  "validation": ["Python unittest: 판정 응답 검증과 측정 요약", "공개 이미지의 실제 로컬 VLM 추론 및 응답 시간", "프로세스 메모리와 모델 크기 기록", "Tools/team 검사", "Windows 및 Unity 동시 실행은 별도 미검증 표시"]
+  "validation": ["Python unittest: 네 범주, 점수 검증, 실제 루프백 HTTP", "Node test: 1초 스케줄, 중복 요청 방지, 중지 후 응답 무시", "공개 이미지로 실제 QEV accurate 추론과 메모리 입력 동등성", "카메라 시작 전 브라우저 화면 확인", "Tools/team 검사", "개인 웹캠 정확도와 Windows/Unity FPS는 미검증 표시"]
 }

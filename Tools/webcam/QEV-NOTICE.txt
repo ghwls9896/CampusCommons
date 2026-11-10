@@ -1,0 +1,10 @@
+QEV, copyright ken-jo / Ken Jo, licensed under Apache License 2.0.
+Source: https://github.com/ken-jo/qev
+Revision: ff55034b2f488e03fab774dc380b08d67a93071b
+
+qev_backend.predict_image adapts the OptionModel.encode inference sequence for
+an in-memory PIL image and one fixed activity question. It reuses upstream
+prompt packing, condition/readout heads and calibration; camera images never
+pass through upstream file-based image loading. Model weights are unmodified.
+The upstream license is in QEV-LICENSE.txt. The pinned dependency retains its
+own LICENSE and NOTICE files.

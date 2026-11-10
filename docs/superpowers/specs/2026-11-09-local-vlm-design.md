@@ -1,4 +1,30 @@
-# Local VLM feasibility before webcam integration
+# QEV local webcam test before Unity integration
+
+## User-approved update, 2026-11-10
+
+The user selected **ken-jo/QEV-0.8B**, accurate mode, a **1,000 ms start-to-start
+inference interval**, and exactly four activity labels: studying, phone, other,
+away. There is no unknown activity category. Inference/camera failures are errors,
+not activity observations. This explicit request supersedes the earlier
+public-image-only feasibility scope below.
+
+The browser requests camera access only after a Start click. Frames travel only
+to a numeric loopback listener, stay in memory, and are never written to disk,
+uploaded or stored in a database. Stop, page exit and backgrounding release camera
+tracks; an old response cannot change a restarted/stopped session. Only one
+inference is in flight. Slow inference drops scheduled captures and uses the next
+fresh frame; there is no backlog or guarantee of 1 Hz throughput before measurement.
+The screen shows actual latency and the image that was judged.
+
+Use the pinned native QEV model, trained head, calibration and all 24 layers.
+Do not substitute Qwen base weights, the similarly named labqoat model, Fast mode
+or generated JSON. The in-memory adapter must agree with upstream file-based
+inference on a public fixture. The test UI shows raw per-frame choices for direct
+evaluation; production study timers/debouncing remain outside this phase.
+
+Unity seating integration remains a later step. No shared Unity files change.
+
+## Earlier feasibility context
 
 The user changed the approved MediaPipe seating prototype to a small VLM and explicitly asked to verify execution conditions first. This phase measures feasibility; it does not claim the Unity seating feature is implemented.
 
