@@ -83,9 +83,14 @@ namespace CampusCommons.StudyImmersive
             // Put the professor in a nearby visible part of the school so players can find them.
             professor=SpawnPatrol("Professor",professorSprite,2.0f,true);
             worker=SpawnPatrol("Maintenance Worker",workerSprite,2.0f,false);
-            SpawnVending(new Vector3(504f,0,41f));
-            SpawnVending(new Vector3(482f,0,33.5f));
-            SpawnVending(new Vector3(527.5f,0,29f));
+            var machines=EscapeSpawnPoint.FindAll(EscapeSpawnPoint.Kind.Vending);
+            if(machines.Count>0)foreach(var marker in machines)SpawnVending(marker.transform.position,marker.transform.rotation);
+            else
+            {
+                SpawnVending(new Vector3(504f,0,41f));
+                SpawnVending(new Vector3(482f,0,33.5f));
+                SpawnVending(new Vector3(527.5f,0,29f));
+            }
             for(int i=0;i<3;i++)SpawnPickup(EscapeGame.InventoryItem.Empty,true);
             SpawnPickup(EscapeGame.InventoryItem.Padlock,false);
             SpawnPickup(EscapeGame.InventoryItem.ExcuseNote,false);
@@ -155,8 +160,13 @@ namespace CampusCommons.StudyImmersive
         void SpawnVending(Vector3 anchor)
         {
             if(!TryVendingPoint(anchor,out Vector3 p,out Vector3 wallDirection)){Debug.LogWarning("No safe vending position near "+anchor);return;}
+            SpawnVending(p,Quaternion.LookRotation(wallDirection,Vector3.up));
+        }
+        void SpawnVending(Vector3 p,Quaternion rotation)
+        {
+            usedPositions.Add(p);
             vending=new GameObject("Soda vending machine");vendingMachines.Add(vending);vending.layer=2;vending.transform.SetParent(transform,false);
-            vending.transform.position=p;vending.transform.rotation=Quaternion.LookRotation(wallDirection,Vector3.up);
+            vending.transform.position=p;vending.transform.rotation=rotation;
             var blue=Material(new Color(.08f,.22f,.48f));
             Cube(vending.transform,"Machine",new Vector3(0,.9f,0),new Vector3(.85f,1.8f,.42f),blue);
             var image=Resources.Load<Texture2D>("EscapePixels/VendingMachinePhoto");
@@ -222,8 +232,11 @@ namespace CampusCommons.StudyImmersive
         Patrol SpawnPatrol(string name,Sprite sprite,float height,bool visible)
         {
             if(!sprite){Debug.LogWarning("Escape patrol sprite missing: "+name);return null;}
-            Vector3 p;if(!(visible?TryVisiblePatrolPoint(out p):TryPoint(8f,out p)))return null;
-            var root=new GameObject(name);root.layer=2;root.transform.SetParent(transform,false);root.transform.position=p+Vector3.up*.08f;
+            var marker=EscapeSpawnPoint.Find(visible?EscapeSpawnPoint.Kind.Professor:EscapeSpawnPoint.Kind.Worker);
+            Vector3 p;
+            if(marker){p=marker.transform.position;usedPositions.Add(p);}
+            else {if(!(visible?TryVisiblePatrolPoint(out p):TryPoint(8f,out p)))return null;p+=Vector3.up*.08f;}
+            var root=new GameObject(name);root.layer=2;root.transform.SetParent(transform,false);root.transform.position=p;
             var body=root.AddComponent<CharacterController>();body.height=1.8f;body.radius=.27f;body.center=Vector3.up*.9f;
             if(name=="Professor") { var playerBody=player.GetComponent<CharacterController>();if(playerBody)Physics.IgnoreCollision(body,playerBody,true); }
             var picture=new GameObject("Character sprite");picture.layer=2;picture.transform.SetParent(root.transform,false);picture.transform.localPosition=Vector3.up*.95f;

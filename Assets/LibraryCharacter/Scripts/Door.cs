@@ -16,6 +16,8 @@ namespace CampusCommons.LibraryCharacter
         float lockUntil;
         GameObject lockBarrier;
         readonly System.Collections.Generic.List<GameObject> lockMarks=new System.Collections.Generic.List<GameObject>();
+        AudioSource openingAudio;
+        AudioClip openingClip,closingClip;
         Collider panel,secondPanel;
         Vector3 doorwayCenter;
         float doorwayWidth;
@@ -51,7 +53,25 @@ namespace CampusCommons.LibraryCharacter
         }
         public void Interact()
         {
-            if(!IsLocked)open=!open;
+            if(IsLocked)return;
+            open=!open;
+            PlayDoorSound(open,true);
+        }
+        void PlayDoorSound(bool opening,bool notifyMonster)
+        {
+            if(!openingAudio)
+            {
+                var emitter=new GameObject("Door opening audio");emitter.transform.SetParent(transform,true);
+                emitter.transform.position=doorwayCenter;
+                openingAudio=emitter.AddComponent<AudioSource>();openingAudio.playOnAwake=false;
+                openingAudio.spatialBlend=1f;openingAudio.rolloffMode=AudioRolloffMode.Linear;
+                openingAudio.minDistance=1.5f;openingAudio.maxDistance=18f;openingAudio.dopplerLevel=0f;
+                openingClip=Resources.Load<AudioClip>("EscapeSounds/KenneyDoorOpen");
+                closingClip=Resources.Load<AudioClip>("EscapeSounds/KenneyDoorClose");
+            }
+            var clip=opening?openingClip:closingClip;
+            if(clip){openingAudio.Stop();openingAudio.PlayOneShot(clip,.55f);}
+            if(notifyMonster && game && game.monster)game.monster.HearDoor(doorwayCenter);
         }
         public void RetireExitDesignation()
         {
@@ -59,11 +79,12 @@ namespace CampusCommons.LibraryCharacter
             foreach(var sign in GetComponentsInChildren<TextMesh>(true))
                 if(sign.text=="EXIT")sign.gameObject.SetActive(false);
         }
-        public void OpenForMonster(){if(!IsLocked)open=true;}
+        public void OpenForMonster(){if(!IsLocked && !open){open=true;PlayDoorSound(true,false);}}
         public bool TryLock(float seconds,Sprite icon)
         {
             if(exitDoor || IsLocked || seconds<=0f || !hinge)return false;
-            open=false;lockUntil=Time.time+seconds;
+            if(open){open=false;PlayDoorSound(false,true);}
+            lockUntil=Time.time+seconds;
             lockBarrier=new GameObject("Temporary locked doorway");lockBarrier.transform.SetParent(transform,true);
             lockBarrier.transform.SetPositionAndRotation(doorwayCenter,transform.rotation);
             var wall=lockBarrier.AddComponent<BoxCollider>();wall.size=new Vector3(Mathf.Max(.7f,doorwayWidth),2.2f,.18f);
@@ -87,7 +108,7 @@ namespace CampusCommons.LibraryCharacter
         }
         public void ResetForNewRound()
         {
-            Unlock();open=false;
+            Unlock();open=false;if(openingAudio)openingAudio.Stop();
             if(hinge)hinge.localRotation=Quaternion.identity;
             if(secondHinge)secondHinge.localRotation=Quaternion.identity;
         }

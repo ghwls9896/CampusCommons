@@ -8,7 +8,7 @@ namespace CampusCommons.LibraryCharacter
     [RequireComponent(typeof(CharacterController))]
     public sealed class Monster : MonoBehaviour
     {
-        public enum Behaviour { Patrol, Chase, Search }
+        public enum Behaviour { Patrol, Chase, Search, Investigate }
         public SchoolGrid map;
         public Transform picture;
         public float graceSeconds=8;
@@ -19,6 +19,7 @@ namespace CampusCommons.LibraryCharacter
         public float searchSeconds=9f;
         public float roomSearchRange=8f;
         public float roomSearchInterval=7f;
+        public float doorHearingRange=10f;
         [Header("After the final sheet")]
         public float finalSpeedMultiplier=2.2f;
         [Header("Sounds (optional overrides)")]
@@ -29,7 +30,7 @@ namespace CampusCommons.LibraryCharacter
         CharacterController body;
         EscapeGame game;
         Transform target;
-        Vector3 spawn,heading,lastSeen,goal,picturePosition,pictureScale;
+        Vector3 spawn,heading,lastSeen,goal,heardPosition,picturePosition,pictureScale;
         Door[] doors;
         Door waitingDoor;
         readonly List<Vector3> path=new List<Vector3>();
@@ -38,7 +39,7 @@ namespace CampusCommons.LibraryCharacter
         readonly Collider[] overlapBuffer=new Collider[64];
         readonly RaycastHit[] castBuffer=new RaycastHit[64];
         int next;
-        float wakeRemaining,repathRemaining,searchRemaining,lostSightRemaining,pauseAtPoint,stuckTime,footDistance,gait,roomSearchRemaining;
+        float wakeRemaining,repathRemaining,searchRemaining,lostSightRemaining,pauseAtPoint,stuckTime,footDistance,gait,roomSearchRemaining,hearingRemaining;
         bool running,hasGoal,awakened;
         Door lastInvestigatedDoor;
         AudioSource steps,alert;
@@ -71,7 +72,8 @@ namespace CampusCommons.LibraryCharacter
         {
             game=owner;target=player;running=true;awakened=false;path.Clear();next=0;hasGoal=false;waitingDoor=null;
             Speed=mode==EscapeGame.Mode.Easy?2.65f:mode==EscapeGame.Mode.Medium?3.1f:mode==EscapeGame.Mode.Hard?3.5f:3.25f;
-            body.enabled=false;transform.position=InitialPosition(player);if(picture)picture.gameObject.SetActive(true);
+            var marker=EscapeSpawnPoint.Find(EscapeSpawnPoint.Kind.Monster);
+            body.enabled=false;transform.position=marker?marker.transform.position:InitialPosition(player);if(picture)picture.gameObject.SetActive(true);
             heading=player?player.position-transform.position:Vector3.forward;heading.y=0;
             if(heading.sqrMagnitude<.01f)heading=Vector3.forward;heading.Normalize();
             doors=FindObjectsByType<Door>();wakeRemaining=graceSeconds;repathRemaining=0;pauseAtPoint=0;
@@ -94,6 +96,15 @@ namespace CampusCommons.LibraryCharacter
                 return point;
             }
             return spawn;
+        }
+        public void HearDoor(Vector3 position)
+        {
+            if(!running || !awakened || !enabled || !body || !body.enabled || !game || !game.IsRunning || game.IsEnded || game.IsAnswering || game.IsExitConfirmOpen || IsFinalHunt || state==Behaviour.Chase)return;
+            if((transform.position-position).sqrMagnitude>doorHearingRange*doorHearingRange || !map)return;
+            int cell=map.NearestCell(position);if(cell<0)return;
+            SetState(Behaviour.Investigate);
+            heardPosition=position;goal=map.Position(cell);hasGoal=true;hearingRemaining=20f;waitingDoor=null;
+            path.Clear();next=0;repathRemaining=0;pauseAtPoint=0;
         }
         public void SpeedUp()
         {
@@ -156,6 +167,11 @@ namespace CampusCommons.LibraryCharacter
                 lostSightRemaining-=dt;
                 if(lostSightRemaining<=0){SetState(Behaviour.Search);goal=lastSeen;hasGoal=true;}
             }
+            if(state==Behaviour.Investigate)
+            {
+                hearingRemaining-=dt;
+                if(hearingRemaining<=0f){waitingDoor=null;SetState(Behaviour.Patrol);}
+            }
             if(state==Behaviour.Search)
             {
                 searchRemaining-=dt;
@@ -185,7 +201,11 @@ namespace CampusCommons.LibraryCharacter
                 if(repathRemaining<=0 && !waitingDoor)
                 {
                     repathRemaining=state==Behaviour.Chase?.45f:1.2f;
-                    if(!PlanPath() && state!=Behaviour.Chase){hasGoal=false;pauseAtPoint=.4f;}
+                    if(!PlanPath() && state!=Behaviour.Chase)
+                    {
+                        if(state==Behaviour.Investigate){if(!PlanNearbySoundPoint())SetState(Behaviour.Patrol);}
+                        else {hasGoal=false;pauseAtPoint=.4f;}
+                    }
                 }
             }
             MoveAlongPath(dt);
@@ -260,6 +280,21 @@ namespace CampusCommons.LibraryCharacter
             {path.Clear();return false;}
             return true;
         }
+        bool PlanNearbySoundPoint()
+        {
+            // A swinging leaf can occupy the doorway cell. Approach the nearest
+            // reachable cell instead of repeatedly trying to walk through it.
+            var candidates=new List<int>();
+            for(int i=0;i<map.links.Length;i++)
+                if(map.links[i]!=0 && HorizontalDistance(map.Position(i),heardPosition)<=1.8f)candidates.Add(i);
+            candidates.Sort((a,b)=>HorizontalDistance(map.Position(a),heardPosition).CompareTo(HorizontalDistance(map.Position(b),heardPosition)));
+            foreach(int cell in candidates)
+            {
+                goal=map.Position(cell);
+                if(PlanPath()){hasGoal=true;repathRemaining=1.2f;return true;}
+            }
+            return false;
+        }
         bool CanTraverse(Vector3 from,Vector3 to)
         {
             if(game && game.World && game.World.IsEdgeBlocked(from,to))return false;
@@ -285,7 +320,11 @@ namespace CampusCommons.LibraryCharacter
                 waitingDoor.OpenForMonster();
                 if(!waitingDoor.IsFullyOpen){body.Move(Vector3.down*2f*dt);ResetPicture();return;}
                 waitingDoor=null;repathRemaining=0;
-                if(!PlanPath() && state!=Behaviour.Chase){hasGoal=false;pauseAtPoint=.4f;}
+                if(!PlanPath() && state!=Behaviour.Chase)
+                {
+                    if(state==Behaviour.Investigate){if(!PlanNearbySoundPoint())SetState(Behaviour.Patrol);}
+                    else {hasGoal=false;pauseAtPoint=.4f;}
+                }
             }
             while(next<path.Count && HorizontalDistance(transform.position,path[next])<.17f)next++;
             if(next>=path.Count)
@@ -293,7 +332,11 @@ namespace CampusCommons.LibraryCharacter
                 body.Move(Vector3.down*2f*dt);ResetPicture();
                 if(hasGoal && state!=Behaviour.Chase)
                 {
-                    if(HorizontalDistance(transform.position,goal)<.8f){hasGoal=false;pauseAtPoint=state==Behaviour.Search?.55f:Random.Range(.5f,1.5f);}
+                    if(HorizontalDistance(transform.position,goal)<.8f)
+                    {
+                        if(state==Behaviour.Investigate){lastSeen=heardPosition;SetState(Behaviour.Search);pauseAtPoint=.55f;}
+                        else {hasGoal=false;pauseAtPoint=state==Behaviour.Search?.55f:Random.Range(.5f,1.5f);}
+                    }
                     else if(repathRemaining<=0){hasGoal=false;pauseAtPoint=.3f;}
                 }
                 return;
@@ -312,7 +355,7 @@ namespace CampusCommons.LibraryCharacter
                 if(toward.sqrMagnitude>.01f && Vector3.Dot(direction,toward.normalized)<.1f)continue;
                 door.OpenForMonster();waitingDoor=door;body.Move(Vector3.down*2f*dt);ResetPicture();return;
             }
-            float speed=state==Behaviour.Chase?CurrentMoveSpeed:state==Behaviour.Search?Speed*.75f:Speed*.55f;
+            float speed=(state==Behaviour.Chase || state==Behaviour.Investigate)?CurrentMoveSpeed:state==Behaviour.Search?Speed*.75f:Speed*.55f;
             Vector3 before=transform.position;
             body.Move(direction*Mathf.Min(speed*dt,remaining)+Vector3.down*2f*dt);
             Vector3 moved=transform.position-before;moved.y=0;float distance=moved.magnitude;

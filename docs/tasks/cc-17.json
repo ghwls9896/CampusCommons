@@ -1,6 +1,6 @@
 {
   "id": "cc-17",
-  "title": "탈출룸 NPC·문 소리, 경로와 편집 배치",
+  "title": "최신 탈출맵과 아바타 통합",
   "owner": "ghwls9896",
   "branch": "codex/cc-17-npc-sounds",
   "issue": "https://github.com/ghwls9896/CampusCommons/issues/17",
@@ -22,9 +22,23 @@
     "Assets/StudyImmersive/Scripts/EscapeSystems/Editor/EscapeDoorHearingVerification.cs",
     "Assets/StudyImmersive/Scripts/EscapeSystems/Editor/EscapeDoorHearingVerification.cs.meta",
     "Assets/StudyImmersive/Resources/EscapePlacementSettings.asset",
-    "Assets/StudyImmersive/Resources/EscapePlacementSettings.asset.meta"
+    "Assets/StudyImmersive/Resources/EscapePlacementSettings.asset.meta",
+    "Assets/StudyImmersive/Scenes/GrandLibrary_Living.unity",
+    "Assets/GrandLibrary/Scripts/Player.cs",
+    "Packages/manifest.json",
+    "Packages/packages-lock.json",
+    "Assets/TeamAvatar/",
+    "Assets/TeamAvatar.meta",
+    "Assets/StudyImmersive/Scripts/EscapeSystems/EscapeSpawnPoint.cs",
+    "Assets/StudyImmersive/Scripts/EscapeSystems/EscapeSpawnPoint.cs.meta",
+    "docs/AVATAR_SETUP.md"
   ],
-  "shared_files": [],
+  "shared_files": [
+    "Assets/StudyImmersive/Scenes/GrandLibrary_Living.unity",
+    "Assets/GrandLibrary/Scripts/Player.cs",
+    "Packages/manifest.json",
+    "Packages/packages-lock.json"
+  ],
   "depends_on": [
     "https://github.com/ghwls9896/CampusCommons/pull/16"
   ],
@@ -32,6 +46,8 @@
     "Unity 6000.4.5f1 Play Mode 게임 진행·구매, NPC 오디오 거리 및 겹침 검증",
     "python Tools/team/check.py --base origin/main",
     "Unity 6000.4.5f1 교수·시설관리 NPC의 잠긴 경로 우회 및 대체 목적지 검증",
-    "Unity 6000.4.5f1 문 소리 10m 청각·NPC 배치 설정 및 회귀 검사"
+    "Unity 6000.4.5f1 문 소리 10m 청각·NPC 배치 설정 및 회귀 검사",
+    "Unity 6000.4.5f1 아바타 에셋 설치 전 기본 캐릭터 컴파일 및 로비 이동",
+    "Unity 6000.4.5f1 에셋 설치 후 아바타 UI와 성별 변경 및 1·3인칭 전환"
   ]
 }
