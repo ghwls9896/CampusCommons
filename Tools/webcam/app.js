@@ -56,7 +56,6 @@ async function analyze(run) {
   const actualInterval = lastCapture === null ? null : (started - lastCapture) / 1000;
   lastCapture = started;
   byId('progress').textContent = '현재 사진을 분석하고 있습니다…';
-  feedback(false);
   const canvas = document.createElement('canvas');
   // Keep the full accurate-mode backbone/head, sample a bounded camera image.
   const scale = Math.min(1, 512 / Math.max(video.videoWidth, video.videoHeight));
@@ -90,6 +89,7 @@ async function analyze(run) {
   } catch (error) {
     if (run !== generation) return;
     clearSnapshot();
+    feedback(false);
     byId('verdict').textContent = '분석 오류';
     byId('reason').textContent = '';
     byId('timing').textContent = '';
@@ -104,6 +104,7 @@ async function analyze(run) {
 }
 
 byId('start').addEventListener('click', async () => {
+  feedback(false);
   byId('start').disabled = true;
   byId('stop').disabled = false;
   byId('progress').textContent = '카메라 접근 허용을 기다립니다…';

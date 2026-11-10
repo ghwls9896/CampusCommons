@@ -70,6 +70,36 @@ test('slow inference schedules only the next fresh capture', async () => {
   assert.equal(b.inference.length, 2);
 });
 
+test('displayed result stays rateable while the next slow inference is pending', async () => {
+  const b = browser(); await settle();
+  await b.el('start').listeners.click(); await settle();
+  b.clock(1500); b.respond(0); await settle();
+  assert.equal(b.el('correct').disabled, false);
+  b.timers.at(-1).fn(); await settle();
+  assert.equal(b.inference.length, 2);
+  assert.equal(b.el('verdict').textContent, '휴대폰 사용중');
+  assert.equal(b.el('correct').disabled, false, 'the visible result must remain rateable');
+  b.el('correct').listeners.click();
+  assert.equal(b.el('correct').disabled, true);
+  assert.equal(b.el('incorrect').disabled, true, 'only one vote for this result');
+  assert.match(b.el('score').textContent, /맞음 1개/);
+  b.clock(3000); b.respond(1); await settle();
+  assert.equal(b.el('correct').disabled, false, 'a new displayed result gets its own vote');
+});
+
+test('analysis error clears the previous result and disables its feedback', async () => {
+  const b = browser(); await settle();
+  await b.el('start').listeners.click(); await settle();
+  b.respond(0); await settle();
+  b.timers.at(-1).fn(); await settle();
+  b.inference[1].reply.resolve({ok:false, json:async () => ({ok:false, error:'test failure'})});
+  await settle();
+  assert.equal(b.el('verdict').textContent, '분석 오류');
+  assert.equal(b.el('snapshot').hidden, true);
+  assert.equal(b.el('correct').disabled, true);
+  assert.equal(b.el('incorrect').disabled, true);
+});
+
 test('stop releases camera and a late response cannot overwrite stopped state', async () => {
   const b = browser(); await settle();
   await b.el('start').listeners.click(); await settle();
