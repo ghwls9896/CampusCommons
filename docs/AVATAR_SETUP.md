@@ -213,3 +213,42 @@ Player.cs에서 사용하는 주요 연결 기능:
 - Sunbox 외부 에셋은 각 사용자가 라이선스 조건에 따라 설치해야 합니다.
 - 검증이 완료되면 PR에 테스트 결과를 기록하고 Ready for review로 변경합니다.
 - 담당자 승인 없이 main 브랜치에 직접 병합하지 않습니다.
+
+## Sunbox 선택적 활성화 및 테스트 결과
+
+캐릭터 시스템은 `CAMPUS_SUNBOX_AVATAR` 조건부 컴파일을 사용합니다.
+
+### Sunbox 에셋을 설치하지 않은 경우
+
+- Scripting Define Symbols에 `CAMPUS_SUNBOX_AVATAR`를 등록하지 않습니다.
+- 아바타 관련 스크립트는 대체 구현으로 컴파일됩니다.
+- `LibraryAvatar.prefab`이 없으면 기존 기본 캐릭터를 사용합니다.
+
+### Sunbox 에셋을 설치한 경우
+
+1. Stylized Customizable Avatars FREE를 Unity Asset Store에서 Import합니다.
+2. Unity UI(uGUI)와 Animation 모듈을 확인합니다.
+3. `CAMPUS_SUNBOX_AVATAR`를 Scripting Define Symbols에 추가합니다.
+4. `LibraryAvatar.prefab`과 `LibraryMovement.controller`를 준비합니다.
+5. Sunbox의 `AvatarCustomization.cs`에서 모자 검색 시 null 항목을 검사하도록 수정합니다.
+6. Unity를 다시 컴파일하고 캐릭터 기능을 테스트합니다.
+
+Sunbox 원본 에셋과 파생 프리팹은 라이선스 확인 없이 공개 GitHub 저장소에 업로드하지 않습니다.
+
+### 검증 결과 — 2026-11-11
+
+테스트 환경: Unity 6000.4.5f1
+
+**Sunbox 미설치 환경**
+- 컴파일 오류 없음
+- 도서관 정상 실행
+- 기본 캐릭터 정상 표시
+
+**Sunbox 설치 환경**
+- 남녀 캐릭터 및 커스터마이징 정상
+- 걷기·달리기·손 흔들기 정상
+- 착석·일어서기 정상
+- 실시간 미리보기 정상
+- 1인칭·3인칭 전환 정상
+
+미검증 항목: 퀴즈 답변 입력 중 캐릭터 단축키 차단, 최신 main과의 통합, GitHub CI 최종 통과.

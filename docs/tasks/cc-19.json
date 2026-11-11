@@ -6,6 +6,10 @@
   "branch": "feat/cc-19-avatar-customization",
   "issue": "https://github.com/ghwls9896/CampusCommons/issues/19",
   "scope": [
+
+    "Packages/manifest.json",
+    "Packages/packages-lock.json",
+
     "Assets/TeamAvatar/",
     "Assets/TeamAvatar.meta",
     "Assets/GrandLibrary/Scripts/Player.cs",

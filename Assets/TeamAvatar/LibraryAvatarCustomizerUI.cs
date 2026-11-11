@@ -1,3 +1,4 @@
+#if CAMPUS_SUNBOX_AVATAR
 
 using System.Collections.Generic;
 using UnityEngine;
@@ -268,3 +269,16 @@ namespace CampusCommons.GrandLibrary
         }
     }
 }
+#else
+using UnityEngine;
+namespace CampusCommons.GrandLibrary
+{
+    public class LibraryAvatarCustomizerUI : MonoBehaviour
+    {
+        public bool IsOpen => false;
+        public void Initialize(GameObject avatar) { }
+        public void Toggle() { }
+        public void Close() { }
+    }
+}
+#endif

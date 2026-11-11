@@ -1,3 +1,4 @@
+#if CAMPUS_SUNBOX_AVATAR
 
 using UnityEngine;
 using Sunbox.Avatars;
@@ -153,3 +154,15 @@ namespace CampusCommons.GrandLibrary
         }
     }
 }
+#else
+using UnityEngine;
+namespace CampusCommons.GrandLibrary
+{
+    public class LibraryAvatarSitPose : MonoBehaviour
+    {
+        public Vector3 sitOffset = new Vector3(0f, -0.24f, -0.05f);
+        public void Initialize(GameObject avatar) { }
+        public void SetSitting(bool sitting) { }
+    }
+}
+#endif

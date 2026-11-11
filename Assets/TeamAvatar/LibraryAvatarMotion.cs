@@ -1,3 +1,4 @@
+#if CAMPUS_SUNBOX_AVATAR
 
 using UnityEngine;
 using Sunbox.Avatars;
@@ -82,3 +83,15 @@ namespace CampusCommons.GrandLibrary
         }
     }
 }
+#else
+using UnityEngine;
+namespace CampusCommons.GrandLibrary
+{
+    public class LibraryAvatarMotion : MonoBehaviour
+    {
+        public void Initialize(GameObject avatar) { }
+        public void UpdateMovement(bool moving, bool running, bool sitting) { }
+        public void Wave() { }
+    }
+}
+#endif
