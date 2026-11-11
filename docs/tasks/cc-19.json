@@ -18,7 +18,9 @@
     "docs/AVATAR_SETUP.md"
   ],
   "shared_files": [
-    "Assets/GrandLibrary/Scripts/Player.cs"
+    "Assets/GrandLibrary/Scripts/Player.cs",
+    "Packages/manifest.json",
+    "Packages/packages-lock.json"
   ],
   "depends_on": [],
   "validation": [
