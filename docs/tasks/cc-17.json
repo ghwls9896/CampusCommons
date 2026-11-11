@@ -1,6 +1,6 @@
 {
   "id": "cc-17",
-  "title": "최신 탈출맵과 아바타 통합",
+  "title": "공간·탈출룸과 최종 캐릭터 통합",
   "owner": "ghwls9896",
   "branch": "codex/cc-17-npc-sounds",
   "issue": "https://github.com/ghwls9896/CampusCommons/issues/17",
@@ -42,7 +42,9 @@
     "Packages/packages-lock.json"
   ],
   "depends_on": [
-    "https://github.com/ghwls9896/CampusCommons/pull/16"
+    "https://github.com/ghwls9896/CampusCommons/pull/16",
+    "https://github.com/ghwls9896/CampusCommons/pull/4",
+    "https://github.com/ghwls9896/CampusCommons/pull/20"
   ],
   "validation": [
     "Unity 6000.4.5f1 Play Mode 게임 진행·구매, NPC 오디오 거리 및 겹침 검증",
@@ -51,6 +53,8 @@
     "Unity 6000.4.5f1 문 소리 10m 청각·NPC 배치 설정 및 회귀 검사",
     "Unity 6000.4.5f1 아바타 에셋 설치 전 기본 캐릭터 컴파일 및 로비 이동",
     "Unity 6000.4.5f1 에셋 설치 후 아바타 UI와 성별 변경 및 1·3인칭 전환",
-    "Unity 6000.4.5f1 열린 문짝 경로 우회, NPC 간 충돌과 막힌 자리 탈출 회귀 검사"
+    "Unity 6000.4.5f1 열린 문짝 경로 우회, NPC 간 충돌과 막힌 자리 탈출 회귀 검사",
+    "PR #4, #20 순서로 main 반영 후 최신 main 통합 및 퀴즈 입력 중 C/R/V 캐릭터 조작 차단 검증",
+    "밝은/어두운 타임어택에서 플레이어 걷기·달리기와 몬스터·교수·시설관리 속도 증가 검증"
   ]
 }
