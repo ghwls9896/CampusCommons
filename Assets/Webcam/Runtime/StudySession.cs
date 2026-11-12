@@ -14,7 +14,7 @@ namespace CampusCommons.Webcam
             if (!seated || !focused || Running) return false;
             Epoch++; Running=true; Label="준비 중"; return true;
         }
-        public void Observe(bool seated,bool focused) { if (!seated || !focused) Stop(); }
+        public void Observe(bool seated,bool focused) { if (!seated) Stop(); }
         public void Stop() { if(Running) Epoch++; Running=false; Label="시작을 눌러 주세요"; }
         public bool Apply(int epoch,string state)
         {
