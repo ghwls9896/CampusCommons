@@ -71,3 +71,7 @@ com.unity.modules.imageconversion 기본 모듈을 manifest에 추가하고 Unit
 Editor SearchDatabase 인덱싱 예외가 batch 시작에서 발생했으며 게임 런타임 검사와
 구분한다. Windows와 독립 배포 빌드는 미검증이다.
 Python19(17통과/선택실제모델2생략), Node10 통과. 실제 모델은 Unity에서 별도 검증했다.
+
+## 게임 배포본의 자동 준비
+
+완성 게임은 Python·모델을 동봉하고 처음 실행에 자동 준비합니다. 위 수동 설치 과정은 개발용입니다. [배포 안내](../distribution/DESKTOP.md)를 따르세요. 독립 `NativeProcessSmoke.cs`를 실행한다면 `RuntimePackageInstaller.cs`도 함께 컴파일하고 `QEV_SMOKE_RUNTIME`에 이미 준비된 패키지 폴더를 지정합니다. 실제 Unity 통합 검사는 `CAMPUS_RUNTIME_TEST_PACKAGE=1`에서 `LocalIntegrationAudit.Live`를 사용합니다.

@@ -33,3 +33,8 @@ backend/*.pdf
 # Operator-provided quiz endpoint and demo access code; never commit live values.
 /Assets/QuizRoom/Resources/QuizConnection.json
 /Assets/QuizRoom/Resources/QuizConnection.json.meta
+
+# Generated offline desktop runtime and local distribution work
+/.distribution-work/
+/Assets/StreamingAssets/StudyRuntime/
+/Assets/StreamingAssets/StudyRuntime.meta

@@ -69,3 +69,15 @@
 - backend pytest **52**, 순수 C# 세션 **37**/문서 **21**, 협업 테스트 **16** 통과. pytest에 기존 httpx 사용 폐기 예정 경고1개가 있습니다.
 - 처음 Unity 실행은 남아 있던 6000.6 라이선스 보조 프로세스가 mutex를 점유해 컴파일 전에 중단됐으며, 해당 프로세스 종료 후 지정 버전에서 모든 검사를 통과했습니다.
 - Sunbox 원본은 설치돼 있으나 팀원의 LibraryAvatar.prefab/LibraryMovement.controller 설정은 아직 없어 기본 캐릭터 상태입니다. 실제 Sunbox 외형의 시각적 검증, Windows/standalone, 이번 합본에서 실제 PDF로 Gemini 생성·채점은 미검증입니다.
+
+## 2026-11-12 데스크톱 자동 준비 배포
+
+- 사용자 요청으로 같은 로컬 통합본에 배포 구성을 추가했습니다. Python 3.12.11·고정 QEV·모델을 OS별 오프라인 ZIP으로 동봉하고 게임이 사용자 전용 폴더에 자동 준비합니다. 시스템 Python/PATH/관리자 설치가 필요 없습니다. 설정은 기존 Resources를 통해 게임에 포함하며 누락·손상·다른 OS 패키지는 빌드 전에 차단합니다.
+- Windows x64 빌드 스크립트와 macOS 15+ Apple Silicon 빌드 스크립트/메뉴를 제공합니다. 이 Mac에서 실제 Windows 바이너리를 만들거나 네이티브 실행/DLL/카메라 검증은 하지 않았습니다. Windows 팀원이 `Tools/distribution/build-windows.ps1`을 해당 OS에서 실행하고 확인해야 합니다. 공개 배포용 서명/공증은 미실시입니다.
+- 실제 Mac 네이티브 payload를 다른 한글·공백 경로로 옮겨 Python 위치 확인 및 **QEV 오프라인 MPS 추론**을 통과했습니다. Unity6000.4.5f1 Mac 앱 빌드 성공, 실행 파일에서 최초 자동 추출 성공, 실제 설치된 Python으로 합성 이미지 오프라인 추론 성공, 최종 앱의 일반 macOS 실행과 캐시 재사용 `STUDY_RUNTIME_READY packaged=true` 확인.
+- `CAMPUS_RUNTIME_TEST_PACKAGE=1 LocalIntegrationAudit.Live`: **실제 카메라 미리보기 → 수동 시작 → 동봉 Python/QEV 판별 → 종료 → 카메라/프로세스 정리 → 기립** 통과. 영상은 저장하지 않았습니다. 인증은 fixture이며 실제 사용자의 신규 로그인이나 이번 배포본에서 실제 PDF Gemini 생성은 새로 수행하지 않았습니다.
+- Unity 계정/퀴즈/통합/웹캠/탈출룸 회귀 검사 모두 PASS. 배포 설정6검사, 설치기31검사, 패키징5검사, backend52, 협업16, 웹캠 JS10 PASS. 독립 NativeProcessSmoke 하네스는 새 런타임 경로와 함께 컴파일 확인했습니다.
+- 독립 검토 Important2건 수정: (1) 다른 게임 프로세스가 사용 중인 런타임을 복구가 삭제하지 않도록 사용 lease 추가. 별도 프로세스 회귀검사에서 Unity Mono의 FileShare가 프로세스 간 잠금을 제공하지 않는 문제까지 재현하여 macOS 네이티브 flock 적용. 실패→설치기31검사 통과. (2) 네이티브 wheel 요구 OS에 맞춰 macOS15.0 최소 버전, wheel 검사, 실제 최종 plist 일치. 실패→패키징5검사 및 빌드 설정6검사 통과. Critical/Minor/미수정 검토 지적 없음.
+- 일반 앱 실행 검사에서 기존 권한 후처리의 XmlDocument.Save가 빈 DTD subset을 만들어 macOS plist 파서를 깨뜨리는 문제를 발견했습니다. `plutil -lint` 실패/앱 실행 실패를 재현한 뒤 정규 plist XML 작성으로 수정했고 빌드 후 plutil 검사를 추가했습니다. 최종 plutil 및 일반 앱 실행 통과.
+- 결과: `Builds/CampusCommons-macos-arm64/CampusCommons.app`, 배포 ZIP `Builds/CampusCommons-macos-arm64.zip`. 자동 생성 대용량 패키지/빌드/실제 QuizConnection.json은 Git 제외. 안내: `docs/distribution/DESKTOP.md`.
+- 남은 범위: Windows 실제 빌드·실행, 공개 다운로드 배포/서명·공증, 팀원 캐릭터 프리팹 연결. 원격 push/PR/main 병합이나 서버 재배포는 수행하지 않았습니다. 공유 씬·ProjectSettings 원본은 변경하지 않았으며 빌드 중 임시 설정은 복원했습니다.

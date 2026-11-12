@@ -55,6 +55,7 @@ namespace CampusCommons.Webcam
         public void ToggleStudy(){if(IsRunning)EndStudy();else StartStudy();}
         public void StartStudy()
         {
+            if(!StudyRuntimeBootstrap.Ready){message="공부 인식 준비가 끝나면 시작할 수 있습니다.";return;}
             if(!PreviewReady || !session.Begin(IsAvailable,focused))return;
             message="모델 준비 중";StartCoroutine(Run(session.Epoch));
         }
@@ -169,8 +170,8 @@ namespace CampusCommons.Webcam
                 button=new GUIStyle(GUI.skin.button){font=font,fontSize=18};
             }
             var old=GUI.matrix;GUI.matrix=Matrix4x4.identity;
-            var rect=new Rect(Mathf.Max(8,Screen.width-320),Mathf.Max(80,Screen.height-395),304,375);
-            GUI.Box(rect,GUIContent.none);GUILayout.BeginArea(new Rect(rect.x+14,rect.y+12,276,350));
+            var rect=new Rect(Mathf.Max(8,Screen.width-320),Mathf.Max(80,Screen.height-435),304,415);
+            GUI.Box(rect,GUIContent.none);GUILayout.BeginArea(new Rect(rect.x+14,rect.y+12,276,390));
             GUILayout.Label("공부 인식",text);GUILayout.Space(8);
             var preview=GUILayoutUtility.GetRect(276,146);
             if(PreviewReady)
@@ -186,13 +187,14 @@ namespace CampusCommons.Webcam
             GUILayout.BeginHorizontal();
             if(!session.Running)
             {
-                GUI.enabled=PreviewReady;
+                GUI.enabled=PreviewReady && StudyRuntimeBootstrap.Ready;
                 if(GUILayout.Button("시작 (F8)",button,GUILayout.Height(38)))StartStudy();
                 GUI.enabled=true;
                 if(!PreviewReady && GUILayout.Button("재시도",button,GUILayout.Height(38))){StopStudy();OpenPreview();}
             }
             if(GUILayout.Button("종료 · 일어나기",button,GUILayout.Height(38)))EndStudy();
             GUILayout.EndHorizontal();
+            if(StudyRuntimeBootstrap.Instance && !StudyRuntimeBootstrap.Instance.Preparing && !session.Running && GUILayout.Button("공부 인식 다시 준비",button)) StudyRuntimeBootstrap.Instance.Retry();
             GUILayout.Space(10);GUILayout.Label("영상 저장 없음 · 이 PC에서만 처리\n종료하면 카메라를 끄고 일어납니다.",text);
             GUILayout.EndArea();GUI.matrix=old;
         }
