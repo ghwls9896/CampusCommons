@@ -81,3 +81,11 @@
 - 일반 앱 실행 검사에서 기존 권한 후처리의 XmlDocument.Save가 빈 DTD subset을 만들어 macOS plist 파서를 깨뜨리는 문제를 발견했습니다. `plutil -lint` 실패/앱 실행 실패를 재현한 뒤 정규 plist XML 작성으로 수정했고 빌드 후 plutil 검사를 추가했습니다. 최종 plutil 및 일반 앱 실행 통과.
 - 결과: `Builds/CampusCommons-macos-arm64/CampusCommons.app`, 배포 ZIP `Builds/CampusCommons-macos-arm64.zip`. 자동 생성 대용량 패키지/빌드/실제 QuizConnection.json은 Git 제외. 안내: `docs/distribution/DESKTOP.md`.
 - 남은 범위: Windows 실제 빌드·실행, 공개 다운로드 배포/서명·공증, 팀원 캐릭터 프리팹 연결. 원격 push/PR/main 병합이나 서버 재배포는 수행하지 않았습니다. 공유 씬·ProjectSettings 원본은 변경하지 않았으며 빌드 중 임시 설정은 복원했습니다.
+
+## 2026-11-12 통합 PR 제출 준비
+
+- 사용자 요청에 따라 `codex/local-integration`을 GitHub의 한 통합 PR로 제출합니다. 기존 #4/#9/#10 변경을 포함하며, 새 통합 PR이 병합되기 전에는 원본 PR/브랜치를 삭제하거나 강제로 덮어쓰지 않습니다. 본 PR 병합 후 중복 PR은 대체된 작업으로 정리합니다. 최종 리뷰/통합 담당은 ghwls9896입니다.
+- 최신 원격 main `0a6c3f7`이 HEAD의 조상이고 main→HEAD 삭제 파일0개입니다. 공유 씬/프리팹, 기존 캐릭터·탈출룸 파일, ProjectSettings는 변경하지 않았습니다. 기존 파일 변경은 `.gitignore`, `GameStart.cs`, `Player.cs`, 두 Packages 파일, README뿐입니다. Player는 퀴즈 중 입력 우선권과 퀴즈 HUD만 추가하고 기존 아바타/이동/탈출룸 경로를 보존했습니다.
+- origin은 main만 fetch하도록 설정되어 있어 열린 PR 브랜치 #4/#9/#10/#22를 명시적으로 갱신했습니다. 인벤토리 #22 최신 `50c3a5f`는 스크립트2개/meta/task를 추가하며 통합본과 `git merge-tree --write-tree` 텍스트 충돌0개입니다. 이 PR에 #22를 병합하지 않았습니다. 로그인 전과 퀴즈 입력 중 인벤토리 I/1~5·표시 제어는 별도 기능 연동 검증이 필요합니다.
+- 제출 직전 Unity6000.4.5f1 INTEGRATED_QUIZ_ACCOUNT_WEBCAM_PASS 및 CC15_WORLD_PASS 재통과. backend52, account C#42, quiz C#37/21, installer31, packaging5, 팀16, webcam Python17+선택검사2생략, JS10 재통과. 실제 카메라/배포본 검증은 위 동일 게임 코드 커밋의 결과입니다.
+- Windows 팀원이 원래 개발 폴더를 보존하고 새 검토 폴더에서 받는 방법, 빌드 담당자1명의 준비, 배포 ZIP과 소스의 차이를 `docs/distribution/WINDOWS_TEAM.md`에 기록했습니다. 실제 QuizConnection.json은 빌드 담당자에게 비공개로 전달해야 하며 Git에는 포함하지 않습니다. 일반 게임 이용자는 배포본에 이미 포함된 설정을 사용합니다.

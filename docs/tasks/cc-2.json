@@ -1,6 +1,6 @@
 {
   "id": "cc-2",
-  "title": "로컬 계정·퀴즈·웹캠 통합과 데스크톱 자동 준비 배포",
+  "title": "계정·퀴즈·웹캠 통합과 데스크톱 자동 준비 배포",
   "owner": "HIGHCHOI",
   "branch": "codex/local-integration",
   "issue": "https://github.com/ghwls9896/CampusCommons/issues/2",
@@ -63,16 +63,14 @@
   ],
   "depends_on": [
     "https://github.com/ghwls9896/CampusCommons/pull/18",
-    "https://github.com/ghwls9896/CampusCommons/pull/20",
-    "https://github.com/ghwls9896/CampusCommons/pull/9",
-    "https://github.com/ghwls9896/CampusCommons/pull/10"
+    "https://github.com/ghwls9896/CampusCommons/pull/20"
   ],
   "validation": [
     "Unity 6000.4.5f1 PDF_QUIZ_ROOM_PASS: 실제 씬, 모의 인증/문항",
     "Unity 6000.4.5f1 INTEGRATED_QUIZ_ACCOUNT_WEBCAM_PASS: 실제 문, 인증차단/로그아웃/재로그인/좌석 종료",
     "backend pytest52; C# 세션37/문서21; 팀16",
     "Unity 계정·탈출룸·웹캠 회귀 검사",
-    "로컬 통합용 명세이며 원격 PR #4 및 main 상태는 변경하지 않음",
+    "PR #4/#9/#10의 구현을 포함하는 통합 PR로 제출하며 개별 PR 중복 병합을 피함",
     "Python/QEV 오프라인 패키지 재배치 및 실제 설치본 추론",
     "Unity 6000.4.5f1 macOS ARM64 standalone 자동 준비 및 실제 카메라/QEV 수명주기",
     "설치기 31검사: 경로/손상/취소/재시도/별도 프로세스 사용잠금; 패키징5검사",

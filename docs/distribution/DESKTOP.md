@@ -9,6 +9,8 @@
 - 로그인/회원가입·PDF 퀴즈는 인터넷과 운영 중인 서버가 필요합니다. 모델은 설치 및 실행 시 인터넷이 필요 없습니다. 회원가입 이메일 확인 정책은 현재 서버 설정을 따릅니다.
 - `AccountConnection.json`과 `QuizConnection.json`은 Unity Resources로 빌드에 포함합니다. 플레이어가 파일을 만들거나 서버 주소를 입력할 필요가 없습니다.
 
+Windows 팀원은 [검토·실행 순서](WINDOWS_TEAM.md)를 먼저 확인하세요.
+
 ## 배포자 빌드
 
 각 운영체제에서 해당 배포본을 만듭니다. 빌드 PC만 Unity **6000.4.5f1** 및 해당 Standalone Build Support, [uv](https://docs.astral.sh/uv/getting-started/installation/), Git과 인터넷이 필요합니다. 게임에는 빌드 도구가 필요 없습니다.
