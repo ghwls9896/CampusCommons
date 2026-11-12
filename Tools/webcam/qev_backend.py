@@ -94,29 +94,19 @@ def predict_image(model, request, image):
 
 
 class QEVBackend:
-    def __init__(self, model, device, variant='original', mode='accurate'):
-        if variant not in ('original', 'compact'):
-            raise ValueError('Unknown model variant')
-        if mode not in ('accurate', 'fast') or (variant == 'compact' and mode != 'accurate'):
-            raise ValueError('Unsupported mode for this model')
-        fast = mode == 'fast'
-        depth = 16 if variant == 'compact' or fast else 24
-        pixels = 262144 if fast else 1638400
-        if fast and getattr(model, 'exit_head', None) is None:
-            raise ValueError('Fast mode requires its trained exit head')
-        if variant == 'compact' and (not model.backbone.get('bundled') or
-                model.backbone.get('depth') != 16 or model.backbone.get('vocabulary') != 32768 or
-                model.encoder.model.language_model.embed_tokens.num_embeddings != 32768):
-            raise ValueError('Expected the bundled compact backbone')
-        if (model.serving_mode != mode or model.early_exit_layer != (16 if fast else None) or
-                len(model.encoder.model.language_model.layers) != depth or
-                model.encoder.processor.image_processor.size['longest_edge'] != pixels):
-            raise ValueError('The selected model requires its native mode configuration.')
+    def __init__(self, model, device, mode='fast'):
+        if (mode != 'fast' or model.serving_mode != 'fast' or model.early_exit_layer != 16 or
+                getattr(model, 'exit_head', None) is None or
+                len(model.encoder.model.language_model.layers) != 16 or
+                model.encoder.processor.image_processor.size['longest_edge'] != 262144):
+            raise ValueError('QEV-0.8B native fast mode is required.')
         self.model, self.device, self.mode = model, device, mode
-        self.model_label = 'QEV-0.5B Compact' if variant == 'compact' else 'QEV-0.8B'
+        self.model_label = 'QEV-0.8B'
 
     @classmethod
-    def load(cls, model_dir, cache_dir, device='auto', variant='original', mode='accurate'):
+    def load(cls, model_dir, cache_dir, device='auto', mode='fast'):
+        if mode != 'fast':
+            raise ValueError('Only fast mode is supported')
         import torch
         from qev import QEV
         if device == 'auto':
@@ -135,7 +125,7 @@ class QEVBackend:
             model.to(device='mps')
             gc.collect()
             torch.mps.empty_cache()
-        return cls(model, device, variant, mode)
+        return cls(model, device, mode)
 
     def classify(self, data):
         from PIL import Image

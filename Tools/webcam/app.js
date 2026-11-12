@@ -2,7 +2,7 @@
 const byId = id => document.getElementById(id);
 const video = byId('video');
 const token = document.querySelector('meta[name="session-token"]').content;
-const labels = {studying:'공부중', phone:'휴대폰 사용중', other:'다른 활동중', away:'자리 비움', drowsy:'졸음 의심'};
+const labels = {studying:'공부중', phone:'휴대폰 사용중', other:'다른활동중', away:'자리비움', drowsy:'자는중'};
 const INTERVAL_MS = 1000;
 let stream = null, generation = 0, timer = null, request = null, snapshotURL = null;
 let correct = 0, incorrect = 0;
@@ -151,7 +151,7 @@ fetch('/api/config').then(response => {
   if (!response.ok) throw new Error('모델 설정을 읽지 못했습니다.');
   return response.json();
 }).then(config => {
-  if (!['accurate', 'fast'].includes(config.mode) || config.interval_ms !== INTERVAL_MS) throw new Error('지원하는 QEV 모드 / 1초 설정이 아닙니다.');
+  if (config.mode !== 'fast' || config.interval_ms !== INTERVAL_MS) throw new Error('지원하는 QEV 모드 / 1초 설정이 아닙니다.');
   if (!stream) byId('progress').textContent = `${config.model} · ${config.device.toUpperCase()}`;
 }).catch(error => {
   byId('progress').textContent = error.message;

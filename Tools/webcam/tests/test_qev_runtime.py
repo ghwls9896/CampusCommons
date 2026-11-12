@@ -30,7 +30,7 @@ class RealQEVTests(unittest.TestCase):
                     headers={'Origin': endpoint, 'X-Session-Token': token, 'Content-Type': 'image/jpeg'})
                 with urlopen(request, timeout=60) as response:
                     result = json.load(response)
-                self.assertEqual(result['mode'], 'accurate')
+                self.assertEqual(result['mode'], 'fast')
                 self.assertEqual(set(result['probabilities']), {'studying', 'phone', 'other', 'away', 'drowsy'})
                 self.assertEqual(result['state'], expected)
 

@@ -8,7 +8,7 @@ const code = readFileSync(new URL('../app.js', import.meta.url), 'utf8');
 const settle = () => new Promise(resolve => setImmediate(resolve));
 const deferred = () => {let resolve; const promise = new Promise(r => {resolve = r;}); return {promise, resolve};};
 
-function browser({pendingPermission = false, mode = 'accurate'} = {}) {
+function browser({pendingPermission = false, mode = 'fast'} = {}) {
   const elements = new Map();
   const el = id => {
     if (!elements.has(id)) elements.set(id, {textContent:'', hidden:false, disabled:false,
@@ -57,7 +57,7 @@ test('drowsy inference displays its label and fifth score', async () => {
   const b = browser(); await settle();
   await b.el('start').listeners.click(); await settle();
   b.respond(0, 'drowsy'); await settle();
-  assert.equal(b.el('verdict').textContent, '졸음 의심');
+  assert.equal(b.el('verdict').textContent, '자는중');
   assert.equal(b.el('bar-drowsy').value, .7);
   assert.equal(b.el('pct-drowsy').textContent, '70%');
 });

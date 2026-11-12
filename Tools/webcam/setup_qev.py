@@ -22,7 +22,7 @@ def main():
         raise ValueError('Unexpected native QEV checkpoint identity.')
     snapshot_download(MODEL_ID, revision=backbone['revision'], cache_dir=args.cache_dir,
                       allow_patterns=['*.json', '*.jinja', 'model.safetensors'])
-    print('QEV-0.8B accurate is cached. live.py can now run offline.')
+    print('QEV-0.8B fast is cached. live.py can now run offline.')
 
 
 if __name__ == '__main__':

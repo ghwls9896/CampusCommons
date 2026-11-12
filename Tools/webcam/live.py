@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parent
 def configure(server, backend, model_label):
     server.backend = backend
     server.origin = f'http://127.0.0.1:{server.server_port}'
-    server.token = secrets.token_urlsafe(32)
+    server.token = os.environ.get('QEV_SESSION_TOKEN') or secrets.token_urlsafe(32)
     server.model_label = model_label
     server.busy = threading.Lock()
 
@@ -63,7 +63,7 @@ class Handler(BaseHTTPRequestHandler):
             mime = 'text/javascript' if self.path.endswith('.js') else 'text/css'
             return self.send(200, (ROOT / self.path[1:]).read_bytes(), mime + '; charset=utf-8')
         if self.path == '/api/config':
-            return self.send(200, {'interval_ms': 1000, 'mode': getattr(self.server.backend, 'mode', 'accurate'),
+            return self.send(200, {'interval_ms': 1000, 'mode': getattr(self.server.backend, 'mode', 'fast'),
                                    'device': self.server.backend.device,
                                    'model': self.server.model_label})
         if self.path == '/favicon.ico':
@@ -101,22 +101,43 @@ class Handler(BaseHTTPRequestHandler):
         self.send(200, result)
 
 
+def start_parent_watchdog():
+    """Exit even if Unity crashes or reloads without managed cleanup."""
+    parent = os.environ.get('QEV_PARENT_PID')
+    if not parent:
+        return
+    import psutil
+    import time
+    try:
+        owner = psutil.Process(int(parent))
+        created = owner.create_time()
+    except (ValueError, psutil.Error):
+        raise RuntimeError('Parent process is unavailable')
+    def watch():
+        while True:
+            time.sleep(2)
+            try:
+                if not owner.is_running() or owner.create_time() != created:
+                    os._exit(0)
+            except psutil.Error:
+                os._exit(0)
+    threading.Thread(target=watch, daemon=True).start()
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--model-dir', type=Path, required=True)
     parser.add_argument('--cache-dir', type=Path, required=True)
     parser.add_argument('--device', choices=('auto', 'mps', 'cuda', 'cpu'), default='auto')
     parser.add_argument('--port', type=int, default=8770)
-    parser.add_argument('--variant', choices=('original', 'compact'), default='original')
-    parser.add_argument('--mode', choices=('accurate', 'fast'), default='accurate')
+    parser.add_argument('--mode', choices=('fast',), default='fast')
     args = parser.parse_args()
-    if args.variant == 'compact' and args.mode != 'accurate':
-        parser.error('Compact supports accurate mode only')
     os.environ['HF_HUB_OFFLINE'] = '1'
     os.environ['TRANSFORMERS_OFFLINE'] = '1'
     os.environ['HF_HUB_DISABLE_TELEMETRY'] = '1'
-    print(f'Loading QEV {args.variant} {args.mode} (local files only)…', flush=True)
-    backend = QEVBackend.load(args.model_dir, args.cache_dir, args.device, args.variant, args.mode)
+    start_parent_watchdog()
+    print(f'Loading QEV-0.8B {args.mode} (local files only)…', flush=True)
+    backend = QEVBackend.load(args.model_dir, args.cache_dir, args.device, args.mode)
     server = ThreadingHTTPServer(('127.0.0.1', args.port), Handler)
     mode_label = '속도 모드' if args.mode == 'fast' else '정확도 우선'
     configure(server, backend, f'{backend.model_label} · {mode_label} · 1초 간격')

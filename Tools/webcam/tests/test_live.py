@@ -100,14 +100,14 @@ class LiveTests(unittest.TestCase):
                 self.assertNotIn('state', json.loads(error.exception.read()))
                 error.exception.close()
 
-    def test_frame_is_passed_in_memory_and_config_has_one_second_accurate_mode(self):
+    def test_frame_is_passed_in_memory_and_config_has_one_second_fast_mode(self):
         with running(live.Handler) as (server, endpoint):
             backend = InMemoryBackend()
             live.configure(server, backend, 'Test model')
             with urlopen(endpoint + '/api/config') as response:
                 config = json.load(response)
             self.assertEqual(config['interval_ms'], 1000)
-            self.assertEqual(config['mode'], 'accurate')
+            self.assertEqual(config['mode'], 'fast')
             data = b'\xff\xd8\xfftest'
             request = Request(endpoint + '/api/infer', data=data, headers={
                 'Origin': endpoint, 'X-Session-Token': server.token, 'Content-Type': 'image/jpeg'})
@@ -143,7 +143,7 @@ class InMemoryBackend:
         self.frames.append(data)
         return {'ok': True, 'state': 'studying', 'probabilities': {
             'studying': .7, 'phone': .1, 'other': .05, 'away': .1, 'drowsy': .05},
-            'confidence': .7, 'seconds': .01, 'mode': 'accurate', 'device': self.device}
+            'confidence': .7, 'seconds': .01, 'mode': 'fast', 'device': self.device}
 
 
 class UnavailableBackend:
