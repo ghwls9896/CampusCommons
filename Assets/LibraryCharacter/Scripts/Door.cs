@@ -13,6 +13,11 @@ namespace CampusCommons.LibraryCharacter
         public float openAngle=88;
         public float degreesPerSecond=260;
         bool open;
+        float lockUntil;
+        GameObject lockBarrier;
+        readonly System.Collections.Generic.List<GameObject> lockMarks=new System.Collections.Generic.List<GameObject>();
+        AudioSource openingAudio;
+        AudioClip openingClip,closingClip;
         Collider panel,secondPanel;
         Vector3 doorwayCenter;
         float doorwayWidth;
@@ -21,7 +26,8 @@ namespace CampusCommons.LibraryCharacter
         public float DoorwayWidth=>doorwayWidth;
         public bool IsFullyOpen=>open && hinge && Mathf.Abs(Mathf.DeltaAngle(hinge.localEulerAngles.y,openAngle))<3f &&
             (!secondHinge || Mathf.Abs(Mathf.DeltaAngle(secondHinge.localEulerAngles.y,-openAngle))<3f);
-        public string Hint=>open?"E / 클릭  문 닫기":"E / 클릭  문 열기";
+        public bool IsLocked=>lockBarrier && Time.time<lockUntil;
+        public string Hint=>IsLocked?"잠긴 문":open?"E / 클릭  문 닫기":"E / 클릭  문 열기";
         void Awake()
         {
             if(!hinge)hinge=transform;if(!game)game=FindAnyObjectByType<EscapeGame>();
@@ -36,6 +42,7 @@ namespace CampusCommons.LibraryCharacter
         }
         void Update()
         {
+            if(lockBarrier && Time.time>=lockUntil)Unlock();
             if(!hinge)return;float angle=Mathf.MoveTowardsAngle(hinge.localEulerAngles.y,open?openAngle:0,degreesPerSecond*Time.deltaTime);
             hinge.localRotation=Quaternion.Euler(0,angle,0);
             if(secondHinge)
@@ -46,7 +53,25 @@ namespace CampusCommons.LibraryCharacter
         }
         public void Interact()
         {
+            if(IsLocked)return;
             open=!open;
+            PlayDoorSound(open,true);
+        }
+        void PlayDoorSound(bool opening,bool notifyMonster)
+        {
+            if(!openingAudio)
+            {
+                var emitter=new GameObject("Door opening audio");emitter.transform.SetParent(transform,true);
+                emitter.transform.position=doorwayCenter;
+                openingAudio=emitter.AddComponent<AudioSource>();openingAudio.playOnAwake=false;
+                openingAudio.spatialBlend=1f;openingAudio.rolloffMode=AudioRolloffMode.Linear;
+                openingAudio.minDistance=1.5f;openingAudio.maxDistance=18f;openingAudio.dopplerLevel=0f;
+                openingClip=Resources.Load<AudioClip>("EscapeSounds/KenneyDoorOpen");
+                closingClip=Resources.Load<AudioClip>("EscapeSounds/KenneyDoorClose");
+            }
+            var clip=opening?openingClip:closingClip;
+            if(clip){openingAudio.Stop();openingAudio.PlayOneShot(clip,.55f);}
+            if(notifyMonster && game && game.monster)game.monster.HearDoor(doorwayCenter);
         }
         public void RetireExitDesignation()
         {
@@ -54,12 +79,69 @@ namespace CampusCommons.LibraryCharacter
             foreach(var sign in GetComponentsInChildren<TextMesh>(true))
                 if(sign.text=="EXIT")sign.gameObject.SetActive(false);
         }
-        public void OpenForMonster(){open=true;}
+        public void OpenForMonster(){if(!IsLocked && !open){open=true;PlayDoorSound(true,false);}}
+        public bool TryLock(float seconds,Sprite icon)
+        {
+            if(exitDoor || IsLocked || seconds<=0f || !hinge)return false;
+            if(open){open=false;PlayDoorSound(false,true);}
+            lockUntil=Time.time+seconds;
+            lockBarrier=new GameObject("Temporary locked doorway");lockBarrier.transform.SetParent(transform,true);
+            lockBarrier.transform.SetPositionAndRotation(doorwayCenter,transform.rotation);
+            var wall=lockBarrier.AddComponent<BoxCollider>();wall.size=new Vector3(Mathf.Max(.7f,doorwayWidth),2.2f,.18f);
+            if(icon)
+            {
+                for(int side=-1;side<=1;side+=2)
+                {
+                    var mark=new GameObject("Padlock mark");mark.transform.SetParent(lockBarrier.transform,false);
+                    mark.transform.localPosition=new Vector3(0,0,.13f*side);
+                    mark.transform.localRotation=Quaternion.Euler(0,side<0?0f:180f,0);
+                    float scale=.38f/Mathf.Max(.01f,icon.rect.height/icon.pixelsPerUnit);mark.transform.localScale=Vector3.one*scale;
+                    mark.AddComponent<SpriteRenderer>().sprite=icon;lockMarks.Add(mark);
+                }
+            }
+            return true;
+        }
+        public void Unlock()
+        {
+            if(lockBarrier){lockBarrier.SetActive(false);Destroy(lockBarrier);}lockBarrier=null;lockUntil=0f;
+            lockMarks.Clear();
+        }
+        public void ResetForNewRound()
+        {
+            Unlock();open=false;if(openingAudio)openingAudio.Stop();
+            if(hinge)hinge.localRotation=Quaternion.identity;
+            if(secondHinge)secondHinge.localRotation=Quaternion.identity;
+        }
         public void AddOpenPanels(System.Collections.Generic.List<Collider> result)
         {
             if(!IsFullyOpen)return;
             if(panel && panel.enabled)result.Add(panel);
             if(secondPanel && secondPanel.enabled)result.Add(secondPanel);
+        }
+        // A fully open leaf can still occupy an adjacent grid edge.
+        public bool OpenLeafBlocks(Vector3 from,Vector3 to,float radius)
+        {
+            if(!IsFullyOpen)return false;
+            return LeafBlocks(panel,from,to,radius) || LeafBlocks(secondPanel,from,to,radius);
+        }
+        static bool LeafBlocks(Collider leaf,Vector3 from,Vector3 to,float radius)
+        {
+            if(!leaf || !leaf.enabled)return false;
+            var bounds=leaf.bounds;var area=bounds;area.Expand(radius*2f+.05f);
+            from.y=to.y=bounds.center.y;
+            var edge=new Bounds((from+to)*.5f,new Vector3(Mathf.Abs(to.x-from.x),.1f,Mathf.Abs(to.z-from.z)));
+            if(!area.Intersects(edge))return false;
+            float start=Vector3.Distance(from,leaf.ClosestPoint(from));
+            float end=Vector3.Distance(to,leaf.ClosestPoint(to));
+            // An actor already touching a leaf must be able to step away.
+            if(start<radius && end>start+.02f)return false;
+            float clearance=radius+.025f;
+            for(int i=0;i<=4;i++)
+            {
+                var point=Vector3.Lerp(from,to,i*.25f);
+                if((point-leaf.ClosestPoint(point)).sqrMagnitude<clearance*clearance)return true;
+            }
+            return false;
         }
         public Vector3 NearestPoint(Vector3 position)
         {
