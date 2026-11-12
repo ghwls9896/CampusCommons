@@ -7,16 +7,16 @@ namespace CampusCommons.Account
  [DefaultExecutionOrder(-32000)]
  public sealed class AccountGate : MonoBehaviour
  {
-  public enum Screen { Login,Signup,SignupCode,RecoveryEmail,RecoveryCode,NewPassword,Nickname,World }
+  public enum Screen { Start,Login,Signup,SignupCode,RecoveryEmail,RecoveryCode,NewPassword,Nickname,World }
   public static AccountGate Instance {get;private set;}
   public AccountSession Session {get;private set;}
-  public Screen Page {get;set;}=Screen.Login;
+  public Screen Page {get;set;}=Screen.Start;
   public bool Ready {get;private set;}
   public bool Busy {get;private set;}
   public string Message {get;private set;}="";
   public bool Configured {get;private set;}
   public AccountWorldGate World {get;private set;}
-  float refreshAt;int operation;
+  float refreshAt;int operation;Camera backdrop;
   public event Action<AccountProfile> EntryReady;
   public event Action EntryRevoked;
   [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)] static void ResetStatic(){Instance=null;}
@@ -28,19 +28,23 @@ namespace CampusCommons.Account
   {
    if(Instance&&Instance!=this){Destroy(gameObject);return;}Instance=this;DontDestroyOnLoad(gameObject);
    World=gameObject.AddComponent<AccountWorldGate>();World.Gate=this;
+   var background=new GameObject("Account background camera");background.transform.SetParent(transform,false);
+   backdrop=background.AddComponent<Camera>();backdrop.clearFlags=CameraClearFlags.SolidColor;
+   backdrop.backgroundColor=new Color(.055f,.075f,.085f);backdrop.cullingMask=0;backdrop.depth=1000;
+   backdrop.allowHDR=false;backdrop.allowMSAA=false;
    var config=Resources.Load<TextAsset>("AccountConnection");AccountConnection connection=null;try{if(config)connection=JsonUtility.FromJson<AccountConnection>(config.text);}catch{}
    connection=connection??new AccountConnection();Configured=connection.IsValid();SetSession(new UnityAccountTransport(this,connection));
    gameObject.AddComponent<AccountView>();SceneManager.sceneLoaded+=SceneLoaded;
   }
-  void SceneLoaded(Scene scene,LoadSceneMode mode){Revoke();Page=Session.IsAuthenticated?Screen.Nickname:Screen.Login;World.Capture();}
+  void SceneLoaded(Scene scene,LoadSceneMode mode){Revoke();Page=Session.IsAuthenticated?Screen.Nickname:Screen.Start;World.Capture();}
   void SetSession(IAccountTransport transport)
   {
    if(Session!=null){Session.Changed-=SessionChanged;Session.Dispose();}Session=new AccountSession(transport);Session.Changed+=SessionChanged;
   }
   // Dependency injection for editor fixtures and future platform transports, not an auth bypass.
-  public void Configure(IAccountTransport transport){Revoke();SetSession(transport);Configured=true;Page=Screen.Login;}
+  public void Configure(IAccountTransport transport){Revoke();SetSession(transport);Configured=true;Page=Screen.Start;}
   void SessionChanged(){if(!Session.IsAuthenticated&&Ready){Revoke();Page=Screen.Login;}}
-  public void Revoke(){bool wasReady=Ready;Ready=false;if(World)World.Block();if(wasReady)EntryRevoked?.Invoke();}
+  public void Revoke(){bool wasReady=Ready;Ready=false;if(backdrop)backdrop.enabled=true;if(World)World.Block();if(wasReady)EntryRevoked?.Invoke();}
   public async Task LoginAsync(string email,string password){Revoke();await Session.SignInAsync(email,password);Page=Screen.Nickname;await Session.ReadProfileAsync();}
   public async Task SignupAsync(string email,string password){Revoke();await Session.SignUpAsync(email,password);Page=Screen.SignupCode;Message="메일의 확인 코드를 입력해 주세요.";}
   public async Task VerifySignupAsync(string email,string code){await Session.VerifySignupCodeAsync(email,code);Page=Screen.Nickname;await Session.ReadProfileAsync();}
@@ -49,9 +53,9 @@ namespace CampusCommons.Account
   public async Task ResetPasswordAsync(string password){await Session.UpdatePasswordAsync(password);Page=Screen.Login;Message="비밀번호를 변경했습니다. 다시 로그인해 주세요.";}
   public async Task EnterAsync(string nickname)
   {
-   var profile=await Session.EnterAsync(nickname);Ready=true;Page=Screen.World;World.Release();EntryReady?.Invoke(profile);
+   var profile=await Session.EnterAsync(nickname);Ready=true;if(backdrop)backdrop.enabled=false;Page=Screen.World;World.Release();EntryReady?.Invoke(profile);
   }
-  public async Task LogoutAsync(){operation++;Busy=false;Revoke();Page=Screen.Login;Message="로그아웃했습니다.";await Session.SignOutAsync();}
+  public async Task LogoutAsync(){operation++;Busy=false;Revoke();Page=Screen.Start;Message="로그아웃했습니다.";await Session.SignOutAsync();}
   public async void Perform(Func<Task> action)
   {
    if(Busy)return;int id=++operation;Busy=true;Message="";
@@ -87,6 +91,7 @@ namespace CampusCommons.Account
    if(e.Status==401||e.Status==403)return "로그인 상태를 확인하지 못했습니다. 다시 로그인해 주세요.";
    return "서버에 연결하지 못했습니다. 연결 상태와 Supabase 설정을 확인해 주세요.";
   }
+  void LateUpdate(){if(backdrop)backdrop.enabled=!Ready;}
   void OnDestroy(){SceneManager.sceneLoaded-=SceneLoaded;if(Session!=null){Session.Changed-=SessionChanged;Session.Dispose();}if(Instance==this)Instance=null;}
  }
 }

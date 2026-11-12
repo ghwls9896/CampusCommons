@@ -6,7 +6,7 @@ namespace CampusCommons.Account
  public sealed class AccountView : MonoBehaviour
  {
   AccountGate gate;string email="",password="",confirm="",code="",nickname="";Vector2 scroll;AccountSession observed;AccountProfile observedProfile;
-  GUIStyle heading,label,field,button,notice;AccountGate.Screen last;
+  GUIStyle heading,label,field,button,notice,choice,panel;AccountGate.Screen last;
   void Awake(){gate=GetComponent<AccountGate>();}
   void Styles()
   {
@@ -16,6 +16,8 @@ namespace CampusCommons.Account
    label=new GUIStyle(GUI.skin.label){font=font,fontSize=17,wordWrap=true};notice=new GUIStyle(label){normal={textColor=new Color(.95f,.79f,.46f)}};
    field=new GUIStyle(GUI.skin.textField){font=font,fontSize=18,fixedHeight=36,padding=new RectOffset(10,10,7,7)};
    button=new GUIStyle(GUI.skin.button){font=font,fontSize=17,fixedHeight=38};
+   choice=new GUIStyle(button){fontSize=26,fontStyle=FontStyle.Bold,fixedHeight=96};
+   panel=new GUIStyle(GUI.skin.box){padding=new RectOffset(24,24,24,24)};
   }
   void Update()
   {
@@ -39,19 +41,26 @@ namespace CampusCommons.Account
    Styles();GUI.depth=-10000;
    if(gate.Ready){DrawHud();return;}
    var old=GUI.color;GUI.color=new Color(.055f,.075f,.085f,.97f);GUI.DrawTexture(new Rect(0,0,Screen.width,Screen.height),Texture2D.whiteTexture);GUI.color=old;
-   float width=Mathf.Min(520,Screen.width-28),height=Mathf.Min(720,Screen.height-28);
-   GUILayout.BeginArea(new Rect((Screen.width-width)/2,(Screen.height-height)/2,width,height),GUI.skin.box);
+   float width=Mathf.Min(520,Screen.width-28),height=Mathf.Min(gate.Page==AccountGate.Screen.Start?520:720,Screen.height-28);
+   GUILayout.BeginArea(new Rect((Screen.width-width)/2,(Screen.height-height)/2,width,height),panel);
    scroll=GUILayout.BeginScrollView(scroll);GUILayout.Label("Campus Commons",heading);GUILayout.Space(12);
    if(!gate.Configured){GUILayout.Label("Supabase 연결 설정이 필요합니다.",heading);GUILayout.Label("프로젝트의 docs/account/SETUP.md에 따라 설정한 뒤 Campus → 계정 → Supabase 연결 설정에서 공개 연결값을 저장해 주세요.",label);}
    GUI.enabled=!gate.Busy&&gate.Configured;
    switch(gate.Page)
    {
+    case AccountGate.Screen.Start:
+     GUILayout.Label("함께 배우는 캠퍼스에 오신 것을 환영합니다.",label);GUILayout.Space(28);
+     if(GUILayout.Button("로그인",choice))gate.Page=AccountGate.Screen.Login;
+     GUILayout.Space(16);
+     if(GUILayout.Button("회원가입",choice))gate.Page=AccountGate.Screen.Signup;
+     GUILayout.Space(40);
+     if(Button("비밀번호 찾기"))gate.Page=AccountGate.Screen.RecoveryEmail;break;
     case AccountGate.Screen.Login:
      GUILayout.Label("로그인",heading);email=Input("이메일",email);password=Input("비밀번호",password,true);
      if(Button("로그인")){var e=email;var p=password;Run(()=>gate.LoginAsync(e,p));}
      if(Button("회원가입"))gate.Page=AccountGate.Screen.Signup;
      if(Button("이메일 확인 코드 입력"))gate.Page=AccountGate.Screen.SignupCode;
-     if(Button("비밀번호 찾기"))gate.Page=AccountGate.Screen.RecoveryEmail;break;
+     if(Button("비밀번호 찾기"))gate.Page=AccountGate.Screen.RecoveryEmail;Back();break;
     case AccountGate.Screen.Signup:
      GUILayout.Label("회원가입",heading);email=Input("이메일",email);password=Input("비밀번호 · 12~128자",password,true);confirm=Input("비밀번호 확인",confirm,true);
      if(Button("가입하고 확인 코드 받기"))PasswordAction(p=>gate.SignupAsync(email,p));Back();break;
@@ -80,7 +89,7 @@ namespace CampusCommons.Account
    if(!string.IsNullOrEmpty(gate.Message))GUILayout.Label(gate.Message,notice);
    GUILayout.EndScrollView();GUILayout.EndArea();
   }
-  void Back(){if(Button("로그인 화면으로")){gate.Session.Clear();gate.Page=AccountGate.Screen.Login;}}
+  void Back(){if(Button("시작 화면으로")){gate.Session.Clear();gate.Page=AccountGate.Screen.Start;}}
   void DrawHud()
   {
    var p=gate.Session.Profile;if(p==null)return;
