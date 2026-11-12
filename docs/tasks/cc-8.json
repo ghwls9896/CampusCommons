@@ -1,6 +1,6 @@
 {
   "id": "cc-8",
-  "title": "이메일 회원가입·로그인 및 개인 성장 DB 구현",
+  "title": "이메일 계정 및 독립 레벨1~15 저장·조회",
   "owner": "HIGHCHOI",
   "branch": "codex/cc-8-account-progression",
   "issue": "https://github.com/ghwls9896/CampusCommons/issues/8",
@@ -13,7 +13,8 @@
     "supabase/",
     "Tools/account/",
     "Packages/manifest.json",
-    "Packages/packages-lock.json"
+    "Packages/packages-lock.json",
+    "docs/superpowers/plans/2026-11-12-level-only.md"
   ],
   "shared_files": [
     "Packages/manifest.json",
@@ -21,7 +22,7 @@
   ],
   "depends_on": [],
   "validation": [
-    "PostgreSQL 실제 역할·RLS·원자적/중복 보상 및 동시성 검사",
+    "PostgreSQL 실제 역할·RLS·레벨1~15·기존 데이터 보존·XP 지급 차단",
     "Deno Edge Functions 인증·권한·입력 검증",
     "C# 인증/세션/계정 전환 검사",
     "Unity 임시6000.6 컴파일/Play Mode; 원본6000.4.5 유지",
