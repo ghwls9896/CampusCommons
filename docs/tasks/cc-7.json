@@ -10,9 +10,14 @@
     "docs/superpowers/specs/2026-11-09-local-vlm-design.md",
     "docs/superpowers/plans/2026-11-09-local-vlm.md",
     "Assets/Webcam/",
-    "Assets/Webcam.meta"
+    "Assets/Webcam.meta",
+    "Packages/manifest.json",
+    "Packages/packages-lock.json"
   ],
-  "shared_files": [],
+  "shared_files": [
+    "Packages/manifest.json",
+    "Packages/packages-lock.json"
+  ],
   "depends_on": [],
   "validation": [
     "Python unittest: 졸음 의심 포함 다섯 범주, 점수 검증, 실제 루프백 HTTP",
@@ -25,6 +30,7 @@
     "Compact 공식 파일 입력/메모리 입력 동등성 및 공개 예제 오분류·MPS 메모리 기록",
     "0.8B fast 전용 exit head 공식 입력 동등성, 화면 모드 표시, 공개 HTTP 추론",
     "Unity 착석/시작/중지/이탈 상태와 모델 프로세스 정리 검사",
-    "이전 웹캠 테스트 모델 삭제 및 잔여 확인"
+    "이전 웹캠 테스트 모델 삭제 및 잔여 확인",
+    "Unity 6000.4.5f1 착석 미리보기, 수동 분석 시작, 종료 기립, 계정 차단 시 정리; 실제 카메라→QEV fast 응답과 프로세스 해제"
   ]
 }
