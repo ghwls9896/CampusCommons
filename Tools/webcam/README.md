@@ -103,3 +103,9 @@ QEV_CACHE_DIR="$QEV_WORK_DIR/hf-cache/hub" QEV_SMOKE_FIXTURES="$FIXTURE_DIR" \
 
 `probe.py`와 관련 테스트는 이전 llama.cpp 후보 조사 도구다. 라이브 QEV 실행 경로에서는 사용하지 않으며, 이전 도구의 `unknown`은 이 화면의 범주가 아니다.
 상류 Apache-2.0 라이선스와 메모리 입력 어댑터 출처는 `QEV-LICENSE.txt`, `QEV-NOTICE.txt`에 있다.
+
+## QEV-0.5B Compact 비교 실행
+
+Compact는 별도 환경과 `start_compact.command`로 실행합니다. 기존 0.8B 실행기는
+유지됩니다. 설치, 전환, 측정 한계는 [Compact 가이드](../../docs/webcam/QEV_COMPACT.md)를
+참고하세요. 두 실행기는 기본 포트가 같으므로 한 번에 하나만 실행합니다.

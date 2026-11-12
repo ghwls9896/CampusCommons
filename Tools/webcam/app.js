@@ -152,7 +152,7 @@ fetch('/api/config').then(response => {
   return response.json();
 }).then(config => {
   if (config.mode !== 'accurate' || config.interval_ms !== INTERVAL_MS) throw new Error('정확도 우선 / 1초 설정이 아닙니다.');
-  if (!stream) byId('progress').textContent = `QEV-0.8B · 정확도 우선 · ${config.device.toUpperCase()}`;
+  if (!stream) byId('progress').textContent = `${config.model} · ${config.device.toUpperCase()}`;
 }).catch(error => {
   byId('progress').textContent = error.message;
   byId('start').disabled = true;

@@ -107,14 +107,15 @@ def main():
     parser.add_argument('--cache-dir', type=Path, required=True)
     parser.add_argument('--device', choices=('auto', 'mps', 'cuda', 'cpu'), default='auto')
     parser.add_argument('--port', type=int, default=8770)
+    parser.add_argument('--variant', choices=('original', 'compact'), default='original')
     args = parser.parse_args()
     os.environ['HF_HUB_OFFLINE'] = '1'
     os.environ['TRANSFORMERS_OFFLINE'] = '1'
     os.environ['HF_HUB_DISABLE_TELEMETRY'] = '1'
-    print('Loading ken-jo/QEV-0.8B accurate (24 layers, local files only)…', flush=True)
-    backend = QEVBackend.load(args.model_dir, args.cache_dir, args.device)
+    print(f'Loading QEV {args.variant} accurate (local files only)…', flush=True)
+    backend = QEVBackend.load(args.model_dir, args.cache_dir, args.device, args.variant)
     server = ThreadingHTTPServer(('127.0.0.1', args.port), Handler)
-    configure(server, backend, 'QEV-0.8B · 정확도 우선 · 1초 간격')
+    configure(server, backend, backend.model_label + ' · 정확도 우선 · 1초 간격')
     print(f'Model ready: accurate / {backend.device}', flush=True)
     print(f'Webcam test: {server.origin} (camera starts only after your click)', flush=True)
     try:

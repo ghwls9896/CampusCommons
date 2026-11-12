@@ -16,3 +16,15 @@
 - Remaining: user's own webcam quality check, Windows/device performance, Unity seating/camera lifecycle integration and study-time recording. Public fixtures are not a webcam accuracy benchmark.
 - PR: https://github.com/ghwls9896/CampusCommons/pull/9. Final human review: ghwls9896; no merge or self-approval performed.
 - No shared files claimed or modified.
+
+## 2026-11-12 Compact 비교 추가
+
+- 사용자 요청으로 QEV-0.5B (이전 이름 QEV-0.8B-compact) 다운로드 및 별도 환경 실행.
+- 기존 0.8B 환경/실행기는 유지. Compact는 `start_compact.command`, 16층 accurate,
+  1초 목표, 기존 5범주. 현재 테스트 서버는 Compact로 실행한다.
+- 공개 5종 중 4종 기대 범주 일치; phone→other 오분류를 숨기지 않고 기록.
+  공식 파일 입력/메모리 입력 확률은 5종 모두 동일. 개인 카메라는 사용하지 않음.
+- M4 HTTP 반복 추론 0.588–0.609초, 첫 요청 0.873초; footprint 1.7GiB, peak 2.1GiB.
+- Python 18 pass/3 skip, Node 9 pass, team 16 pass; Compact 실제 계약/동등성 3 pass.
+- 재현/측정 한계: docs/webcam/QEV_COMPACT.md. Unity FPS 및 개인 웹캠 정확도 미검증.
+- 변경은 기존 cc-7 범위 안에만 있으며 공유 파일 조율 대상 없음. 같은 PR #9로 인계.
