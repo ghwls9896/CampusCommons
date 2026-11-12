@@ -10,6 +10,13 @@ namespace CampusCommons.GrandLibrary
         public Portal.Space currentSpace = Portal.Space.Library;
         CharacterController body;
         Transform model, leftLeg, rightLeg, leftArm, rightArm;
+
+
+        LibraryAvatarMotion avatarMotion;
+        LibraryAvatarCustomizerUI avatarUI;
+        LibraryAvatarSitPose avatarSitPose;
+
+
         Camera cameraView;
         Seat[] seats;
         Seat nearest, sitting;
@@ -65,7 +72,46 @@ namespace CampusCommons.GrandLibrary
         void BuildAvatar()
         {
             model=new GameObject("Student character").transform; model.SetParent(transform,false);
-            var skin=Material("Skin",new Color(.78f,.56f,.40f));
+
+            GameObject avatarPrefab =
+                Resources.Load<GameObject>("TeamAvatar/LibraryAvatar");
+
+            if (avatarPrefab != null)
+            {
+                // 기존 플레이어 아래에 Sunbox 아바타 생성
+                GameObject avatar = Instantiate(
+                    avatarPrefab, model, false);
+
+                avatar.name = "AvatarVisual";
+
+                // 걷기·달리기·손 흔들기
+                avatarMotion =
+                    gameObject.AddComponent<LibraryAvatarMotion>();
+                avatarMotion.Initialize(avatar);
+
+                // C키 커스터마이징
+                avatarUI =
+                    gameObject.AddComponent<LibraryAvatarCustomizerUI>();
+                avatarUI.Initialize(avatar);
+
+                // E키 앉기 자세
+                avatarSitPose =
+                    gameObject.AddComponent<LibraryAvatarSitPose>();
+                avatarSitPose.Initialize(avatar);
+
+                // 실시간 캐릭터 미리보기
+                LibraryAvatarPreview avatarPreview =
+                    gameObject.AddComponent<LibraryAvatarPreview>();
+                avatarPreview.Initialize(avatar, avatarUI);
+
+                Debug.Log("Sunbox 아바타 시스템 연결 완료");
+                return;
+            }
+
+            Debug.LogWarning(
+                "LibraryAvatar를 찾지 못해 기본 캐릭터를 생성합니다.");
+
+            var skin =Material("Skin",new Color(.78f,.56f,.40f));
             var shirt=Material("Sweater",new Color(.26f,.40f,.35f));
             var pants=Material("Trousers",new Color(.17f,.19f,.20f));
             var shoes=Material("Shoes",new Color(.78f,.75f,.68f));
@@ -89,7 +135,29 @@ namespace CampusCommons.GrandLibrary
         }
         void Update()
         {
-            if(Input.GetKeyDown(KeyCode.Escape))
+
+            if (Input.GetKeyDown(KeyCode.C) && !exitConfirm)
+            {
+                avatarUI?.Toggle();
+            }
+
+            if (avatarUI != null && avatarUI.IsOpen)
+            {
+                if (Input.GetKeyDown(KeyCode.Escape))
+                {
+                    avatarUI.Close();
+                }
+
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
+
+                avatarMotion?.UpdateMovement(
+                    false, false, sitting != null);
+
+                return;
+            }
+
+            if (Input.GetKeyDown(KeyCode.Escape))
             {
                 if(exitConfirm)CancelRoomExit();else RequestRoomExit();
                 return;
@@ -120,7 +188,15 @@ namespace CampusCommons.GrandLibrary
                 else if (nearestDoor) nearestDoor.TryEnter(this);
                 else if (nearest) TrySit(nearest);
             }
-            if (Input.GetKeyDown(KeyCode.R)) { waving=true; waveUntil=Time.time+2; }
+
+            if (Input.GetKeyDown(KeyCode.R))
+            {
+                waving = true;
+                waveUntil = Time.time + 2f;
+
+                avatarMotion?.Wave();
+            }
+
             if (Time.time>waveUntil) waving=false;
             float x=(Input.GetKey(KeyCode.D)||Input.GetKey(KeyCode.RightArrow)?1:0)-(Input.GetKey(KeyCode.A)||Input.GetKey(KeyCode.LeftArrow)?1:0);
             float z=(Input.GetKey(KeyCode.W)||Input.GetKey(KeyCode.UpArrow)?1:0)-(Input.GetKey(KeyCode.S)||Input.GetKey(KeyCode.DownArrow)?1:0);
@@ -135,17 +211,63 @@ namespace CampusCommons.GrandLibrary
             }
             AnimateAvatar(direction,Input.GetKey(KeyCode.LeftShift));
         }
-        void AnimateAvatar(Vector3 direction,bool running)
+
+        void AnimateAvatar(Vector3 direction, bool running)
         {
-            if(!model || !leftLeg || !rightLeg || !leftArm || !rightArm)return;
-            if(!sitting && direction.sqrMagnitude>.01f)model.rotation=Quaternion.Slerp(model.rotation,Quaternion.LookRotation(direction),12*Time.deltaTime);
-            gait+=Time.deltaTime*(running?12:8);
-            float swing=direction.sqrMagnitude>.01f?Mathf.Sin(gait)*25:0;
-            leftLeg.localRotation=Quaternion.Euler(sitting?-75:swing,0,0);
-            rightLeg.localRotation=Quaternion.Euler(sitting?-75:-swing,0,0);
-            leftArm.localRotation=Quaternion.Euler(-swing*.7f,0,0);
-            rightArm.localRotation=waving?Quaternion.Euler(0,0,-140+Mathf.Sin(Time.time*14)*20):Quaternion.Euler(swing*.7f,0,0);
+            if (!model) return;
+
+            // Sunbox 아바타 이동 애니메이션
+            if (avatarMotion != null)
+            {
+                avatarMotion.UpdateMovement(
+                    sitting == null && direction.sqrMagnitude > 0.01f,
+                    running,
+                    sitting != null
+                );
+            }
+
+            // Sunbox 아바타 앉기 자세
+            if (avatarSitPose != null)
+            {
+                avatarSitPose.SetSitting(sitting != null);
+            }
+
+            // 기존 이동 방향 회전 유지
+            if (!sitting && direction.sqrMagnitude > .01f)
+            {
+                model.rotation = Quaternion.Slerp(
+                    model.rotation,
+                    Quaternion.LookRotation(direction),
+                    12f * Time.deltaTime
+                );
+            }
+
+            // 기본 도형 캐릭터가 없으면 아래 동작 생략
+            if (!leftLeg || !rightLeg || !leftArm || !rightArm)
+                return;
+
+            // 기존 기본 캐릭터 애니메이션 유지
+            gait += Time.deltaTime * (running ? 12 : 8);
+
+            float swing = direction.sqrMagnitude > .01f
+                ? Mathf.Sin(gait) * 25f : 0f;
+
+            leftLeg.localRotation =
+                Quaternion.Euler(sitting ? -75 : swing, 0, 0);
+
+            rightLeg.localRotation =
+                Quaternion.Euler(sitting ? -75 : -swing, 0, 0);
+
+            leftArm.localRotation =
+                Quaternion.Euler(-swing * .7f, 0, 0);
+
+            rightArm.localRotation = waving
+                ? Quaternion.Euler(
+                    0, 0,
+                    -140 + Mathf.Sin(Time.time * 14) * 20)
+                : Quaternion.Euler(swing * .7f, 0, 0);
         }
+
         public void ToggleView(){SetFirstPerson(!firstPerson);}
         public void SetFirstPerson(bool value){firstPerson=value;RefreshView();}
         public void RefreshView()

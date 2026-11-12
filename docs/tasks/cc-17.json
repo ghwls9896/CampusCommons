@@ -1,0 +1,60 @@
+{
+  "id": "cc-17",
+  "title": "공간·탈출룸과 최종 캐릭터 통합",
+  "owner": "ghwls9896",
+  "branch": "codex/cc-17-npc-sounds",
+  "issue": "https://github.com/ghwls9896/CampusCommons/issues/17",
+  "scope": [
+    "Assets/StudyImmersive/Scripts/EscapeGame.cs",
+    "Assets/StudyImmersive/Scripts/EscapeSystems/EscapeWorld.cs",
+    "Assets/StudyImmersive/Resources/EscapeSounds/",
+    "Assets/StudyImmersive/Resources/EscapeSounds.meta",
+    "docs/tasks/cc-17.json",
+    "docs/tasks/cc-17.md",
+    "Assets/StudyImmersive/Scripts/EscapeSystems/Editor/EscapeNpcLockedRouteVerification.cs",
+    "Assets/StudyImmersive/Scripts/EscapeSystems/Editor/EscapeNpcLockedRouteVerification.cs.meta",
+    "Assets/LibraryCharacter/Scripts/Door.cs",
+    "Assets/LibraryCharacter/Scripts/Monster.cs",
+    "Assets/StudyImmersive/Scripts/EscapeSystems/EscapePlacementSettings.cs",
+    "Assets/StudyImmersive/Scripts/EscapeSystems/EscapePlacementSettings.cs.meta",
+    "Assets/StudyImmersive/Scripts/EscapeSystems/Editor/EscapePlacementEditor.cs",
+    "Assets/StudyImmersive/Scripts/EscapeSystems/Editor/EscapePlacementEditor.cs.meta",
+    "Assets/StudyImmersive/Scripts/EscapeSystems/Editor/EscapeDoorHearingVerification.cs",
+    "Assets/StudyImmersive/Scripts/EscapeSystems/Editor/EscapeDoorHearingVerification.cs.meta",
+    "Assets/StudyImmersive/Resources/EscapePlacementSettings.asset",
+    "Assets/StudyImmersive/Resources/EscapePlacementSettings.asset.meta",
+    "Assets/StudyImmersive/Scenes/GrandLibrary_Living.unity",
+    "Assets/GrandLibrary/Scripts/Player.cs",
+    "Packages/manifest.json",
+    "Packages/packages-lock.json",
+    "Assets/TeamAvatar/",
+    "Assets/TeamAvatar.meta",
+    "Assets/StudyImmersive/Scripts/EscapeSystems/EscapeSpawnPoint.cs",
+    "Assets/StudyImmersive/Scripts/EscapeSystems/EscapeSpawnPoint.cs.meta",
+    "docs/AVATAR_SETUP.md",
+    "Assets/StudyImmersive/Scripts/EscapeSystems/Editor/EscapeOpenDoorRouteVerification.cs",
+    "Assets/StudyImmersive/Scripts/EscapeSystems/Editor/EscapeOpenDoorRouteVerification.cs.meta",
+    "docs/tasks/cc-19.json",
+    "docs/tasks/cc-19.md"
+  ],
+  "shared_files": [
+    "Assets/StudyImmersive/Scenes/GrandLibrary_Living.unity",
+    "Assets/GrandLibrary/Scripts/Player.cs",
+    "Packages/manifest.json",
+    "Packages/packages-lock.json"
+  ],
+  "depends_on": [
+    "https://github.com/ghwls9896/CampusCommons/pull/16",
+    "https://github.com/ghwls9896/CampusCommons/pull/20"
+  ],
+  "validation": [
+    "Unity 6000.4.5f1 Play Mode 게임 진행·구매, NPC 오디오 거리 및 겹침 검증",
+    "python Tools/team/check.py --base origin/main",
+    "Unity 6000.4.5f1 교수·시설관리 NPC의 잠긴 경로 우회 및 대체 목적지 검증",
+    "Unity 6000.4.5f1 문 소리 10m 청각·NPC 배치 설정 및 회귀 검사",
+    "Unity 6000.4.5f1 아바타 에셋 설치 전 기본 캐릭터 컴파일 및 로비 이동",
+    "Unity 6000.4.5f1 에셋 설치 후 아바타 UI와 성별 변경 및 1·3인칭 전환",
+    "Unity 6000.4.5f1 열린 문짝 경로 우회, NPC 간 충돌과 막힌 자리 탈출 회귀 검사",
+    "PR #20 선행 통합 후 아바타 대체 구현 중복 없이 컴파일 및 탈출룸 회귀 검사; #4 퀴즈 입력과 타임어택 추가 변경은 별도 후속 작업"
+  ]
+}
