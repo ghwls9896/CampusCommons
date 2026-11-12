@@ -1,0 +1,38 @@
+using System;
+using System.Collections;
+using System.Linq;
+using System.Reflection;
+using CampusCommons.GrandLibrary;
+using CampusCommons.LibraryCharacter;
+using CampusCommons.StudyImmersive;
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+public static class EscapeWorldIntegrationVerification
+{
+    const string Pending="CC15WorldTestPending";
+    static int stage;static float start;static EscapeGame game;static Player player;static EscapeWorld world;static Monster monster;static CharacterController body;static Door locked;
+    static void Check(bool ok,string message){if(!ok)throw new Exception(message);}
+    static void Step(int next){stage=next;start=Time.time;}
+    static void Place(Vector3 point){body.enabled=false;point.y=.08f;player.transform.position=point;body.enabled=true;Physics.SyncTransforms();}
+    static object Field(object obj,string name)=>obj.GetType().GetField(name,BindingFlags.Instance|BindingFlags.NonPublic|BindingFlags.Public).GetValue(obj);
+    static int Find(EscapeGame.InventoryItem item){for(int i=0;i<3;i++)if(game.ItemAt(i)==item)return i;return -1;}
+    public static void Run(){EditorSceneManager.OpenScene("Assets/StudyImmersive/Scenes/GrandLibrary_Living.unity");SessionState.SetBool(Pending,true);EditorApplication.EnterPlaymode();}
+    [InitializeOnLoadMethod]static void Resume(){EditorApplication.delayCall+=()=>{if(SessionState.GetBool(Pending,false))EditorApplication.update+=Tick;};}
+    static void Finish(int status){Time.timeScale=1;EditorApplication.update-=Tick;SessionState.SetBool(Pending,false);EditorApplication.Exit(status);}
+    static void Tick(){if(!EditorApplication.isPlaying)return;try{
+      if(stage==0){if(Time.timeSinceLevelLoad<1.5f)return;game=UnityEngine.Object.FindAnyObjectByType<EscapeGame>();player=UnityEngine.Object.FindAnyObjectByType<Player>();monster=UnityEngine.Object.FindAnyObjectByType<Monster>();Check(game&&player&&monster,"Missing scene game/player/monster");body=player.GetComponent<CharacterController>();var door=UnityEngine.Object.FindObjectsByType<LobbyDoor>().First(d=>d.escape==game);Place(door.transform.position);Check(door.TryEnter(player),"Lobby door interaction failed");Step(1);}
+      else if(stage==1 && Time.time-start>.8f){Check(game.IsSelecting,"Did not enter escape room");Check(game.ChooseMode(EscapeGame.Mode.Easy),"Could not start");world=game.World;Check(world && world.PickupCount==5,"Unexpected randomized pickup count: "+(world?world.PickupCount:-1));Check(GameObject.Find("Soda vending machine"),"Vending missing");Check(GameObject.Find("Professor")&&GameObject.Find("Maintenance Worker"),"Patrol NPCs missing");Check(Resources.Load<AudioClip>("CrowAlert"),"Monster warning sound missing");Check(!monster.IsAwakened,"Monster must wait for first wrong answer");
+        var sheet=UnityEngine.Object.FindObjectsByType<Sheet>().First();Check(game.OpenSheet(sheet.gameObject),"Sheet failed to open");int wrong=(game.CurrentCorrectAnswer+1)%4;Check(game.SubmitAnswer(wrong),"Wrong answer failed");Check(monster.IsAwakened,"First wrong answer did not wake monster");Check(game.ContinueQuestion(),"Question continue failed");for(int i=0;i<2;i++){Check(game.SubmitAnswer(game.CurrentCorrectAnswer),"Correct answer failed");Check(game.ContinueQuestion(),"Question continue failed");}Check(game.Found==1,"Sheet collection failed");monster.enabled=false;Step(2);}
+      else if(stage==2){var items=(IList)Field(world,"pickups");object coin=null;foreach(var item in items)if((bool)Field(item,"coin")){coin=item;break;}Check(coin!=null,"No coin spawned");var coinRoot=(GameObject)Field(coin,"root");Place(coinRoot.transform.position);Check(world.TryInteract(false)&&world.Coins==1,"Coin pickup failed");var machine=(GameObject)Field(world,"vending");Place(machine.transform.position);Check(world.TryInteract(false)&&world.Coins==0,"Vending purchase failed");int soda=Find(EscapeGame.InventoryItem.Soda);Check(soda>=0&&world.UseItem(soda)&&world.HasSpeedBoost,"Soda usage failed");
+        for(int i=0;i<3;i++)Check(game.AddItem(EscapeGame.InventoryItem.ExcuseNote),"Could not fill inventory");Check(!game.AddItem(EscapeGame.InventoryItem.Padlock),"Inventory exceeded three slots");typeof(EscapeWorld).GetField("coins",BindingFlags.Instance|BindingFlags.NonPublic).SetValue(world,1);Check(world.TryInteract(false)&&world.Coins==1,"Full inventory consumed a coin");for(int i=0;i<3;i++)Check(game.RemoveItem(i),"Could not clear inventory");
+        var professor=GameObject.Find("Professor");Place(professor.transform.position);Step(3);}
+      else if(stage==3 && Time.time-start>.2f){Check(world.ProfessorQuestionOpen,"Professor encounter did not start");var q=(CodeQuestions.Question)Field(world,"question");Check(world.AnswerProfessor((q.Correct+1)%q.Options.Length),"Professor answer rejected");Check(world.BlocksMovement && world.ReviewRemaining>9,"Professor review not 10 seconds");Check(game.AddItem(EscapeGame.InventoryItem.ExcuseNote),"Could not add excuse note");int slot=Find(EscapeGame.InventoryItem.ExcuseNote);Check(world.UseItem(slot)&&!world.BlocksMovement,"Excuse did not release professor");
+        var door=UnityEngine.Object.FindObjectsByType<Door>().First(d=>d && !d.exitDoor && d.DoorwayWidth>.7f);Place(door.DoorwayCenter-door.transform.forward*.8f);Check(game.AddItem(EscapeGame.InventoryItem.Padlock),"Could not add padlock");slot=Find(EscapeGame.InventoryItem.Padlock);Check(world.UseItem(slot),"Padlock use failed");locked=UnityEngine.Object.FindObjectsByType<Door>().FirstOrDefault(d=>d.IsLocked);Check(locked,"No door locked");locked.OpenForMonster();Check(!locked.IsOpen,"Monster opened locked door");var marks=locked.GetComponentsInChildren<Transform>(true).Count(t=>t.name=="Padlock mark");Check(marks==2,"Padlock is not shown on both sides");
+        var begin=typeof(EscapeWorld).GetMethod("BeginProfessorQuestion",BindingFlags.Instance|BindingFlags.NonPublic);begin.Invoke(world,null);q=(CodeQuestions.Question)Field(world,"question");Check(world.AnswerProfessor(q.Correct)&&!world.BlocksMovement,"Correct professor answer did not release player");begin.Invoke(world,null);q=(CodeQuestions.Question)Field(world,"question");Check(world.AnswerProfessor((q.Correct+1)%q.Options.Length)&&world.BlocksMovement,"Second review did not start");Time.timeScale=12f;Step(4);}
+      else if(stage==4 && Time.time-start>16f){Check(!locked.IsLocked,"Door did not unlock after 15 seconds");Check(!world.BlocksMovement,"Professor review did not expire after ten seconds");Time.timeScale=1f;Place(game.schoolArrival);int count=0;for(int i=0;i<game.schoolGrid.links.Length && count<400;i+=7){if(game.schoolGrid.links[i]==0)continue;count++;if(world.TryPlaceSafeBarrier(game.schoolGrid.Position(i)))break;}Check(world.ActiveBarrierCount==1,"No safe temporary barricade could be placed");
+        foreach(var sheet in UnityEngine.Object.FindObjectsByType<Sheet>().Where(s=>s.gameObject.activeSelf)){Check(game.OpenSheet(sheet.gameObject),"Remaining sheet failed to open");for(int i=0;i<3;i++)Check(game.SubmitAnswer(game.CurrentCorrectAnswer)&&game.ContinueQuestion(),"Remaining answer failed");}
+        Check(game.Found==3 && game.ReadyToExit,"Could not complete all sheets");var elevator=UnityEngine.Object.FindAnyObjectByType<ElevatorExit>();Check(elevator,"Elevator missing");elevator.Interact();Check(game.Completed,"Elevator did not complete escape");
+        Debug.Log("CC15_WORLD_PASS lobby, all sheets, elevator, first-wrong monster, pickups, vending, soda, professor, excuse, lock expiry, safe barricade");game.ExitToLobby();Check(player.enabled&&player.currentSpace==Portal.Space.Library,"Lobby return failed");Finish(0);}
+    }catch(Exception e){Debug.LogException(e);Finish(1);}}
+}
