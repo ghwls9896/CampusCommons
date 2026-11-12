@@ -1,0 +1,27 @@
+{
+  "id": "cc-21",
+  "title": "인벤토리 UI 및 단축 슬롯 구현",
+  "owner": "GongBeak",
+  "branch": "feat/cc-21-inventory-ui",
+  "issue": "https://github.com/ghwls9896/CampusCommons/issues/21",
+  "scope": [
+    "Assets/TeamInventory/",
+    "Assets/TeamInventory.meta",
+    "docs/tasks/cc-21.json",
+    "docs/INVENTORY_SETUP.md"
+  ],
+  "shared_files": [],
+  "depends_on": [
+    "cc-19"
+  ],
+  "validation": [
+    "Unity 6000.4.5f1 컴파일 확인",
+    "I키 인벤토리 열기 및 닫기",
+    "5열 6행 총 30칸 표시",
+    "1~5번 단축 슬롯 선택",
+    "화면 오른쪽 상단 UI 확인",
+    "캐릭터 미리보기 연동 확인",
+    "기존 플레이어 기능 유지",
+    "python Tools/team/check.py --base origin/main"
+  ]
+}
