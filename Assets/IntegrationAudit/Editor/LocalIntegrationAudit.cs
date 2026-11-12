@@ -22,6 +22,7 @@ public static class LocalIntegrationAudit
  }
  public static void OpenForUser(){SessionState.EraseString(Key);EditorSceneManager.OpenScene("Assets/StudyImmersive/Scenes/GrandLibrary_Living.unity");EditorApplication.EnterPlaymode();}
  public static void Live(){SessionState.SetString(Key,"live");EditorSceneManager.OpenScene("Assets/StudyImmersive/Scenes/GrandLibrary_Living.unity");EditorApplication.EnterPlaymode();}
+ public static void Quiz(){SessionState.SetString(Key,"quiz");CampusCommons.Quiz.Editor.QuizRoomTest.Run();}
  public static void Webcam(){SessionState.SetString(Key,"webcam");WebcamLobbyVerification.Run();}
  public static void World(){SessionState.SetString(Key,"world");EscapeWorldIntegrationVerification.Run();}
  public static void Locked(){SessionState.SetString(Key,"locked");EscapeNpcLockedRouteVerification.Run();}

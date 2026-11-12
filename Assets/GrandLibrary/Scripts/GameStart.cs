@@ -8,7 +8,10 @@ namespace CampusCommons.GrandLibrary
         void Awake()
         {
             Application.targetFrameRate = 60;
-            if (!FindAnyObjectByType<Player>()) Player.Create(transform);
+            var player = FindAnyObjectByType<Player>();
+            if (!player) player = Player.Create(transform);
+            if (!player.GetComponent<CampusCommons.Quiz.QuizRoom>())
+                player.gameObject.AddComponent<CampusCommons.Quiz.QuizRoom>();
         }
     }
 }
