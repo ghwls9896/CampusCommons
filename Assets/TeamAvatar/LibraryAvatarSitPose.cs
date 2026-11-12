@@ -7,13 +7,13 @@ namespace CampusCommons.GrandLibrary
 {
     public class LibraryAvatarSitPose : MonoBehaviour
     {
-        [Header("¾É±â ÀÚ¼¼ °¢µµ")]
+        [Header("ì•‰ê¸° ìì„¸ ê°ë„")]
         public float thighAngle = -75f;
         public float kneeAngle = 75f;
 
 
 
-        [Header("ÀÇÀÚ À§Ä¡ º¸Á¤")]
+        [Header("ì˜ì ìœ„ì¹˜ ë³´ì •")]
         public Vector3 sitOffset = new Vector3(0f, -0.24f, -0.05f);
 
 
@@ -40,7 +40,7 @@ namespace CampusCommons.GrandLibrary
                 <AvatarCustomization>(true);
 
             if (avatar == null)
-                Debug.LogError("¾É±â ÀÚ¼¼: AvatarCustomizationÀ» Ã£Áö ¸øÇß½À´Ï´Ù.");
+                Debug.LogError("ì•‰ê¸° ìì„¸: AvatarCustomizationì„ ì°¾ì§€ ëª»í–ˆìŠµë‹ˆë‹¤.");
         }
 
 
@@ -50,8 +50,8 @@ namespace CampusCommons.GrandLibrary
             {
                 sitting = value;
 
-                // ¾É±â ¶Ç´Â ÀÏ¾î¼­±â »óÅÂ°¡ ¹Ù²î¸é
-                // ÀÌÀü¿¡ ÀúÀåÇÑ ´Ù¸® ÀÚ¼¼¸¦ ´Ù½Ã °è»ê
+                // ì•‰ê¸° ë˜ëŠ” ì¼ì–´ì„œê¸° ìƒíƒœê°€ ë°”ë€Œë©´
+                // ì´ì „ì— ì €ì¥í•œ ë‹¤ë¦¬ ìì„¸ë¥¼ ë‹¤ì‹œ ê³„ì‚°
                 hasBasePose = false;
             }
         }
@@ -87,7 +87,7 @@ namespace CampusCommons.GrandLibrary
                 !leftKnee || !rightKnee)
             {
                 Debug.LogError(
-                    "¾É±â ÀÚ¼¼: ´Ù¸® »À´ë¸¦ Ã£Áö ¸øÇß½À´Ï´Ù.");
+                    "ì•‰ê¸° ìì„¸: ë‹¤ë¦¬ ë¼ˆëŒ€ë¥¼ ì°¾ì§€ ëª»í–ˆìŠµë‹ˆë‹¤.");
             }
         }
 
@@ -104,7 +104,7 @@ namespace CampusCommons.GrandLibrary
         private void LateUpdate()
         {
 
-            // ¾ÉÀ¸¸é Ä³¸¯ÅÍ ¿ÜÇü¸¸ ÀÇÀÚ À§Ä¡¿¡ ¸Â°Ô º¸Á¤
+            // ì•‰ìœ¼ë©´ ìºë¦­í„° ì™¸í˜•ë§Œ ì˜ì ìœ„ì¹˜ì— ë§ê²Œ ë³´ì •
             if (avatarVisualTransform != null)
             {
                 Vector3 target = originalAvatarPosition +
@@ -126,7 +126,7 @@ namespace CampusCommons.GrandLibrary
                 !leftKnee || !rightKnee)
                 return;
 
-            // Æò¼Ò¿¡´Â Animator°¡ ¸¸µç ÀÚ¼¼¸¦ º¸Á¸
+            // í‰ì†Œì—ëŠ” Animatorê°€ ë§Œë“  ìì„¸ë¥¼ ë³´ì¡´
             if (!sitting)
             {
                 RememberBasePose();
@@ -139,7 +139,7 @@ namespace CampusCommons.GrandLibrary
             if (!hasBasePose)
                 RememberBasePose();
 
-            // ±âÁ¸ Ä³¸¯ÅÍÀÇ ´Ù¸® È¸Àü ¹æ½Ä ÀçÇö
+            // ê¸°ì¡´ ìºë¦­í„°ì˜ ë‹¤ë¦¬ íšŒì „ ë°©ì‹ ì¬í˜„
             leftThigh.localRotation = leftThighBase *
                 Quaternion.Euler(thighAngle, 0f, 0f);
 

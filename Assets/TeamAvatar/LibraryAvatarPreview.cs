@@ -36,7 +36,7 @@ namespace CampusCommons.GrandLibrary
 
             previewCamera.targetTexture = previewTexture;
 
-            // Ä³¸¯ÅÍ¸¸ ÃÔ¿µ
+            // ìºë¦­í„°ë§Œ ì´¬ì˜
             previewCamera.cullingMask = 1 << 2;
 
             previewCamera.clearFlags =
@@ -45,7 +45,7 @@ namespace CampusCommons.GrandLibrary
             previewCamera.backgroundColor =
                 new Color(0.12f, 0.14f, 0.17f);
 
-            // Àü½ÅÀ» ÃÔ¿µÇÏ´Â Ä«¸Ş¶ó
+            // ì „ì‹ ì„ ì´¬ì˜í•˜ëŠ” ì¹´ë©”ë¼
             previewCamera.orthographic = true;
             previewCamera.orthographicSize = 1.2f;
 
@@ -55,7 +55,7 @@ namespace CampusCommons.GrandLibrary
 
         private void SetPreviewLayer(Transform target)
         {
-            // ÇÃ·¹ÀÌ¾î°¡ ÀÌ¹Ì »ç¿ë ÁßÀÎ Ignore Raycast ·¹ÀÌ¾î
+            // í”Œë ˆì´ì–´ê°€ ì´ë¯¸ ì‚¬ìš© ì¤‘ì¸ Ignore Raycast ë ˆì´ì–´
             target.gameObject.layer = 2;
 
             foreach (Transform child in target)
@@ -77,8 +77,8 @@ namespace CampusCommons.GrandLibrary
                 return;
             }
 
-            // 1ÀÎÄª¿¡¼­´Â ¸ğµ¨ÀÌ ¼û°ÜÁú ¼ö ÀÖÀ¸¹Ç·Î
-            // Ä¿½ºÅÍ¸¶ÀÌÂ¡ Áß¿¡´Â 3ÀÎÄªÀ¸·Î ÀüÈ¯
+            // 1ì¸ì¹­ì—ì„œëŠ” ëª¨ë¸ì´ ìˆ¨ê²¨ì§ˆ ìˆ˜ ìˆìœ¼ë¯€ë¡œ
+            // ì»¤ìŠ¤í„°ë§ˆì´ì§• ì¤‘ì—ëŠ” 3ì¸ì¹­ìœ¼ë¡œ ì „í™˜
             Player player = GetComponent<Player>();
 
             if (player != null && player.IsFirstPerson)
@@ -91,7 +91,7 @@ namespace CampusCommons.GrandLibrary
             if (previewCamera == null)
                 CreatePreviewCamera();
 
-            // Çì¾î³ª ÀÇ»ó º¯°æÀ¸·Î »õ·Î »ı±ä ¸Ş½Ãµµ Æ÷ÇÔ
+            // í—¤ì–´ë‚˜ ì˜ìƒ ë³€ê²½ìœ¼ë¡œ ìƒˆë¡œ ìƒê¸´ ë©”ì‹œë„ í¬í•¨
             SetPreviewLayer(avatarVisual);
 
             Vector3 targetPosition =
@@ -117,14 +117,14 @@ namespace CampusCommons.GrandLibrary
                 previewTexture == null)
                 return;
 
-            // ±âÁ¸ ¿À¸¥ÂÊ Ä¿½ºÅÍ¸¶ÀÌÂ¡ ¸Ş´ºÀÇ ½ÃÀÛ À§Ä¡
+            // ê¸°ì¡´ ì˜¤ë¥¸ìª½ ì»¤ìŠ¤í„°ë§ˆì´ì§• ë©”ë‰´ì˜ ì‹œì‘ ìœ„ì¹˜
             float menuWidth =
                 Mathf.Min(360f, Screen.width - 20f);
 
             float menuX =
                 Mathf.Max(10f, Screen.width - menuWidth - 10f);
 
-            // ¿ŞÂÊ¿¡ °ø°£ÀÌ ºÎÁ·ÇÏ¸é ¹Ì¸®º¸±â ¼û±è
+            // ì™¼ìª½ì— ê³µê°„ì´ ë¶€ì¡±í•˜ë©´ ë¯¸ë¦¬ë³´ê¸° ìˆ¨ê¹€
             if (menuX < 160f)
                 return;
 
@@ -135,7 +135,7 @@ namespace CampusCommons.GrandLibrary
                 Mathf.Max(190f, Screen.height - 130f)
             );
 
-            GUI.Box(previewRect, "³» Ä³¸¯ÅÍ");
+            GUI.Box(previewRect, "ë‚´ ìºë¦­í„°");
 
             Rect imageRect = new Rect(
                 previewRect.x + 8f,
@@ -159,7 +159,7 @@ namespace CampusCommons.GrandLibrary
                     buttonY,
                     buttonWidth,
                     26f),
-                "¿ŞÂÊ È¸Àü"))
+                "ì™¼ìª½ íšŒì „"))
             {
                 rotationAngle -= 45f;
             }
@@ -170,7 +170,7 @@ namespace CampusCommons.GrandLibrary
                     buttonY,
                     buttonWidth,
                     26f),
-                "¿À¸¥ÂÊ È¸Àü"))
+                "ì˜¤ë¥¸ìª½ íšŒì „"))
             {
                 rotationAngle += 45f;
             }

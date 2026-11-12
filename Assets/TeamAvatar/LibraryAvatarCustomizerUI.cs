@@ -19,7 +19,7 @@ namespace CampusCommons.GrandLibrary
                 <AvatarCustomization>(true);
 
             if (avatar == null)
-                Debug.LogError("AvatarCustomizationÀ» Ã£Áö ¸øÇß½À´Ï´Ù.");
+                Debug.LogError("AvatarCustomizationì„ ì°¾ì§€ ëª»í–ˆìŠµë‹ˆë‹¤.");
         }
 
         public void Toggle()
@@ -88,7 +88,7 @@ namespace CampusCommons.GrandLibrary
         {
             if (avatar.CurrentGender == gender) return;
 
-            // »õ ¼ºº°¿¡ »ç¿ëÇÒ ¼ö ÀÖ´Â ¿ÊÀ¸·Î ¸ÕÀú ±³Ã¼
+            // ìƒˆ ì„±ë³„ì— ì‚¬ìš©í•  ìˆ˜ ìˆëŠ” ì˜·ìœ¼ë¡œ ë¨¼ì € êµì²´
             avatar.ClothingItemTop = SuitableClothing(
                 SlotType.Top, avatar.ClothingItemTop, gender);
 
@@ -187,17 +187,17 @@ namespace CampusCommons.GrandLibrary
             var item = avatar.GetClothingItemFromSlot(slot);
 
             GUILayout.Label(title + ": " +
-                (item != null ? item.Name : "¾øÀ½"));
+                (item != null ? item.Name : "ì—†ìŒ"));
 
             GUILayout.BeginHorizontal();
 
-            if (GUILayout.Button("ÀÌÀü"))
+            if (GUILayout.Button("ì´ì „"))
                 ChangeClothing(slot, -1);
 
-            if (GUILayout.Button("´ÙÀ½"))
+            if (GUILayout.Button("ë‹¤ìŒ"))
                 ChangeClothing(slot, 1);
 
-            if (GUILayout.Button("»ö»ó"))
+            if (GUILayout.Button("ìƒ‰ìƒ"))
                 ChangeClothingColor(slot);
 
             GUILayout.EndHorizontal();
@@ -215,7 +215,7 @@ namespace CampusCommons.GrandLibrary
                 Mathf.Max(10, Screen.width - width - 10),
                 35, width, Mathf.Max(160, Screen.height - 50));
 
-            GUI.Box(panel, "Ä³¸¯ÅÍ Ä¿½ºÅÍ¸¶ÀÌÂ¡");
+            GUI.Box(panel, "ìºë¦­í„° ì»¤ìŠ¤í„°ë§ˆì´ì§•");
 
             GUILayout.BeginArea(new Rect(
                 panel.x + 10, panel.y + 28,
@@ -223,46 +223,46 @@ namespace CampusCommons.GrandLibrary
 
             scroll = GUILayout.BeginScrollView(scroll);
 
-            if (GUILayout.Button("´İ±â"))
+            if (GUILayout.Button("ë‹«ê¸°"))
                 Close();
 
-            GUILayout.Label("¼ºº° ¼±ÅÃ");
+            GUILayout.Label("ì„±ë³„ ì„ íƒ");
             GUILayout.BeginHorizontal();
 
-            if (GUILayout.Button("³²¼º"))
+            if (GUILayout.Button("ë‚¨ì„±"))
                 ChangeGender(AvatarCustomization.AvatarGender.Male);
 
-            if (GUILayout.Button("¿©¼º"))
+            if (GUILayout.Button("ì—¬ì„±"))
                 ChangeGender(AvatarCustomization.AvatarGender.Female);
 
             GUILayout.EndHorizontal();
 
-            if (GUILayout.Button("ÇÇºÎ»ö º¯°æ"))
+            if (GUILayout.Button("í”¼ë¶€ìƒ‰ ë³€ê²½"))
                 ChangeSkin();
 
             GUILayout.Space(10);
-            GUILayout.Label("Çì¾î½ºÅ¸ÀÏ");
+            GUILayout.Label("í—¤ì–´ìŠ¤íƒ€ì¼");
             GUILayout.BeginHorizontal();
 
-            if (GUILayout.Button("ÀÌÀü Çì¾î"))
+            if (GUILayout.Button("ì´ì „ í—¤ì–´"))
                 ChangeHair(-1);
 
-            if (GUILayout.Button("´ÙÀ½ Çì¾î"))
+            if (GUILayout.Button("ë‹¤ìŒ í—¤ì–´"))
                 ChangeHair(1);
 
             GUILayout.EndHorizontal();
 
-            if (GUILayout.Button("¸Ó¸®»ö º¯°æ"))
+            if (GUILayout.Button("ë¨¸ë¦¬ìƒ‰ ë³€ê²½"))
                 ChangeHairColor();
 
             GUILayout.Space(10);
-            GUILayout.Label("ÀÇ»ó");
+            GUILayout.Label("ì˜ìƒ");
 
-            ClothingRow("»óÀÇ", SlotType.Top);
-            ClothingRow("ÇÏÀÇ", SlotType.Bottom);
-            ClothingRow("½Å¹ß", SlotType.Shoes);
-            ClothingRow("¾È°æ", SlotType.Glasses);
-            ClothingRow("¸ğÀÚ", SlotType.Hat);
+            ClothingRow("ìƒì˜", SlotType.Top);
+            ClothingRow("í•˜ì˜", SlotType.Bottom);
+            ClothingRow("ì‹ ë°œ", SlotType.Shoes);
+            ClothingRow("ì•ˆê²½", SlotType.Glasses);
+            ClothingRow("ëª¨ì", SlotType.Hat);
 
             GUILayout.EndScrollView();
             GUILayout.EndArea();

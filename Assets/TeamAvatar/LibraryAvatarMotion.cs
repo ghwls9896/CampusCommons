@@ -16,7 +16,7 @@ namespace CampusCommons.GrandLibrary
 
             if (avatar == null)
             {
-                Debug.LogError("AvatarCustomizationÀ» Ã£Áö ¸øÇß½À´Ï´Ù.");
+                Debug.LogError("AvatarCustomizationì„ ì°¾ì§€ ëª»í–ˆìŠµë‹ˆë‹¤.");
                 return;
             }
 
@@ -26,11 +26,11 @@ namespace CampusCommons.GrandLibrary
 
             if (controller == null)
             {
-                Debug.LogError("LibraryMovement ÄÁÆ®·Ñ·¯¸¦ Ã£Áö ¸øÇß½À´Ï´Ù.");
+                Debug.LogError("LibraryMovement ì»¨íŠ¸ë¡¤ëŸ¬ë¥¼ ì°¾ì§€ ëª»í–ˆìŠµë‹ˆë‹¤.");
                 return;
             }
 
-            // ³²¼º°ú ¿©¼º ¸ğµÎ °°Àº ¾Ö´Ï¸ŞÀÌ¼Ç ÄÁÆ®·Ñ·¯ »ç¿ë
+            // ë‚¨ì„±ê³¼ ì—¬ì„± ëª¨ë‘ ê°™ì€ ì• ë‹ˆë©”ì´ì…˜ ì»¨íŠ¸ë¡¤ëŸ¬ ì‚¬ìš©
             avatar.AnimatorController = controller;
         }
 
@@ -43,12 +43,12 @@ namespace CampusCommons.GrandLibrary
 
             animator.applyRootMotion = false;
 
-            // ±âÁ¸ Player.cs´Â ÀÌµ¿ ¹æÇâÀ¸·Î ¸öÀ» È¸Àü½ÃÅ°¹Ç·Î
-            // ÀüÁø °È±â ¾Ö´Ï¸ŞÀÌ¼ÇÀ» ±âº»À¸·Î »ç¿ë
+            // ê¸°ì¡´ Player.csëŠ” ì´ë™ ë°©í–¥ìœ¼ë¡œ ëª¸ì„ íšŒì „ì‹œí‚¤ë¯€ë¡œ
+            // ì „ì§„ ê±·ê¸° ì• ë‹ˆë©”ì´ì…˜ì„ ê¸°ë³¸ìœ¼ë¡œ ì‚¬ìš©
 
             if (sitting)
             {
-                // ¾É´Â µ¿¾È °È±â ¾Ö´Ï¸ŞÀÌ¼ÇÀ» Áï½Ã Á¤Áö
+                // ì•‰ëŠ” ë™ì•ˆ ê±·ê¸° ì• ë‹ˆë©”ì´ì…˜ì„ ì¦‰ì‹œ ì •ì§€
                 animator.SetFloat("MoveX", 0f);
                 animator.SetFloat("MoveY", 0f);
             }
@@ -64,10 +64,10 @@ namespace CampusCommons.GrandLibrary
             }
 
 
-            // Âø¼® ¿©ºÎ Àü´Ş
+            // ì°©ì„ ì—¬ë¶€ ì „ë‹¬
             animator.SetBool("IsSitting", sitting);
 
-            // º°µµ ´Ş¸®±â Å¬¸³ Ãß°¡ Àü±îÁö Àç»ı ¼Óµµ·Î ±¸ºĞ
+            // ë³„ë„ ë‹¬ë¦¬ê¸° í´ë¦½ ì¶”ê°€ ì „ê¹Œì§€ ì¬ìƒ ì†ë„ë¡œ êµ¬ë¶„
             animator.speed = moving && running && !sitting
                 ? 1.5f : 1f;
         }
