@@ -5,7 +5,7 @@
 - 담당 HIGHCHOI / 최종 사람 리뷰·통합 ghwls9896
 - 브랜치 codex/cc-8-account-progression / 기준 main fc5d8c7
 - 작업 폴더 CampusCommons-account-progression. 다른 기능 worktree와 분리.
-- 마지막 변경: 이 문서를 포함하는 독립 레벨/인증 마무리 커밋. DB 구현 커밋 fad8734, 승인 범위 문서 f17dbf5. 최종 head는 PR을 기준으로 확인.
+- 마지막 변경: 이 문서를 포함하는 독립 레벨/인증 마무리 커밋. Unity 구현 커밋 e1f4d10, DB 구현 fad8734, 승인 범위 문서 f17dbf5. 최종 head는 PR을 기준으로 확인.
 
 ## 완료한 구현
 - 이메일+비밀번호 가입/로그인,6자리 가입확인 코드/재전송,복구 코드/새 비밀번호,세션 갱신,로그아웃.
@@ -23,7 +23,7 @@
 - Mono C# 세션42 checks: 인증/복구/계정 전환 지연응답,갱신,1/5/10/15 응답,범위 밖 거절,복구 중 입장/실패한 암호 변경 제한 통과.
 - 임시 Unity6000.6.0f1 실제 GrandLibrary_Living 씬 ACCOUNT_FLOW_PASS: 초기 입력 차단,로그인 후 아바타/카메라,비동기 이전 닉네임 자동 입력,Lv15 보존,만료 후 오프라인 차단,로그아웃. Supabase 응답은 fixture.
 - 알려진 Unity Editor SearchDatabase 시작 예외는 기존 테스트의 editor-only 필터로 구분. 게임 런타임 오류는 통과 조건에 포함.
-- 기존 협업 검사16개 통과. 제출 범위 검사는 최종 커밋 후 실행.
+- 기존 협업 검사16개 통과. 제출 범위 TEAM_CHECK_PASS48 경로 통과.
 - Hosted DB 기존1계정/Lv1 보존,독립 column/default1/RLS3개 확인. 트랜잭션으로 Lv15 저장/조회,0·16 거절,보상 차단 검사 후 ROLLBACK하여 실회원 데이터 유지.
 - 2026-11-10 실제 이메일 수신·가입확인·비밀번호 로그인·닉네임 저장·refresh/logout 검증 및 복구 메일 수신 확인. 이번에 사용자 암호 변경을 실제 수행했다는 의미는 아님.
 
