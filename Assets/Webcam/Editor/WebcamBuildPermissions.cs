@@ -16,7 +16,7 @@ namespace CampusCommons.Webcam.Editor
             var dict=xml.SelectSingleNode("/plist/dict");
             var key=dict.SelectSingleNode("key[.='NSCameraUsageDescription']");
             if(key==null){key=xml.CreateElement("key");key.InnerText="NSCameraUsageDescription";dict.AppendChild(key);dict.AppendChild(xml.CreateElement("string"));}
-            key.NextSibling.InnerText="시작을 누르면 이 기기에서만 공부 상태를 판별합니다. 영상은 저장하거나 외부로 전송하지 않습니다.";
+            key.NextSibling.InnerText="좌석에 앉으면 미리보기를 켜고, 시작을 누르면 이 기기에서만 공부 상태를 판별합니다. 영상은 저장하거나 외부로 전송하지 않습니다.";
             xml.Save(path);
         }
     }

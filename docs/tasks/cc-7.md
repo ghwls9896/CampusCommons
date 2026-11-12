@@ -39,3 +39,11 @@
 peak 3.5GiB. 정확도 모드 대비 상주 메모리 절감은 실측되지 않음.
 Python 19 pass/4 skip, Node 10 pass, opt-in fast 2 pass.
 가이드 docs/webcam/QEV_FAST.md 및 원본 JSON 참고. 같은 cc-7 범위, 공유 파일 변경 없음.
+
+## 착석 미리보기 / 종료 기립 후속
+
+- 사용자의 후속 요청에 따라 시작 전에는 미리보기만 표시, 종료 버튼은 기립까지 수행.
+- Unity6000.4.5f1 누락 imageconversion 모듈 수정, 실제 카메라→로컬 모델→정리 검증 통과.
+- Packages 두 파일은 새 공통 파일 변경이며 최종 사람 리뷰 대상. 공용 Player와 씬 수정 없음.
+- 상세 검증/남은 한계는 docs/webcam/UNITY_INTEGRATION.md 마지막 절.
+- 통합 실행본은 별도 로컬 브랜치이며 main 병합과 구분. 최종 사람 승인 ghwls9896.
