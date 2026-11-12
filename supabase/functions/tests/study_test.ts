@@ -10,3 +10,12 @@ Deno.test('study auth failure and methods fail closed',async()=>{const f=fixture
 Deno.test('study rejects malformed intervals and unknown states',async()=>{for(const s of [{sequence:0,start_ms:0,end_ms:2000,state:'studying'},{sequence:-1,start_ms:1000,end_ms:2000,state:'studying'},{sequence:0,start_ms:2000,end_ms:1000,state:'studying'},{sequence:0,start_ms:1000,end_ms:2000,state:'unknown'},{sequence:0,start_ms:1000,end_ms:2000,state:'studying',reward:99}]){const f=fixture();eq((await studyHandler(f.deps)(req({...body(),segments:[s]}))).status,400);eq(f.calls.length,0);}});
 Deno.test('study summary has no target and errors hide internals',async()=>{const f=fixture();eq((await studyHandler(f.deps)(req({action:'summary'}))).status,200);f.deps.rpc=async()=>{throw {code:'23505',message:'private'};};const r=await studyHandler(f.deps)(req(body()));eq(r.status,409);eq((await r.text()).includes('private'),false);});
 Deno.test('study enforces byte and segment limits',async()=>{const f=fixture();eq((await studyHandler(f.deps)(req({...body(),segments:Array(129).fill(body().segments[0])}))).status,400);eq((await studyHandler(f.deps)(req({x:'a'.repeat(70000)}))).status,413);});
+Deno.test('network type error stays retryable',async()=>{
+ const f=fixture();f.deps.rpc=async()=>{throw new TypeError('fetch failed');};
+ eq((await studyHandler(f.deps)(req(body()))).status,503);
+});
+Deno.test('study session and sequence types match database columns',async()=>{
+ const f=fixture();eq((await studyHandler(f.deps)(req({...body(),session_id:[sid]}))).status,400);
+ eq((await studyHandler(f.deps)(req({...body(),segments:[{...body().segments[0],sequence:2147483648}]}))).status,400);
+ eq(f.calls.length,0);
+});

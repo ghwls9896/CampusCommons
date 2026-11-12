@@ -436,3 +436,7 @@ verify_jwt = false
 [functions.progression]
 # Auth /user verifies every caller; supports EC signing keys.
 verify_jwt = false
+
+[functions.study]
+# The handler verifies each user's token through Auth /user.
+verify_jwt = false
