@@ -6,7 +6,7 @@
 
 - 담당자: GongBeak
 - Issue: #19
-- 원본 캐릭터 PR: #20 (통합 시 중복 병합 여부 확인)
+- Draft PR: #20
 - 작업 브랜치: `feat/cc-19-avatar-customization`
 - 개발 Unity 버전: `6000.4.5f1`
 
@@ -34,7 +34,7 @@ Unity에서 다음 항목을 준비해야 합니다.
 2. Unity UI(uGUI) 패키지 `com.unity.ugui`가 설치되어 있는지 확인합니다.
 3. `Window → Package Manager → Built-in → Animation` 모듈이 활성화되어 있는지 확인합니다.
 
-에셋을 설치하기 전에는 기본 도형 캐릭터로 실행됩니다. Sunbox 원본 및 원본을 복제한 프리팹/컨트롤러는 저장소에 포함하지 않습니다. 설치를 마치고 아래 프리팹·컨트롤러를 준비한 뒤 `Edit → Project Settings → Player → Other Settings → Scripting Define Symbols`에서 현재 빌드 대상에 `CAMPUS_SUNBOX_AVATAR`를 추가해 적용하세요. 이 심볼을 추가하기 전까지는 C키 아바타 꾸미기가 활성화되지 않습니다. 제거하면 기본 캐릭터로 되돌아갑니다.
+Sunbox를 설치하지 않았을 때는 `CAMPUS_SUNBOX_AVATAR` 심볼을 설정하지 않습니다. 각 아바타 스크립트의 대체 구현으로 컴파일되며, 프리팹이 없으면 기본 캐릭터를 사용합니다. 설치 후에는 아래 선택적 활성화 절차를 따릅니다.
 
 ## 3. 파일 구조
 
@@ -168,7 +168,7 @@ Player.cs에서 사용하는 주요 연결 기능:
 
 `Player.cs`는 팀 공통 파일이므로 다른 작업자의 변경 사항을 덮어쓰지 않고, 담당자와 조율한 후 최신 버전에 연결 코드를 병합해야 합니다.
 
-**현재 Draft PR 단계에서는 Player.cs 통합이 완료되었다고 간주하지 않습니다.**
+Player.cs 연결 코드는 PR #20에 포함되어 있습니다. PR #20 → #18 순서로 통합하며 #4의 퀴즈 입력 연동은 이후 별도로 검증합니다.
 
 ## 10. 게임 조작 방법
 
@@ -213,3 +213,42 @@ Player.cs에서 사용하는 주요 연결 기능:
 - Sunbox 외부 에셋은 각 사용자가 라이선스 조건에 따라 설치해야 합니다.
 - 검증이 완료되면 PR에 테스트 결과를 기록하고 Ready for review로 변경합니다.
 - 담당자 승인 없이 main 브랜치에 직접 병합하지 않습니다.
+
+## Sunbox 선택적 활성화 및 테스트 결과
+
+캐릭터 시스템은 `CAMPUS_SUNBOX_AVATAR` 조건부 컴파일을 사용합니다.
+
+### Sunbox 에셋을 설치하지 않은 경우
+
+- Scripting Define Symbols에 `CAMPUS_SUNBOX_AVATAR`를 등록하지 않습니다.
+- 아바타 관련 스크립트는 대체 구현으로 컴파일됩니다.
+- `LibraryAvatar.prefab`이 없으면 기존 기본 캐릭터를 사용합니다.
+
+### Sunbox 에셋을 설치한 경우
+
+1. Stylized Customizable Avatars FREE를 Unity Asset Store에서 Import합니다.
+2. Unity UI(uGUI)와 Animation 모듈을 확인합니다.
+3. `CAMPUS_SUNBOX_AVATAR`를 Scripting Define Symbols에 추가합니다.
+4. `LibraryAvatar.prefab`과 `LibraryMovement.controller`를 준비합니다.
+5. Sunbox의 `AvatarCustomization.cs`에서 모자 검색 시 null 항목을 검사하도록 수정합니다.
+6. Unity를 다시 컴파일하고 캐릭터 기능을 테스트합니다.
+
+Sunbox 원본 에셋과 파생 프리팹은 라이선스 확인 없이 공개 GitHub 저장소에 업로드하지 않습니다.
+
+### 검증 결과 — 2026-11-11
+
+테스트 환경: Unity 6000.4.5f1
+
+**Sunbox 미설치 환경**
+- 컴파일 오류 없음
+- 도서관 정상 실행
+- 기본 캐릭터 정상 표시
+
+**Sunbox 설치 환경**
+- 남녀 캐릭터 및 커스터마이징 정상
+- 걷기·달리기·손 흔들기 정상
+- 착석·일어서기 정상
+- 실시간 미리보기 정상
+- 1인칭·3인칭 전환 정상
+
+미검증 항목: 퀴즈 답변 입력 중 캐릭터 단축키 차단, 최신 main과의 통합, GitHub CI 최종 통과.

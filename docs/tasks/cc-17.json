@@ -33,7 +33,9 @@
     "Assets/StudyImmersive/Scripts/EscapeSystems/EscapeSpawnPoint.cs.meta",
     "docs/AVATAR_SETUP.md",
     "Assets/StudyImmersive/Scripts/EscapeSystems/Editor/EscapeOpenDoorRouteVerification.cs",
-    "Assets/StudyImmersive/Scripts/EscapeSystems/Editor/EscapeOpenDoorRouteVerification.cs.meta"
+    "Assets/StudyImmersive/Scripts/EscapeSystems/Editor/EscapeOpenDoorRouteVerification.cs.meta",
+    "docs/tasks/cc-19.json",
+    "docs/tasks/cc-19.md"
   ],
   "shared_files": [
     "Assets/StudyImmersive/Scenes/GrandLibrary_Living.unity",
@@ -43,7 +45,6 @@
   ],
   "depends_on": [
     "https://github.com/ghwls9896/CampusCommons/pull/16",
-    "https://github.com/ghwls9896/CampusCommons/pull/4",
     "https://github.com/ghwls9896/CampusCommons/pull/20"
   ],
   "validation": [
@@ -54,7 +55,6 @@
     "Unity 6000.4.5f1 아바타 에셋 설치 전 기본 캐릭터 컴파일 및 로비 이동",
     "Unity 6000.4.5f1 에셋 설치 후 아바타 UI와 성별 변경 및 1·3인칭 전환",
     "Unity 6000.4.5f1 열린 문짝 경로 우회, NPC 간 충돌과 막힌 자리 탈출 회귀 검사",
-    "PR #4, #20 순서로 main 반영 후 최신 main 통합 및 퀴즈 입력 중 C/R/V 캐릭터 조작 차단 검증",
-    "밝은/어두운 타임어택에서 플레이어 걷기·달리기와 몬스터·교수·시설관리 속도 증가 검증"
+    "PR #20 선행 통합 후 아바타 대체 구현 중복 없이 컴파일 및 탈출룸 회귀 검사; #4 퀴즈 입력과 타임어택 추가 변경은 별도 후속 작업"
   ]
 }

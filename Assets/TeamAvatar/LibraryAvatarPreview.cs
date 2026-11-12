@@ -192,4 +192,14 @@ namespace CampusCommons.GrandLibrary
         }
     }
 }
+#else
+using UnityEngine;
+namespace CampusCommons.GrandLibrary
+{
+    public class LibraryAvatarPreview : MonoBehaviour
+    {
+        public RenderTexture PreviewTexture => null;
+        public void Initialize(GameObject avatar, LibraryAvatarCustomizerUI ui) { }
+    }
+}
 #endif
