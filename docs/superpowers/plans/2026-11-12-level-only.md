@@ -35,4 +35,4 @@
 - [x] DTO·세션 유효성·UI를 level만 사용하도록 수정. 기존 Auth 흐름 유지, 확인 코드는 설정과 같은6자리 검증.
 - [x] Mono로 SessionTests를 컴파일/실행. Expected: ACCOUNT_SESSION_PASS. 임시 Unity 실제 씬 fixture를 Lv15로 검사. Expected: ACCOUNT_FLOW_PASS, 원본 버전 불변.
 - [x] 로컬 전체 검사 완료 후 hosted 현재 값 확인 → migration 이력과 함께 트랜잭션 적용 → 두 함수 배포 → 서버 보호/레벨 응답 확인. 사용자의 비밀번호를 기록하지 않는다.
-- [ ] 문서·PR/Issue 갱신, 커밋 후 python3 Tools/team/check.py --base origin/main. Expected: TEAM_CHECK_PASS. 전체 변경 독립 검토 후 중요 수정 검증, 기존 브랜치 push.
+- [x] 문서·PR/Issue 갱신, 커밋 후 python3 Tools/team/check.py --base origin/main. Expected: TEAM_CHECK_PASS. 전체 변경 독립 검토 후 중요 수정 검증, 기존 브랜치 push.

@@ -3,7 +3,7 @@
 - Issue: https://github.com/ghwls9896/CampusCommons/issues/8
 - Draft PR: https://github.com/ghwls9896/CampusCommons/pull/10
 - 담당 HIGHCHOI / 최종 사람 리뷰·통합 ghwls9896
-- 브랜치 codex/cc-8-account-progression / 기준 main fc5d8c7
+- 브랜치 codex/cc-8-account-progression / 시작 기준 main fc5d8c7 / 최신 main 0a6c3f7 통합 8b70f32
 - 작업 폴더 CampusCommons-account-progression. 다른 기능 worktree와 분리.
 - 마지막 변경: 이 문서를 포함하는 독립 레벨/인증 마무리 커밋. Unity 구현 커밋 e1f4d10, DB 구현 fad8734, 승인 범위 문서 f17dbf5. 최종 head는 PR을 기준으로 확인.
 
@@ -23,12 +23,14 @@
 - Mono C# 세션42 checks: 인증/복구/계정 전환 지연응답,갱신,1/5/10/15 응답,범위 밖 거절,복구 중 입장/실패한 암호 변경 제한 통과.
 - 임시 Unity6000.6.0f1 실제 GrandLibrary_Living 씬 ACCOUNT_FLOW_PASS: 초기 입력 차단,로그인 후 아바타/카메라,비동기 이전 닉네임 자동 입력,Lv15 보존,만료 후 오프라인 차단,로그아웃. Supabase 응답은 fixture.
 - 알려진 Unity Editor SearchDatabase 시작 예외는 기존 테스트의 editor-only 필터로 구분. 게임 런타임 오류는 통과 조건에 포함.
+- 최신 main0a6c3f7 통합 후 임시 Unity 실제 씬 검사도 ACCOUNT_FLOW_PASS.
+- 독립 코드 리뷰 Critical/Important/Minor 없음, C#42개 독립 재실행 통과.
 - 기존 협업 검사16개 통과. 제출 범위 TEAM_CHECK_PASS48 경로 통과.
 - Hosted DB 기존1계정/Lv1 보존,독립 column/default1/RLS3개 확인. 트랜잭션으로 Lv15 저장/조회,0·16 거절,보상 차단 검사 후 ROLLBACK하여 실회원 데이터 유지.
 - 2026-11-10 실제 이메일 수신·가입확인·비밀번호 로그인·닉네임 저장·refresh/logout 검증 및 복구 메일 수신 확인. 이번에 사용자 암호 변경을 실제 수행했다는 의미는 아님.
 
 ## 수정 경계와 공유 파일
-Assets/Account/,supabase/,Tools/account/,계정 문서/task,기존 UnityWebRequest 모듈 패키지 추가. 이번 후속 작업에서 공유 씬/Player/GameStart/패키지를 추가 변경하지 않음. PR #4의 동일 패키지 추가는 최종 통합 때 중복 확인. 독립 모듈 bootstrap으로 연동하며 신규 캐릭터/룸은 차단 대상 호환성 검사가 필요함.
+Assets/Account/,supabase/,Tools/account/,계정 문서/task,기존 UnityWebRequest 모듈 패키지 추가. 이번 후속 작업에서 공유 씬/Player/GameStart/패키지를 추가 변경하지 않음. main의 캐릭터·탈출룸 통합 후 packages-lock 충돌은 ui/ugui와 unitywebrequest를 모두 보존하여 해결. 독립 모듈 bootstrap으로 연동하며 신규 캐릭터/룸은 차단 대상 호환성 검사가 필요함.
 
 ## 남은 검증과 다음 행동
 - 지정 Unity6000.4.5f1이 설치되지 않아 해당 버전 및 standalone 빌드는 미검증. 원본 버전 설정 유지.

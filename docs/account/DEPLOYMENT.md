@@ -12,6 +12,7 @@
 - 로컬 PostgreSQL migration 데이터 보존/실패 롤백·권한 테스트 통과, Edge9/세션42/팀16 검사 통과.
 - 임시 Unity6000.6.0f1 실제 메인 씬 fixture 검사 ACCOUNT_FLOW_PASS. 최초 라이선스 채널 연결 실패 후 기존 라이선스 IPC 채널 지정으로 정상 실행. 원본6000.4.5f1은 변경하지 않음.
 - 2026-11-12 Hosted Health 오류0/경고0. Security 오류0/경고1(Leaked Password Protection Disabled)/Info1(private.activity_runs RLS no policy). 유출 비밀번호 차단은 [공식 문서](https://supabase.com/docs/guides/auth/password-security)에 따라 Pro 이상 기능이므로 무료 요금제를 유지하며 추가 결제하지 않음. private 테이블은 클라이언트 접근을 허용하지 않는 의도된 설정.
+- 최신 main0a6c3f7의 캐릭터·탈출룸을 계정 브랜치에 병합한 뒤 임시 Unity 실제 씬 ACCOUNT_FLOW_PASS 재확인. 독립 코드 리뷰에서 수정 필요 결함 없음.
 - 아래 2026-11-10의 실메일/실제 로그인 결과는 당시 검증 기록이며, 이번 레벨 변경의 hosted 검증은 SQL 계약 검사와 공개 HTTP 보호 검사로 구분한다.
 
 ## 2026-11-10 완료·확인
