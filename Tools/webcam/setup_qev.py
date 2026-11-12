@@ -13,7 +13,7 @@ def main():
     parser.add_argument('--cache-dir', type=Path, required=True)
     args = parser.parse_args()
     snapshot_download(MODEL_ID, revision=MODEL_REVISION, local_dir=args.model_dir,
-                      allow_patterns=['manifest.json', 'head.safetensors', 'LICENSE', 'README.md'])
+                      allow_patterns=['manifest.json', 'head.safetensors', 'exit16.safetensors', 'LICENSE', 'README.md'])
     manifest = json.loads((args.model_dir / 'manifest.json').read_text())
     backbone = manifest['backbone']
     if (backbone['model_id'] != MODEL_ID or

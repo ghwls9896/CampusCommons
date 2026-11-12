@@ -48,7 +48,7 @@ def validate_answer(answer):
 
 
 def predict_image(model, request, image):
-    """One accurate-mode question, identical native prompt/readout, without a file.
+    """One native-mode question, identical native prompt/readout, without a file.
 
     Deliberately restricted to this one-question, one-image, one-view test app.
     Native predict() remains available for public-fixture parity verification.
@@ -84,29 +84,39 @@ def predict_image(model, request, image):
         hidden = model.encoder.model(**inputs, use_cache=False).last_hidden_state
         rows = torch.arange(1, device=hidden.device)
         states = hidden[rows, last.to(hidden.device)].float()
-        conditions = model.condition_readout(hidden[rows, condition_at.to(hidden.device)].float())
-        logits = model._readout(states, {name: positions}, conditions)
+        condition_states = hidden[rows, condition_at.to(hidden.device)].float()
+        if getattr(model, 'exit_head', None) is not None:
+            logits = model._group(model.exit_head(states, condition_states), {name: positions})
+        else:
+            conditions = model.condition_readout(condition_states)
+            logits = model._readout(states, {name: positions}, conditions)
         return typed_answer(question, logits[name], model.calibration)
 
 
 class QEVBackend:
-    def __init__(self, model, device, variant='original'):
+    def __init__(self, model, device, variant='original', mode='accurate'):
         if variant not in ('original', 'compact'):
             raise ValueError('Unknown model variant')
-        depth = 16 if variant == 'compact' else 24
+        if mode not in ('accurate', 'fast') or (variant == 'compact' and mode != 'accurate'):
+            raise ValueError('Unsupported mode for this model')
+        fast = mode == 'fast'
+        depth = 16 if variant == 'compact' or fast else 24
+        pixels = 262144 if fast else 1638400
+        if fast and getattr(model, 'exit_head', None) is None:
+            raise ValueError('Fast mode requires its trained exit head')
         if variant == 'compact' and (not model.backbone.get('bundled') or
                 model.backbone.get('depth') != 16 or model.backbone.get('vocabulary') != 32768 or
                 model.encoder.model.language_model.embed_tokens.num_embeddings != 32768):
             raise ValueError('Expected the bundled compact backbone')
-        if (model.serving_mode != 'accurate' or model.early_exit_layer is not None or
+        if (model.serving_mode != mode or model.early_exit_layer != (16 if fast else None) or
                 len(model.encoder.model.language_model.layers) != depth or
-                model.encoder.processor.image_processor.size['longest_edge'] != 1638400):
-            raise ValueError('The selected model requires its complete accurate-mode stack.')
-        self.model, self.device = model, device
+                model.encoder.processor.image_processor.size['longest_edge'] != pixels):
+            raise ValueError('The selected model requires its native mode configuration.')
+        self.model, self.device, self.mode = model, device, mode
         self.model_label = 'QEV-0.5B Compact' if variant == 'compact' else 'QEV-0.8B'
 
     @classmethod
-    def load(cls, model_dir, cache_dir, device='auto', variant='original'):
+    def load(cls, model_dir, cache_dir, device='auto', variant='original', mode='accurate'):
         import torch
         from qev import QEV
         if device == 'auto':
@@ -118,14 +128,14 @@ class QEVBackend:
         # never needs the FP32 backbone alongside the final BF16 weights.
         load_device = 'cpu' if device == 'mps' else device
         model = QEV.load(Path(model_dir), device=load_device, cache_dir=str(cache_dir),
-                         local_files_only=True, mode='accurate', early_exit=False)
+                         local_files_only=True, mode=mode, early_exit=(mode == 'fast'))
         if device == 'mps':
             # Cast before the GPU transfer, keeping the trained scoring heads FP32.
             model.encoder.model.to(dtype=torch.bfloat16)
             model.to(device='mps')
             gc.collect()
             torch.mps.empty_cache()
-        return cls(model, device, variant)
+        return cls(model, device, variant, mode)
 
     def classify(self, data):
         from PIL import Image
@@ -140,4 +150,4 @@ class QEVBackend:
                 request = DecisionRequest.model_validate(build_request())
                 answer = predict_image(self.model, request, image)
         return {'ok': True, **validate_answer(answer), 'seconds': time.perf_counter() - started,
-                'mode': 'accurate', 'device': self.device}
+                'mode': self.mode, 'device': self.device}

@@ -63,7 +63,7 @@ class Handler(BaseHTTPRequestHandler):
             mime = 'text/javascript' if self.path.endswith('.js') else 'text/css'
             return self.send(200, (ROOT / self.path[1:]).read_bytes(), mime + '; charset=utf-8')
         if self.path == '/api/config':
-            return self.send(200, {'interval_ms': 1000, 'mode': 'accurate',
+            return self.send(200, {'interval_ms': 1000, 'mode': getattr(self.server.backend, 'mode', 'accurate'),
                                    'device': self.server.backend.device,
                                    'model': self.server.model_label})
         if self.path == '/favicon.ico':
@@ -108,15 +108,19 @@ def main():
     parser.add_argument('--device', choices=('auto', 'mps', 'cuda', 'cpu'), default='auto')
     parser.add_argument('--port', type=int, default=8770)
     parser.add_argument('--variant', choices=('original', 'compact'), default='original')
+    parser.add_argument('--mode', choices=('accurate', 'fast'), default='accurate')
     args = parser.parse_args()
+    if args.variant == 'compact' and args.mode != 'accurate':
+        parser.error('Compact supports accurate mode only')
     os.environ['HF_HUB_OFFLINE'] = '1'
     os.environ['TRANSFORMERS_OFFLINE'] = '1'
     os.environ['HF_HUB_DISABLE_TELEMETRY'] = '1'
-    print(f'Loading QEV {args.variant} accurate (local files only)…', flush=True)
-    backend = QEVBackend.load(args.model_dir, args.cache_dir, args.device, args.variant)
+    print(f'Loading QEV {args.variant} {args.mode} (local files only)…', flush=True)
+    backend = QEVBackend.load(args.model_dir, args.cache_dir, args.device, args.variant, args.mode)
     server = ThreadingHTTPServer(('127.0.0.1', args.port), Handler)
-    configure(server, backend, backend.model_label + ' · 정확도 우선 · 1초 간격')
-    print(f'Model ready: accurate / {backend.device}', flush=True)
+    mode_label = '속도 모드' if args.mode == 'fast' else '정확도 우선'
+    configure(server, backend, f'{backend.model_label} · {mode_label} · 1초 간격')
+    print(f'Model ready: {backend.mode} / {backend.device}', flush=True)
     print(f'Webcam test: {server.origin} (camera starts only after your click)', flush=True)
     try:
         server.serve_forever()

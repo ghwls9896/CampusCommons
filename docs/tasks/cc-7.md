@@ -28,3 +28,14 @@
 - Python 18 pass/3 skip, Node 9 pass, team 16 pass; Compact 실제 계약/동등성 3 pass.
 - 재현/측정 한계: docs/webcam/QEV_COMPACT.md. Unity FPS 및 개인 웹캠 정확도 미검증.
 - 변경은 기존 cc-7 범위 안에만 있으며 공유 파일 조율 대상 없음. 같은 PR #9로 인계.
+
+## 2026-11-12 0.8B fast 전환
+
+사용자가 Compact 정확도가 낮다고 평가하여 공식 0.8B fast로 전환 요청.
+같은 고정 revision의 exit16 head 추가, 공식 조기 종료/전용 head로 메모리 추론.
+현재 서버 QEV-0.8B fast, 1초 목표/5범주/프레임 로컬 RAM 처리 유지.
+공개 5종×2 모두 기대 범주 일치; 공식 파일 입력과 메모리 입력 확률도 동일.
+개인 카메라 접근 없음. 첫 HTTP 0.914s, 이후 0.583–0.624s, footprint 2.9GiB,
+peak 3.5GiB. 정확도 모드 대비 상주 메모리 절감은 실측되지 않음.
+Python 19 pass/4 skip, Node 10 pass, opt-in fast 2 pass.
+가이드 docs/webcam/QEV_FAST.md 및 원본 JSON 참고. 같은 cc-7 범위, 공유 파일 변경 없음.

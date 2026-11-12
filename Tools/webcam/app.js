@@ -57,7 +57,7 @@ async function analyze(run) {
   lastCapture = started;
   byId('progress').textContent = '현재 사진을 분석하고 있습니다…';
   const canvas = document.createElement('canvas');
-  // Keep the full accurate-mode backbone/head, sample a bounded camera image.
+  // Sample a bounded camera image; the backend applies the selected native mode.
   const scale = Math.min(1, 512 / Math.max(video.videoWidth, video.videoHeight));
   canvas.width = Math.max(1, Math.round(video.videoWidth * scale));
   canvas.height = Math.max(1, Math.round(video.videoHeight * scale));
@@ -81,7 +81,7 @@ async function analyze(run) {
     if (!Object.hasOwn(labels, result.state)) throw new Error('모델이 다섯 범주 중 하나를 반환하지 않았습니다.');
     byId('verdict').textContent = labels[result.state];
     showScores(result.probabilities);
-    byId('reason').textContent = `QEV accurate · ${Math.round(result.confidence * 100)}% 선택 점수`;
+    byId('reason').textContent = `QEV ${result.mode} · ${Math.round(result.confidence * 100)}% 선택 점수`;
     const intervalText = actualInterval === null ? '' : ` · 실제 간격 ${actualInterval.toFixed(2)}초`;
     byId('timing').textContent = `${captured.toLocaleTimeString('ko-KR')} 촬영 · ${canvas.width}×${canvas.height} · 분석 ${result.seconds.toFixed(2)}초${intervalText}`;
     byId('progress').textContent = '아래 사진에 대한 추정입니다. 직접 확인해 주세요.';
@@ -151,7 +151,7 @@ fetch('/api/config').then(response => {
   if (!response.ok) throw new Error('모델 설정을 읽지 못했습니다.');
   return response.json();
 }).then(config => {
-  if (config.mode !== 'accurate' || config.interval_ms !== INTERVAL_MS) throw new Error('정확도 우선 / 1초 설정이 아닙니다.');
+  if (!['accurate', 'fast'].includes(config.mode) || config.interval_ms !== INTERVAL_MS) throw new Error('지원하는 QEV 모드 / 1초 설정이 아닙니다.');
   if (!stream) byId('progress').textContent = `${config.model} · ${config.device.toUpperCase()}`;
 }).catch(error => {
   byId('progress').textContent = error.message;

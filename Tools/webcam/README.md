@@ -109,3 +109,8 @@ QEV_CACHE_DIR="$QEV_WORK_DIR/hf-cache/hub" QEV_SMOKE_FIXTURES="$FIXTURE_DIR" \
 Compact는 별도 환경과 `start_compact.command`로 실행합니다. 기존 0.8B 실행기는
 유지됩니다. 설치, 전환, 측정 한계는 [Compact 가이드](../../docs/webcam/QEV_COMPACT.md)를
 참고하세요. 두 실행기는 기본 포트가 같으므로 한 번에 하나만 실행합니다.
+
+## QEV-0.8B 속도 모드
+
+`Tools/webcam/start_fast.command`로 공식 fast 모드를 실행합니다. 설치/전환 및
+실측은 [속도 모드 가이드](../../docs/webcam/QEV_FAST.md)를 참고하세요.

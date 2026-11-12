@@ -1,6 +1,6 @@
 {
   "id": "cc-7",
-  "title": "QEV 0.8B/0.5B Compact accurate 1초 로컬 웹캠 비교",
+  "title": "QEV accurate/fast 및 Compact 1초 로컬 웹캠 비교",
   "owner": "HIGHCHOI",
   "branch": "codex/webcam-study",
   "issue": "https://github.com/ghwls9896/CampusCommons/issues/7",
@@ -20,6 +20,7 @@
     "카메라 시작 전 브라우저 화면 확인",
     "Tools/team 검사",
     "개인 웹캠 정확도와 Windows/Unity FPS는 미검증 표시",
-    "Compact 공식 파일 입력/메모리 입력 동등성 및 공개 예제 오분류·MPS 메모리 기록"
+    "Compact 공식 파일 입력/메모리 입력 동등성 및 공개 예제 오분류·MPS 메모리 기록",
+    "0.8B fast 전용 exit head 공식 입력 동등성, 화면 모드 표시, 공개 HTTP 추론"
   ]
 }

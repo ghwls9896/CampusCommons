@@ -8,7 +8,7 @@ const code = readFileSync(new URL('../app.js', import.meta.url), 'utf8');
 const settle = () => new Promise(resolve => setImmediate(resolve));
 const deferred = () => {let resolve; const promise = new Promise(r => {resolve = r;}); return {promise, resolve};};
 
-function browser({pendingPermission = false} = {}) {
+function browser({pendingPermission = false, mode = 'accurate'} = {}) {
   const elements = new Map();
   const el = id => {
     if (!elements.has(id)) elements.set(id, {textContent:'', hidden:false, disabled:false,
@@ -32,7 +32,7 @@ function browser({pendingPermission = false} = {}) {
     setTimeout:(fn, delay) => {timers.push({fn, delay}); return timers.length;},
     clearTimeout(){},
     fetch:async (path, options) => {
-      if (path === '/api/config') return {ok:true, json:async () => ({interval_ms:1000, mode:'accurate', device:'test'})};
+      if (path === '/api/config') return {ok:true, json:async () => ({interval_ms:1000, mode, device:'test'})};
       const reply = deferred(); inference.push({options, reply}); return reply.promise;
     }
   };
@@ -44,7 +44,7 @@ function browser({pendingPermission = false} = {}) {
       ok:true, state, probabilities:state === 'drowsy'
         ? {studying:.1, phone:.05, other:.1, away:.05, drowsy:.7}
         : {studying:.1, phone:.7, other:.05, away:.1, drowsy:.05}, confidence:.7,
-      seconds:.2, mode:'accurate', device:'test'})});}};
+      seconds:.2, mode, device:'test'})});}};
 }
 
 test('loading the page does not access the camera', async () => {
@@ -138,4 +138,13 @@ test('backgrounding the page releases the camera', async () => {
   b.context.document.hidden = true;
   b.docListeners.visibilitychange();
   assert.equal(b.stopped, 1);
+});
+
+
+test('fast config remains usable and the result names fast mode', async () => {
+  const b = browser({mode:'fast'}); await settle();
+  assert.equal(b.el('start').disabled, false);
+  await b.el('start').listeners.click(); await settle();
+  b.respond(0); await settle();
+  assert.match(b.el('reason').textContent, /QEV fast/);
 });
