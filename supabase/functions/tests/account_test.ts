@@ -17,7 +17,7 @@ Deno.test('read has no caller supplied target',async()=>{
  eq(calls,[{name:'account_read',args:{p_user_id:uid}}]);
 });
 Deno.test('invalid nicknames and excess fields never write',async()=>{
- for(const b of [{action:'enter',nickname:'a'},{action:'enter',nickname:'<b>닉</b>'},{action:'enter',nickname:'닉\n네임'},{action:'enter',nickname:'가'.repeat(13)},{action:'enter',nickname:'닉네임',user_id:uid},{action:'read',delta:999},{action:'enter',nickname:'닉\u202E네임'}]) {
+ for(const b of [{action:'enter',nickname:'a'},{action:'enter',nickname:'<b>닉</b>'},{action:'enter',nickname:'닉\n네임'},{action:'enter',nickname:'가'.repeat(13)},{action:'enter',nickname:'닉네임',user_id:uid},{action:'read',delta:999},{action:'enter',nickname:'닉네임',level:15},{action:'set_level',level:15},{action:'enter',nickname:'닉\u202E네임'}]) {
   const {deps,calls}=fixture();eq((await handler('account',deps)(req(b))).status,400);eq(calls.length,0);
  }
 });
@@ -28,11 +28,16 @@ Deno.test('no auth, malformed JSON, oversized body and wrong method fail closed'
  eq((await handler('account',f.deps)(new Request('https://e.test',{method:'POST',body:'{'}))).status,400);
  eq((await handler('account',f.deps)(req({action:'enter',nickname:'가'.repeat(5000)}))).status,413);
 });
-Deno.test('production has no test reward route; sources disabled by default',async()=>{
- const {deps,calls}=fixture();eq((await handler('progression',deps)(req({source:'quiz',activity_id:uid}))).status,409);eq(calls.length,0);
- eq((await handler('progression',deps)(req({source:'test',activity_id:uid,delta:100}))).status,400);
- deps.rewardSources=new Set(['quiz']);eq((await handler('progression',deps)(req({source:'quiz',activity_id:uid}))).status,200);
- eq(calls,[{name:'account_award',args:{p_user_id:uid,p_activity_id:uid,p_source:'quiz'}}]);
+Deno.test('level-only phase disables rewards even when a source is enabled',async()=>{
+ const {deps,calls}=fixture();
+ for(const enabled of [['quiz','escape','study'],[]]) {
+  deps.rewardSources=new Set(enabled);
+  const res=await handler('progression',deps)(req({source:'quiz',activity_id:uid}));
+  eq(res.status,409);eq(await res.json(),{error:{code:'progression_not_enabled'}});eq(calls.length,0);
+ }
+ deps.authenticate=async()=>{throw Error('auth');};
+ eq((await handler('progression',deps)(req({source:'quiz',activity_id:uid}))).status,401);
+
 });
 Deno.test('database ownership and pending rejection are stable; internal errors are hidden',async()=>{
  const f=fixture();f.deps.rpc=async()=>{throw {code:'42501'};};eq((await handler('account',f.deps)(req({action:'read'}))).status,403);

@@ -3,7 +3,6 @@ export interface Dependencies {
  rpc(name: string,args: Record<string,unknown>): Promise<unknown>;
  rewardSources: Set<string>;
 }
-const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 class InputError extends Error { constructor(public status:number,public code:string){super(code);} }
 function reply(data:unknown,status=200):Response {return Response.json(data,{status,headers:{'Cache-Control':'no-store'}});}
 async function readBody(req:Request):Promise<Record<string,unknown>> {
@@ -23,9 +22,10 @@ export function handler(kind:'account'|'progression',deps:Dependencies) {
  return async(req:Request):Promise<Response>=>{
   if(req.method!=='POST')return reply({error:{code:'method_not_allowed'}},405);
   let userId:string;try{userId=await deps.authenticate(req);}catch{return reply({error:{code:'unauthorized'}},401);}
+  if(kind==='progression')return reply({error:{code:'progression_not_enabled'}},409);
   try {
    const b=await readBody(req);
-   if(kind==='account') {
+   {
     if(b.action==='read'){keys(b,['action']);return reply(await deps.rpc('account_read',{p_user_id:userId}));}
     if(b.action!=='enter')throw new InputError(400,'invalid_request');keys(b,['action','nickname']);
     if(typeof b.nickname!=='string')throw new InputError(400,'invalid_nickname');
@@ -33,10 +33,7 @@ export function handler(kind:'account'|'progression',deps:Dependencies) {
     if([...name].length<2||[...name].length>12||/[\p{Cc}\p{Cf}\p{Zl}\p{Zp}<>]/u.test(name))throw new InputError(400,'invalid_nickname');
     return reply(await deps.rpc('account_enter',{p_user_id:userId,p_nickname:name}));
    }
-   keys(b,['source','activity_id']);
-   if(typeof b.source!=='string'||!['quiz','escape','study'].includes(b.source)||typeof b.activity_id!=='string'||!uuid.test(b.activity_id))throw new InputError(400,'invalid_request');
-   if(!deps.rewardSources.has(b.source))throw new InputError(409,'reward_source_not_enabled');
-   return reply(await deps.rpc('account_award',{p_user_id:userId,p_activity_id:b.activity_id,p_source:b.source}));
+
   } catch(e) {
    const code=(e as {code?:string})?.code;
    const status=e instanceof InputError?e.status:code==='42501'?403:code==='22023'?400:503;
