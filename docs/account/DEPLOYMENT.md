@@ -1,9 +1,19 @@
-# campuscommons 실제 배포 현황 — 2026-11-10
+# campuscommons 실제 배포 현황 — 2026-11-12
 
 프로젝트 ref: gumkrzpnzaaxqlpswwvn / API URL: https://gumkrzpnzaaxqlpswwvn.supabase.co
 사용자가 만든 Free 프로젝트에 Chrome Dashboard에서 설정. Supabase MCP 연결에는 이 프로젝트 권한이 없어서 로그인된 UI로 수행.
 
-## 완료·확인
+## 2026-11-12 독립 레벨 전환
+- 신규 migration 20261112013634/standalone_account_level을 hosted DB에 트랜잭션 적용하고 schema_migrations 이력도 같은 트랜잭션에 기록.
+- 적용 전 회원 1명, 레벨 범위1..1, 범위 밖0. 적용 후 회원1명/레벨1 그대로, level is_generated=NEVER/default=1, public 세 테이블 RLS 유지.
+- 실제 DB에서 임시 Lv.15 설정 → account_enter로 닉네임 저장 → 레벨15/XP 없는 응답 검사,0/16 거절, public/private 보상 함수55000을 검증하고 전체 테스트 트랜잭션 ROLLBACK. 실제 회원의 레벨·닉네임은 그대로 유지. 결과 HOSTED_LEVEL_CHECK_PASS.
+- account/progression 함수의 공통 모듈과 entrypoint를 단일 파일로 결합하여 재배포. Dashboard 목록에서 두 함수의 새 배포 시각 확인. 실제 두 endpoint의 미로그인·위조 bearer 요청 모두401 unauthorized 검증.
+- Unity DTO/HUD는 레벨만 사용. 새 가입 Lv.1, 최대15, 자동 상승·재화·외형 아이템 지급 없음.
+- 로컬 PostgreSQL migration 데이터 보존/실패 롤백·권한 테스트 통과, Edge9/세션42/팀16 검사 통과.
+- 임시 Unity6000.6.0f1 실제 메인 씬 fixture 검사 ACCOUNT_FLOW_PASS. 최초 라이선스 채널 연결 실패 후 기존 라이선스 IPC 채널 지정으로 정상 실행. 원본6000.4.5f1은 변경하지 않음.
+- 아래 2026-11-10의 실메일/실제 로그인 결과는 당시 검증 기록이며, 이번 레벨 변경의 hosted 검증은 SQL 계약 검사와 공개 HTTP 보호 검사로 구분한다.
+
+## 2026-11-10 완료·확인
 - public.profiles/player_progress/xp_events, private 활동·함수, 신규 Auth 계정 초기화 적용.
 - 세 public 테이블 rowsecurity=true와 account_read/account_enter/account_award 생성 확인.
 - supabase_migrations.schema_migrations에 20261109081917/account_progression 적용 이력 기록. 이력 테이블도 RLS 활성. 같은 migration 재실행 불필요.
@@ -36,4 +46,4 @@
 ## 남은 사용자·실환경 검증
 - 테스트 계정을 실제로 쓰려면 Unity의 비밀번호 찾기에서 사용자가 원하는 비밀번호를 직접 설정해야 함. 새 비밀번호 입력·확인·제출은 사용자 작업이며 채팅이나 저장소로 받지 않음.
 - 두 계정 분리·다른 PC, 지정 Unity6000.4.5f1의 실제 Auth 연결 및 standalone 검증. 임시6000.6의 기존 Unity 검사는 fixture이므로 위 실제 HTTP/DB 검증과 구분함.
-- 실제 보상 원천 연결은 별도 서버 검증 계약 후 진행. 현재 초기 XP가 유지되는 것이 정상임.
+- 자동 레벨 상승·경험치·재화·외형 보상은 다음 작업. 현재 progression은 설정과 무관하게 비활성.

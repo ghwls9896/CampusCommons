@@ -1,8 +1,8 @@
 # Supabase 계정·DB 설정
 
-이 브랜치 `codex/cc-8-account-progression`의 계정 모듈은 메인 씬에서 자동으로 시작합니다. 이메일+비밀번호 → 이메일 코드 확인 → 입장 닉네임 → 로비 순서이며, 로그아웃하면 게임 입력과 계정 캐시를 지웁니다. 초기 경험치는 0, 레벨은 1입니다. 토큰/비밀번호는 디스크나 PlayerPrefs에 저장하지 않습니다.
+이 브랜치 `codex/cc-8-account-progression`의 계정 모듈은 메인 씬에서 자동으로 시작합니다. 이메일+비밀번호 → 이메일 코드 확인 → 입장 닉네임 → 로비 순서이며, 로그아웃하면 게임 입력과 계정 캐시를 지웁니다. 새 계정의 레벨은 1이며 1~15 범위에서 독립적으로 저장합니다. 경험치 상승·재화·보상 아이템은 후속 작업입니다. 토큰/비밀번호는 디스크나 PlayerPrefs에 저장하지 않습니다.
 
-현재 campuscommons 프로젝트의 DB/함수/기본 인증 정책과 Unity 공개 연결값, 사용자 입력 SMTP, 가입확인·복구 코드 메일 템플릿은 적용됐습니다. 실제 메일 수신·가입 확인·로그인·닉네임/초기 성장 DB 및 세션 갱신/로그아웃을 확인했습니다. 사용자가 쓸 비밀번호 설정과 지정 Unity 버전의 실제 화면 검증 등 남은 항목은 DEPLOYMENT.md를 참고하세요. 아래 절차는 새 환경 재설정용입니다. DB 스키마는 `supabase/migrations/20261109081917_account_progression.sql`, 메일 본문은 `supabase/templates/`, 함수는 `supabase/functions/`에 있습니다.
+현재 campuscommons 프로젝트의 DB/함수/기본 인증 정책과 Unity 공개 연결값, 사용자 입력 SMTP, 가입확인·복구 코드 메일 템플릿은 적용됐습니다. 실제 메일 수신·가입 확인·로그인·닉네임/계정 DB 및 세션 갱신/로그아웃을 확인했습니다. 사용자가 쓸 비밀번호 설정과 지정 Unity 버전의 실제 화면 검증 등 남은 항목은 DEPLOYMENT.md를 참고하세요. 아래 절차는 새 환경 재설정용입니다. DB 스키마는 `supabase/migrations/`의 초기 migration과 `20261112013634_standalone_account_level.sql`, 메일 본문은 `supabase/templates/`, 함수는 `supabase/functions/`에 있습니다.
 
 ## 1. 무료 프로젝트 만들기
 
@@ -53,13 +53,13 @@ npx --yes supabase@3.0.0 functions deploy account progression --use-api
 
 `YOUR_PROJECT_REF`를 자신의 ID로 바꿉니다. 로그인은 브라우저에서 하고, CLI가 DB 비밀번호를 요구하면 로컬 터미널에 입력합니다. `--use-api`는 함수 번들링에 로컬 Docker가 필요 없게 합니다. `--no-verify-jwt`나 `--prune`은 붙이지 않습니다.
 
-migration은 profiles/player_progress/xp_events 및 private 내부 함수·활동 테이블을 생성하고 기존 Auth 계정도 초기화합니다. Auth 사용자를 만들면 프로필과 XP0/레벨1 행이 같은 트랜잭션에서 생성됩니다. SQL Editor에 같은 migration을 따로 실행하고 다시 CLI로 중복 적용하지 마세요. 이 문서는 CLI 경로를 기준으로 합니다.
+migration은 profiles/player_progress/xp_events 및 private 내부 함수·활동 테이블을 생성하고 기존 Auth 계정도 초기화합니다. 두 번째 migration은 기존 레벨을 보존하면서 경험치 계산식과 분리합니다. 기존 레벨이 1~15를 벗어나면 자동 보정 없이 실패하므로 관리자 검토가 필요합니다. Auth 사용자를 만들면 프로필과 레벨1 행이 같은 트랜잭션에서 생성됩니다. SQL Editor에 같은 migration을 따로 실행하고 다시 CLI로 중복 적용하지 마세요. 이 문서는 CLI 경로를 기준으로 합니다.
 
 Integrations → Data API에서 Data API가 켜져 있고 **public** schema가 노출되는지 확인합니다. **private schema는 노출하지 않습니다.** client는 DB의 성장 행을 수정할 권한이 없습니다. 서버 전용 public RPC wrapper에도 anon/authenticated EXECUTE 권한이 없습니다.
 
 함수는 기본 환경변수 `SUPABASE_URL`과 `SUPABASE_PUBLISHABLE_KEYS`/`SUPABASE_SECRET_KEYS`의 default key를 우선 사용합니다. 이전 환경에서는 `SUPABASE_ANON_KEY`/`SUPABASE_SERVICE_ROLE_KEY`로 호환됩니다. 이 값들은 Supabase가 서버 환경에 제공합니다. 클라이언트로 복사하지 않습니다. 두 함수는 EC 서명키와 호환되도록 Dashboard의 **Verify JWT with legacy secret**을 끄고, 함수 코드의 Auth `/user` 검증으로 토큰·이메일 확인 상태·익명 계정 여부를 강제합니다. `config.toml`의 verify_jwt=false는 이 레거시 게이트만 해제하며 함수 내부 인증을 제거하는 설정이 아닙니다. [공식 환경변수 안내](https://supabase.com/docs/guides/functions/secrets)
 
-**`ACCOUNT_REWARD_SOURCES`는 처음에는 설정하지 않습니다.** 현재 로컬 게임 결과를 검증 없이 경험치로 바꾸지 않기 위해 실제 보상은 기본 비활성입니다. 서버가 완료를 검증한 activity_runs만 지급할 수 있으며, 기능별 계약을 완료한 다음 해당 source만 활성화합니다.
+**현재 경험치 지급은 항상 비활성입니다.** `ACCOUNT_REWARD_SOURCES`를 설정해도 progression API는 인증 후 409 `progression_not_enabled`, DB 보상 함수는 55000을 반환합니다. 보상 도입은 별도 구현과 migration이 필요합니다.
 
 Dashboard의 Security/Performance Advisor에서 경고를 확인합니다. migration은 RLS·고정 search_path·명시적 GRANT/REVOKE를 포함하지만 hosted Advisor는 실제 프로젝트에서 별도로 실행해야 합니다.
 
@@ -75,27 +75,25 @@ Dashboard의 Security/Performance Advisor에서 경고를 확인합니다. migra
 ## 6. 실제 사용자 확인
 
 - 회원가입에서 이메일/비밀번호/확인을 입력 → 메일의 6자리 코드 확인 → 닉네임 입력 → 로비 입장
-- 앱 종료 후 같은 계정으로 다시 로그인 → 닉네임을 바꿔도 동일한 계정의 XP·레벨이 표시되는지 확인
+- 앱 종료 후 같은 계정으로 다시 로그인 → 닉네임을 바꿔도 동일한 계정의 레벨이 표시되는지 확인
 - 서로 다른 두 계정과 다른 PC에서 데이터가 섞이지 않는지 확인
 - 로그아웃하면 즉시 이동·포털 입력이 막히고 로그인 화면으로 돌아오는지 확인
 - 비밀번호 찾기 → 메일 코드 → 새 비밀번호 → 다시 로그인
 - 잘못된 코드/만료 코드/중복 가입/재전송 제한/네트워크 단절에서 오류 안내와 재시도를 확인
-- Dashboard의 Authentication Users와 profiles/player_progress를 대조. **사용자마다 XP0/레벨1로 시작하는 것은 정상**이며 보상 연동을 완료하기 전에는 자동으로 경험치가 오르지 않습니다.
+- Dashboard의 Authentication Users와 profiles/player_progress를 대조. **신규 사용자마다 레벨1로 시작하는 것은 정상**이며 자동 레벨 상승은 없습니다.
 
-전송 실패 시 저장 성공으로 표시하지 않습니다. 보상 API를 사용할 때는 동일한 활동 ID로 재시도합니다. 매 프레임이나 종료할 때 전체 XP를 덮어쓰는 방식은 사용하지 않습니다.
+전송 실패 시 저장 성공으로 표시하지 않습니다. 클라이언트는 레벨 값을 쓰거나 초기화하지 않고 서버에 저장된 값을 조회합니다.
 
 ## 7. 개발 검사와 운영
 
 ```sh
 # 아래 DB 검사는 실제 회원 DB가 아닌 일회용 로컬 DB에서만 실행
-psql "$ACCOUNT_TEST_DATABASE_URL" -v ON_ERROR_STOP=1 -f Tools/account/bootstrap_test_db.sql
-psql "$ACCOUNT_TEST_DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/migrations/20261109081917_account_progression.sql
 python3 Tools/account/run_database_tests.py
 # Edge 함수: 외부 요청은 fixture로 대체하며 실메일 검증과 구분
  deno test supabase/functions/tests/
 ```
 
-`bootstrap_test_db.sql`은 기본 PostgreSQL에서 Supabase 역할·auth.uid()를 흉내 내는 **검사용 schema**입니다. hosted Supabase나 이미 초기화된 Supabase 로컬 스택에 실행하지 않습니다. `ACCOUNT_TEST_DATABASE_URL`은 개발자 로컬 환경에 설정합니다. DB 검사는 RLS·미확인 계정·중복/동시 보상·중간 실패 롤백을 실제 PostgreSQL에서 실행합니다.
+`bootstrap_test_db.sql`은 기본 PostgreSQL에서 Supabase 역할·auth.uid()를 흉내 내는 **검사용 schema**입니다. hosted Supabase나 이미 초기화된 Supabase 로컬 스택에 실행하지 않습니다. `ACCOUNT_TEST_DATABASE_URL`은 개발자 로컬 환경에 설정합니다. runner는 localhost의 maintenance DB에 접속하여 임의 이름의 일회용 DB를 만들고 초기화·검사 후 그 DB만 삭제합니다. RLS·미확인 계정·레벨 범위·계정 분리·닉네임 보존·보상 차단·migration 데이터 보존/실패 롤백을 실제 PostgreSQL에서 검사합니다.
 
 C# 세션 검사는 `Tools/account/SessionTests.cs`와 AccountModels.cs/AccountSession.cs를 함께 컴파일해 실행합니다. Unity 메인 씬 검사는 `-executeMethod CampusCommons.Account.Editor.AccountFlowTests.Run`입니다. Auth fixture를 사용하므로 실제 Supabase/SMTP 성공을 뜻하지 않습니다.
 

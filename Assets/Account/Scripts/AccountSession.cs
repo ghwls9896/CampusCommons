@@ -88,7 +88,7 @@ namespace CampusCommons.Account
     try{result=await transport.SendAsync<AccountProfile>("POST","/functions/v1/account",body,access,linked.Token);}
     catch(AccountException e){if(g==generation&&(e.Status==401||e.Status==403))Clear();throw;}
     Current(g,linked.Token);
-    if(result==null||result.user_id!=UserId||result.total_xp<0||result.level<1||result.next_level_total_xp<=result.total_xp)throw new AccountException(502,"invalid_profile");
+    if(result==null||result.user_id!=UserId||result.level<1||result.level>15)throw new AccountException(502,"invalid_profile");
     Profile=result;Changed?.Invoke();return result;
    }
   }

@@ -70,7 +70,7 @@ namespace CampusCommons.Account
      if(Button("비밀번호 변경"))PasswordAction(p=>gate.ResetPasswordAsync(p));Back();break;
     case AccountGate.Screen.Nickname:
      GUILayout.Label("입장 닉네임",heading);nickname=Input("닉네임 · 2~12자",nickname);
-     if(gate.Session.Profile!=null){var p=gate.Session.Profile;GUILayout.Label("레벨 "+p.level+" · 누적 경험치 "+p.total_xp,label);}
+     if(gate.Session.Profile!=null){var p=gate.Session.Profile;GUILayout.Label("Lv. "+p.level+" / 15",label);}
      if(Button("로비 입장")){var n=nickname;Run(()=>gate.EnterAsync(n));}
      if(Button("내 정보 다시 불러오기"))Run(async()=>{await gate.Session.ReadProfileAsync();nickname=gate.Session.Profile.nickname;});
      if(Button("다른 계정으로 로그인"))Run(()=>gate.LogoutAsync());break;
@@ -83,9 +83,9 @@ namespace CampusCommons.Account
   void Back(){if(Button("로그인 화면으로")){gate.Session.Clear();gate.Page=AccountGate.Screen.Login;}}
   void DrawHud()
   {
-   var p=gate.Session.Profile;if(p==null)return;long floor=50L*(p.level-1)*p.level;
-   GUILayout.BeginArea(new Rect(Mathf.Max(8,Screen.width-310),12,298,170),GUI.skin.box);
-   GUILayout.Label(p.nickname+" · Lv. "+p.level,label);GUILayout.Label("경험치 "+(p.total_xp-floor)+" / "+(p.next_level_total_xp-floor),label);
+   var p=gate.Session.Profile;if(p==null)return;
+   GUILayout.BeginArea(new Rect(Mathf.Max(8,Screen.width-310),12,298,140),GUI.skin.box);
+   GUILayout.Label(p.nickname+" · Lv. "+p.level+" / 15"+(p.level==15?" · MAX":""),label);
    GUI.enabled=!gate.Busy;if(Button("로그아웃"))Run(()=>gate.LogoutAsync());GUI.enabled=true;
    if(!string.IsNullOrEmpty(gate.Message))GUILayout.Label(gate.Message,notice);GUILayout.EndArea();
   }

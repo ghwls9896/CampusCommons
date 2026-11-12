@@ -7,7 +7,7 @@ namespace CampusCommons.Account
 {
  [Serializable] public sealed class AuthUser { public string id,email,email_confirmed_at; public bool is_anonymous; }
  [Serializable] public sealed class AuthResponse { public string access_token,refresh_token; public long expires_at,expires_in; public AuthUser user; }
- [Serializable] public sealed class AccountProfile { public string user_id,nickname; public long total_xp,next_level_total_xp; public int level; public long awarded_xp; public bool already_awarded; }
+ [Serializable] public sealed class AccountProfile { public string user_id,nickname; public int level; }
  [Serializable] public sealed class Credentials {public string email,password;}
  [Serializable] public sealed class EmailRequest {public string email,type;}
  [Serializable] public sealed class CodeRequest {public string email,token,type;}
@@ -48,6 +48,6 @@ namespace CampusCommons.Account
    if(length<2||length>12)throw new AccountException(400,"invalid_nickname");return name;
   }
   public static string Code(string value)
-  {value=(value??"").Trim();if(value.Length<6||value.Length>10)throw new AccountException(400,"invalid_code");foreach(char c in value)if(c<'0'||c>'9')throw new AccountException(400,"invalid_code");return value;}
+  {value=(value??"").Trim();if(value.Length!=6)throw new AccountException(400,"invalid_code");foreach(char c in value)if(c<'0'||c>'9')throw new AccountException(400,"invalid_code");return value;}
  }
 }

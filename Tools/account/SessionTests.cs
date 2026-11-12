@@ -16,14 +16,14 @@ public static class SessionTests
   { Paths.Add(method+" "+path);return (T)await Reply(path,body); }
  }
  static AuthResponse Auth(string id="a",long expiry=4000000000) {return new AuthResponse{access_token="access-"+id,refresh_token="refresh-"+id,expires_at=expiry,user=new AuthUser{id=id,email="a@example.test",email_confirmed_at="date"}};}
- static AccountProfile Profile(string id="a"){return new AccountProfile{user_id=id,nickname="닉네임",total_xp=150,level=2,next_level_total_xp=300};}
+ static AccountProfile Profile(string id="a",int level=1){return new AccountProfile{user_id=id,nickname="닉네임",level=level};}
  public static int Main(){Run().GetAwaiter().GetResult();Console.WriteLine("ACCOUNT_SESSION_PASS "+checks+" checks");return 0;}
  static async Task Run()
  {
   var f=new Fake(); f.Reply=(p,b)=>Task.FromResult<object>(Auth());var s=new AccountSession(f);
   Check(!s.IsAuthenticated,"starts signed out");await s.SignInAsync(" a@example.test ","password12345");Check(s.IsAuthenticated && s.UserId=="a","sign in");
-  f.Reply=(p,b)=>Task.FromResult<object>(Profile());await s.ReadProfileAsync();Check(s.Profile.total_xp==150,"load persistent profile");
-  await s.EnterAsync("새닉네임");Check(s.Profile.level==2,"enter preserves growth");
+  f.Reply=(p,b)=>Task.FromResult<object>(Profile());await s.ReadProfileAsync();Check(s.Profile.level==1,"load persistent profile");
+  await s.EnterAsync("새닉네임");Check(s.Profile.level==1,"enter preserves level");
   f.Reply=(p,b)=>Task.FromResult<object>(null);await s.SignOutAsync();Check(!s.IsAuthenticated && s.Profile==null,"logout clears local state");
   var pending=new TaskCompletionSource<object>();f.Reply=(p,b)=>pending.Task;
   var old=s.SignInAsync("a@example.test","password12345");s.Clear();
@@ -45,6 +45,32 @@ public static class SessionTests
   f.Reply=(p,b)=>{throw new AccountException(503,"connection_failed");};try{await s.EnsureFreshAsync();}catch(AccountException){}Check(s.IsAuthenticated,"transient failure before expiry retains valid auth");
   f.Reply=(p,b)=>Task.FromResult<object>(Auth("a",1));await s.SignInAsync("a@example.test","password12345");
   f.Reply=(p,b)=>{throw new AccountException(503,"connection_failed");};try{await s.EnsureFreshAsync();}catch(AccountException){}Check(!s.IsAuthenticated,"expired offline token cannot authorize world");
+  foreach(int level in new[]{1,5,10,15}) {
+   f.Reply=(p,b)=>Task.FromResult<object>(Auth());await s.SignInAsync("a@example.test","password12345");
+   f.Reply=(p,b)=>Task.FromResult<object>(Profile("a",level));await s.ReadProfileAsync();await s.EnterAsync("변경닉네임");
+   Check(s.Profile.level==level,"level-only response and nickname preserve level "+level);
+  }
+  foreach(int level in new[]{0,-1,16,100}) {
+   f.Reply=(p,b)=>Task.FromResult<object>(Auth());await s.SignInAsync("a@example.test","password12345");
+   f.Reply=(p,b)=>Task.FromResult<object>(Profile("a",level));
+   try{await s.ReadProfileAsync();Check(false,"invalid level accepted");}catch(AccountException e){Check(e.Code=="invalid_profile"&&s.Profile==null,"invalid level rejected");}
+  }
+  f.Reply=(p,b)=>Task.FromResult<object>(Auth("b"));await s.SignInAsync("b@example.test","password12345");
+  f.Reply=(p,b)=>Task.FromResult<object>(Profile("b",1));await s.ReadProfileAsync();Check(s.Profile.user_id=="b"&&s.Profile.level==1,"B reads only B level");
+  f.Reply=(p,b)=>Task.FromResult<object>(Auth());await s.SignInAsync("a@example.test","password12345");
+  f.Reply=(p,b)=>Task.FromResult<object>(Profile("a",15));await s.ReadProfileAsync();Check(s.Profile.level==15,"A level restored after re-login");
+  var unconfirmed=Auth();unconfirmed.user.email_confirmed_at=null;f.Reply=(p,b)=>Task.FromResult<object>(unconfirmed);
+  try{await s.SignInAsync("a@example.test","password12345");Check(false,"unconfirmed login accepted");}catch(AccountException){Check(!s.HasSession,"unconfirmed login blocked");}
+  foreach(var code in new[]{"12345","1234567","1234567890","12a456"}){
+   int count=f.Paths.Count;try{await s.VerifySignupCodeAsync("a@example.test",code);Check(false,"invalid code accepted");}catch(AccountException){Check(f.Paths.Count==count,"invalid code never sent");}
+  }
+  f.Reply=(p,b)=>{throw new AccountException(403,"otp_expired");};
+  try{await s.VerifySignupCodeAsync("a@example.test","123456");Check(false,"expired signup OTP accepted");}catch(AccountException){Check(!s.HasSession,"failed signup OTP blocked");}
+  try{await s.VerifyRecoveryCodeAsync("a@example.test","123456");Check(false,"expired recovery OTP accepted");}catch(AccountException){Check(!s.HasSession,"failed recovery OTP blocked");}
+  f.Reply=(p,b)=>Task.FromResult<object>(Auth());await s.VerifyRecoveryCodeAsync("a@example.test","123456");int before=f.Paths.Count;
+  try{await s.EnterAsync("닉네임");Check(false,"recovery entered world");}catch(AccountException){Check(f.Paths.Count==before,"recovery cannot call account API");}
+  f.Reply=(p,b)=>{throw new AccountException(503,"connection_failed");};
+  try{await s.UpdatePasswordAsync("newpassword123");Check(false,"failed password update succeeded");}catch(AccountException){Check(s.RecoveryPending&&!s.IsAuthenticated,"failed reset remains restricted");}
   s.Dispose();Check(f.Disposed,"session disposal owns transport cleanup");
   Check(AccountRules.Nickname("  가나다  ")=="가나다","nickname NFC trim");
   foreach(var name in new[]{"a","<b>닉</b>","닉\n네임","닉\u202E네임",new string('가',13)}){try{AccountRules.Nickname(name);Check(false,"invalid nickname");}catch(AccountException){Check(true,"nickname rejected");}}
