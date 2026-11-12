@@ -1,0 +1,12 @@
+# Python 3.12; install in a separate virtual environment.
+qev @ git+https://github.com/ken-jo/qev.git@ff55034b2f488e03fab774dc380b08d67a93071b
+# Inference versions verified on Apple M4; QEV's other dependencies come from its pinned source.
+torch==2.10.0
+torchvision==0.25.0
+transformers==5.17.0
+accelerate==1.15.0
+numpy==2.5.3
+Pillow==12.3.0
+safetensors==0.8.0
+pydantic==2.13.5
+huggingface-hub==1.33.0

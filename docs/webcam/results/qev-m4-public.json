@@ -1,0 +1,168 @@
+{
+  "date": "2026-11-10",
+  "model": "ken-jo/QEV-0.8B",
+  "model_revision": "3933310d0637b5721c05633cb07b7de5fd11d050",
+  "source_revision": "ff55034b2f488e03fab774dc380b08d67a93071b",
+  "mode": "accurate",
+  "early_exit": false,
+  "layers": 24,
+  "input": "512x288 JPEG quality 85, letterboxed public fixtures",
+  "device": "Apple M4 MPS, 32 GB",
+  "backbone_dtype": "bfloat16",
+  "head_dtype": "float32",
+  "scope": "Four hand-picked public examples, not a webcam accuracy benchmark.",
+  "samples": [
+    {
+      "fixture": "reading",
+      "expected": "studying",
+      "run": 1,
+      "sha256": "05dae71d42dbfac516ecd1b35840de3dc5dfcc70a7eed726f30954dac23b93ad",
+      "http_seconds": 1.1755588330124738,
+      "ok": true,
+      "state": "studying",
+      "probabilities": {
+        "studying": 0.9300704002380371,
+        "phone": 0.024192189797759056,
+        "other": 0.022526461631059647,
+        "away": 0.023210927844047546
+      },
+      "confidence": 0.9300704002380371,
+      "seconds": 1.1746626250096597,
+      "mode": "accurate",
+      "device": "mps"
+    },
+    {
+      "fixture": "reading",
+      "expected": "studying",
+      "run": 2,
+      "sha256": "05dae71d42dbfac516ecd1b35840de3dc5dfcc70a7eed726f30954dac23b93ad",
+      "http_seconds": 0.8039687500131549,
+      "ok": true,
+      "state": "studying",
+      "probabilities": {
+        "studying": 0.9300704002380371,
+        "phone": 0.024192189797759056,
+        "other": 0.022526461631059647,
+        "away": 0.023210927844047546
+      },
+      "confidence": 0.9300704002380371,
+      "seconds": 0.8031419579929207,
+      "mode": "accurate",
+      "device": "mps"
+    },
+    {
+      "fixture": "phone",
+      "expected": "phone",
+      "run": 1,
+      "sha256": "22ce17b9cf046de2200d7c2280bb5c4f4f7ada10e880fc30f7098b3edb1aabbc",
+      "http_seconds": 0.7802185830078088,
+      "ok": true,
+      "state": "phone",
+      "probabilities": {
+        "studying": 0.03548301383852959,
+        "phone": 0.9114044904708862,
+        "other": 0.028994200751185417,
+        "away": 0.024118341505527496
+      },
+      "confidence": 0.9114044904708862,
+      "seconds": 0.7793245829961961,
+      "mode": "accurate",
+      "device": "mps"
+    },
+    {
+      "fixture": "phone",
+      "expected": "phone",
+      "run": 2,
+      "sha256": "22ce17b9cf046de2200d7c2280bb5c4f4f7ada10e880fc30f7098b3edb1aabbc",
+      "http_seconds": 0.734047541001928,
+      "ok": true,
+      "state": "phone",
+      "probabilities": {
+        "studying": 0.03548301383852959,
+        "phone": 0.9114044904708862,
+        "other": 0.028994200751185417,
+        "away": 0.024118341505527496
+      },
+      "confidence": 0.9114044904708862,
+      "seconds": 0.7331402499985415,
+      "mode": "accurate",
+      "device": "mps"
+    },
+    {
+      "fixture": "other",
+      "expected": "other",
+      "run": 1,
+      "sha256": "145655e011703b740aba4626d0a0053a303bf0f3b1ed9198fcf8b3f54884bdd6",
+      "http_seconds": 0.746515291990363,
+      "ok": true,
+      "state": "other",
+      "probabilities": {
+        "studying": 0.017119960859417915,
+        "phone": 0.01964562200009823,
+        "other": 0.94208824634552,
+        "away": 0.021146196871995926
+      },
+      "confidence": 0.94208824634552,
+      "seconds": 0.7456321249919711,
+      "mode": "accurate",
+      "device": "mps"
+    },
+    {
+      "fixture": "other",
+      "expected": "other",
+      "run": 2,
+      "sha256": "145655e011703b740aba4626d0a0053a303bf0f3b1ed9198fcf8b3f54884bdd6",
+      "http_seconds": 0.7500622080115136,
+      "ok": true,
+      "state": "other",
+      "probabilities": {
+        "studying": 0.017119960859417915,
+        "phone": 0.01964562200009823,
+        "other": 0.94208824634552,
+        "away": 0.021146196871995926
+      },
+      "confidence": 0.94208824634552,
+      "seconds": 0.7492154580104398,
+      "mode": "accurate",
+      "device": "mps"
+    },
+    {
+      "fixture": "away",
+      "expected": "away",
+      "run": 1,
+      "sha256": "f14a4bfb5d1115a119fd68924d5e5411df26a7991334ed701f559e05a46b03e5",
+      "http_seconds": 0.7872133750061039,
+      "ok": true,
+      "state": "away",
+      "probabilities": {
+        "studying": 0.025499312207102776,
+        "phone": 0.039308156818151474,
+        "other": 0.03604714199900627,
+        "away": 0.8991453647613525
+      },
+      "confidence": 0.8991453647613525,
+      "seconds": 0.7862867500080029,
+      "mode": "accurate",
+      "device": "mps"
+    },
+    {
+      "fixture": "away",
+      "expected": "away",
+      "run": 2,
+      "sha256": "f14a4bfb5d1115a119fd68924d5e5411df26a7991334ed701f559e05a46b03e5",
+      "http_seconds": 0.7765646250045393,
+      "ok": true,
+      "state": "away",
+      "probabilities": {
+        "studying": 0.025499312207102776,
+        "phone": 0.039308156818151474,
+        "other": 0.03604714199900627,
+        "away": 0.8991453647613525
+      },
+      "confidence": 0.8991453647613525,
+      "seconds": 0.7757353339984547,
+      "mode": "accurate",
+      "device": "mps"
+    }
+  ]
+}

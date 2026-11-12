@@ -1,0 +1,209 @@
+{
+  "date": "2026-11-10",
+  "model": "ken-jo/QEV-0.8B",
+  "device": "Apple M4 MPS, 32GB",
+  "mode": "accurate",
+  "backbone_dtype": "bfloat16",
+  "head_dtype": "float32",
+  "input": "512x288 letterboxed public JPEG, quality85",
+  "wall_seconds": 10.044887500000186,
+  "cpu_seconds": 2.51,
+  "cpu_percent_one_core": 24.987835851819675,
+  "gpu_utilization_percent": null,
+  "samples": [
+    {
+      "fixture": "reading",
+      "run": 1,
+      "expected": "studying",
+      "sha256": "05dae71d42dbfac516ecd1b35840de3dc5dfcc70a7eed726f30954dac23b93ad",
+      "ok": true,
+      "state": "studying",
+      "probabilities": {
+        "studying": 0.5830345153808594,
+        "phone": 0.03941367194056511,
+        "other": 0.04299385845661163,
+        "away": 0.05568632856011391,
+        "drowsy": 0.2788715958595276
+      },
+      "confidence": 0.5830345153808594,
+      "seconds": 0.8083047079999233,
+      "mode": "accurate",
+      "device": "mps"
+    },
+    {
+      "fixture": "phone",
+      "run": 1,
+      "expected": "phone",
+      "sha256": "22ce17b9cf046de2200d7c2280bb5c4f4f7ada10e880fc30f7098b3edb1aabbc",
+      "ok": true,
+      "state": "phone",
+      "probabilities": {
+        "studying": 0.04186909645795822,
+        "phone": 0.7226739525794983,
+        "other": 0.15245434641838074,
+        "away": 0.03402680903673172,
+        "drowsy": 0.048975806683301926
+      },
+      "confidence": 0.7226739525794983,
+      "seconds": 0.7920247919973917,
+      "mode": "accurate",
+      "device": "mps"
+    },
+    {
+      "fixture": "other",
+      "run": 1,
+      "expected": "other",
+      "sha256": "145655e011703b740aba4626d0a0053a303bf0f3b1ed9198fcf8b3f54884bdd6",
+      "ok": true,
+      "state": "other",
+      "probabilities": {
+        "studying": 0.027104320004582405,
+        "phone": 0.02289021760225296,
+        "other": 0.879102349281311,
+        "away": 0.027972878888249397,
+        "drowsy": 0.042930297553539276
+      },
+      "confidence": 0.879102349281311,
+      "seconds": 0.7926686669961782,
+      "mode": "accurate",
+      "device": "mps"
+    },
+    {
+      "fixture": "away",
+      "run": 1,
+      "expected": "away",
+      "sha256": "f14a4bfb5d1115a119fd68924d5e5411df26a7991334ed701f559e05a46b03e5",
+      "ok": true,
+      "state": "away",
+      "probabilities": {
+        "studying": 0.04254186898469925,
+        "phone": 0.06061987206339836,
+        "other": 0.0844823494553566,
+        "away": 0.7020522952079773,
+        "drowsy": 0.11030364781618118
+      },
+      "confidence": 0.7020522952079773,
+      "seconds": 0.8077519590005977,
+      "mode": "accurate",
+      "device": "mps"
+    },
+    {
+      "fixture": "drowsy",
+      "run": 1,
+      "expected": "drowsy",
+      "sha256": "0ad4fa31688e262421397aee9e8182951439734037e9cecb46ef00a5c0b5eec8",
+      "ok": true,
+      "state": "drowsy",
+      "probabilities": {
+        "studying": 0.05863412842154503,
+        "phone": 0.038300201296806335,
+        "other": 0.0626986101269722,
+        "away": 0.030650775879621506,
+        "drowsy": 0.8097162246704102
+      },
+      "confidence": 0.8097162246704102,
+      "seconds": 0.8023720420023892,
+      "mode": "accurate",
+      "device": "mps"
+    },
+    {
+      "fixture": "reading",
+      "run": 2,
+      "expected": "studying",
+      "sha256": "05dae71d42dbfac516ecd1b35840de3dc5dfcc70a7eed726f30954dac23b93ad",
+      "ok": true,
+      "state": "studying",
+      "probabilities": {
+        "studying": 0.5830345153808594,
+        "phone": 0.03941367194056511,
+        "other": 0.04299385845661163,
+        "away": 0.05568632856011391,
+        "drowsy": 0.2788715958595276
+      },
+      "confidence": 0.5830345153808594,
+      "seconds": 0.8061973750009201,
+      "mode": "accurate",
+      "device": "mps"
+    },
+    {
+      "fixture": "phone",
+      "run": 2,
+      "expected": "phone",
+      "sha256": "22ce17b9cf046de2200d7c2280bb5c4f4f7ada10e880fc30f7098b3edb1aabbc",
+      "ok": true,
+      "state": "phone",
+      "probabilities": {
+        "studying": 0.04186909645795822,
+        "phone": 0.7226739525794983,
+        "other": 0.15245434641838074,
+        "away": 0.03402680903673172,
+        "drowsy": 0.048975806683301926
+      },
+      "confidence": 0.7226739525794983,
+      "seconds": 0.8005272919981508,
+      "mode": "accurate",
+      "device": "mps"
+    },
+    {
+      "fixture": "other",
+      "run": 2,
+      "expected": "other",
+      "sha256": "145655e011703b740aba4626d0a0053a303bf0f3b1ed9198fcf8b3f54884bdd6",
+      "ok": true,
+      "state": "other",
+      "probabilities": {
+        "studying": 0.027104320004582405,
+        "phone": 0.02289021760225296,
+        "other": 0.879102349281311,
+        "away": 0.027972878888249397,
+        "drowsy": 0.042930297553539276
+      },
+      "confidence": 0.879102349281311,
+      "seconds": 0.8034222080023028,
+      "mode": "accurate",
+      "device": "mps"
+    },
+    {
+      "fixture": "away",
+      "run": 2,
+      "expected": "away",
+      "sha256": "f14a4bfb5d1115a119fd68924d5e5411df26a7991334ed701f559e05a46b03e5",
+      "ok": true,
+      "state": "away",
+      "probabilities": {
+        "studying": 0.04254186898469925,
+        "phone": 0.06061987206339836,
+        "other": 0.0844823494553566,
+        "away": 0.7020522952079773,
+        "drowsy": 0.11030364781618118
+      },
+      "confidence": 0.7020522952079773,
+      "seconds": 0.7999247920088237,
+      "mode": "accurate",
+      "device": "mps"
+    },
+    {
+      "fixture": "drowsy",
+      "run": 2,
+      "expected": "drowsy",
+      "sha256": "0ad4fa31688e262421397aee9e8182951439734037e9cecb46ef00a5c0b5eec8",
+      "ok": true,
+      "state": "drowsy",
+      "probabilities": {
+        "studying": 0.05863412842154503,
+        "phone": 0.038300201296806335,
+        "other": 0.0626986101269722,
+        "away": 0.030650775879621506,
+        "drowsy": 0.8097162246704102
+      },
+      "confidence": 0.8097162246704102,
+      "seconds": 0.8036721249955008,
+      "mode": "accurate",
+      "device": "mps"
+    }
+  ],
+  "memory_summary": [
+    "Physical footprint:         4.9G",
+    "Physical footprint (peak):  4.9G"
+  ]
+}
