@@ -16,12 +16,14 @@
     "docs/superpowers/specs/2026-11-12-study-records.md",
     "docs/superpowers/plans/2026-11-12-study-records.md",
     "supabase/config.toml",
-    "supabase/migrations/20261112071053_study_records.sql"
+    "supabase/migrations/20261112071053_study_records.sql",
+    "docs/tasks/cc-2.json"
   ],
   "shared_files": [],
   "depends_on": [
     "cc-7",
-    "cc-8"
+    "cc-8",
+    "https://github.com/ghwls9896/CampusCommons/pull/29"
   ],
   "validation": [
     "Mono evidence/time/outbox/account tests",

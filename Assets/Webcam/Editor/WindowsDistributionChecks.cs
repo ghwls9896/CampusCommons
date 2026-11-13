@@ -18,7 +18,7 @@ public static class WindowsDistributionChecks
    var boot=StudyRuntimeBootstrap.Instance;
    var lobby=UnityEngine.Object.FindAnyObjectByType<LobbyStudyWebcam>();
    if(!lobby)lobby=new GameObject("Font ownership test").AddComponent<LobbyStudyWebcam>();
-   targets=new MonoBehaviour[]{boot,lobby};
+   targets=new MonoBehaviour[]{boot,lobby,StudyRecordService.Instance};
    foreach(var target in targets){
     target.GetType().GetField("font",BindingFlags.NonPublic|BindingFlags.Instance).SetValue(target,shared);
     UnityEngine.Object.Destroy(target.gameObject);

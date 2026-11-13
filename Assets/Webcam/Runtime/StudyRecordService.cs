@@ -335,7 +335,7 @@ namespace CampusCommons.Webcam
             if (owner == null) return;
             if (text == null)
             {
-                font = Font.CreateDynamicFontFromOSFont(new[] { "Apple SD Gothic Neo", "Malgun Gothic", "Arial" }, 16);
+                font = Resources.Load<Font>("KIT/NotoSansKR");
                 text = new GUIStyle(GUI.skin.label) { font = font, fontSize = 16, wordWrap = true };
                 button = new GUIStyle(GUI.skin.button) { font = font, fontSize = 16 };
             }
@@ -383,7 +383,6 @@ namespace CampusCommons.Webcam
         {
             Finish();
             store?.Dispose();
-            if (font) Destroy(font);
             if (Instance == this) Instance = null;
         }
     }
