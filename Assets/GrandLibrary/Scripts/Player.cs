@@ -137,14 +137,6 @@ namespace CampusCommons.GrandLibrary
         }
         void Update()
         {
-            var inventory = GetComponent<LibraryInventoryUI>();
-            if (inventory != null && inventory.OwnsInput)
-            {
-                Cursor.lockState = CursorLockMode.None;
-                Cursor.visible = true;
-                AnimateAvatar(Vector3.zero, false);
-                return;
-            }
 
 
             if (Input.GetKeyDown(KeyCode.C) && !exitConfirm)
@@ -165,6 +157,15 @@ namespace CampusCommons.GrandLibrary
                 avatarMotion?.UpdateMovement(
                     false, false, sitting != null);
 
+                return;
+            }
+
+            var inventory = GetComponent<LibraryInventoryUI>();
+            if (inventory != null && inventory.OwnsInput)
+            {
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
+                AnimateAvatar(Vector3.zero, false);
                 return;
             }
 
