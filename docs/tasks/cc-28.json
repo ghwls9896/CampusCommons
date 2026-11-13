@@ -1,0 +1,25 @@
+{
+  "id": "cc-28",
+  "title": "Windows 통합 배포 첫 실행 오류 수정",
+  "owner": "ghwls9896",
+  "branch": "codex/cc-28-windows-fix",
+  "issue": "https://github.com/ghwls9896/CampusCommons/issues/28",
+  "scope": [
+    "Assets/Account/Scripts/AccountView.cs",
+    "Assets/Webcam/Runtime/StudyRuntimeBootstrap.cs",
+    "Assets/Webcam/Runtime/LobbyStudyWebcam.cs",
+    "Assets/Webcam/Runtime/RuntimePackageInstaller.cs",
+    "Tools/distribution/build-windows.ps1",
+    "docs/tasks/cc-28.json",
+    "docs/tasks/cc-28.md"
+  ],
+  "shared_files": [],
+  "depends_on": [
+    "https://github.com/ghwls9896/CampusCommons/pull/23"
+  ],
+  "validation": [
+    "Unity 6000.4.5f1 Windows 빌드 로그인 표시와 런타임 첫 실행",
+    "Windows 빌드 프로세스 완료 및 실패 전파 검증",
+    "웹캠 실기기는 이 PC에 카메라가 없어 미검증"
+  ]
+}
