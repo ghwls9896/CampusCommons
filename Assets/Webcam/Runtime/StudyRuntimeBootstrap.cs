@@ -94,7 +94,7 @@ namespace CampusCommons.Webcam
         void OnApplicationQuit() { cancel?.Cancel(); }
         void OnDestroy()
         {
-            cancel?.Cancel(); if (font) Destroy(font);
+            cancel?.Cancel();
             if (Instance == this) Instance = null;
         }
         void OnGUI()

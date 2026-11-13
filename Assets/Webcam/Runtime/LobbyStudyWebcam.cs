@@ -159,7 +159,7 @@ namespace CampusCommons.Webcam
         void OnApplicationFocus(bool value){if(focused==value)return;focused=value;if(!value)StopStudy();else previewAttempted=false;}
         void OnApplicationPause(bool value){if(value)StopStudy();else previewAttempted=false;}
         void OnDisable(){EndStudy();}
-        void OnDestroy(){SceneManager.sceneLoaded-=SceneLoaded;StopStudy();if(font)Destroy(font);}
+        void OnDestroy(){SceneManager.sceneLoaded-=SceneLoaded;StopStudy();}
         void OnApplicationQuit(){StopStudy();}
         void OnGUI()
         {
