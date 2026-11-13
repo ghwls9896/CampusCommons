@@ -40,6 +40,10 @@ namespace CampusCommons.LibraryCharacter
         readonly List<Collider> panelsToRestore=new List<Collider>();
         const float ChaseStride=.8f;
         const float StepsBeyondLastSeen=5f*ChaseStride;
+        const float CatchDistance=2.5f;
+        const float MaxSweptDistance=8f;
+        Vector3 previousMonsterPosition, previousPlayerPosition;
+        bool hasPreviousCapturePositions;
         int next;
         float wakeRemaining,repathRemaining,searchRemaining,pauseAtPoint,stuckTime,footDistance,gait,roomSearchRemaining,hearingRemaining,blockedUntil;
         float chaseDistanceRemaining;
@@ -83,7 +87,7 @@ namespace CampusCommons.LibraryCharacter
             if(heading.sqrMagnitude<.01f)heading=Vector3.forward;heading.Normalize();
             doors=FindObjectsByType<Door>();wakeRemaining=graceSeconds;repathRemaining=0;pauseAtPoint=0;
             stuckTime=0;blockedUntil=0;footDistance=0;gait=0;pastLastSeen=false;chaseDistanceRemaining=0;roomSearchRemaining=3f;lastInvestigatedDoor=null;
-            state=Behaviour.Patrol;StopSounds();ResetPicture();
+            state=Behaviour.Patrol;hasPreviousCapturePositions=false;StopSounds();ResetPicture();
         }
         Vector3 InitialPosition(Transform player)
         {
@@ -129,10 +133,10 @@ namespace CampusCommons.LibraryCharacter
             // Restore temporary carried-character collisions before disabling the monster collider.
             if (game && game.World && game.World.IsCleanerCarrying(body)) game.World.ReleaseCleanerActors();
             RestoreOpenDoorCollisions();
-            running=false;awakened=false;pastLastSeen=false;chaseDistanceRemaining=0;target=null;path.Clear();hasGoal=false;waitingDoor=null;StopSounds();ResetPicture();
+            running=false;awakened=false;pastLastSeen=false;chaseDistanceRemaining=0;target=null;path.Clear();hasGoal=false;waitingDoor=null;hasPreviousCapturePositions=false;StopSounds();ResetPicture();
             if(body)body.enabled=false;if(picture)picture.gameObject.SetActive(false);
         }
-        void OnDisable(){RestoreOpenDoorCollisions();StopSounds();ResetPicture();}
+        void OnDisable(){hasPreviousCapturePositions=false;RestoreOpenDoorCollisions();StopSounds();ResetPicture();}
         void StopSounds(){if(steps)steps.Stop();if(alert)alert.Stop();}
         void ResetPicture(){if(picture){picture.localPosition=picturePosition;picture.localScale=pictureScale;}}
 
@@ -200,12 +204,14 @@ namespace CampusCommons.LibraryCharacter
             if (!running || !game || !target || !body || !body.enabled ||
                 !game.IsRunning || game.IsEnded || game.IsExitConfirmOpen)
             {
+                hasPreviousCapturePositions=false;
                 StopSounds();
                 ResetPicture();
                 return;
             }
             if (!awakened)
             {
+                hasPreviousCapturePositions=false;
                 StopSounds();
                 ResetPicture();
                 return;
@@ -216,12 +222,14 @@ namespace CampusCommons.LibraryCharacter
             if (wakeRemaining > 0) wakeRemaining = Mathf.Max(0, wakeRemaining - dt);
             if (game.IsAnswering || wakeRemaining > 0)
             {
+                hasPreviousCapturePositions=false;
                 StopSounds();
                 ResetPicture();
                 return;
             }
             if (game.World && game.World.IsCleanerCarrying(body))
             {
+                hasPreviousCapturePositions=false;
                 StopSounds();
                 ResetPicture();
                 return;
@@ -232,10 +240,28 @@ namespace CampusCommons.LibraryCharacter
             UpdateSearchAndInvestigation(dt);
             UpdatePathPlan(dt);
             MoveAlongPath(dt);
-            if (HorizontalDistance(transform.position, target.position) < .85f &&
-                Mathf.Abs(transform.position.y - target.position.y) < 1.6f &&
-                HasClearSight(transform.position + Vector3.up * 1f, target.position + Vector3.up * 1f))
+            Vector3 monsterNow=transform.position, playerNow=target.position;
+            Vector3 monsterBefore=hasPreviousCapturePositions?previousMonsterPosition:monsterNow;
+            Vector3 playerBefore=hasPreviousCapturePositions?previousPlayerPosition:playerNow;
+            if (CanCaptureBetween(monsterBefore,monsterNow,playerBefore,playerNow))
                 game.CaughtByMonster();
+            previousMonsterPosition=monsterNow;previousPlayerPosition=playerNow;hasPreviousCapturePositions=true;
+        }
+
+        bool CanCaptureBetween(Vector3 monsterBefore, Vector3 monsterNow, Vector3 playerBefore, Vector3 playerNow)
+        {
+            // Treat teleports as a new position rather than catching everything along the jump.
+            if ((monsterNow-monsterBefore).sqrMagnitude>MaxSweptDistance*MaxSweptDistance ||
+                (playerNow-playerBefore).sqrMagnitude>MaxSweptDistance*MaxSweptDistance)
+            { monsterBefore=monsterNow; playerBefore=playerNow; }
+            Vector3 relative=playerBefore-monsterBefore;
+            Vector3 motion=(playerNow-playerBefore)-(monsterNow-monsterBefore);
+            relative.y=0f;motion.y=0f;
+            float t=motion.sqrMagnitude>.000001f?Mathf.Clamp01(-Vector3.Dot(relative,motion)/motion.sqrMagnitude):1f;
+            Vector3 monsterAt=Vector3.Lerp(monsterBefore,monsterNow,t), playerAt=Vector3.Lerp(playerBefore,playerNow,t);
+            return Mathf.Abs(monsterAt.y-playerAt.y)<1.6f && HorizontalDistance(monsterAt,playerAt)<CatchDistance &&
+                HasClearSight(monsterAt+Vector3.up,playerAt+Vector3.up) &&
+                HasClearSight(monsterNow+Vector3.up,playerNow+Vector3.up);
         }
         public void CleanerReleased()
         {
@@ -245,6 +271,7 @@ namespace CampusCommons.LibraryCharacter
             waitingDoor = null;
             stuckTime = 0f;
             blockedUntil = 0f;
+            hasPreviousCapturePositions = false;
         }
         void UpdateVisibilityAndChase(float dt)
         {
@@ -521,9 +548,7 @@ namespace CampusCommons.LibraryCharacter
                 if(toward.sqrMagnitude>.01f && Vector3.Dot(direction,toward.normalized)<.1f)continue;
                 door.OpenForMonster();waitingDoor=door;body.Move(Vector3.down*2f*dt);ResetPicture();return;
             }
-            float chaseSpeed=(12f+Mathf.Max(0f,Speed-2.65f))*(IsFinalHunt?1.2f:1f)*(game?game.TimeAttackSpeed:1f);
-            float speed=state==Behaviour.Chase ? Mathf.Max(CurrentMoveSpeed, chaseSpeed) :
-                state==Behaviour.Investigate ? CurrentMoveSpeed : state==Behaviour.Search ? BaseMoveSpeed*.75f : BaseMoveSpeed*.55f;
+            float speed=(state==Behaviour.Chase || state==Behaviour.Investigate)?CurrentMoveSpeed:state==Behaviour.Search?BaseMoveSpeed*.75f:BaseMoveSpeed*.55f;
             Vector3 before=transform.position;
             body.Move(direction*Mathf.Min(speed*dt,remaining)+Vector3.down*2f*dt);
             Vector3 moved=transform.position-before;moved.y=0;float distance=moved.magnitude;

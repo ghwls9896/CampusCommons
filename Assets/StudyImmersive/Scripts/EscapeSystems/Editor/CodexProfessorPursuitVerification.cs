@@ -18,8 +18,8 @@ public static class CodexProfessorPursuitVerification {
  Place(prof,new Vector3(527.5f,.08f,-38));Place(body,new Vector3(527.5f,.08f,-30));Physics.SyncTransforms();
  var see=typeof(EscapeWorld).GetMethod("CanSeePlayer",F);Check((bool)see.Invoke(world,new object[]{12f}),"professor could not see player in clear corridor");
  var update=typeof(EscapeWorld).GetMethod("UpdatePatrols",F);float initial=Vector3.Distance(prof.transform.position,body.transform.position);
- for(int i=0;i<50 && !world.BlocksMovement;i++){body.Move(Vector3.forward*(7.02f*.05f)+Vector3.down*.1f);Physics.SyncTransforms();update.Invoke(world,new object[]{.05f});}
- float after=Vector3.Distance(prof.transform.position,body.transform.position);Check(after<initial-1f,"professor failed to close gap while player ran: before="+initial+" after="+after);Debug.Log("PROFESSOR_CHASE_RUN_PASS before="+initial+" after="+after);
+ for(int i=0;i<50 && !world.BlocksMovement;i++){body.Move(Vector3.forward*(3.6f*.05f)+Vector3.down*.1f);Physics.SyncTransforms();update.Invoke(world,new object[]{.05f});}
+ float after=Vector3.Distance(prof.transform.position,body.transform.position);Check(after<initial-1f,"professor failed to follow walking player: before="+initial+" after="+after);Debug.Log("PROFESSOR_CHASE_RUN_PASS before="+initial+" after="+after);
  Check((bool)Get(npc,"pursuing") || world.BlocksMovement,"professor not pursuing");
  if(!world.BlocksMovement){var blocker=GameObject.CreatePrimitive(PrimitiveType.Cube);blocker.transform.position=(prof.transform.position+body.transform.position)*.5f+Vector3.up;blocker.transform.localScale=new Vector3(3,3,.5f);Physics.SyncTransforms();Check(!(bool)see.Invoke(world,new object[]{12f}),"blocker did not break sight");update.Invoke(world,new object[]{.1f});Check((bool)Get(npc,"pursuing"),"professor forgot player immediately after losing sight");Debug.Log("PROFESSOR_CHASE_MEMORY_PASS");UnityEngine.Object.Destroy(blocker);}
  game.ExitToLobby();EditorApplication.Exit(0);

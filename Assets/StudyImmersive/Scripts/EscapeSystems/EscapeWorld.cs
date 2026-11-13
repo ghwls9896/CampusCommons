@@ -328,7 +328,7 @@ namespace CampusCommons.StudyImmersive
                         ReplanPatrol(professor, false);
                 }
                 if (professor != null) professor.pursuing = pursuing;
-                MovePatrol(professor, (pursuing ? 9.5f : 4.85f) * DifficultySpeed(), dt);
+                MovePatrol(professor, 4.85f * DifficultySpeed(), dt);
             }
             if (worker == null || !IsCleanerCarrying(worker.body)) MovePatrol(worker, 4.45f * DifficultySpeed(), dt);
             if (!BlocksMovement && !professorCarried && !IsCleanerPushing && professorCooldown <= 0 && CanMeetProfessor()) BeginProfessorQuestion();
