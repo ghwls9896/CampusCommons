@@ -10,7 +10,10 @@
     "Assets/LibraryCharacter/Scripts/Door.cs",
     "Assets/LibraryCharacter/Scripts/Monster.cs",
     "docs/tasks/cc-26.json",
-    "docs/tasks/cc-26.md"
+    "docs/tasks/cc-26.md",
+    "Assets/LibraryCharacter/Editor/GameTest.cs",
+    "Assets/LibraryCharacter/Editor/CampusEscapeVerification.cs",
+    "Assets/StudyImmersive/Editor/ImmersiveValidation.cs"
   ],
   "shared_files": [],
   "depends_on": [
@@ -21,6 +24,7 @@
     "python Tools/team/check.py --base origin/main",
     "공유 씬 변경은 별도 조율 후 검증",
     "Unity 6000.4.5f1 밝은/어두운 모드에서 몬스터 근접 효과 및 종료 복구, 3D 소리 설정 검증",
-    "Unity 6000.4.5f1 교수 시야·추격 유지 및 기존 속도와 몬스터 이동 중 포획·벽 차단 검증"
+    "Unity 6000.4.5f1 교수 시야·추격 유지 및 기존 속도와 몬스터 이동 중 포획·벽 차단 검증",
+    "쉬움 5장/보통 7장, 밝은·어두운 무제한 타임어택과 라운드 재시작 회귀 검사"
   ]
 }
