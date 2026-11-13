@@ -120,7 +120,7 @@ namespace CampusCommons.LibraryCharacter.Editor
                 }
                 if(state==3 && Time.time-started>.5f)
                 {
-                    Check(game.IsRunning && game.Target==3 && game.ActiveNotebookCount==3,"Easy mode did not spawn three sheets");
+                    Check(game.IsRunning && game.Target==5 && game.ActiveNotebookCount==5,"Easy mode did not spawn five sheets");
                     Check(!player.enabled && player.currentSpace==Portal.Space.Escape,"First-person school transition failed");
                     Check(!game.schoolReturnTrigger.activeSelf && !game.schoolReturnVisual.activeSelf,"Return portal should be hidden");
                     var sprite=picture.GetComponent<SpriteRenderer>();Check(sprite && sprite.sprite && sprite.sprite.texture.alphaIsTransparency,"Transparent character sprite missing");
@@ -171,14 +171,14 @@ namespace CampusCommons.LibraryCharacter.Editor
                     Check(!game.LastAnswerCorrect && monster.Speed>before,"Wrong answer did not increase monster speed");
                     float increased=monster.Speed;Check(!game.SubmitAnswer(0) && Mathf.Approximately(increased,monster.Speed),"Repeated click increased speed twice");
                     Check(game.ContinueQuestion() && game.QuestionNumber==2,"Question two missing");AnswerCurrent(true);Check(game.QuestionNumber==3,"Question three missing");AnswerCurrent(true);
-                    Check(!game.IsAnswering && game.Found==1 && game.ActiveNotebookCount==2,"Three answers did not collect one sheet");
+                    Check(!game.IsAnswering && game.Found==1 && game.ActiveNotebookCount==4,"Three answers did not collect one sheet");
                     monster.graceSeconds=100;monster.Begin(game,player.transform,EscapeGame.Mode.Easy);
                     foreach(var remaining in UnityEngine.Object.FindObjectsByType<Sheet>())
                     {
                         Check(game.OpenSheet(remaining.gameObject),"Could not open another sheet");
                         for(int i=0;i<3;i++)AnswerCurrent(true);
                     }
-                    Check(game.Found==3 && game.ReadyToExit && !game.Completed,"Collecting all sheets must unlock the exit");
+                    Check(game.Found==5 && game.ReadyToExit && !game.Completed,"Collecting all sheets must unlock the exit");
                     UnityEngine.Object.FindAnyObjectByType<ElevatorExit>().Interact();Check(game.Completed,"Elevator did not complete the escape");
                     Check(game.RequestExit() && game.ConfirmExit(),"Confirming exit did not return to the lounge");
                     Check(player.enabled && player.currentSpace==Portal.Space.Library && !monster.picture.gameObject.activeSelf,"Lobby return did not restore the player");Next(9);
@@ -220,11 +220,11 @@ namespace CampusCommons.LibraryCharacter.Editor
                 }
                 if(state==13 && Time.time-started>.9f)
                 {
-                    Check(game.TimedOut && !monster.IsChasing,"Time attack did not expire");game.ExitToLobby();Check(!error,"Runtime error during game checks");
+                    Check(!game.TimedOut && game.IsRunning && game.Remaining<=0 && !game.ReadyToExit,"Unlimited time attack ended at the legacy time limit");game.ExitToLobby();Check(!error,"Runtime error during game checks");
                     Directory.CreateDirectory("Design/CharacterAndBooks");File.WriteAllText("Design/CharacterAndBooks/game-validation.txt",
                         "PASS\n960 detailed 3D book rows with 4K textures; 23 operable doors; 20 reachable distributed sheet locations.\n"+
                         "Real portal entry, 1st-person mode, sprite facing in four directions, clickable sheet, 3 distinct coding questions, wrong-answer speed increase, unlocked exit and lobby return.\n"+
-                        "Monster path movement and capture, time-attack expiry.\n");
+                        "Monster path movement and capture, unlimited time-attack continuation.\n");
                     Debug.Log("SCHOOL_GAME_PLAYMODE_PASS");Finish(0);
                 }
             }
