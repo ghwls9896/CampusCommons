@@ -11,7 +11,7 @@ namespace CampusCommons.StudyImmersive
     [UnityEngine.Scripting.APIUpdating.MovedFrom(true, "CampusCommons.StudyImmersive", null, "EscapeModeFlow")]
     public class EscapeGame : MonoBehaviour
     {
-        public enum Mode { Easy, Medium, Hard, TimeAttack }
+        public enum Mode { Easy, Medium, Hard, TimeAttack, TimeAttackDark }
         public enum InventoryItem { Empty, Soda, Padlock, ExcuseNote }
         const int InventorySlots=3;
         const float MaxStamina=100f;
@@ -44,6 +44,10 @@ namespace CampusCommons.StudyImmersive
         Door[] doors=Array.Empty<Door>();
         ElevatorExit[] elevators=Array.Empty<ElevatorExit>();
         readonly List<GameObject> notebooks=new List<GameObject>();
+        readonly List<Vector3> sheetSlots=new List<Vector3>();
+        readonly List<Quaternion> sheetRotations=new List<Quaternion>();
+        readonly List<bool> sheetOnDesk=new List<bool>();
+        readonly Dictionary<GameObject,int> sheetSlotByObject=new Dictionary<GameObject,int>();
         // Teacher desks in the five furnished classrooms, relative to Escape School.
         // Each has two separated positions on the tabletop for modes requiring more than five sheets.
         static readonly Vector3[] classroomDesks={
@@ -58,8 +62,11 @@ namespace CampusCommons.StudyImmersive
         CodeQuestions.Question[] quizQuestions;
         int quizIndex;
         Mode currentMode;
-        float yaw,pitch,falling,elapsed,rearmAt,noticeUntil;
+        float yaw,pitch,falling,elapsed,rearmAt,noticeUntil,startGuideUntil;
+        const float CaptureTurnSeconds=.18f, CaptureHoldSeconds=.10f, CaptureApproachSeconds=.15f;
+        const float CaptureRevealAt=CaptureTurnSeconds+CaptureHoldSeconds+CaptureApproachSeconds;
         float jumpElapsed;
+        float jumpCameraFov;
         float panicElapsed;
         Vector3 jumpCameraStart,jumpCameraEnd,jumpLookAt;
         Quaternion jumpCameraRotation;
@@ -72,6 +79,7 @@ namespace CampusCommons.StudyImmersive
         string notice="";
         string noticeEnglish="";
         GUIStyle title,text,choice,crosshair;
+        Texture2D flashlightHeld;
         Font koreanFont;
         bool korean;
 
@@ -82,14 +90,15 @@ namespace CampusCommons.StudyImmersive
         public bool Completed=>completed;
         public bool TimedOut=>timedOut;
         public bool Caught=>caught;
-        public bool IsJumpScarePlaying=>caught && jumpElapsed<jumpScareSeconds;
+        public bool IsJumpScarePlaying=>caught && jumpElapsed<CaptureRevealAt+Mathf.Max(.1f,jumpScareSeconds);
+        public bool IsJumpScareVisible=>IsJumpScarePlaying && jumpElapsed>=CaptureRevealAt;
         public bool IsEnded=>completed || timedOut || caught;
         public bool IsAnswering=>quizOpen && running && !IsEnded;
         public bool AwaitingNextQuestion=>quizFeedback;
         public int QuestionNumber=>quizOpen?quizIndex+1:0;
         public int CurrentCorrectAnswer=>quizOpen?quizQuestions[quizIndex].Correct:-1;
         public bool LastAnswerCorrect=>lastCorrect;
-        public bool ReadyToExit=>running && !IsEnded && found>=target;
+        public bool ReadyToExit=>running && !IsEnded && !IsTimeAttack && found>=target;
         public bool IsPanicActive=>ReadyToExit;
         public int ElevatorCount=>elevators.Length;
         public int Found=>found;
@@ -98,6 +107,16 @@ namespace CampusCommons.StudyImmersive
         public Mode CurrentMode=>currentMode;
         public int ActiveNotebookCount=>notebooks.FindAll(n=>n && n.activeSelf).Count;
         public EscapeWorld World{get;private set;}
+        EscapeLighting lighting;
+        DarkEscapeAtmosphere darkAtmosphere;
+        MonsterProximityEffect proximityEffect;
+        bool blackoutTriggered; GameObject breaker;
+        public bool PowerOut=>blackoutTriggered && breaker && lighting && lighting.IsDark;
+        public bool IsTimeAttack=>currentMode==Mode.TimeAttack || currentMode==Mode.TimeAttackDark;
+        public bool IsDark=>lighting && lighting.IsDark;
+        public float TimeAttackSpeed { get { if(!IsTimeAttack)return 1f;float minutes=elapsed/60f;return 1f+.15f*minutes*minutes; } }
+        string RecordKey=>currentMode==Mode.TimeAttackDark?"EscapeTimeAttackDarkRecord":"EscapeTimeAttackBrightRecord";
+        public int BestTimeAttackRecord=>PlayerPrefs.GetInt(RecordKey,0);
         public IEnumerable<Vector3> PendingSheetPositions
         {
             get { foreach(var sheet in notebooks)if(sheet && sheet.activeSelf)yield return sheet.transform.position; }
@@ -141,24 +160,42 @@ namespace CampusCommons.StudyImmersive
         }
         public bool BeginSelection(Player local)
         {
-            if(!local || !local.enabled || local.currentSpace!=Portal.Space.Library || selecting || running || Time.time<rearmAt)return false;
-            var controller=local.GetComponent<CharacterController>();if(!controller || !controller.enabled)return false;
-            player=local;body=controller;view=Camera.main;
-            if(!view || notebookPositions==null || notebookPositions.Length<7 || !notebookPrefab)return false;
-            avatar=player.transform.Find("Student character");
-            selecting=true;exitConfirm=false;player.enabled=false;
-            body.enabled=false;player.transform.position=schoolArrival;body.enabled=true;player.currentSpace=Portal.Space.Escape;
-            if(avatar)avatar.gameObject.SetActive(false);
-            yaw=schoolYaw;pitch=0;falling=-2;Physics.SyncTransforms();UpdateCamera();
-            Cursor.lockState=CursorLockMode.None;Cursor.visible=true;return true;
+            if (!local || !local.enabled || local.currentSpace != Portal.Space.Library ||
+                selecting || running || Time.time < rearmAt) return false;
+            var controller = local.GetComponent<CharacterController>();
+            if (!controller || !controller.enabled) return false;
+            player = local;
+            body = controller;
+            view = Camera.main;
+            if (!view || notebookPositions == null || notebookPositions.Length < 7 || !notebookPrefab) return false;
+
+            avatar = player.transform.Find("Student character");
+            selecting = true;
+            exitConfirm = false;
+            player.enabled = false;
+            body.enabled = false;
+            player.transform.position = schoolArrival;
+            body.enabled = true;
+            player.currentSpace = Portal.Space.Escape;
+            if (avatar) avatar.gameObject.SetActive(false);
+            yaw = schoolYaw;
+            pitch = 0;
+            falling = -2;
+            Physics.SyncTransforms();
+            UpdateCamera();
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+            return true;
         }
         public bool ChooseMode(Mode mode)
         {
             if(!selecting || exitConfirm || !player || !body || !view)return false;
             ResetRoundState();
-            currentMode=mode;target=mode==Mode.Easy?3:mode==Mode.Medium?5:mode==Mode.Hard?7:5;
+            currentMode = mode;
+            target = mode == Mode.Easy ? 5 : mode == Mode.Medium ? 7 : mode == Mode.Hard ? 7 : 5;
             ClearNotebooks();
-            doors=FindObjectsByType<Door>();ResetSchoolDoors();
+            doors = FindObjectsByType<Door>();
+            ResetSchoolDoors();
             if(jumpAudio)jumpAudio.Stop();
             var points=schoolGrid && schoolGrid.sheetLocations!=null && schoolGrid.sheetLocations.Length>=target?schoolGrid.sheetLocations:notebookPositions;
             if(points==null || points.Length<target)return false;
@@ -168,17 +205,18 @@ namespace CampusCommons.StudyImmersive
             var deskOrder=new int[classroomDesks.Length+otherRoomLocations.Length];var firstSide=new int[deskOrder.Length];
             for(int i=0;i<deskOrder.Length;i++){deskOrder[i]=i;firstSide[i]=UnityEngine.Random.value<.5f?-1:1;}
             for(int i=deskOrder.Length-1;i>0;i--){int j=UnityEngine.Random.Range(0,i+1);int temp=deskOrder[i];deskOrder[i]=deskOrder[j];deskOrder[j]=temp;}
-            for(int i=0;i<target;i++)
+            sheetSlots.Clear();sheetRotations.Clear();sheetOnDesk.Clear();sheetSlotByObject.Clear();
+            for(int i=0;i<deskOrder.Length;i++)
             {
                 Vector3 position=points[0];
                 Quaternion rotation=Quaternion.identity;
                 bool onDesk=school;
                 if(onDesk)
                 {
-                    int deskIndex=deskOrder[i%deskOrder.Length];
+                    int deskIndex = deskOrder[i];
                     if(deskIndex<classroomDesks.Length)
                     {
-                        int side=i<deskOrder.Length?firstSide[deskIndex]:-firstSide[deskIndex];
+                        int side = firstSide[deskIndex];
                         position=school.TransformPoint(classroomDesks[deskIndex]+Vector3.forward*(.45f*side));
                         rotation=school.rotation*Quaternion.Euler(0,90,0);
                     }
@@ -189,17 +227,38 @@ namespace CampusCommons.StudyImmersive
                         rotation=school.rotation;
                     }
                 }
+                sheetSlots.Add(position);sheetRotations.Add(rotation);sheetOnDesk.Add(onDesk);
+                if(i>=target)continue;
                 var item=Instantiate(notebookPrefab,position,rotation);item.name="Question Sheet "+(i+1);
                 if(schoolRoot)item.transform.SetParent(schoolRoot,true);
                 if(onDesk)item.transform.localScale*=.5f;
-                var sheet=item.GetComponent<Sheet>();if(sheet)sheet.game=this;notebooks.Add(item);
+                var sheet=item.GetComponent<Sheet>();if(sheet)sheet.game=this;notebooks.Add(item);sheetSlotByObject[item]=i;
             }
-            body.enabled=false;player.transform.position=schoolArrival;body.enabled=true;player.currentSpace=Portal.Space.Escape;
-            if(avatar)avatar.gameObject.SetActive(false);
-            yaw=schoolYaw;pitch=0;falling=-2;selecting=false;running=true;Physics.SyncTransforms();UpdateCamera();
-            if(monster)monster.Begin(this,player.transform,mode);
-            World=EscapeWorld.Create(this,player.transform,schoolGrid,doors);
-            Cursor.lockState=CursorLockMode.Locked;Cursor.visible=false;return true;
+            body.enabled = false;
+            player.transform.position = schoolArrival;
+            body.enabled = true;
+            player.currentSpace = Portal.Space.Escape;
+            if (avatar) avatar.gameObject.SetActive(false);
+            yaw = schoolYaw;
+            pitch = 0;
+            falling = -2;
+            selecting = false;
+            running = true;
+            Physics.SyncTransforms();
+            UpdateCamera();
+            if (monster) monster.Begin(this, player.transform, mode);
+            if (monster && view) proximityEffect = MonsterProximityEffect.Create(this, monster, player.transform, view);
+            World = EscapeWorld.Create(this, player.transform, schoolGrid, doors);
+            lighting = EscapeLighting.Create(view);
+            if (mode == Mode.Hard || mode == Mode.TimeAttackDark)
+            {
+                lighting.StartDark();
+                darkAtmosphere = DarkEscapeAtmosphere.Create(this, monster, player.transform);
+            }
+            startGuideUntil = Time.time + 10f;
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+            return true;
         }
         void Update()
         {
@@ -209,27 +268,29 @@ namespace CampusCommons.StudyImmersive
             if(IsJumpScarePlaying){UpdateJumpScare();return;}
             if(!running || !player || !body || !view || IsEnded)return;
             if(IsPanicActive)panicElapsed+=Time.deltaTime;
-            if(currentMode==Mode.TimeAttack)
+            if(IsTimeAttack)
             {
                 elapsed+=Time.deltaTime;
-                if(elapsed>=timeLimitSeconds){elapsed=timeLimitSeconds;timedOut=true;return;}
             }
             if(IsAnswering)return;
+            if(IsDark && Input.GetKeyDown(KeyCode.F))lighting.Toggle();
             if(World)World.HandleInventoryKeys();
-            if(World && World.BlocksMovement)return;
+            if(World && World.BlocksMovement){FocusProfessor(World.ProfessorFocusPoint);return;}
             yaw+=Input.GetAxisRaw("Mouse X")*2.5f;pitch=Mathf.Clamp(pitch-Input.GetAxisRaw("Mouse Y")*2.0f,-80,80);
+            if (World && World.IsCleanerPushing) { UpdateCamera(); return; }
             float x=(Input.GetKey(KeyCode.D)||Input.GetKey(KeyCode.RightArrow)?1:0)-(Input.GetKey(KeyCode.A)||Input.GetKey(KeyCode.LeftArrow)?1:0);
             float z=(Input.GetKey(KeyCode.W)||Input.GetKey(KeyCode.UpArrow)?1:0)-(Input.GetKey(KeyCode.S)||Input.GetKey(KeyCode.DownArrow)?1:0);
             Vector3 dir=Quaternion.Euler(0,yaw,0)*Vector3.ClampMagnitude(new Vector3(x,0,z),1);
             if(body.isGrounded && falling<0)falling=-2;falling+=Physics.gravity.y*Time.deltaTime;
             bool sprinting=UpdateStamina(Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift),dir.sqrMagnitude>.001f,Time.deltaTime);
             float boost=World && World.HasSpeedBoost?1.35f:1f;
-            body.Move((dir*((sprinting?5.2f:3.6f)*boost)+Vector3.up*falling)*Time.deltaTime);
+            body.Move((dir*(PlayerMoveSpeed(sprinting)*boost)+Vector3.up*falling)*Time.deltaTime);
             if(player.transform.position.y< -5){body.enabled=false;player.transform.position=schoolArrival;body.enabled=true;falling=-2;}
             UpdateCamera();
             if(Input.GetMouseButtonDown(0))Interact(true);
             if(Input.GetKeyDown(KeyCode.E))Interact(false);
         }
+        float PlayerMoveSpeed(bool sprinting)=>(sprinting?5.2f:3.6f)*TimeAttackSpeed;
         bool UpdateStamina(bool sprintHeld,bool moving,float deltaTime)
         {
             if(!sprintHeld)sprintExhausted=false;
@@ -258,6 +319,17 @@ namespace CampusCommons.StudyImmersive
             }
             view.transform.SetPositionAndRotation(cameraPosition,cameraRotation);
         }
+        void FocusProfessor(Vector3 targetPoint)
+        {
+            if(!view || !player)return;
+            Vector3 delta=targetPoint-view.transform.position;
+            if(delta.sqrMagnitude<.0001f)return;
+            Quaternion desired=Quaternion.LookRotation(delta);
+            Quaternion rotation=Quaternion.Slerp(view.transform.rotation,desired,1f-Mathf.Exp(-8f*Time.deltaTime));
+            Vector3 angles=rotation.eulerAngles; yaw=angles.y;
+            pitch=Mathf.Clamp(Mathf.DeltaAngle(0,angles.x),-80f,80f);
+            UpdateCamera();
+        }
         public void AimAt(Vector3 targetPoint)
         {
             if(!view || !player)return;Vector3 delta=targetPoint-(player.transform.position+Vector3.up*1.62f);
@@ -268,6 +340,7 @@ namespace CampusCommons.StudyImmersive
         public bool Interact(bool requireAim)
         {
             if(!running || IsEnded || IsAnswering || exitConfirm || !view || !player || (World && World.BlocksMovement))return false;
+            if(PowerOut && breaker && Vector3.Distance(player.transform.position,breaker.transform.position)<2.2f){RepairPower();return true;}
             if(World && World.TryInteract(requireAim))return true;
             var ray=view.ViewportPointToRay(new Vector3(.5f,.5f,0));
             var hits=Physics.RaycastAll(ray,2.25f,Physics.DefaultRaycastLayers,QueryTriggerInteraction.Collide);
@@ -319,65 +392,110 @@ namespace CampusCommons.StudyImmersive
         }
         public bool OpenSheet(GameObject item)
         {
-            if(!running || IsEnded || IsAnswering || exitConfirm || !item || !item.activeSelf || !notebooks.Contains(item))return false;
-            activeSheet=item;quizQuestions=CodeQuestions.RandomThree();quizIndex=0;quizFeedback=false;quizOpen=true;
-            Cursor.lockState=CursorLockMode.None;Cursor.visible=true;return true;
+            if (!running || IsEnded || IsAnswering || exitConfirm || !item || !item.activeSelf || !notebooks.Contains(item))
+                return false;
+            activeSheet = item;
+            quizQuestions = CodeQuestions.RandomThree();
+            quizIndex = 0;
+            quizFeedback = false;
+            quizOpen = true;
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+            return true;
         }
         public bool SubmitAnswer(int answer)
         {
-            if(!IsAnswering || quizFeedback || answer<0 || answer>=quizQuestions[quizIndex].Options.Length)return false;
-            lastCorrect=answer==quizQuestions[quizIndex].Correct;quizFeedback=true;
-            if(!lastCorrect && monster)
+            if (!IsAnswering || quizFeedback || answer < 0 || answer >= quizQuestions[quizIndex].Options.Length)
+                return false;
+            lastCorrect = answer == quizQuestions[quizIndex].Correct;
+            quizFeedback = true;
+            if (!lastCorrect && monster)
             {
-                bool first=!monster.IsAwakened;monster.SpeedUp();
-                if(first && jumpAudio && crowAnger)jumpAudio.PlayOneShot(crowAnger,1f);
+                bool first = !monster.IsAwakened;
+                monster.SpeedUp();
+                if (first && jumpAudio && crowAnger) jumpAudio.PlayOneShot(crowAnger, 1f);
             }
             return true;
         }
         public bool ContinueQuestion()
         {
-            if(!IsAnswering || !quizFeedback)return false;
-            quizFeedback=false;quizIndex++;
-            if(quizIndex<quizQuestions.Length)return true;
-            quizOpen=false;var item=activeSheet;activeSheet=null;Cursor.lockState=CursorLockMode.Locked;Cursor.visible=false;
+            if (!IsAnswering || !quizFeedback) return false;
+            quizFeedback = false;
+            quizIndex++;
+            if (quizIndex < quizQuestions.Length) return true;
+            quizOpen = false;
+            var item = activeSheet;
+            activeSheet = null;
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
             return CollectSheet(item);
         }
         public bool CollectSheet(GameObject item)
         {
             if(!running || IsEnded || IsAnswering || !item || !item.activeSelf || !notebooks.Contains(item))return false;
             item.SetActive(false);found++;
+            if(IsTimeAttack)
+            {
+                var free=new List<int>();int previous=sheetSlotByObject[item];
+                for(int i=0;i<sheetSlots.Count;i++){if(i==previous)continue;bool occupied=false;foreach(var entry in sheetSlotByObject)if(entry.Key!=item && entry.Key && entry.Key.activeSelf && entry.Value==i){occupied=true;break;}if(!occupied)free.Add(i);}
+                if(free.Count==0)free.Add(previous);int slot=free[UnityEngine.Random.Range(0,free.Count)];sheetSlotByObject[item]=slot;
+                item.transform.SetPositionAndRotation(sheetSlots[slot],sheetRotations[slot]);item.transform.localScale=notebookPrefab.transform.localScale*(sheetOnDesk[slot]?.5f:1f);item.SetActive(true);
+                Notice("문제지 수집: "+found,"Sheets collected: "+found);return true;
+            }
             if(found>=target)
             {
                 panicElapsed=0;
                 Notice("문제지를 모두 수집했습니다.","All sheets collected.");
             }
-            else Notice("문제지를 수집했습니다.","Sheet collected.");
+            else { Notice("문제지를 수집했습니다.","Sheet collected.");TryBlackout(); }
             return true;
         }
+        void TryBlackout()
+        {
+            if(blackoutTriggered || found<2 || found>=target || (currentMode!=Mode.Easy && currentMode!=Mode.Medium) || UnityEngine.Random.value>=.3f || !schoolGrid)return;
+            var school=schoolRoot?schoolRoot.Find("Escape School"):null;if(!school)return;
+            var route=new List<Vector3>();Vector3 point=Vector3.zero;bool foundPoint=false;
+            foreach(var loc in otherRoomLocations){var candidate=school.TransformPoint(loc);int cell=schoolGrid.NearestCell(candidate);if(cell>=0 && schoolGrid.FindPath(player.transform.position,schoolGrid.Position(cell),route)){point=schoolGrid.Position(cell);foundPoint=true;break;}}
+            if(!foundPoint)return;blackoutTriggered=true;lighting.StartDark();
+            breaker=GameObject.CreatePrimitive(PrimitiveType.Cube);breaker.name="전기실 차단기";breaker.transform.position=point+Vector3.up*.85f;breaker.transform.localScale=new Vector3(.38f,.55f,.2f);
+            var renderer=breaker.GetComponent<Renderer>();renderer.material.color=new Color(.96f,.7f,.12f);Notice("정전! 전기실 차단기를 올리세요.","Blackout! Reset the breaker.");
+        }
+        void RepairPower(){if(!PowerOut)return;lighting.Restore();Destroy(breaker);breaker=null;Notice("전력이 복구됐습니다.","Power restored.");}
+        void SaveTimeAttackRecord(){if(IsTimeAttack && found>BestTimeAttackRecord){PlayerPrefs.SetInt(RecordKey,found);PlayerPrefs.Save();}}
         public void Notice(string message,string english="Keep moving!"){notice=message;noticeEnglish=english;noticeUntil=Time.time+3f;}
         public void CaughtByMonster()
         {
             if(!running || IsEnded)return;
-            caught=true;jumpElapsed=0;
+            caught=true;jumpElapsed=0;SaveTimeAttackRecord();
+            var sound=darkAtmosphere && darkAtmosphere.JumpScare?darkAtmosphere.JumpScare:jumpScareSound;
+            if(jumpAudio && sound)jumpAudio.PlayOneShot(sound,.85f);
             if(view && monster)
             {
-                jumpCameraStart=view.transform.position;jumpCameraRotation=view.transform.rotation;
-                jumpLookAt=monster.transform.position+Vector3.up*1.2f;
+                jumpCameraStart=view.transform.position;jumpCameraRotation=view.transform.rotation;jumpCameraFov=view.fieldOfView;
+                var birdSprite=monster.GetComponentInChildren<SpriteRenderer>(true);
+                if(birdSprite && birdSprite.sprite && birdSprite.bounds.size.y>.1f)
+                {
+                    var bounds=birdSprite.bounds;
+                    jumpLookAt=new Vector3(bounds.center.x,Mathf.Lerp(bounds.min.y,bounds.max.y,.68f),bounds.center.z);
+                }
+                else jumpLookAt=monster.transform.position+Vector3.up*1.65f;
                 var delta=jumpLookAt-jumpCameraStart;
                 float move=Mathf.Clamp(delta.magnitude-.3f,0,.55f);
                 jumpCameraEnd=jumpCameraStart+(delta.sqrMagnitude>.0001f?delta.normalized*move:Vector3.zero);
                 if(move>0 && Physics.SphereCast(jumpCameraStart,.1f,delta.normalized,out RaycastHit hit,move,Physics.DefaultRaycastLayers,QueryTriggerInteraction.Ignore))
                     jumpCameraEnd=jumpCameraStart+delta.normalized*Mathf.Max(0,hit.distance-.12f);
             }
-            if(jumpAudio && jumpScareSound)jumpAudio.PlayOneShot(jumpScareSound,.85f);
         }
         void UpdateJumpScare()
         {
-            jumpElapsed+=Time.deltaTime;if(!view || !monster)return;
-            float amount=Mathf.SmoothStep(0,1,Mathf.Clamp01(jumpElapsed/.42f));
-            view.transform.position=Vector3.Lerp(jumpCameraStart,jumpCameraEnd,amount);
+            jumpElapsed+=Time.deltaTime;
+            if(!view || !monster)return;
+            float turn=Mathf.SmoothStep(0f,1f,Mathf.Clamp01(jumpElapsed/CaptureTurnSeconds));
+            float approach=Mathf.SmoothStep(0f,1f,Mathf.Clamp01((jumpElapsed-CaptureTurnSeconds-CaptureHoldSeconds)/CaptureApproachSeconds));
+            view.transform.position=Vector3.Lerp(jumpCameraStart,jumpCameraEnd,approach);
+            view.fieldOfView=Mathf.Lerp(jumpCameraFov,Mathf.Max(28f,jumpCameraFov*.62f),approach);
             Vector3 direction=jumpLookAt-view.transform.position;
-            if(direction.sqrMagnitude>.0001f)view.transform.rotation=Quaternion.Slerp(jumpCameraRotation,Quaternion.LookRotation(direction),amount);
+            if(direction.sqrMagnitude>.0001f)view.transform.rotation=Quaternion.Slerp(jumpCameraRotation,Quaternion.LookRotation(direction),turn);
         }
         public void CompleteEscape(){if(ReadyToExit)completed=true;}
         public bool RequestExit()
@@ -394,23 +512,90 @@ namespace CampusCommons.StudyImmersive
         public bool ConfirmExit(){if(!exitConfirm)return false;ExitToLobby();return true;}
         public void ExitToLobby()
         {
-            if(!selecting && !running)return;selecting=false;running=false;exitConfirm=false;quizOpen=false;activeSheet=null;ClearNotebooks();if(monster)monster.End();if(jumpAudio)jumpAudio.Stop();
-            if(World){World.Shutdown();World.gameObject.SetActive(false);Destroy(World.gameObject);World=null;}
+            if (!selecting && !running) return;
+            if (running && IsTimeAttack) SaveTimeAttackRecord();
+            if (caught && view && jumpCameraFov > 0) view.fieldOfView = jumpCameraFov;
+            selecting = false;
+            running = false;
+            exitConfirm = false;
+            quizOpen = false;
+            activeSheet = null;
+            ClearNotebooks();
+            if (monster) monster.End();
+            if (proximityEffect)
+            {
+                proximityEffect.Shutdown();
+                Destroy(proximityEffect.gameObject);
+                proximityEffect = null;
+            }
+            if (jumpAudio) jumpAudio.Stop();
+
+            if (darkAtmosphere)
+            {
+                darkAtmosphere.Shutdown();
+                Destroy(darkAtmosphere.gameObject);
+                darkAtmosphere = null;
+            }
+            if (breaker)
+            {
+                Destroy(breaker);
+                breaker = null;
+            }
+            if (lighting)
+            {
+                lighting.Restore();
+                Destroy(lighting.gameObject);
+                lighting = null;
+            }
+            if (World)
+            {
+                World.Shutdown();
+                World.gameObject.SetActive(false);
+                Destroy(World.gameObject);
+                World = null;
+            }
             ResetSchoolDoors();
             ResetRoundState();
-            if(player && body)
+            if (player && body)
             {
-                body.enabled=false;player.transform.position=lobbyReturn;body.enabled=true;player.currentSpace=Portal.Space.Library;
-                player.enabled=true;Physics.SyncTransforms();player.RefreshView();
+                body.enabled = false;
+                player.transform.position = lobbyReturn;
+                body.enabled = true;
+                player.currentSpace = Portal.Space.Library;
+                player.enabled = true;
+                Physics.SyncTransforms();
+                player.RefreshView();
             }
-            rearmAt=Time.time+1.3f;Cursor.lockState=CursorLockMode.None;Cursor.visible=true;
+            rearmAt = Time.time + 1.3f;
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
         }
+
         void ResetRoundState()
         {
-            stamina=MaxStamina;sprintExhausted=false;Array.Clear(inventory,0,inventory.Length);
-            found=0;target=0;elapsed=0;panicElapsed=0;completed=false;timedOut=false;caught=false;
-            jumpElapsed=0;quizOpen=false;quizFeedback=false;lastCorrect=false;quizIndex=0;quizQuestions=null;activeSheet=null;
-            noticeUntil=0;notice="";noticeEnglish="";
+            stamina = MaxStamina;
+            sprintExhausted = false;
+            Array.Clear(inventory, 0, inventory.Length);
+            found = 0;
+            target = 0;
+            elapsed = 0;
+            panicElapsed = 0;
+            completed = false;
+            timedOut = false;
+            caught = false;
+            blackoutTriggered = false;
+            breaker = null;
+            jumpElapsed = 0;
+            quizOpen = false;
+            quizFeedback = false;
+            lastCorrect = false;
+            quizIndex = 0;
+            quizQuestions = null;
+            activeSheet = null;
+            noticeUntil = 0;
+            startGuideUntil = 0;
+            notice = "";
+            noticeEnglish = "";
         }
         void ResetSchoolDoors()
         {
@@ -426,6 +611,7 @@ namespace CampusCommons.StudyImmersive
             text=new GUIStyle(GUI.skin.label){fontSize=16,wordWrap=true};text.normal.textColor=new Color(.93f,.9f,.83f);
             choice=new GUIStyle(GUI.skin.button){fontSize=19,fontStyle=FontStyle.Bold,wordWrap=true};
             crosshair=new GUIStyle(GUI.skin.label){fontSize=25,alignment=TextAnchor.MiddleCenter,fontStyle=FontStyle.Bold};crosshair.normal.textColor=Color.white;
+            flashlightHeld=Resources.Load<Texture2D>("EscapeFlashlightHeld");
             koreanFont=Resources.Load<Font>("KIT/NotoSansKR");
             if(koreanFont){title.font=koreanFont;text.font=koreanFont;choice.font=koreanFont;crosshair.font=koreanFont;korean=true;}
         }
@@ -436,6 +622,7 @@ namespace CampusCommons.StudyImmersive
             if(!selecting && !running)return;Styles();var old=GUI.matrix;float s=Mathf.Min(Screen.width/1280f,Screen.height/720f);
             GUI.matrix=Matrix4x4.TRS(new Vector3((Screen.width-1280*s)*.5f,(Screen.height-720*s)*.5f,0),Quaternion.identity,Vector3.one*s);
             if(IsPanicActive)DrawPanicTint();
+            if(IsDark && !IsEnded && flashlightHeld)GUI.DrawTexture(new Rect(850,425,430,295),flashlightHeld,ScaleMode.ScaleToFit,true);
             if(exitConfirm)
             {
                 Panel(new Rect(360,230,560,250),.97f);
@@ -451,24 +638,28 @@ namespace CampusCommons.StudyImmersive
             }
             if(selecting)
             {
-                Panel(new Rect(355,112,570,490));GUI.Label(new Rect(389,136,500,45),L("탈출방 모드 선택","ESCAPE ROOM"),title);
-                GUI.Label(new Rect(389,183,500,48),L("문제지를 찾아 코딩 문제를 풀고 탈출하세요.","Find the sheets, answer coding questions, and escape."),text);
-                if(GUI.Button(new Rect(390,248,235,82),L("쉬움\n문제지 3개","EASY\n3 sheets"),choice))ChooseMode(Mode.Easy);
-                if(GUI.Button(new Rect(655,248,235,82),L("보통\n문제지 5개","MEDIUM\n5 sheets"),choice))ChooseMode(Mode.Medium);
-                if(GUI.Button(new Rect(390,350,235,82),L("어려움\n문제지 7개","HARD\n7 sheets"),choice))ChooseMode(Mode.Hard);
-                if(GUI.Button(new Rect(655,350,235,82),L("타임어택\n문제지 5개 / 3분","TIME ATTACK\n5 sheets / 3 min"),choice))ChooseMode(Mode.TimeAttack);
-                GUI.Label(new Rect(390,480,500,65),L("WASD: 이동  |  마우스: 시점  |  클릭/E: 상호작용\nESC: 라운지로 돌아가기","WASD: move  |  Mouse: look  |  Click/E: interact\nESC: return to the lounge"),text);
+                Panel(new Rect(305,112,670,490));GUI.Label(new Rect(335,136,610,45),L("탈출방 모드 선택","ESCAPE ROOM"),title);
+                GUI.Label(new Rect(335,183,610,48),L("문제지를 찾아 코딩 문제를 풀고 탈출하세요.","Find the sheets, answer coding questions, and escape."),text);
+                if(GUI.Button(new Rect(325,245,195,82),L("쉬움\n문제지 5개","EASY\n5 sheets"),choice))ChooseMode(Mode.Easy);
+                if(GUI.Button(new Rect(542,245,195,82),L("보통\n문제지 7개","MEDIUM\n7 sheets"),choice))ChooseMode(Mode.Medium);
+                if(GUI.Button(new Rect(759,245,195,82),L("어려움\n어둠 / 7개","HARD\nDARK / 7 sheets"),choice))ChooseMode(Mode.Hard);
+                if(GUI.Button(new Rect(390,350,235,82),L("밝은 타임어택\n무제한 / 기록 도전","BRIGHT TIME ATTACK\nNo limit / score"),choice))ChooseMode(Mode.TimeAttack);
+                if(GUI.Button(new Rect(655,350,235,82),L("어두운 타임어택\n무제한 / 손전등","DARK TIME ATTACK\nNo limit / flashlight"),choice))ChooseMode(Mode.TimeAttackDark);
+                GUI.Label(new Rect(335,450,610,62),L("타임어택: 시작부터 플레이어와 모든 NPC가 점점 빨라집니다.\n몬스터: 첫 오답 10초 후 플레이어를 쫓아옵니다.","TIME ATTACK: You and all NPCs gradually speed up from the start.\nMONSTER: Chases you 10 seconds after your first wrong answer."),text);
+                GUI.Label(new Rect(335,530,610,60),L("WASD: 이동  |  F: 손전등  |  클릭/E: 상호작용\nESC: 라운지로 돌아가기","WASD: move  |  F: flashlight  |  Click/E: interact\nESC: return to the lounge"),text);
             }
             else
             {
                 PixelBox(new Rect(20,20,240,48),new Color(.13f,.17f,.20f,.94f));
-                GUI.Label(new Rect(32,30,220,28),L("남은 문제지  ","SHEETS LEFT  ")+Mathf.Max(0,target-found),text);
-                if(currentMode==Mode.TimeAttack)
+                GUI.Label(new Rect(32,30,220,28),IsTimeAttack?L("수집한 문제지  ","COLLECTED  ")+found:L("남은 문제지  ","SHEETS LEFT  ")+Mathf.Max(0,target-found),text);
+                if(IsTimeAttack)
                 {
                     PixelBox(new Rect(530,20,220,48),new Color(.13f,.17f,.20f,.94f));
-                    GUI.Label(new Rect(544,30,200,28),L("남은 시간  ","TIME  ")+TimeSpan.FromSeconds(Mathf.CeilToInt(Remaining)).ToString(@"mm\:ss"),text);
+                    GUI.Label(new Rect(544,30,200,28),L("진행 시간  ","TIME  ")+string.Format("{0:00}:{1:00}",Mathf.FloorToInt(elapsed/60f),Mathf.FloorToInt(elapsed)%60),text);
                 }
+                if(PowerOut && breaker){PixelBox(new Rect(20,190,260,42),new Color(.13f,.17f,.20f,.94f));GUI.Label(new Rect(32,198,245,28),L("차단기까지 ","BREAKER ")+Mathf.CeilToInt(Vector3.Distance(player.transform.position,breaker.transform.position))+"m",text);}
                 if(!IsEnded)DrawEscapeHud();
+                if(!IsEnded && !IsAnswering && !(World && World.BlocksMovement) && Time.time<startGuideUntil)DrawStartGuide();
                 if(World && World.BlocksMovement && !IsEnded)
                 {
                     World.DrawProfessor(title,text,choice,korean);GUI.matrix=old;return;
@@ -476,7 +667,7 @@ namespace CampusCommons.StudyImmersive
                 if(IsEnded)
                 {
                     Panel(new Rect(385,265,510,145));string status=completed?L("탈출 성공!","ESCAPED!"):timedOut?L("시간 종료","TIME IS UP"):L("몬스터에게 잡혔습니다","CAUGHT BY THE MONSTER");
-                    GUI.Label(new Rect(420,287,460,40),status,title);GUI.Label(new Rect(420,341,460,42),L("ESC를 눌러 라운지로 돌아가세요.","Press ESC to return to the lounge."),text);
+                    GUI.Label(new Rect(420,287,460,40),status,title);GUI.Label(new Rect(420,325,460,32),IsTimeAttack?L("이번 기록: ","SCORE: ")+found+L("장  최고: ","  BEST: ")+BestTimeAttackRecord:L("ESC를 눌러 라운지로 돌아가세요.","Press ESC to return to the lounge."),text);
                 }
                 else if(IsAnswering)
                 {
@@ -502,7 +693,8 @@ namespace CampusCommons.StudyImmersive
                 else
                 {
                     GUI.Label(new Rect(622,342,36,36),"+",crosshair);
-                    if(Time.time<noticeUntil){Panel(new Rect(365,555,550,48),.88f);GUI.Label(new Rect(380,565,520,28),korean?notice:noticeEnglish,text);}
+                    if(PowerOut && breaker && Vector3.Distance(player.transform.position,breaker.transform.position)<2.2f){Panel(new Rect(420,555,440,48),.87f);GUI.Label(new Rect(435,565,410,28),L("E / 클릭  차단기 올리기","E / CLICK  RESET BREAKER"),text);}
+                    else if(Time.time<noticeUntil){Panel(new Rect(365,555,550,48),.88f);GUI.Label(new Rect(380,565,520,28),korean?notice:noticeEnglish,text);}
                     else if(World && World.NearbyHint!=null){Panel(new Rect(420,555,440,48),.87f);GUI.Label(new Rect(435,565,410,28),World.NearbyHint,text);}
                     else if(NearestDistance()<1.7f){Panel(new Rect(475,555,330,48),.87f);GUI.Label(new Rect(490,565,300,28),L("클릭 / E   문제지 열기","CLICK / E   OPEN SHEET"),text);}
                     else
@@ -518,6 +710,13 @@ namespace CampusCommons.StudyImmersive
         static void PixelFill(Rect rect,Color color)
         {
             Color previous=GUI.color;GUI.color=color;GUI.DrawTexture(rect,Texture2D.whiteTexture);GUI.color=previous;
+        }
+        void DrawStartGuide()
+        {
+            var box=new Rect(290,82,700,IsTimeAttack?76:49);
+            PixelBox(box,new Color(.10f,.14f,.18f,.97f));
+            GUI.Label(new Rect(305,93,670,28),L("몬스터는 첫 오답 후 10초를 기다렸다가 추격합니다.","The monster waits 10 seconds after your first wrong answer before chasing."),text);
+            if(IsTimeAttack)GUI.Label(new Rect(305,120,670,28),L("타임어택: 시작부터 플레이어와 모든 NPC가 점점 빨라집니다.","Time attack: You and all NPCs speed up gradually from the start."),text);
         }
         static void PixelBox(Rect rect,Color inside)
         {
@@ -561,16 +760,20 @@ namespace CampusCommons.StudyImmersive
             GUI.color=new Color(.86f,.01f,.02f,Mathf.Clamp01(panicTintOpacity+.025f*Mathf.Sin(panicElapsed*4f)));
             GUI.DrawTexture(new Rect(0,0,1280,720),Texture2D.whiteTexture);GUI.color=old;
         }
+        Texture2D ActiveJumpScareImage=>darkAtmosphere && darkAtmosphere.JumpScareImage?darkAtmosphere.JumpScareImage:jumpScareImage;
         void DrawJumpScare()
         {
-            float t=Mathf.Clamp01(jumpElapsed/Mathf.Max(.1f,jumpScareSeconds));
+            if(!IsJumpScareVisible)return;
+            var image=ActiveJumpScareImage;
+            float imageElapsed=jumpElapsed-CaptureRevealAt;
+            float t=Mathf.Clamp01(imageElapsed/Mathf.Max(.1f,jumpScareSeconds));
             Color previous=GUI.color;
             GUI.color=new Color(.08f,0,.01f,Mathf.Clamp01(.3f+t*2));GUI.DrawTexture(new Rect(0,0,1280,720),Texture2D.whiteTexture);
-            if(jumpScareImage)
+            if(image)
             {
-                float size=Mathf.Lerp(470,930,Mathf.SmoothStep(0,1,Mathf.Clamp01(jumpElapsed/.38f)));
+                float size=Mathf.Lerp(470,930,Mathf.SmoothStep(0,1,Mathf.Clamp01(imageElapsed/.20f)));
                 float shake=Mathf.Sin(jumpElapsed*47f)*Mathf.Lerp(12,3,t);
-                GUI.color=Color.white;GUI.DrawTexture(new Rect(640-size*.5f+shake,360-size*.5f,size,size),jumpScareImage,ScaleMode.ScaleToFit,true);
+                GUI.color=Color.white;GUI.DrawTexture(new Rect(640-size*.5f+shake,360-size*.5f,size,size),image,ScaleMode.ScaleToFit,true);
             }
             GUI.color=previous;
         }

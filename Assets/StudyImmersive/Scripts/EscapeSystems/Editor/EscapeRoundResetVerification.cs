@@ -38,7 +38,7 @@ public static class EscapeRoundResetVerification
             typeof(EscapeWorld).GetField("speedRemaining",BindingFlags.Instance|BindingFlags.NonPublic).SetValue(world,50f);
             var barrier=ConstructionBarrier.Create(game.schoolArrival+Vector3.right*8,Quaternion.identity,2f,600f);barrier.transform.SetParent(oldWorld.transform,true);
             var barriers=(List<ConstructionBarrier>)typeof(EscapeWorld).GetField("barriers",BindingFlags.Instance|BindingFlags.NonPublic).GetValue(world);barriers.Add(barrier);
-            oldSheets=UnityEngine.Object.FindObjectsByType<Sheet>();Check(oldSheets.Length==3,"First-round sheets missing");
+            oldSheets=UnityEngine.Object.FindObjectsByType<Sheet>();Check(oldSheets.Length==5,"First-round sheets missing");
             Check(game.OpenSheet(oldSheets[0].gameObject),"Could not open test sheet");Check(game.SubmitAnswer((game.CurrentCorrectAnswer+1)%4),"Could not answer test sheet");Check(monster.IsAwakened,"Monster did not awaken");Next(1);
         }
         else if(stage==1 && Time.time-start>.7f)
@@ -56,7 +56,7 @@ public static class EscapeRoundResetVerification
         {
             Check(game.BeginSelection(player)&&game.ChooseMode(EscapeGame.Mode.Medium),"Second round failed to start");
             Check(game.World && game.World.gameObject!=oldWorld && game.World.Coins==0 && !game.World.HasSpeedBoost && !game.World.BlocksMovement && game.World.ActiveBarrierCount==0,"World state persisted into second round");
-            Check(game.Found==0 && game.Target==5 && game.ActiveNotebookCount==5 && !monster.IsAwakened && monster.picture.gameObject.activeSelf,"Second round was not fresh");
+            Check(game.Found==0 && game.Target==7 && game.ActiveNotebookCount==7 && !monster.IsAwakened && monster.picture.gameObject.activeSelf,"Second round was not fresh");
             Check(Closed(single)&&Closed(doubleDoor)&&Closed(locked),"A door stayed open or locked");
             foreach(var sheet in UnityEngine.Object.FindObjectsByType<Sheet>())Check(game.CollectSheet(sheet.gameObject),"Could not finish second-round sheet");
             var elevator=UnityEngine.Object.FindAnyObjectByType<ElevatorExit>();Check(elevator && game.ReadyToExit,"Second round exit unavailable");elevator.Interact();Check(game.Completed,"Second round did not complete");game.ExitToLobby();Check(!game.Completed && game.World==null && Closed(single),"Completed round did not reset");Next(3);
@@ -67,13 +67,22 @@ public static class EscapeRoundResetVerification
         }
         else if(stage==4 && Time.time-start>.4f)
         {
-            Check(game.TimedOut,"Timed round did not expire");game.ExitToLobby();Check(!game.TimedOut && game.World==null,"Timed-out round did not reset");game.timeLimitSeconds=originalLimit;Next(5);
+            Check(!game.TimedOut && game.IsRunning && game.Remaining<=0 && !game.ReadyToExit,"Unlimited time attack ended at the legacy limit");var sheet=UnityEngine.Object.FindObjectsByType<Sheet>().First();Check(game.CollectSheet(sheet.gameObject)&&game.Found==1&&sheet.gameObject.activeSelf&&game.ActiveNotebookCount==5,"Time attack sheet did not respawn");game.ExitToLobby();Check(!game.TimedOut && game.World==null && game.Found==0,"Time attack round did not reset");game.timeLimitSeconds=originalLimit;Next(5);
         }
         else if(stage==5 && Time.time-start>1.5f)
         {
             Check(game.BeginSelection(player)&&game.ChooseMode(EscapeGame.Mode.Easy),"Fourth round failed to start");
-            Check(game.Found==0 && game.Target==3 && !game.TimedOut && !game.Caught && !game.Completed && Closed(single)&&Closed(doubleDoor)&&Closed(locked),"Fourth round is not fresh");
-            Debug.Log("ESCAPE_ROUND_RESET_PASS single and double doors, locks, world, items, sheets, monster, success and timeout");game.ExitToLobby();Finish(0);
+            Check(game.Found==0 && game.Target==5 && !game.TimedOut && !game.Caught && !game.Completed && Closed(single)&&Closed(doubleDoor)&&Closed(locked),"Fourth round is not fresh");
+            game.ExitToLobby();Next(6);
+        }
+        else if(stage==6 && Time.time-start>1.5f)
+        {
+            game.timeLimitSeconds=.2f;Check(game.BeginSelection(player)&&game.ChooseMode(EscapeGame.Mode.TimeAttackDark),"Dark time attack failed to start");Check(game.IsDark&&game.Target==5,"Dark mode configuration missing");Next(7);
+        }
+        else if(stage==7 && Time.time-start>.4f)
+        {
+            Check(!game.TimedOut&&game.IsRunning&&!game.ReadyToExit,"Dark time attack ended at legacy limit");game.ExitToLobby();game.timeLimitSeconds=originalLimit;Check(!game.IsDark&&player.enabled&&game.World==null,"Dark mode did not restore lobby");
+            Debug.Log("ESCAPE_ROUND_RESET_PASS doors, locks, world, items, sheets, monster, success, unlimited bright/dark time attack and lobby restore");Finish(0);
         }
     }
     catch(Exception ex){Debug.LogException(ex);Finish(1);}}
