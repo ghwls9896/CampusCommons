@@ -102,7 +102,7 @@ namespace CampusCommons.Webcam
             if (Ready) return;
             if (text == null)
             {
-                font = Font.CreateDynamicFontFromOSFont(new[] { "Apple SD Gothic Neo", "Malgun Gothic", "Arial" }, 16);
+                font = Resources.Load<Font>("KIT/NotoSansKR");
                 text = new GUIStyle(GUI.skin.label) { font = font, fontSize = 16, wordWrap = true };
             }
             var matrix = GUI.matrix; GUI.matrix = Matrix4x4.identity;

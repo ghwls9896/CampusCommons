@@ -10,6 +10,7 @@
     "Assets/Webcam/Runtime/LobbyStudyWebcam.cs",
     "Assets/Webcam/Runtime/RuntimePackageInstaller.cs",
     "Tools/distribution/build-windows.ps1",
+    "Tools/distribution/tests/",
     "docs/tasks/cc-28.json",
     "docs/tasks/cc-28.md"
   ],

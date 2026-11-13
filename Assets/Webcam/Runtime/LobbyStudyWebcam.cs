@@ -165,7 +165,7 @@ namespace CampusCommons.Webcam
         {
             if(!IsAvailable)return;
             if(text==null){
-                font=Font.CreateDynamicFontFromOSFont(new[]{"Apple SD Gothic Neo","Malgun Gothic","Noto Sans CJK KR","Arial Unicode MS"},18);
+                font=Resources.Load<Font>("KIT/NotoSansKR");
                 text=new GUIStyle(GUI.skin.label){font=font,fontSize=18,wordWrap=true};
                 button=new GUIStyle(GUI.skin.button){font=font,fontSize=18};
             }

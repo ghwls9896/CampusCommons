@@ -11,7 +11,7 @@ namespace CampusCommons.Account
   void Styles()
   {
    if(heading!=null)return;
-   var font=Font.CreateDynamicFontFromOSFont(new[]{"Apple SD Gothic Neo","Malgun Gothic","Noto Sans CJK KR","Arial"},18);
+   var font=Resources.Load<Font>("KIT/NotoSansKR");
    heading=new GUIStyle(GUI.skin.label){font=font,fontSize=28,fontStyle=FontStyle.Bold,wordWrap=true};
    label=new GUIStyle(GUI.skin.label){font=font,fontSize=17,wordWrap=true};notice=new GUIStyle(label){normal={textColor=new Color(.95f,.79f,.46f)}};
    field=new GUIStyle(GUI.skin.textField){font=font,fontSize=18,fixedHeight=36,padding=new RectOffset(10,10,7,7)};
