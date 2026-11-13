@@ -4,6 +4,7 @@ using UnityEngine;
 using CampusCommons.GrandLibrary;
 
 
+[DefaultExecutionOrder(-50)]
 public class LibraryInventoryUI : MonoBehaviour
 {
     public bool IsOpen { get; private set; }
@@ -25,33 +26,35 @@ public class LibraryInventoryUI : MonoBehaviour
 
     private readonly string[] items = new string[SlotCount];
 
+    private Player player;
+    private LibraryAvatarPreview preview;
+    public bool CanUseInput => isActiveAndEnabled && player != null && player.CanUseInventory;
+    public bool OwnsInput => IsOpen && CanUseInput;
+
+    void Awake() { player = GetComponent<Player>(); }
+
+    public void SetOpen(bool open)
+    {
+        IsOpen = open && CanUseInput;
+        if (preview == null) preview = GetComponent<LibraryAvatarPreview>();
+        if (preview != null) preview.SetInventoryVisible(IsOpen);
+    }
+
     void Update()
     {
-        // IŰ: �κ��丮 ���� / �ݱ�
-        if (Input.GetKeyDown(KeyCode.I))
-        {
-            IsOpen = !IsOpen;
-        }
-
-        // ���� 1~5: ���� ���� ����
+        if (!CanUseInput) { SetOpen(false); return; }
+        if (Input.GetKeyDown(KeyCode.I)) SetOpen(!IsOpen);
+        if (IsOpen && (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.C))) SetOpen(false);
         for (int i = 0; i < hotkeys.Length; i++)
-        {
-            if (Input.GetKeyDown(hotkeys[i]))
-            {
-                SelectHotbar(i);
-            }
-        }
-
-        if (IsOpen)
-        {
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
-        }
+            if (Input.GetKeyDown(hotkeys[i])) SelectHotbar(i);
     }
+
+    void LateUpdate() { if (!CanUseInput) SetOpen(false); }
+    void OnDisable() { SetOpen(false); }
 
     public void SelectHotbar(int index)
     {
-        if (index < 0 || index >= 5)
+        if (!CanUseInput || index < 0 || index >= 5)
             return;
 
         SelectedHotbar = index;
@@ -61,6 +64,7 @@ public class LibraryInventoryUI : MonoBehaviour
 
     void OnGUI()
     {
+        if (!CanUseInput) return;
         DrawHotbar();
 
         if (IsOpen)
@@ -102,22 +106,8 @@ public class LibraryInventoryUI : MonoBehaviour
 
         // ���� Ŀ���͸���¡ �̸����� ��������
         
-    Texture avatarTexture = null;
-
-    // 아바타 시스템이 설치되어 있을 때만 연결
-    Component preview = GetComponent("LibraryAvatarPreview");
-
-    if (preview != null)
-    {
-        var property = preview.GetType()
-            .GetProperty("PreviewTexture");
-
-        if (property != null)
-        {
-            avatarTexture =
-               property.GetValue(preview) as Texture;
-         }
-    }
+        if (preview == null) preview = GetComponent<LibraryAvatarPreview>();
+        Texture avatarTexture = preview != null ? preview.PreviewTexture : null;
 
 // 미리보기 표시
 if (avatarTexture != null)

@@ -11,6 +11,9 @@ namespace CampusCommons.GrandLibrary
 
         private Camera previewCamera;
         private RenderTexture previewTexture;
+        private bool inventoryVisible;
+        public RenderTexture PreviewTexture => previewTexture;
+        public void SetInventoryVisible(bool visible) { inventoryVisible = visible; }
 
         private float rotationAngle = 0f;
 
@@ -66,10 +69,9 @@ namespace CampusCommons.GrandLibrary
 
         private void LateUpdate()
         {
-            if (avatarUI == null)
-                return;
-
-            if (!avatarUI.IsOpen)
+            var owner = GetComponent<Player>();
+            if ((owner != null && !owner.isActiveAndEnabled) ||
+                (!inventoryVisible && (avatarUI == null || !avatarUI.IsOpen)))
             {
                 if (previewCamera != null)
                     previewCamera.enabled = false;
@@ -199,6 +201,7 @@ namespace CampusCommons.GrandLibrary
     public class LibraryAvatarPreview : MonoBehaviour
     {
         public RenderTexture PreviewTexture => null;
+        public void SetInventoryVisible(bool visible) { }
         public void Initialize(GameObject avatar, LibraryAvatarCustomizerUI ui) { }
     }
 }

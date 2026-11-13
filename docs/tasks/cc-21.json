@@ -8,9 +8,13 @@
     "Assets/TeamInventory/",
     "Assets/TeamInventory.meta",
     "docs/tasks/cc-21.json",
-    "docs/INVENTORY_SETUP.md"
+    "docs/INVENTORY_SETUP.md",
+    "Assets/GrandLibrary/Scripts/Player.cs",
+    "Assets/TeamAvatar/LibraryAvatarPreview.cs"
   ],
-  "shared_files": [],
+  "shared_files": [
+    "Assets/GrandLibrary/Scripts/Player.cs"
+  ],
   "depends_on": [
     "cc-19"
   ],
@@ -22,6 +26,8 @@
     "화면 오른쪽 상단 UI 확인",
     "캐릭터 미리보기 연동 확인",
     "기존 플레이어 기능 유지",
-    "python Tools/team/check.py --base origin/main"
+    "python Tools/team/check.py --base origin/main",
+    "계정/룸이 Player를 차단하면 인벤토리 입력과 화면 닫힘",
+    "Sunbox 실제 프리팹: 커스터마이징이 닫힌 동안 인벤토리 미리보기 렌더링"
   ]
 }

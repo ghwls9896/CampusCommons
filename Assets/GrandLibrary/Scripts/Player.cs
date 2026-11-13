@@ -30,6 +30,8 @@ namespace CampusCommons.GrandLibrary
         bool koreanExit;
         public bool IsExitConfirmOpen=>exitConfirm;
         public bool IsFirstPerson=>firstPerson;
+        public bool CanUseInventory => isActiveAndEnabled && currentSpace == Portal.Space.Library &&
+            !exitConfirm && (avatarUI == null || !avatarUI.IsOpen);
 
         public static Player Create(Transform parent = null)
         {
@@ -135,6 +137,15 @@ namespace CampusCommons.GrandLibrary
         }
         void Update()
         {
+            var inventory = GetComponent<LibraryInventoryUI>();
+            if (inventory != null && inventory.OwnsInput)
+            {
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
+                AnimateAvatar(Vector3.zero, false);
+                return;
+            }
+
 
             if (Input.GetKeyDown(KeyCode.C) && !exitConfirm)
             {
