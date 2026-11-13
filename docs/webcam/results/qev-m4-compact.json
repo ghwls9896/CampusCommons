@@ -1,0 +1,284 @@
+{
+  "model": "ken-jo/QEV-0.5B",
+  "revision": "0d99aa34b354a81a4b963cb3059b75466174fd54",
+  "native_parity": true,
+  "samples": [
+    {
+      "fixture": "reading",
+      "expected": "studying",
+      "sha256": "05dae71d42dbfac516ecd1b35840de3dc5dfcc70a7eed726f30954dac23b93ad",
+      "ok": true,
+      "state": "studying",
+      "probabilities": {
+        "studying": 0.516150712966919,
+        "phone": 0.026764705777168274,
+        "other": 0.049499981105327606,
+        "away": 0.05943180248141289,
+        "drowsy": 0.3481527864933014
+      },
+      "confidence": 0.516150712966919,
+      "seconds": 1.2047607910062652,
+      "mode": "accurate",
+      "device": "mps"
+    },
+    {
+      "fixture": "phone",
+      "expected": "phone",
+      "sha256": "22ce17b9cf046de2200d7c2280bb5c4f4f7ada10e880fc30f7098b3edb1aabbc",
+      "ok": true,
+      "state": "other",
+      "probabilities": {
+        "studying": 0.054178763180971146,
+        "phone": 0.394153356552124,
+        "other": 0.4348076283931732,
+        "away": 0.038243893533945084,
+        "drowsy": 0.07861635088920593
+      },
+      "confidence": 0.4348076283931732,
+      "seconds": 0.5478994159784634,
+      "mode": "accurate",
+      "device": "mps"
+    },
+    {
+      "fixture": "other",
+      "expected": "other",
+      "sha256": "145655e011703b740aba4626d0a0053a303bf0f3b1ed9198fcf8b3f54884bdd6",
+      "ok": true,
+      "state": "other",
+      "probabilities": {
+        "studying": 0.008482526987791061,
+        "phone": 0.005530906841158867,
+        "other": 0.9571841955184937,
+        "away": 0.006854334846138954,
+        "drowsy": 0.021948056295514107
+      },
+      "confidence": 0.9571841955184937,
+      "seconds": 0.550257209019037,
+      "mode": "accurate",
+      "device": "mps"
+    },
+    {
+      "fixture": "away",
+      "expected": "away",
+      "sha256": "f14a4bfb5d1115a119fd68924d5e5411df26a7991334ed701f559e05a46b03e5",
+      "ok": true,
+      "state": "away",
+      "probabilities": {
+        "studying": 0.03822633996605873,
+        "phone": 0.05789874494075775,
+        "other": 0.04722992330789566,
+        "away": 0.7261712551116943,
+        "drowsy": 0.13047367334365845
+      },
+      "confidence": 0.7261712551116943,
+      "seconds": 0.5472374579985626,
+      "mode": "accurate",
+      "device": "mps"
+    },
+    {
+      "fixture": "drowsy",
+      "expected": "drowsy",
+      "sha256": "0ad4fa31688e262421397aee9e8182951439734037e9cecb46ef00a5c0b5eec8",
+      "ok": true,
+      "state": "drowsy",
+      "probabilities": {
+        "studying": 0.07302230596542358,
+        "phone": 0.027450092136859894,
+        "other": 0.09210626035928726,
+        "away": 0.04311218112707138,
+        "drowsy": 0.7643091678619385
+      },
+      "confidence": 0.7643091678619385,
+      "seconds": 0.5497254999936558,
+      "mode": "accurate",
+      "device": "mps"
+    }
+  ],
+  "driver_allocated_bytes": 1405386752,
+  "limitations": "Five public sanity examples, not webcam accuracy. No camera accessed.",
+  "date": "2026-11-12",
+  "hardware": "Apple M4 32GB",
+  "source_revision": "e091f7ae8c6f064860d59be560faa27f0387ff35",
+  "live_samples": [
+    {
+      "fixture": "reading",
+      "run": 1,
+      "ok": true,
+      "state": "studying",
+      "probabilities": {
+        "studying": 0.516150712966919,
+        "phone": 0.026764705777168274,
+        "other": 0.049499981105327606,
+        "away": 0.05943180248141289,
+        "drowsy": 0.3481527864933014
+      },
+      "confidence": 0.516150712966919,
+      "seconds": 0.8733775840082671,
+      "mode": "accurate",
+      "device": "mps"
+    },
+    {
+      "fixture": "phone",
+      "run": 1,
+      "ok": true,
+      "state": "other",
+      "probabilities": {
+        "studying": 0.054178763180971146,
+        "phone": 0.394153356552124,
+        "other": 0.4348076283931732,
+        "away": 0.038243893533945084,
+        "drowsy": 0.07861635088920593
+      },
+      "confidence": 0.4348076283931732,
+      "seconds": 0.5948569999891333,
+      "mode": "accurate",
+      "device": "mps"
+    },
+    {
+      "fixture": "other",
+      "run": 1,
+      "ok": true,
+      "state": "other",
+      "probabilities": {
+        "studying": 0.008482526987791061,
+        "phone": 0.005530906841158867,
+        "other": 0.9571841955184937,
+        "away": 0.006854334846138954,
+        "drowsy": 0.021948056295514107
+      },
+      "confidence": 0.9571841955184937,
+      "seconds": 0.6090192499978002,
+      "mode": "accurate",
+      "device": "mps"
+    },
+    {
+      "fixture": "away",
+      "run": 1,
+      "ok": true,
+      "state": "away",
+      "probabilities": {
+        "studying": 0.03822633996605873,
+        "phone": 0.05789874494075775,
+        "other": 0.04722992330789566,
+        "away": 0.7261712551116943,
+        "drowsy": 0.13047367334365845
+      },
+      "confidence": 0.7261712551116943,
+      "seconds": 0.6028131670027506,
+      "mode": "accurate",
+      "device": "mps"
+    },
+    {
+      "fixture": "drowsy",
+      "run": 1,
+      "ok": true,
+      "state": "drowsy",
+      "probabilities": {
+        "studying": 0.07302230596542358,
+        "phone": 0.027450092136859894,
+        "other": 0.09210626035928726,
+        "away": 0.04311218112707138,
+        "drowsy": 0.7643091678619385
+      },
+      "confidence": 0.7643091678619385,
+      "seconds": 0.6040751669788733,
+      "mode": "accurate",
+      "device": "mps"
+    },
+    {
+      "fixture": "reading",
+      "run": 2,
+      "ok": true,
+      "state": "studying",
+      "probabilities": {
+        "studying": 0.516150712966919,
+        "phone": 0.026764705777168274,
+        "other": 0.049499981105327606,
+        "away": 0.05943180248141289,
+        "drowsy": 0.3481527864933014
+      },
+      "confidence": 0.516150712966919,
+      "seconds": 0.6021953329909593,
+      "mode": "accurate",
+      "device": "mps"
+    },
+    {
+      "fixture": "phone",
+      "run": 2,
+      "ok": true,
+      "state": "other",
+      "probabilities": {
+        "studying": 0.054178763180971146,
+        "phone": 0.394153356552124,
+        "other": 0.4348076283931732,
+        "away": 0.038243893533945084,
+        "drowsy": 0.07861635088920593
+      },
+      "confidence": 0.4348076283931732,
+      "seconds": 0.6042330419877544,
+      "mode": "accurate",
+      "device": "mps"
+    },
+    {
+      "fixture": "other",
+      "run": 2,
+      "ok": true,
+      "state": "other",
+      "probabilities": {
+        "studying": 0.008482526987791061,
+        "phone": 0.005530906841158867,
+        "other": 0.9571841955184937,
+        "away": 0.006854334846138954,
+        "drowsy": 0.021948056295514107
+      },
+      "confidence": 0.9571841955184937,
+      "seconds": 0.6015708330087364,
+      "mode": "accurate",
+      "device": "mps"
+    },
+    {
+      "fixture": "away",
+      "run": 2,
+      "ok": true,
+      "state": "away",
+      "probabilities": {
+        "studying": 0.03822633996605873,
+        "phone": 0.05789874494075775,
+        "other": 0.04722992330789566,
+        "away": 0.7261712551116943,
+        "drowsy": 0.13047367334365845
+      },
+      "confidence": 0.7261712551116943,
+      "seconds": 0.5875351249997038,
+      "mode": "accurate",
+      "device": "mps"
+    },
+    {
+      "fixture": "drowsy",
+      "run": 2,
+      "ok": true,
+      "state": "drowsy",
+      "probabilities": {
+        "studying": 0.07302230596542358,
+        "phone": 0.027450092136859894,
+        "other": 0.09210626035928726,
+        "away": 0.04311218112707138,
+        "drowsy": 0.7643091678619385
+      },
+      "confidence": 0.7643091678619385,
+      "seconds": 0.6070156659989152,
+      "mode": "accurate",
+      "device": "mps"
+    }
+  ],
+  "physical_footprint": [
+    "Physical footprint:         1.7G",
+    "Physical footprint (peak):  2.1G"
+  ],
+  "config": {
+    "interval_ms": 1000,
+    "mode": "accurate",
+    "device": "mps",
+    "model": "QEV-0.5B Compact \u00b7 \uc815\ud655\ub3c4 \uc6b0\uc120 \u00b7 1\ucd08 \uac04\uaca9"
+  }
+}

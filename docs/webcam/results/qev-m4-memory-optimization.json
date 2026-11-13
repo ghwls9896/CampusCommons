@@ -1,0 +1,309 @@
+{
+  "date": "2026-11-10",
+  "change": "Native QEV CPU validation/load, BF16 cast before MPS transfer, one startup empty_cache",
+  "hardware": "Apple M4 32GB",
+  "scope": "Same full24 accurate, original BF16 backbone/FP32 heads, five categories, 512x288 JPEG85, one-second start target",
+  "samples": [
+    {
+      "fixture": "reading",
+      "run": 1,
+      "ok": true,
+      "state": "studying",
+      "probabilities": {
+        "studying": 0.5830345153808594,
+        "phone": 0.03941367194056511,
+        "other": 0.04299385845661163,
+        "away": 0.05568632856011391,
+        "drowsy": 0.2788715958595276
+      },
+      "confidence": 0.5830345153808594,
+      "seconds": 0.7843482500175014,
+      "mode": "accurate",
+      "device": "mps"
+    },
+    {
+      "fixture": "phone",
+      "run": 1,
+      "ok": true,
+      "state": "phone",
+      "probabilities": {
+        "studying": 0.04186909645795822,
+        "phone": 0.7226739525794983,
+        "other": 0.15245434641838074,
+        "away": 0.03402680903673172,
+        "drowsy": 0.048975806683301926
+      },
+      "confidence": 0.7226739525794983,
+      "seconds": 0.7977509159827605,
+      "mode": "accurate",
+      "device": "mps"
+    },
+    {
+      "fixture": "other",
+      "run": 1,
+      "ok": true,
+      "state": "other",
+      "probabilities": {
+        "studying": 0.027104320004582405,
+        "phone": 0.02289021760225296,
+        "other": 0.879102349281311,
+        "away": 0.027972878888249397,
+        "drowsy": 0.042930297553539276
+      },
+      "confidence": 0.879102349281311,
+      "seconds": 0.7640887079760432,
+      "mode": "accurate",
+      "device": "mps"
+    },
+    {
+      "fixture": "away",
+      "run": 1,
+      "ok": true,
+      "state": "away",
+      "probabilities": {
+        "studying": 0.04254186898469925,
+        "phone": 0.06061987206339836,
+        "other": 0.0844823494553566,
+        "away": 0.7020522952079773,
+        "drowsy": 0.11030364781618118
+      },
+      "confidence": 0.7020522952079773,
+      "seconds": 0.7655060830002185,
+      "mode": "accurate",
+      "device": "mps"
+    },
+    {
+      "fixture": "drowsy",
+      "run": 1,
+      "ok": true,
+      "state": "drowsy",
+      "probabilities": {
+        "studying": 0.05863412842154503,
+        "phone": 0.038300201296806335,
+        "other": 0.0626986101269722,
+        "away": 0.030650775879621506,
+        "drowsy": 0.8097162246704102
+      },
+      "confidence": 0.8097162246704102,
+      "seconds": 0.764103833003901,
+      "mode": "accurate",
+      "device": "mps"
+    },
+    {
+      "fixture": "reading",
+      "run": 2,
+      "ok": true,
+      "state": "studying",
+      "probabilities": {
+        "studying": 0.5830345153808594,
+        "phone": 0.03941367194056511,
+        "other": 0.04299385845661163,
+        "away": 0.05568632856011391,
+        "drowsy": 0.2788715958595276
+      },
+      "confidence": 0.5830345153808594,
+      "seconds": 0.7665090420050547,
+      "mode": "accurate",
+      "device": "mps"
+    },
+    {
+      "fixture": "phone",
+      "run": 2,
+      "ok": true,
+      "state": "phone",
+      "probabilities": {
+        "studying": 0.04186909645795822,
+        "phone": 0.7226739525794983,
+        "other": 0.15245434641838074,
+        "away": 0.03402680903673172,
+        "drowsy": 0.048975806683301926
+      },
+      "confidence": 0.7226739525794983,
+      "seconds": 0.7662326659774408,
+      "mode": "accurate",
+      "device": "mps"
+    },
+    {
+      "fixture": "other",
+      "run": 2,
+      "ok": true,
+      "state": "other",
+      "probabilities": {
+        "studying": 0.027104320004582405,
+        "phone": 0.02289021760225296,
+        "other": 0.879102349281311,
+        "away": 0.027972878888249397,
+        "drowsy": 0.042930297553539276
+      },
+      "confidence": 0.879102349281311,
+      "seconds": 0.7640808330033906,
+      "mode": "accurate",
+      "device": "mps"
+    },
+    {
+      "fixture": "away",
+      "run": 2,
+      "ok": true,
+      "state": "away",
+      "probabilities": {
+        "studying": 0.04254186898469925,
+        "phone": 0.06061987206339836,
+        "other": 0.0844823494553566,
+        "away": 0.7020522952079773,
+        "drowsy": 0.11030364781618118
+      },
+      "confidence": 0.7020522952079773,
+      "seconds": 0.7629493749991525,
+      "mode": "accurate",
+      "device": "mps"
+    },
+    {
+      "fixture": "drowsy",
+      "run": 2,
+      "ok": true,
+      "state": "drowsy",
+      "probabilities": {
+        "studying": 0.05863412842154503,
+        "phone": 0.038300201296806335,
+        "other": 0.0626986101269722,
+        "away": 0.030650775879621506,
+        "drowsy": 0.8097162246704102
+      },
+      "confidence": 0.8097162246704102,
+      "seconds": 0.7649322079960257,
+      "mode": "accurate",
+      "device": "mps"
+    }
+  ],
+  "live_server_footprint": [
+    "Physical footprint:         2.9G",
+    "Physical footprint (peak):  3.8G"
+  ],
+  "max_probability_difference": 0.0,
+  "model": "ken-jo/QEV-0.8B",
+  "model_revision": "3933310d0637b5721c05633cb07b7de5fd11d050",
+  "source_revision": "ff55034b2f488e03fab774dc380b08d67a93071b",
+  "selected_implementation": "Native QEV CPU load -> backbone BF16 -> full module MPS -> startup empty_cache",
+  "experiments": [
+    {
+      "variant": "MPS cache only; same BF16 weights, full24 accurate, prompt, five choices and JPEGs",
+      "selected": false,
+      "memory": [
+        {
+          "stage": "after_load",
+          "tensor_bytes": 2874956288,
+          "driver_bytes": 4465344512,
+          "footprint": [
+            "Physical footprint:         4.7G",
+            "Physical footprint (peak):  4.7G"
+          ]
+        },
+        {
+          "stage": "original",
+          "tensor_bytes": 2874956544,
+          "driver_bytes": 4536434688,
+          "footprint": [
+            "Physical footprint:         4.9G",
+            "Physical footprint (peak):  4.9G"
+          ]
+        },
+        {
+          "stage": "after_empty_cache",
+          "tensor_bytes": 2874956544,
+          "driver_bytes": 3494150144,
+          "footprint": [
+            "Physical footprint:         3.9G",
+            "Physical footprint (peak):  4.9G"
+          ]
+        },
+        {
+          "stage": "one_time_release",
+          "tensor_bytes": 2874956544,
+          "driver_bytes": 3527704576,
+          "footprint": [
+            "Physical footprint:         3.9G",
+            "Physical footprint (peak):  4.9G"
+          ]
+        },
+        {
+          "stage": "release_each_frame",
+          "tensor_bytes": 2874956544,
+          "driver_bytes": 3502538752,
+          "footprint": [
+            "Physical footprint:         3.9G",
+            "Physical footprint (peak):  4.9G"
+          ]
+        }
+      ],
+      "max_probability_difference": 0.0
+    },
+    {
+      "variant": "direct BF16 load, post-load cast retained for identical buffer dtype",
+      "selected": false,
+      "memory": [
+        {
+          "stage": "after_load",
+          "tensor_bytes": 443648,
+          "driver_bytes": 1714913280,
+          "footprint": [
+            "Physical footprint:         2.0G",
+            "Physical footprint (peak):  2.0G"
+          ]
+        },
+        {
+          "stage": "after_empty_cache",
+          "tensor_bytes": 443648,
+          "driver_bytes": 1714896896,
+          "footprint": [
+            "Physical footprint:         2.0G",
+            "Physical footprint (peak):  2.0G"
+          ]
+        },
+        {
+          "stage": "after_inference",
+          "tensor_bytes": 443904,
+          "driver_bytes": 1895038976,
+          "footprint": [
+            "Physical footprint:         2.3G",
+            "Physical footprint (peak):  2.3G"
+          ]
+        }
+      ],
+      "max_probability_difference": 0.0
+    },
+    {
+      "variant": "native CPU load, BF16 cast before MPS transfer",
+      "selected": true,
+      "memory": [
+        {
+          "stage": "after_load",
+          "tensor_bytes": 1706341632,
+          "driver_bytes": 2399617024,
+          "footprint": [
+            "Physical footprint:         2.7G",
+            "Physical footprint (peak):  3.9G"
+          ]
+        },
+        {
+          "stage": "after_empty_cache",
+          "tensor_bytes": 1706341632,
+          "driver_bytes": 2399617024,
+          "footprint": [
+            "Physical footprint:         2.7G",
+            "Physical footprint (peak):  3.9G"
+          ]
+        },
+        {
+          "stage": "after_inference",
+          "tensor_bytes": 1706341888,
+          "driver_bytes": 2479095808,
+          "footprint": [
+            "Physical footprint:         2.9G",
+            "Physical footprint (peak):  3.9G"
+          ]
+        }
+      ],
+      "max_probability_difference": 0.0
+    }
+  ]
+}

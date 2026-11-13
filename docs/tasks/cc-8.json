@@ -1,0 +1,31 @@
+{
+  "id": "cc-8",
+  "title": "이메일 계정 및 독립 레벨1~15 저장·조회",
+  "owner": "HIGHCHOI",
+  "branch": "codex/cc-8-account-progression",
+  "issue": "https://github.com/ghwls9896/CampusCommons/issues/8",
+  "scope": [
+    "docs/account/",
+    "docs/superpowers/specs/2026-11-09-account-progression-design.md",
+    "docs/superpowers/plans/2026-11-09-account-progression.md",
+    "Assets/Account/",
+    "Assets/Account.meta",
+    "supabase/",
+    "Tools/account/",
+    "Packages/manifest.json",
+    "Packages/packages-lock.json",
+    "docs/superpowers/plans/2026-11-12-level-only.md"
+  ],
+  "shared_files": [
+    "Packages/manifest.json",
+    "Packages/packages-lock.json"
+  ],
+  "depends_on": [],
+  "validation": [
+    "PostgreSQL 실제 역할·RLS·레벨1~15·기존 데이터 보존·XP 지급 차단",
+    "Deno Edge Functions 인증·권한·입력 검증",
+    "C# 인증/세션/계정 전환 검사",
+    "Unity 임시6000.6 컴파일/Play Mode; 원본6000.4.5 유지",
+    "팀 협업 테스트 및 제출 범위 검사"
+  ]
+}
