@@ -521,7 +521,9 @@ namespace CampusCommons.LibraryCharacter
                 if(toward.sqrMagnitude>.01f && Vector3.Dot(direction,toward.normalized)<.1f)continue;
                 door.OpenForMonster();waitingDoor=door;body.Move(Vector3.down*2f*dt);ResetPicture();return;
             }
-            float speed=(state==Behaviour.Chase || state==Behaviour.Investigate)?CurrentMoveSpeed:state==Behaviour.Search?BaseMoveSpeed*.75f:BaseMoveSpeed*.55f;
+            float chaseSpeed=(12f+Mathf.Max(0f,Speed-2.65f))*(IsFinalHunt?1.2f:1f)*(game?game.TimeAttackSpeed:1f);
+            float speed=state==Behaviour.Chase ? Mathf.Max(CurrentMoveSpeed, chaseSpeed) :
+                state==Behaviour.Investigate ? CurrentMoveSpeed : state==Behaviour.Search ? BaseMoveSpeed*.75f : BaseMoveSpeed*.55f;
             Vector3 before=transform.position;
             body.Move(direction*Mathf.Min(speed*dt,remaining)+Vector3.down*2f*dt);
             Vector3 moved=transform.position-before;moved.y=0;float distance=moved.magnitude;

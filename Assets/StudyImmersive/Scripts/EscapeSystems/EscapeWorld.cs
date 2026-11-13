@@ -21,9 +21,9 @@ namespace CampusCommons.StudyImmersive
             public CharacterController body;
             public readonly List<Vector3> route=new List<Vector3>();
             public int next;
-            public float replan,stuckTime;
+            public float replan,stuckTime,chaseMemory;
             public bool pursuing,hasDestination;
-            public Vector3 destination;
+            public Vector3 destination,chaseTarget;
             public AudioSource audio;
             public AudioClip ambient;
             public float ambientWait;
@@ -60,6 +60,7 @@ namespace CampusCommons.StudyImmersive
                 patrol.stuckTime = 0f;
                 patrol.hasDestination = false;
                 patrol.pursuing = false;
+                patrol.chaseMemory = 0f;
             }
             if (game && game.monster && game.monster.GetComponent<CharacterController>() == actor)
                 game.monster.CleanerReleased();
@@ -309,19 +310,25 @@ namespace CampusCommons.StudyImmersive
             bool professorCarried = professor != null && IsCleanerCarrying(professor.body);
             if (!BlocksMovement && !professorCarried)
             {
-                bool pursuing = professorCooldown <= 0f && CanSeePlayer(5f);
+                bool visible = professorCooldown <= 0f && CanSeePlayer(12f);
+                if (professor != null)
+                {
+                    professor.chaseMemory = visible ? 8f : Mathf.Max(0f, professor.chaseMemory - dt);
+                    if (visible) professor.chaseTarget = player.position;
+                }
+                bool pursuing = professor != null && professorCooldown <= 0f && professor.chaseMemory > 0f;
                 if (professor != null && pursuing && (!professor.pursuing || professor.replan <= dt))
                 {
                     professor.route.Clear();
                     professor.next = 0;
                     professor.replan = .5f;
-                    professor.destination = player.position;
+                    professor.destination = professor.chaseTarget;
                     professor.hasDestination = true;
                     if (!map.FindPath(professor.root.transform.position, professor.destination, professor.route, CanTraverse))
                         ReplanPatrol(professor, false);
                 }
                 if (professor != null) professor.pursuing = pursuing;
-                MovePatrol(professor, 4.85f * DifficultySpeed(), dt);
+                MovePatrol(professor, (pursuing ? 9.5f : 4.85f) * DifficultySpeed(), dt);
             }
             if (worker == null || !IsCleanerCarrying(worker.body)) MovePatrol(worker, 4.45f * DifficultySpeed(), dt);
             if (!BlocksMovement && !professorCarried && !IsCleanerPushing && professorCooldown <= 0 && CanMeetProfessor()) BeginProfessorQuestion();
@@ -381,7 +388,8 @@ namespace CampusCommons.StudyImmersive
             try{Physics.queriesHitBackfaces=true;hits=Physics.RaycastAll(origin,delta.normalized,delta.magnitude,Physics.DefaultRaycastLayers,QueryTriggerInteraction.Ignore);}
             finally{Physics.queriesHitBackfaces=previous;}
             foreach(var hit in hits)
-                if(hit.collider && hit.collider.transform!=player && !hit.collider.transform.IsChildOf(player))return false;
+                if(hit.collider && hit.collider.transform!=player && !hit.collider.transform.IsChildOf(player) &&
+                    hit.collider.transform!=professor.root.transform && !hit.collider.transform.IsChildOf(professor.root.transform))return false;
             return true;
         }
         bool ReplanPatrol(Patrol npc,bool keepDestination)
@@ -577,7 +585,7 @@ namespace CampusCommons.StudyImmersive
             {
                 Vector3 direction=player.position-professor.root.transform.position;direction.y=0;
                 if(direction.sqrMagnitude<.01f)direction=player.forward;
-                professor.route.Clear();professor.next=0;professor.replan=4f;professor.pursuing=false;
+                professor.route.Clear();professor.next=0;professor.replan=4f;professor.pursuing=false;professor.chaseMemory=0f;
                 professor.destination=player.position+direction.normalized*5f;professor.hasDestination=true;
                 if(!map.FindPath(professor.root.transform.position,professor.destination,professor.route,CanTraverse))ReplanPatrol(professor,false);
             }

@@ -71,7 +71,7 @@ namespace CampusCommons.StudyImmersive
         {
             RestoreCamera();
             if (!view || !game || !game.IsRunning || game.IsEnded || game.IsAnswering || game.IsExitConfirmOpen) return;
-            float shake = Mathf.InverseLerp(.65f, 1f, intensity) * .3f;
+            float shake = ShakeDegrees(intensity);
             if (shake <= 0f) return;
             originalRotation = view.transform.rotation;
             float x = (Mathf.PerlinNoise(Time.unscaledTime * 7f, 1f) - .5f) * 2f * shake;
@@ -90,13 +90,13 @@ namespace CampusCommons.StudyImmersive
 
         void OnGUI()
         {
-            if (Event.current.type != EventType.Repaint || intensity <= .001f || !game || !game.IsRunning || game.IsEnded) return;
+            if (Event.current.type != EventType.Repaint || !game || !game.IsRunning || game.IsEnded) return;
             var previousMatrix = GUI.matrix; var previousColor = GUI.color; int previousDepth = GUI.depth;
             GUI.matrix = Matrix4x4.identity; GUI.depth = 100;
             GUI.color = new Color(1, 1, 1, intensity * .58f);
             GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), vignette);
             float frame = Mathf.Floor(Time.unscaledTime * 10f);
-            GUI.color = new Color(1, 1, 1, intensity * .055f);
+            GUI.color = new Color(1, 1, 1, NoiseOpacity(intensity));
             GUI.DrawTextureWithTexCoords(new Rect(0, 0, Screen.width, Screen.height), grain,
                 new Rect((frame * .137f) % 1f, (frame * .271f) % 1f, Screen.width / 128f, Screen.height / 128f));
             GUI.matrix = previousMatrix; GUI.color = previousColor; GUI.depth = previousDepth;
@@ -110,6 +110,8 @@ namespace CampusCommons.StudyImmersive
             if (grain) Destroy(grain);
             vignette = null; grain = null;
         }
+        static float NoiseOpacity(float level) => Mathf.Lerp(.018f, .18f, level);
+        static float ShakeDegrees(float level) => Mathf.InverseLerp(.08f, 1f, level) * 1.15f;
         void OnDestroy() { Shutdown(); }
     }
 }
