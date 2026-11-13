@@ -40,6 +40,16 @@ public static class RuntimePackageInstallerTests
   temp=Path.Combine(Path.GetTempPath(),"runtime test 한글 "+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(temp);
   try{
    var p=Package("good");string root=Install(p);Check(File.Exists(Path.Combine(root,p.python)),"fresh install");Check(Install(p)==root,"cached install");
+   Check(Path.GetFileName(root)==p.sha256.Substring(0,16),"runtime directory is not shortened");
+   Check(File.ReadAllText(Path.Combine(root,"ready")).StartsWith(p.sha256+"\n",StringComparison.Ordinal),"ready marker lost full hash");
+   string collisionBase=Path.Combine(temp,"collision"), collisionRoot=Path.Combine(collisionBase,p.sha256.Substring(0,16));
+   Directory.CreateDirectory(collisionRoot);
+   string otherHash=p.sha256.Substring(0,16)+new string(p.sha256[16]=='0'?'1':'0',48);
+   File.WriteAllText(Path.Combine(collisionRoot,"ready"),otherHash+"\nexisting");
+   File.WriteAllText(Path.Combine(collisionRoot,"keep"),"existing runtime");
+   Reject(()=>Install(p,collisionBase),"short-prefix collision accepted");
+   Reject(()=>Install(p,collisionBase,force:true),"force repair overwrote a hash collision");
+   Check(File.ReadAllText(Path.Combine(collisionRoot,"keep"))=="existing runtime","collision modified existing runtime");
    File.Delete(Path.Combine(root,"app/live.py"));Install(p);Check(File.Exists(Path.Combine(root,"app/live.py")),"repair missing entrypoint");
    File.WriteAllText(Path.Combine(root,"app/live.py"),"broken");Install(p,force:true);Check(File.ReadAllText(Path.Combine(root,"app/live.py"))=="test","force repair");
    foreach(var bad in new[]{"../escape","/absolute","C:/escape","dir\\escape","app/../../escape","app/LIVE.py","APP/other.py"}){var b=Package("bad"+checks,bad);Reject(()=>Install(b),"unsafe path accepted: "+bad);}
@@ -62,12 +72,12 @@ public static class RuntimePackageInstallerTests
    }finally{File.WriteAllText(root+".release","");if(!child.WaitForExit(5000))child.Kill();child.Dispose();}
    Check(Directory.Exists(Install(p,force:true)),"repair did not resume after lease release");
    var cts=new CancellationTokenSource();cts.Cancel();Reject(()=>Install(p,Path.Combine(temp,"cancel"),token:cts.Token),"cancel ignored");
-   Check(!Directory.Exists(Path.Combine(temp,"cancel",p.sha256)),"cancel installed ready directory");
+   Check(!Directory.Exists(Path.Combine(temp,"cancel",p.sha256.Substring(0,16))),"cancel installed ready directory");
    var mid=Package("mid");var midCancel=new CancellationTokenSource();string midBase=Path.Combine(temp,"mid");
    Reject(()=>RuntimePackageInstaller.Install(mid,Path.Combine(temp,mid.archive),midBase,"macos-arm64",(v,msg)=>{if(v>.1f)midCancel.Cancel();},midCancel.Token),"mid-extraction cancel ignored");
-   Check(!Directory.Exists(Path.Combine(midBase,mid.sha256))&&!Directory.Exists(Path.Combine(midBase,mid.sha256+".installing")),"partial install left after cancel");
+   Check(!Directory.Exists(Path.Combine(midBase,mid.sha256.Substring(0,16)))&&!Directory.Exists(Path.Combine(midBase,mid.sha256.Substring(0,16)+".installing")),"partial install left after cancel");
    Check(Directory.Exists(Install(mid,midBase)),"retry after interruption failed");
-   string concurrent=Path.Combine(temp,"concurrent");Task.WaitAll(Task.Run(()=>Install(p,concurrent)),Task.Run(()=>Install(p,concurrent)));Check(File.Exists(Path.Combine(concurrent,p.sha256,"ready")),"concurrent install failed");
+   string concurrent=Path.Combine(temp,"concurrent");Task.WaitAll(Task.Run(()=>Install(p,concurrent)),Task.Run(()=>Install(p,concurrent)));Check(File.Exists(Path.Combine(concurrent,p.sha256.Substring(0,16),"ready")),"concurrent install failed");
    var retry=Package("retry","../bad");Reject(()=>Install(retry),"bad initial package");var good=Package("retry");Check(Directory.Exists(Install(good)),"retry did not recover");
    Console.WriteLine("RUNTIME_INSTALLER_PASS "+checks+" checks");return 0;
   }finally{Directory.Delete(temp,true);}
