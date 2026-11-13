@@ -16,8 +16,8 @@ namespace CampusCommons.StudyImmersive.Editor
         static int state,modeIndex;
         static float started,lastFixed;
         static bool error,searchError;
-        static readonly EscapeGame.Mode[] Modes={EscapeGame.Mode.Easy,EscapeGame.Mode.Medium,EscapeGame.Mode.Hard,EscapeGame.Mode.TimeAttack};
-        static readonly int[] Expected={3,5,7,5};
+        static readonly EscapeGame.Mode[] Modes={EscapeGame.Mode.Easy,EscapeGame.Mode.Medium,EscapeGame.Mode.Hard,EscapeGame.Mode.TimeAttack,EscapeGame.Mode.TimeAttackDark};
+        static readonly int[] Expected={5,7,7,5,5};
         public static void Run()
         {
             SessionState.SetBool("LivingValidation",false);
@@ -118,13 +118,13 @@ namespace CampusCommons.StudyImmersive.Editor
                     Check(!flow.schoolReturnTrigger.activeSelf && !flow.schoolReturnVisual.activeSelf,"School portal became visible");
                     Vector3 note=flow.notebookPositions[0];
                     controller.enabled=false;player.transform.position=note+new Vector3(.7f,.08f,0);controller.enabled=true;Physics.SyncTransforms();
-                    Check(flow.CollectNearest() && flow.Found==1 && flow.ActiveNotebookCount==2,"Notebook collection failed");
+                    Check(flow.CollectNearest() && flow.Found==1 && flow.ActiveNotebookCount==4,"Notebook collection failed");
                     for (int i=1;i<Expected[0];i++)
                     {
                         controller.enabled=false;player.transform.position=flow.notebookPositions[i]+new Vector3(.7f,.08f,0);controller.enabled=true;Physics.SyncTransforms();
                         Check(flow.CollectNearest(),"Could not collect easy notebook "+i);
                     }
-                    Check(flow.Completed && flow.Found==Expected[0] && flow.ActiveNotebookCount==0,"Completing the easy mode failed");
+                    Check(flow.ReadyToExit && flow.Found==Expected[0] && flow.ActiveNotebookCount==0,"Completing the easy mode failed");
                     flow.ExitToLobby();
                     Check(!flow.IsRunning && player.enabled && player.currentSpace==Portal.Space.Library && player.transform.Find("Student character").gameObject.activeSelf,"ESC exit did not restore lobby state");
                     modeIndex=1; Next(4);
@@ -132,15 +132,15 @@ namespace CampusCommons.StudyImmersive.Editor
                 if(state==4 && Time.time-started>1.4f)
                 {
                     Check(flow.BeginSelection(player),"Could not reopen selection for "+Modes[modeIndex]);
-                    if(modeIndex==3) flow.timeLimitSeconds=.7f;
+                    if(modeIndex>=3) flow.timeLimitSeconds=.7f;
                     Check(flow.ChooseMode(Modes[modeIndex]),"Mode selection failed: "+Modes[modeIndex]);
                     Check(flow.IsRunning && flow.Target==Expected[modeIndex] && flow.ActiveNotebookCount==Expected[modeIndex],"Notebook target mismatch for "+Modes[modeIndex]);
                     Check(!flow.schoolReturnTrigger.activeSelf && !flow.schoolReturnVisual.activeSelf,"Return portal must stay hidden");
                     Next(5);
                 }
-                if(state==5 && Time.time-started>(modeIndex==3?1.1f:.2f))
+                if(state==5 && Time.time-started>(modeIndex>=3?1.1f:.2f))
                 {
-                    if(modeIndex==3) Check(flow.TimedOut && flow.Remaining<=0 && !flow.CollectNearest(),"Time attack countdown/failure is broken");
+                    if(modeIndex>=3) Check(!flow.TimedOut && flow.IsRunning && flow.Remaining<=0 && !flow.ReadyToExit,"Unlimited time attack ended at legacy time limit");
                     flow.ExitToLobby(); Check(player.enabled && !flow.IsRunning,"Lobby controller did not resume");
                     modeIndex++; if(modeIndex==Modes.Length) Next(6);else Next(4);
                 }
@@ -151,7 +151,7 @@ namespace CampusCommons.StudyImmersive.Editor
                     string report=SessionState.GetBool("LivingValidation",false)?"Design/Immersive/living-validation.txt":"Design/Immersive/validation.txt";
                     File.WriteAllText(report,"PASS\nUnity "+Application.unityVersion+"\n"+
                         (SessionState.GetBool("LivingValidation",false)?"Owned skybox, trees, grass and ferns; 6 tables, 24 chairs and corrected mafia table; ":"Owned skybox; 4 study tables and 16 raised chairs; detailed plant and book props; ")+
-                        "Walk into escape portal; mode menu; 3/5/7/5 notebooks; first-person camera and hidden avatar; hidden return portal; complete easy mode; time attack expiry; return and restore third person.\n"+
+                        "Walk into escape portal; mode menu; 5/7/7/5/5 notebooks; first-person camera and hidden avatar; hidden return portal; complete easy mode; unlimited bright/dark time attack; return and restore third person.\n"+
                         "Escape key input maps to the tested ExitToLobby method; real multiplayer and Baldi chase AI are not implemented.\nEditor Search exception: "+searchError+"\n");
                     Debug.Log("IMMERSIVE_PLAYMODE_PASS");Finish(0);
                 }

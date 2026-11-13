@@ -21,9 +21,9 @@ namespace CampusCommons.StudyImmersive
             public CharacterController body;
             public readonly List<Vector3> route=new List<Vector3>();
             public int next;
-            public float replan,stuckTime;
+            public float replan,stuckTime,chaseMemory;
             public bool pursuing,hasDestination;
-            public Vector3 destination;
+            public Vector3 destination,chaseTarget;
             public AudioSource audio;
             public AudioClip ambient;
             public float ambientWait;
@@ -38,6 +38,7 @@ namespace CampusCommons.StudyImmersive
         readonly List<Material> materials=new List<Material>();
         readonly List<ConstructionBarrier> barriers=new List<ConstructionBarrier>();
         Patrol professor,worker;
+        EscapeCorridorCleaner cleaner;
         GameObject vending;
         readonly List<GameObject> vendingMachines=new List<GameObject>();
         int coins;
@@ -45,9 +46,29 @@ namespace CampusCommons.StudyImmersive
         bool professorQuestion;
         CodeQuestions.Question question;
         public bool BlocksMovement=>professorQuestion || reviewRemaining>0f;
+        public bool IsCleanerPushing => cleaner && cleaner.IsPushing;
+        public bool IsCleanerCarrying(CharacterController actor) => cleaner && cleaner.IsCarrying(actor);
+        public void ReleaseCleanerActors() { if (cleaner) cleaner.Release(); }
+        public void CleanerReleased(CharacterController actor)
+        {
+            foreach (var patrol in new[] { professor, worker })
+            {
+                if (patrol == null || patrol.body != actor) continue;
+                patrol.route.Clear();
+                patrol.next = 0;
+                patrol.replan = 0f;
+                patrol.stuckTime = 0f;
+                patrol.hasDestination = false;
+                patrol.pursuing = false;
+                patrol.chaseMemory = 0f;
+            }
+            if (game && game.monster && game.monster.GetComponent<CharacterController>() == actor)
+                game.monster.CleanerReleased();
+        }
         public bool HasSpeedBoost=>speedRemaining>0f;
         public int Coins=>coins;
         public bool ProfessorQuestionOpen=>professorQuestion;
+        public Vector3 ProfessorFocusPoint=>professor!=null && professor.root?professor.root.transform.position+Vector3.up*1.65f:player.position+player.forward;
         public float ReviewRemaining=>reviewRemaining;
         public int ActiveBarrierCount { get { barriers.RemoveAll(b=>!b);return barriers.Count; } }
         public int PickupCount=>pickups.Count;
@@ -77,6 +98,7 @@ namespace CampusCommons.StudyImmersive
             professorSprite=Resources.Load<Sprite>("EscapePixels/CodingProfessor");
             workerSprite=Resources.Load<Sprite>("EscapePixels/MaintenanceWorker");
             if(!map || !player)return;
+            EscapePlayerFootsteps.Create(game, player, transform);
             usedPositions.Add(player.position);
             if(game.monster)usedPositions.Add(game.monster.transform.position);
             foreach(var p in game.PendingSheetPositions)usedPositions.Add(p);
@@ -84,6 +106,10 @@ namespace CampusCommons.StudyImmersive
             professor=SpawnPatrol("Professor",professorSprite,2.0f,true);
             worker=SpawnPatrol("Maintenance Worker",workerSprite,2.0f,false);
             if(professor?.body && worker?.body)Physics.IgnoreCollision(professor.body,worker.body);
+            cleaner = EscapeCorridorCleaner.Create(game, this, player, doors);
+            if (cleaner)
+                cleaner.RegisterParticipants(professor?.body, worker?.body,
+                    game.monster ? game.monster.GetComponent<CharacterController>() : null);
             var machines=EscapeSpawnPoint.FindAll(EscapeSpawnPoint.Kind.Vending);
             if(machines.Count>0)foreach(var marker in machines)SpawnVending(marker.transform.position,marker.transform.rotation);
             else
@@ -95,7 +121,7 @@ namespace CampusCommons.StudyImmersive
             for(int i=0;i<3;i++)SpawnPickup(EscapeGame.InventoryItem.Empty,true);
             SpawnPickup(EscapeGame.InventoryItem.Padlock,false);
             SpawnPickup(EscapeGame.InventoryItem.ExcuseNote,false);
-            barrierCountdown=Random.Range(18f,28f);
+            barrierCountdown=Random.Range(14f,22f);
         }
         Sprite ItemSprite(EscapeGame.InventoryItem item)
         {
@@ -243,11 +269,11 @@ namespace CampusCommons.StudyImmersive
             var picture=new GameObject("Character sprite");picture.layer=2;picture.transform.SetParent(root.transform,false);picture.transform.localPosition=Vector3.up*.95f;
             CreateBillboard(picture.transform,sprite,height,"Artwork");
             var sound=root.AddComponent<AudioSource>();sound.playOnAwake=false;sound.spatialBlend=1f;
-            sound.rolloffMode=AudioRolloffMode.Linear;sound.minDistance=1.5f;sound.maxDistance=11f;sound.dopplerLevel=0f;sound.volume=.5f;
             bool isProfessor=name=="Professor";
+            sound.rolloffMode=AudioRolloffMode.Linear;sound.minDistance=1.5f;sound.maxDistance=11f;sound.dopplerLevel=0f;sound.volume=isProfessor ? .8f : .5f;
             return new Patrol{root=root,body=body,audio=sound,
                 ambient=Resources.Load<AudioClip>(isProfessor?"EscapeSounds/ProfessorMurmur":"EscapeSounds/WorkerTool"),
-                ambientWait=Random.Range(isProfessor?3f:6f,isProfessor?5f:8f)};
+                ambientWait=Random.Range(isProfessor?1.5f:5f,isProfessor?3f:7f)};
         }
         public void IgnoreMonsterPatrolCollisions(CharacterController monsterBody)
         {
@@ -257,62 +283,98 @@ namespace CampusCommons.StudyImmersive
         }
         void Update()
         {
-            if(!game || !game.IsRunning || game.IsEnded || game.IsExitConfirmOpen)return;
-            float dt=Time.deltaTime;
-            if(speedRemaining>0f)speedRemaining=Mathf.Max(0,speedRemaining-dt);
-            if(professorCooldown>0f)professorCooldown=Mathf.Max(0,professorCooldown-dt);
-            if(reviewRemaining>0f)
+            if (!game || !game.IsRunning || game.IsEnded || game.IsExitConfirmOpen) return;
+            float dt = Time.deltaTime;
+            UpdateTimers(dt);
+            UpdatePatrolAmbient(professor, dt);
+            UpdatePatrolAmbient(worker, dt);
+            if (game.IsAnswering) return;
+
+            UpdatePatrols(dt);
+            UpdateBarrierPlacement(dt);
+        }
+
+        void UpdateTimers(float dt)
+        {
+            if (speedRemaining > 0f) speedRemaining = Mathf.Max(0, speedRemaining - dt);
+            if (professorCooldown > 0f) professorCooldown = Mathf.Max(0, professorCooldown - dt);
+            if (reviewRemaining > 0f)
             {
-                reviewRemaining=Mathf.Max(0,reviewRemaining-dt);
-                if(reviewRemaining<=0f)ReleaseProfessor();
-            }
-            UpdatePatrolAmbient(professor,dt);
-            UpdatePatrolAmbient(worker,dt);
-            if(!game.IsAnswering)
-            {
-                if(!BlocksMovement)
-                {
-                    bool pursuing=professorCooldown<=0f && CanSeePlayer(5f);
-                    if(professor!=null && pursuing && (!professor.pursuing || professor.replan<=dt))
-                    {
-                        professor.route.Clear();professor.next=0;professor.replan=.5f;
-                        professor.destination=player.position;professor.hasDestination=true;
-                        if(!map.FindPath(professor.root.transform.position,professor.destination,professor.route,CanTraverse))ReplanPatrol(professor,false);
-                    }
-                    if(professor!=null)professor.pursuing=pursuing;
-                    MovePatrol(professor,4f,dt);
-                }
-                MovePatrol(worker,3.6f,dt);
-                if(!BlocksMovement && professorCooldown<=0 && CanMeetProfessor())BeginProfessorQuestion();
-                barrierCountdown-=dt;
-                if(barrierCountdown<=0f)
-                {
-                    barrierCountdown=Random.Range(25f,40f);
-                    if(ActiveBarrierCount==0 && worker!=null && worker.root)
-                    {
-                        Vector3 ahead=worker.root.transform.position;
-                        if(worker.next<worker.route.Count)
-                        {
-                            Vector3 direction=worker.route[worker.next]-ahead;direction.y=0;
-                            if(direction.sqrMagnitude>.01f)ahead+=direction.normalized*1.5f;
-                        }
-                        int cell=map.NearestCell(ahead);
-                        if(cell<0 || !TryPlaceSafeBarrier(map.Position(cell)))barrierCountdown=Random.Range(4f,7f);
-                    }
-                }
+                reviewRemaining = Mathf.Max(0, reviewRemaining - dt);
+                if (reviewRemaining <= 0f) ReleaseProfessor();
             }
         }
-        void UpdatePatrolAmbient(Patrol npc,float dt)
+
+        void UpdatePatrols(float dt)
         {
-            if(npc==null || !npc.audio || !npc.ambient)return;
-            npc.ambientWait-=dt;
-            if(npc.ambientWait<=0f)
+            bool professorCarried = professor != null && IsCleanerCarrying(professor.body);
+            if (!BlocksMovement && !professorCarried)
             {
-                var other=npc==professor?worker:professor;
-                if(npc.audio.isPlaying || (other!=null && other.audio && other.audio.isPlaying && Horizontal(npc.root.transform.position,other.root.transform.position)<11f))
-                {npc.ambientWait=1f;return;}
-                npc.audio.pitch=Random.Range(.97f,1.03f);npc.audio.PlayOneShot(npc.ambient,.55f);npc.ambientWait=Random.Range(5.5f,9f);
+                bool visible = professorCooldown <= 0f && CanSeePlayer(12f);
+                if (professor != null)
+                {
+                    professor.chaseMemory = visible ? 8f : Mathf.Max(0f, professor.chaseMemory - dt);
+                    if (visible) professor.chaseTarget = player.position;
+                }
+                bool pursuing = professor != null && professorCooldown <= 0f && professor.chaseMemory > 0f;
+                if (professor != null && pursuing && (!professor.pursuing || professor.replan <= dt))
+                {
+                    professor.route.Clear();
+                    professor.next = 0;
+                    professor.replan = .5f;
+                    professor.destination = professor.chaseTarget;
+                    professor.hasDestination = true;
+                    if (!map.FindPath(professor.root.transform.position, professor.destination, professor.route, CanTraverse))
+                        ReplanPatrol(professor, false);
+                }
+                if (professor != null) professor.pursuing = pursuing;
+                MovePatrol(professor, 4.85f * DifficultySpeed(), dt);
             }
+            if (worker == null || !IsCleanerCarrying(worker.body)) MovePatrol(worker, 4.45f * DifficultySpeed(), dt);
+            if (!BlocksMovement && !professorCarried && !IsCleanerPushing && professorCooldown <= 0 && CanMeetProfessor()) BeginProfessorQuestion();
+        }
+
+        void UpdateBarrierPlacement(float dt)
+        {
+            if (worker != null && IsCleanerCarrying(worker.body)) return;
+            barrierCountdown -= dt;
+            if (!(barrierCountdown <= 0f)) return;
+
+            if (ActiveBarrierCount != 0)
+            {
+                // Recheck soon after the existing barrier expires; still keep only one at a time.
+                barrierCountdown = Random.Range(5f, 8f);
+                return;
+            }
+            barrierCountdown = Random.Range(20f, 30f);
+            if (worker == null || !worker.root) return;
+            Vector3 ahead = worker.root.transform.position;
+            if (worker.next < worker.route.Count)
+            {
+                Vector3 direction = worker.route[worker.next] - ahead;
+                direction.y = 0;
+                if (direction.sqrMagnitude > .01f) ahead += direction.normalized * 1.5f;
+            }
+            int cell = map.NearestCell(ahead);
+            if (cell < 0 || !TryPlaceSafeBarrier(map.Position(cell))) barrierCountdown = Random.Range(4f, 7f);
+        }
+        float DifficultySpeed()=>(game.CurrentMode==EscapeGame.Mode.Medium?1.07f:game.CurrentMode==EscapeGame.Mode.Hard?1.14f:1f)*game.TimeAttackSpeed;
+        void UpdatePatrolAmbient(Patrol npc, float dt)
+        {
+            if (npc == null || !npc.audio || !npc.ambient) return;
+            npc.ambientWait -= dt;
+            if (!(npc.ambientWait <= 0f)) return;
+
+            var other = npc == professor ? worker : professor;
+            if (npc.audio.isPlaying || (other != null && other.audio && other.audio.isPlaying &&
+                Horizontal(npc.root.transform.position, other.root.transform.position) < 11f))
+            {
+                npc.ambientWait = 1f;
+                return;
+            }
+            npc.audio.pitch = Random.Range(.97f, 1.03f);
+            npc.audio.PlayOneShot(npc.ambient, .55f);
+            npc.ambientWait = npc == professor ? Random.Range(2.5f, 4f) : Random.Range(4.5f, 7.5f);
         }
         static float Horizontal(Vector3 a,Vector3 b){a.y=b.y=0;return Vector3.Distance(a,b);}
         bool CanMeetProfessor()=>CanSeePlayer(1.25f);
@@ -326,7 +388,8 @@ namespace CampusCommons.StudyImmersive
             try{Physics.queriesHitBackfaces=true;hits=Physics.RaycastAll(origin,delta.normalized,delta.magnitude,Physics.DefaultRaycastLayers,QueryTriggerInteraction.Ignore);}
             finally{Physics.queriesHitBackfaces=previous;}
             foreach(var hit in hits)
-                if(hit.collider && hit.collider.transform!=player && !hit.collider.transform.IsChildOf(player))return false;
+                if(hit.collider && hit.collider.transform!=player && !hit.collider.transform.IsChildOf(player) &&
+                    hit.collider.transform!=professor.root.transform && !hit.collider.transform.IsChildOf(professor.root.transform))return false;
             return true;
         }
         bool ReplanPatrol(Patrol npc,bool keepDestination)
@@ -496,6 +559,7 @@ namespace CampusCommons.StudyImmersive
             }
             foreach(var machine in vendingMachines)if(machine && NearAndVisible(machine.transform.position+Vector3.up*.8f,requireAim,1.8f))
             {
+                if(game.PowerOut){game.Notice("정전 중에는 자판기를 사용할 수 없습니다.","Vending is unavailable during blackout.");return true;}
                 if(coins<1)game.Notice("동전이 필요합니다.","A coin is required.");
                 else if(game.AddItem(EscapeGame.InventoryItem.Soda)){coins--;game.Notice("캔음료를 뽑았습니다.","Soda acquired.");}
                 else game.Notice("인벤토리가 가득 찼습니다.","Inventory is full.");
@@ -521,7 +585,7 @@ namespace CampusCommons.StudyImmersive
             {
                 Vector3 direction=player.position-professor.root.transform.position;direction.y=0;
                 if(direction.sqrMagnitude<.01f)direction=player.forward;
-                professor.route.Clear();professor.next=0;professor.replan=4f;professor.pursuing=false;
+                professor.route.Clear();professor.next=0;professor.replan=4f;professor.pursuing=false;professor.chaseMemory=0f;
                 professor.destination=player.position+direction.normalized*5f;professor.hasDestination=true;
                 if(!map.FindPath(professor.root.transform.position,professor.destination,professor.route,CanTraverse))ReplanPatrol(professor,false);
             }
@@ -550,6 +614,7 @@ namespace CampusCommons.StudyImmersive
         }
         public void Shutdown()
         {
+            ReleaseCleanerActors();
             foreach(var door in doors)if(door && door.IsLocked)door.Unlock();
             foreach(var barrier in barriers)if(barrier)Destroy(barrier.gameObject);
             barriers.Clear();

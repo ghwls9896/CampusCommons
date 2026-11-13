@@ -19,6 +19,7 @@ namespace CampusCommons.LibraryCharacter
         AudioSource openingAudio;
         AudioClip openingClip,closingClip;
         Collider panel,secondPanel;
+        Mesh correctedHandleFace;
         Vector3 doorwayCenter;
         float doorwayWidth;
         public bool IsOpen=>open;
@@ -31,6 +32,8 @@ namespace CampusCommons.LibraryCharacter
         void Awake()
         {
             if(!hinge)hinge=transform;if(!game)game=FindAnyObjectByType<EscapeGame>();
+            ConfigureInwardRoomSwing();
+            CorrectReverseFaceHandle();
             panel=hinge.GetComponentInChildren<Collider>();if(secondHinge)secondPanel=secondHinge.GetComponentInChildren<Collider>();
             if(panel)
             {
@@ -39,6 +42,67 @@ namespace CampusCommons.LibraryCharacter
                 doorwayWidth=Mathf.Abs(transform.right.x)*bounds.size.x+Mathf.Abs(transform.right.z)*bounds.size.z;
             }
             else{doorwayCenter=transform.position;doorwayWidth=1f;}
+        }
+        // These room doors have their room on the opposite side from the original
+        // swing. Keep corridor gates and doors in other scenes unchanged.
+        void ConfigureInwardRoomSwing()
+        {
+            if (secondHinge || !transform.parent || transform.parent.name != "School Doors") return;
+            switch (name)
+            {
+                case "Classroom Door 01":
+                case "Classroom Door 03":
+                case "Classroom Door 07":
+                case "Classroom Door 08":
+                case "Classroom Door 10":
+                case "Classroom Door 12":
+                case "Classroom Door 19":
+                    openAngle = -Mathf.Abs(openAngle);
+                    break;
+            }
+        }
+        // The two faces use the same image, but the back face is rotated 180°.
+        // Mirror only the handle-height strip so both handles stay on the free edge;
+        // the room label and the rest of the artwork remain readable.
+        void CorrectReverseFaceHandle()
+        {
+            if (secondHinge || !transform.parent || transform.parent.name != "School Doors") return;
+            foreach (var filter in hinge.GetComponentsInChildren<MeshFilter>(true))
+            {
+                if (!filter.name.StartsWith("Door Texture") || Vector3.Dot(filter.transform.right, hinge.right) > -.5f) continue;
+                var renderer = filter.GetComponent<Renderer>();
+                if (!renderer || !renderer.sharedMaterial || renderer.sharedMaterial.name != "Campus Door") continue;
+                float[] edges = { 0f, .36f, .46f, 1f };
+                var vertices = new Vector3[12];
+                var uv = new Vector2[12];
+                var triangles = new int[18];
+                for (int strip = 0; strip < 3; strip++)
+                {
+                    int v = strip * 4, t = strip * 6;
+                    float bottom = edges[strip], top = edges[strip + 1];
+                    vertices[v] = new Vector3(-.5f, bottom - .5f, 0);
+                    vertices[v + 1] = new Vector3(.5f, bottom - .5f, 0);
+                    vertices[v + 2] = new Vector3(-.5f, top - .5f, 0);
+                    vertices[v + 3] = new Vector3(.5f, top - .5f, 0);
+                    float left = strip == 1 ? 1f : 0f, right = 1f - left;
+                    uv[v] = new Vector2(left, bottom); uv[v + 1] = new Vector2(right, bottom);
+                    uv[v + 2] = new Vector2(left, top); uv[v + 3] = new Vector2(right, top);
+                    triangles[t] = v; triangles[t + 1] = v + 3; triangles[t + 2] = v + 1;
+                    triangles[t + 3] = v + 3; triangles[t + 4] = v; triangles[t + 5] = v + 2;
+                }
+                correctedHandleFace = new Mesh { name = "Door face with aligned handles" };
+                correctedHandleFace.vertices = vertices;
+                correctedHandleFace.uv = uv;
+                correctedHandleFace.triangles = triangles;
+                correctedHandleFace.RecalculateNormals();
+                correctedHandleFace.RecalculateBounds();
+                filter.sharedMesh = correctedHandleFace;
+                break;
+            }
+        }
+        void OnDestroy()
+        {
+            if (correctedHandleFace) Destroy(correctedHandleFace);
         }
         void Update()
         {
@@ -70,7 +134,7 @@ namespace CampusCommons.LibraryCharacter
                 closingClip=Resources.Load<AudioClip>("EscapeSounds/KenneyDoorClose");
             }
             var clip=opening?openingClip:closingClip;
-            if(clip){openingAudio.Stop();openingAudio.PlayOneShot(clip,.55f);}
+            if(clip){openingAudio.Stop();openingAudio.PlayOneShot(clip,.45f);}
             if(notifyMonster && game && game.monster)game.monster.HearDoor(doorwayCenter);
         }
         public void RetireExitDesignation()
