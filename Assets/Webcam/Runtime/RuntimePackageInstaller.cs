@@ -108,11 +108,16 @@ namespace CampusCommons.Webcam
             if (!File.Exists(archive) || new FileInfo(archive).Length != m.archiveBytes)
                 throw new InvalidDataException("공부 인식 파일이 누락되거나 손상됐습니다. 게임 파일을 다시 받아 주세요.");
             Directory.CreateDirectory(installBase);
-            string root = Path.Combine(installBase, m.sha256), stage = root + ".installing";
+            // Shorten Windows extraction paths to reduce legacy MAX_PATH failures.
+            // The marker still stores and checks the complete digest.
+            string root = Path.Combine(installBase, m.sha256.Substring(0, 16)), stage = root + ".installing";
             progress?.Invoke(0, "공부 인식 준비 중");
             using (Acquire(root + ".lock", cancel))
             {
                 if (!force && Ready(root, m)) { progress?.Invoke(1, "공부 인식 준비 완료"); return root; }
+                string existingMarker = Path.Combine(root, "ready");
+                if (File.Exists(existingMarker) && !File.ReadAllText(existingMarker).StartsWith(m.sha256 + "\n", StringComparison.Ordinal))
+                    throw new InvalidDataException("공부 인식 패키지 경로가 충돌했습니다.");
                 using (ExclusiveUsage(root))
                 {
                 progress?.Invoke(.01f, "게임 파일 확인 중");

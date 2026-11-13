@@ -12,7 +12,10 @@ try {
     & uv @prepareArgs
     if ($LASTEXITCODE -ne 0) { throw "Runtime preparation failed." }
     $log = Join-Path (Get-Location) ".distribution-work/unity-windows-build.log"
-    & $UnityEditor -batchmode -quit -projectPath (Get-Location).Path -executeMethod CampusCommons.Webcam.Editor.DistributionBuild.Windows -logFile $log
-    if ($LASTEXITCODE -ne 0) { throw "Unity build failed. Check $log" }
+    # Unity on Windows is a GUI executable: wait for it explicitly and inspect its exit code.
+    $unityArgs = @("-batchmode", "-quit", "-projectPath", ('"' + (Get-Location).Path + '"'),
+        "-executeMethod", "CampusCommons.Webcam.Editor.DistributionBuild.Windows", "-logFile", ('"' + $log + '"'))
+    $unity = Start-Process -FilePath $UnityEditor -ArgumentList $unityArgs -WindowStyle Hidden -PassThru -Wait
+    if ($unity.ExitCode -ne 0) { throw "Unity build failed (exit $($unity.ExitCode)). Check $log" }
     Write-Output "Ready: Builds/CampusCommons-windows-x64 (distribute the entire folder)."
 } finally { Pop-Location }
