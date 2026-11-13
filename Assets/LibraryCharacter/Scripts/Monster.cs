@@ -40,7 +40,7 @@ namespace CampusCommons.LibraryCharacter
         readonly List<Collider> panelsToRestore=new List<Collider>();
         const float ChaseStride=.8f;
         const float StepsBeyondLastSeen=5f*ChaseStride;
-        const float CatchDistance=2.5f;
+        const float CatchDistance=2.0f;
         const float MaxSweptDistance=8f;
         Vector3 previousMonsterPosition, previousPlayerPosition;
         bool hasPreviousCapturePositions;
