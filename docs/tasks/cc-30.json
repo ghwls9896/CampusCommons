@@ -1,0 +1,23 @@
+{
+  "id": "cc-30",
+  "title": "교수 질문에서 공결증 사용 안정화",
+  "owner": "ghwls9896",
+  "branch": "codex/cc-30-excuse-fix",
+  "issue": "https://github.com/ghwls9896/CampusCommons/issues/30",
+  "scope": [
+    "Assets/StudyImmersive/Scripts/EscapeSystems/EscapeWorld.cs",
+    "Assets/StudyImmersive/Scripts/EscapeSystems/Editor/CodexExcuseNoteVerification.cs",
+    "Assets/StudyImmersive/Scripts/EscapeSystems/Editor/CodexExcuseNoteVerification.cs.meta",
+    "docs/tasks/cc-30.json",
+    "docs/tasks/cc-30.md"
+  ],
+  "shared_files": [],
+  "depends_on": [
+    "https://github.com/ghwls9896/CampusCommons/pull/27"
+  ],
+  "validation": [
+    "Unity 6000.4.5f1 교수 질문과 복습 중 각 슬롯 공결증 사용, 비어 있거나 다른 아이템인 슬롯 보존",
+    "숫자열과 숫자패드 키, 화면 버튼 처리 검증",
+    "팀 범위 검사"
+  ]
+}
