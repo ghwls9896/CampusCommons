@@ -13,7 +13,6 @@ namespace CampusCommons.StudyImmersive
         const float PursuitStopDistance = 40f;
         const float PursuitRestartDistance = 38f;
         const float FadePerSecond = .5f;
-        const float HeartbeatHoldSeconds = 7f;
         const float StingerRearmSeconds = 10f;
         const float SightingRetrySeconds = .5f;
         const float CryMinInterval = 45f;
@@ -22,14 +21,14 @@ namespace CampusCommons.StudyImmersive
         EscapeGame game;
         Monster monster;
         Transform player;
-        AudioSource ambience, pursuit, cry, stinger, heartbeat;
+        AudioSource ambience, pursuit, cry, stinger;
         AudioClip cryClip, stingerClip;
         SpriteRenderer birdRenderer;
         Sprite originalBird, nightBird;
-        bool pursuitStarted, pursuitPlaying, heartbeatActive;
+        bool pursuitStarted, pursuitPlaying;
         bool previousLook, sawAway, stopped, paused;
         bool stingerArmed = true;
-        float nextCry, nextSightingAttempt, unseenSeconds, stingerUnseenSeconds;
+        float nextCry, nextSightingAttempt, stingerUnseenSeconds;
 
         public AudioClip JumpScare { get; private set; }
         public Texture2D JumpScareImage { get; private set; }
@@ -84,11 +83,6 @@ namespace CampusCommons.StudyImmersive
             stingerClip = Resources.Load<AudioClip>(ResourceFolder + "Stinger");
             stinger.volume = .8f;
 
-            heartbeat = Source("Heartbeat while seen", false);
-            heartbeat.clip = Resources.Load<AudioClip>(ResourceFolder + "Heartbeat");
-            heartbeat.loop = true;
-            heartbeat.volume = 0f;
-
             JumpScare = Resources.Load<AudioClip>(ResourceFolder + "Jumpscare");
             JumpScareImage = Resources.Load<Texture2D>(ResourceFolder + "NightJumpscare");
             nextCry = Time.time + Random.Range(CryMinInterval, CryMaxInterval);
@@ -134,7 +128,6 @@ namespace CampusCommons.StudyImmersive
             if (pursuitStarted && player && monster)
             {
                 UpdatePursuit(Vector3.Distance(player.position, monster.transform.position), Time.deltaTime);
-                UpdateHeartbeat(monster.IsLookingAtPlayer, Time.deltaTime);
                 CheckSighting();
             }
             if (cryClip && cry && Time.time >= nextCry)
@@ -167,43 +160,11 @@ namespace CampusCommons.StudyImmersive
             }
         }
 
-        void UpdateHeartbeat(bool visible, float dt)
-        {
-            if (!heartbeat || !heartbeat.clip) return;
-            float fadeDt = dt;
-            if (visible)
-            {
-                unseenSeconds = 0f;
-                if (!heartbeatActive)
-                {
-                    heartbeat.Stop();
-                    heartbeat.time = 0f;
-                    heartbeat.volume = 0f;
-                    heartbeat.Play();
-                    heartbeatActive = true;
-                }
-            }
-            else if (heartbeatActive)
-            {
-                unseenSeconds += dt;
-                fadeDt = Mathf.Min(dt, Mathf.Max(0f, unseenSeconds - HeartbeatHoldSeconds));
-            }
-            if (!heartbeatActive) return;
-
-            float target = visible || unseenSeconds < HeartbeatHoldSeconds ? 1f : 0f;
-            heartbeat.volume = Mathf.MoveTowards(heartbeat.volume, target, (target > 0f ? dt : fadeDt) * FadePerSecond);
-            if (target == 0f && heartbeat.volume <= 0f)
-            {
-                heartbeat.Stop();
-                heartbeatActive = false;
-            }
-        }
-
         void SetPaused(bool value)
         {
             if (paused == value) return;
             paused = value;
-            foreach (var source in new[] { ambience, pursuit, cry, stinger, heartbeat })
+            foreach (var source in new[] { ambience, pursuit, cry, stinger })
             {
                 if (!source) continue;
                 if (value) source.Pause();
@@ -247,7 +208,7 @@ namespace CampusCommons.StudyImmersive
         {
             if (stopped) return;
             stopped = true;
-            foreach (var source in new[] { ambience, pursuit, cry, stinger, heartbeat })
+            foreach (var source in new[] { ambience, pursuit, cry, stinger })
                 if (source) source.Stop();
         }
 

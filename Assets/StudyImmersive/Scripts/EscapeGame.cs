@@ -109,6 +109,7 @@ namespace CampusCommons.StudyImmersive
         public EscapeWorld World{get;private set;}
         EscapeLighting lighting;
         DarkEscapeAtmosphere darkAtmosphere;
+        MonsterProximityEffect proximityEffect;
         bool blackoutTriggered; GameObject breaker;
         public bool PowerOut=>blackoutTriggered && breaker && lighting && lighting.IsDark;
         public bool IsTimeAttack=>currentMode==Mode.TimeAttack || currentMode==Mode.TimeAttackDark;
@@ -246,6 +247,7 @@ namespace CampusCommons.StudyImmersive
             Physics.SyncTransforms();
             UpdateCamera();
             if (monster) monster.Begin(this, player.transform, mode);
+            if (monster && view) proximityEffect = MonsterProximityEffect.Create(this, monster, player.transform, view);
             World = EscapeWorld.Create(this, player.transform, schoolGrid, doors);
             lighting = EscapeLighting.Create(view);
             if (mode == Mode.Hard || mode == Mode.TimeAttackDark)
@@ -520,6 +522,12 @@ namespace CampusCommons.StudyImmersive
             activeSheet = null;
             ClearNotebooks();
             if (monster) monster.End();
+            if (proximityEffect)
+            {
+                proximityEffect.Shutdown();
+                Destroy(proximityEffect.gameObject);
+                proximityEffect = null;
+            }
             if (jumpAudio) jumpAudio.Stop();
 
             if (darkAtmosphere)

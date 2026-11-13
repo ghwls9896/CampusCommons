@@ -1,6 +1,6 @@
 {
   "id": "cc-26",
-  "title": "탈출맵 청소기 순찰 및 NPC·사운드 후속 작업 공유",
+  "title": "탈출맵 청소기·NPC·몬스터 근접 연출 개선",
   "owner": "ghwls9896",
   "branch": "codex/cc-26-escape-followup",
   "issue": "https://github.com/ghwls9896/CampusCommons/issues/26",
@@ -19,6 +19,7 @@
   "validation": [
     "Unity 6000.4.5f1 컴파일 및 청소기 복도·문·사물함·NPC 동작 검증",
     "python Tools/team/check.py --base origin/main",
-    "공유 씬 변경은 별도 조율 후 검증"
+    "공유 씬 변경은 별도 조율 후 검증",
+    "Unity 6000.4.5f1 밝은/어두운 모드에서 몬스터 근접 효과 및 종료 복구, 3D 소리 설정 검증"
   ]
 }
