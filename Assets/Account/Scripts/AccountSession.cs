@@ -92,6 +92,18 @@ namespace CampusCommons.Account
     Profile=result;Changed?.Invoke();return result;
    }
   }
+  public async Task<T> StudyCallAsync<T>(string expectedUser,object body,CancellationToken ct=default(CancellationToken)) where T:class
+  {
+   if(!IsAuthenticated||UserId!=expectedUser)throw new AccountException(401,"not_signed_in");
+   int g=generation;
+   using(var linked=CancellationTokenSource.CreateLinkedTokenSource(ct,lifetime.Token))
+   {
+    await EnsureFreshAsync(linked.Token);Current(g,linked.Token);
+    if(!IsAuthenticated||UserId!=expectedUser)throw new AccountException(401,"not_signed_in");
+    var result=await transport.SendAsync<T>("POST","/functions/v1/study",body,access,linked.Token);
+    Current(g,linked.Token);return result;
+   }
+  }
   public Task<AccountProfile> ReadProfileAsync(CancellationToken ct=default(CancellationToken))=>ProfileCall(new ReadRequest(),ct);
   public Task<AccountProfile> EnterAsync(string nickname,CancellationToken ct=default(CancellationToken))=>ProfileCall(new ProfileRequest{action="enter",nickname=AccountRules.Nickname(nickname)},ct);
   public async Task SignOutAsync(CancellationToken ct=default(CancellationToken))

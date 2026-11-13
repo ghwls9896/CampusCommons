@@ -25,7 +25,7 @@ namespace CampusCommons.Webcam
             if(FindAnyObjectByType<LobbyStudyWebcam>())return;
             var go=new GameObject("Local study webcam");DontDestroyOnLoad(go);go.AddComponent<LobbyStudyWebcam>();
         }
-        void Awake(){focused=Application.isFocused;SceneManager.sceneLoaded+=SceneLoaded;Scan();}
+        void Awake(){Application.runInBackground=true;focused=Application.isFocused;SceneManager.sceneLoaded+=SceneLoaded;Scan();}
         void SceneLoaded(Scene scene,LoadSceneMode mode){StopStudy();Scan();}
         void Scan(){player=FindAnyObjectByType<Player>();seats=FindObjectsByType<Seat>(FindObjectsSortMode.None);}
         void Update()
@@ -56,7 +56,9 @@ namespace CampusCommons.Webcam
         public void StartStudy()
         {
             if(!StudyRuntimeBootstrap.Ready){message="공부 인식 준비가 끝나면 시작할 수 있습니다.";return;}
-            if(!PreviewReady || !session.Begin(IsAvailable,focused))return;
+            if(!PreviewReady || session.Running || !IsAvailable || !focused)return;
+            if(!StudyRecordService.Instance || !StudyRecordService.Instance.Begin()){message="로그인과 기록 저장 상태를 확인해 주세요.";return;}
+            if(!session.Begin(IsAvailable,focused)){StudyRecordService.Instance.Finish();return;}
             message="모델 준비 중";StartCoroutine(Run(session.Epoch));
         }
         void ReleaseSeat()
@@ -72,7 +74,7 @@ namespace CampusCommons.Webcam
         }
         public void StopStudy()
         {
-            session.Stop();StopAllCoroutines();
+            session.Stop();StudyRecordService.Instance?.Finish();StopAllCoroutines();
             if(request!=null){request.Abort();request.Dispose();request=null;}
             if(cameraTexture){cameraTexture.Stop();Destroy(cameraTexture);cameraTexture=null;}
             local?.Dispose();local=null;message="";
@@ -123,7 +125,7 @@ namespace CampusCommons.Webcam
                     yield return null;continue;
                 }
                 session.FrameSeen(Time.realtimeSinceStartup);
-                float began=Time.realtimeSinceStartup;byte[] bytes;
+                double captured=Time.realtimeSinceStartupAsDouble;float began=Time.realtimeSinceStartup;byte[] bytes;
                 try{bytes=WebcamFrameEncoder.Encode(cameraTexture);}
                 catch(Exception){Fail("카메라 프레임을 읽지 못했습니다.");yield break;}
                 request=new UnityWebRequest(local.Origin+"/api/infer","POST");
@@ -131,14 +133,17 @@ namespace CampusCommons.Webcam
                 request.SetRequestHeader("Content-Type","image/jpeg");request.SetRequestHeader("Origin",local.Origin);
                 request.SetRequestHeader("X-Session-Token",local.Token);
                 yield return request.SendWebRequest();
-                string state=null;
+                string state=null;Decision decision=null;
                 if(request.result==UnityWebRequest.Result.Success){
-                    try{state=DecisionState(request.downloadHandler.text);}catch(Exception){state=null;}
+                    try{state=DecisionState(request.downloadHandler.text);decision=JsonUtility.FromJson<Decision>(request.downloadHandler.text);}catch(Exception){state=null;}
                 }
                 request.Dispose();request=null;
                 if(state==null){Fail("분석 오류입니다. 다시 시작해 주세요.");yield break;}
-                if(!session.Apply(epoch,state))yield break;
-                message="";
+                var records=StudyRecordService.Instance;var scores=decision.probabilities;
+                records.Observe(captured,new double[]{scores.studying,scores.phone,scores.other,scores.away,scores.drowsy});
+                string stable=records.Tracker?.Label;
+                if(stable!=null){if(!session.Apply(epoch,stable))yield break;message="";}
+                else message="분석 중";
                 float wait=1-(Time.realtimeSinceStartup-began);
                 if(wait>0)yield return new WaitForSecondsRealtime(wait);
             }
@@ -156,7 +161,7 @@ namespace CampusCommons.Webcam
         [Serializable] class Config{public string mode;public int interval_ms;}
         [Serializable] class Scores{public float studying,phone,other,away,drowsy;}
         [Serializable] class Decision{public bool ok;public string state,mode;public Scores probabilities;}
-        void OnApplicationFocus(bool value){if(focused==value)return;focused=value;if(!value)StopStudy();else previewAttempted=false;}
+        void OnApplicationFocus(bool value){focused=value;}
         void OnApplicationPause(bool value){if(value)StopStudy();else previewAttempted=false;}
         void OnDisable(){EndStudy();}
         void OnDestroy(){SceneManager.sceneLoaded-=SceneLoaded;StopStudy();}
@@ -170,8 +175,8 @@ namespace CampusCommons.Webcam
                 button=new GUIStyle(GUI.skin.button){font=font,fontSize=18};
             }
             var old=GUI.matrix;GUI.matrix=Matrix4x4.identity;
-            var rect=new Rect(Mathf.Max(8,Screen.width-320),Mathf.Max(80,Screen.height-435),304,415);
-            GUI.Box(rect,GUIContent.none);GUILayout.BeginArea(new Rect(rect.x+14,rect.y+12,276,390));
+            var rect=new Rect(Mathf.Max(8,Screen.width-320),Mathf.Max(80,Screen.height-540),304,520);
+            GUI.Box(rect,GUIContent.none);GUILayout.BeginArea(new Rect(rect.x+14,rect.y+12,276,495));
             GUILayout.Label("공부 인식",text);GUILayout.Space(8);
             var preview=GUILayoutUtility.GetRect(276,146);
             if(PreviewReady)
@@ -183,7 +188,13 @@ namespace CampusCommons.Webcam
                 GUI.matrix=matrix;
             }
             else GUI.Label(preview,"카메라 미리보기",text);
-            GUILayout.Label(Status,text,GUILayout.Height(60));
+            GUILayout.Label(Status,text,GUILayout.Height(46));
+            var records=StudyRecordService.Instance;
+            if(records){
+                GUILayout.Label("이번 공부  "+StudyTime.Clock(records.SessionMilliseconds),text);
+                GUILayout.Label("오늘 누적  "+StudyTime.Clock(records.TodayMilliseconds),text);
+                GUILayout.Label(records.SyncStatus,text,GUILayout.Height(42));
+            }
             GUILayout.BeginHorizontal();
             if(!session.Running)
             {
@@ -195,7 +206,7 @@ namespace CampusCommons.Webcam
             if(GUILayout.Button("종료 · 일어나기",button,GUILayout.Height(38)))EndStudy();
             GUILayout.EndHorizontal();
             if(StudyRuntimeBootstrap.Instance && !StudyRuntimeBootstrap.Instance.Preparing && !session.Running && GUILayout.Button("공부 인식 다시 준비",button)) StudyRuntimeBootstrap.Instance.Retry();
-            GUILayout.Space(10);GUILayout.Label("영상 저장 없음 · 이 PC에서만 처리\n종료하면 카메라를 끄고 일어납니다.",text);
+            GUILayout.Space(10);GUILayout.Label("다른 창에서도 측정합니다 · 영상 저장 없음\n종료하면 카메라를 끄고 일어납니다.",text);
             GUILayout.EndArea();GUI.matrix=old;
         }
     }

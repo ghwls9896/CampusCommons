@@ -15,7 +15,7 @@ public static class StudySessionChecks
         Check(!s.Apply(epoch,"studying"),"Reject late response");
         s.Observe(true,true);Check(!s.Running,"Reseating does not restart");
         Check(s.Begin(true,true),"Restart");s.Observe(true,false);
-        Check(!s.Running,"Focus loss ends capture");
+        Check(s.Running,"Focus loss preserves capture");
         Check(StudySession.LabelFor("away")=="자리비움","Away label");
         Check(StudySession.LabelFor("phone")=="휴대폰 사용중","Phone label");
         Check(StudySession.LabelFor("other")=="다른활동중","Other label");
