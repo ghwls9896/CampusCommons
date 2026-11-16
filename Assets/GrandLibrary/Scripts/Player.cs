@@ -1,4 +1,5 @@
 using UnityEngine;
+using CampusCommons.Account;
 
 namespace CampusCommons.GrandLibrary
 {
@@ -31,7 +32,7 @@ namespace CampusCommons.GrandLibrary
         public bool IsExitConfirmOpen=>exitConfirm;
         public bool IsFirstPerson=>firstPerson;
         public bool CanUseInventory => isActiveAndEnabled && currentSpace == Portal.Space.Library &&
-            !exitConfirm && (avatarUI == null || !avatarUI.IsOpen);
+            !exitConfirm && !AccountGate.LobbyMenuOwnsInput && (avatarUI == null || !avatarUI.IsOpen);
 
         public static Player Create(Transform parent = null)
         {
@@ -137,6 +138,12 @@ namespace CampusCommons.GrandLibrary
         }
         void Update()
         {
+            if (AccountGate.LobbyMenuOwnsInput)
+            {
+                AnimateAvatar(Vector3.zero, false);
+                return;
+            }
+
             // Quiz text input owns C/R/V and movement; Escape still controls room exit.
             var quiz = GetComponent<CampusCommons.Quiz.QuizRoom>();
             if (quiz && quiz.BlocksMovement)

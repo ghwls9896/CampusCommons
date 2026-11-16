@@ -9,6 +9,7 @@ namespace CampusCommons.Account
  {
   public enum Screen { Start,Login,Signup,SignupCode,RecoveryEmail,RecoveryCode,NewPassword,Nickname,World }
   public static AccountGate Instance {get;private set;}
+  public static bool LobbyMenuOwnsInput => Instance && Instance.view && Instance.view.LobbyMenuOpen;
   public AccountSession Session {get;private set;}
   public Screen Page {get;set;}=Screen.Start;
   public bool Ready {get;private set;}
@@ -17,6 +18,7 @@ namespace CampusCommons.Account
   public bool Configured {get;private set;}
   public AccountWorldGate World {get;private set;}
   float refreshAt;int operation;Camera backdrop;
+  AccountView view;
   public event Action<AccountProfile> EntryReady;
   public event Action EntryRevoked;
   [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)] static void ResetStatic(){Instance=null;}
@@ -34,7 +36,7 @@ namespace CampusCommons.Account
    backdrop.allowHDR=false;backdrop.allowMSAA=false;
    var config=Resources.Load<TextAsset>("AccountConnection");AccountConnection connection=null;try{if(config)connection=JsonUtility.FromJson<AccountConnection>(config.text);}catch{}
    connection=connection??new AccountConnection();Configured=connection.IsValid();SetSession(new UnityAccountTransport(this,connection));
-   gameObject.AddComponent<AccountView>();SceneManager.sceneLoaded+=SceneLoaded;
+   view=gameObject.AddComponent<AccountView>();SceneManager.sceneLoaded+=SceneLoaded;
   }
   void SceneLoaded(Scene scene,LoadSceneMode mode){Revoke();Page=Session.IsAuthenticated?Screen.Nickname:Screen.Start;World.Capture();}
   void SetSession(IAccountTransport transport)
@@ -55,7 +57,7 @@ namespace CampusCommons.Account
   {
    var profile=await Session.EnterAsync(nickname);Ready=true;if(backdrop)backdrop.enabled=false;Page=Screen.World;World.Release();EntryReady?.Invoke(profile);
   }
-  public async Task LogoutAsync(){operation++;Busy=false;Revoke();Page=Screen.Start;Message="로그아웃했습니다.";await Session.SignOutAsync();}
+  public async Task LogoutAsync(){operation++;Busy=false;Revoke();Page=Screen.Login;Message="로그아웃했습니다.";await Session.SignOutAsync();}
   public async void Perform(Func<Task> action)
   {
    if(Busy)return;int id=++operation;Busy=true;Message="";

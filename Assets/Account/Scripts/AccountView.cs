@@ -1,12 +1,22 @@
 using System;
 using System.Threading.Tasks;
+using CampusCommons.GrandLibrary;
+using CampusCommons.Webcam;
 using UnityEngine;
 namespace CampusCommons.Account
 {
+ [DefaultExecutionOrder(-100)]
  public sealed class AccountView : MonoBehaviour
  {
   AccountGate gate;string email="",password="",confirm="",code="",nickname="";Vector2 scroll;AccountSession observed;AccountProfile observedProfile;
   GUIStyle heading,label,field,button,notice,choice,panel;AccountGate.Screen last;
+  GUIStyle hudLabel, hudLevel, hudButton;
+  Player localPlayer;
+  bool showLobbyMenu;
+
+  internal bool LobbyMenuOpen => showLobbyMenu && gate.Ready && IsInLobby;
+  bool IsInLobby => localPlayer && localPlayer.isActiveAndEnabled && localPlayer.currentSpace == Portal.Space.Library;
+
   void Awake(){gate=GetComponent<AccountGate>();}
   void Styles()
   {
@@ -18,6 +28,9 @@ namespace CampusCommons.Account
    button=new GUIStyle(GUI.skin.button){font=font,fontSize=17,fixedHeight=38};
    choice=new GUIStyle(button){fontSize=26,fontStyle=FontStyle.Bold,fixedHeight=96};
    panel=new GUIStyle(GUI.skin.box){padding=new RectOffset(24,24,24,24)};
+   hudLabel = new GUIStyle(label) { fontSize = 16, wordWrap = false, clipping = TextClipping.Clip };
+   hudLevel = new GUIStyle(hudLabel) { alignment = TextAnchor.MiddleRight };
+   hudButton = new GUIStyle(button) { fontSize = 15, fixedHeight = 0 };
   }
   void Update()
   {
@@ -25,6 +38,50 @@ namespace CampusCommons.Account
    if(last!=gate.Page){password=confirm=code="";if(gate.Page==AccountGate.Screen.Nickname)nickname=gate.Session.Profile?.nickname??"";last=gate.Page;}
    // The profile arrives after the screen transition during real HTTP requests.
    if(gate.Session.Profile!=observedProfile){observedProfile=gate.Session.Profile;if(gate.Page==AccountGate.Screen.Nickname)nickname=observedProfile?.nickname??"";}
+
+   if (gate.Ready && !localPlayer) localPlayer = FindAnyObjectByType<Player>();
+   if (!gate.Ready || !IsInLobby) showLobbyMenu = false;
+   if (UnityEngine.Input.GetKeyDown(KeyCode.Escape)) HandleLobbyEscape();
+   if (LobbyMenuOpen) ShowPointer();
+  }
+
+  bool PlayerOverlayOpen()
+  {
+   if (!localPlayer) return false;
+   return (localPlayer.TryGetComponent(out LibraryInventoryUI inventory) && inventory.OwnsInput) ||
+       (localPlayer.TryGetComponent(out LibraryAvatarCustomizerUI avatar) && avatar.IsOpen);
+  }
+
+  bool HandleLobbyEscape()
+  {
+   if (!gate.Ready || !IsInLobby) return false;
+   if (showLobbyMenu)
+   {
+    showLobbyMenu = false;
+    return true;
+   }
+
+   // Inventory and avatar customization handle their own Escape input.
+   if (PlayerOverlayOpen() || localPlayer.IsExitConfirmOpen) return false;
+   var records = StudyRecordService.Instance;
+   if (records && records.CloseHistory()) return true;
+
+   showLobbyMenu = true;
+   ShowPointer();
+   return true;
+  }
+
+  static void ShowPointer()
+  {
+   Cursor.lockState = CursorLockMode.None;
+   Cursor.visible = true;
+  }
+
+  void LogoutFromLobbyMenu()
+  {
+   if (!LobbyMenuOpen || gate.Busy) return;
+   showLobbyMenu = false;
+   Run(gate.LogoutAsync);
   }
   void ClearWhenSignedOut(){if(!gate.Session.IsAuthenticated&&!gate.Session.RecoveryPending){password=confirm=code=nickname="";}}
   void OnDestroy(){if(observed!=null)observed.Changed-=ClearWhenSignedOut;}
@@ -38,8 +95,23 @@ namespace CampusCommons.Account
   }
   void OnGUI()
   {
-   Styles();GUI.depth=-10000;
-   if(gate.Ready){DrawHud();return;}
+   Styles();
+   int previousDepth = GUI.depth;
+   GUI.depth = -10000;
+   try
+   {
+    if (gate.Ready)
+    {
+     if (LobbyMenuOpen) DrawLobbyMenu();
+     else if (!PlayerOverlayOpen()) DrawHud();
+    }
+    else DrawSignIn();
+   }
+   finally { GUI.depth = previousDepth; }
+  }
+
+  void DrawSignIn()
+  {
    var old=GUI.color;GUI.color=new Color(.055f,.075f,.085f,.97f);GUI.DrawTexture(new Rect(0,0,Screen.width,Screen.height),Texture2D.whiteTexture);GUI.color=old;
    float width=Mathf.Min(520,Screen.width-28),height=Mathf.Min(gate.Page==AccountGate.Screen.Start?520:720,Screen.height-28);
    GUILayout.BeginArea(new Rect((Screen.width-width)/2,(Screen.height-height)/2,width,height),panel);
@@ -92,11 +164,49 @@ namespace CampusCommons.Account
   void Back(){if(Button("시작 화면으로")){gate.Session.Clear();gate.Page=AccountGate.Screen.Start;}}
   void DrawHud()
   {
-   var p=gate.Session.Profile;if(p==null)return;
-   GUILayout.BeginArea(new Rect(Mathf.Max(8,Screen.width-310),12,298,140),GUI.skin.box);
-   GUILayout.Label(p.nickname+" · Lv. "+p.level+" / 15"+(p.level==15?" · MAX":""),label);
-   GUI.enabled=!gate.Busy;if(Button("로그아웃"))Run(()=>gate.LogoutAsync());GUI.enabled=true;
-   if(!string.IsNullOrEmpty(gate.Message))GUILayout.Label(gate.Message,notice);GUILayout.EndArea();
+   var profile = gate.Session.Profile;
+   if (profile == null) return;
+
+   var records = StudyRecordService.Instance;
+   bool showStudy = records && records.CanShowHistory;
+   float width = Mathf.Min(328, Screen.width - 24);
+   var rect = new Rect(Screen.width - width - 12, 12, width, showStudy ? 64 : 34);
+   GUI.Box(rect, GUIContent.none);
+
+   const float levelWidth = 122;
+   GUI.Label(new Rect(rect.x + 10, rect.y + 4, width - levelWidth - 24, 25), profile.nickname, hudLabel);
+   string level = $"Lv. {profile.level} / 15" + (profile.level == 15 ? " · MAX" : "");
+   GUI.Label(new Rect(rect.xMax - levelWidth - 10, rect.y + 4, levelWidth, 25), level, hudLevel);
+   if (!showStudy) return;
+
+   const float recordButtonWidth = 126;
+   GUI.Label(new Rect(rect.x + 10, rect.y + 34, width - recordButtonWidth - 24, 24),
+       "오늘 공부  " + StudyTime.Clock(records.TodayMilliseconds), hudLabel);
+   if (GUI.Button(new Rect(rect.xMax - recordButtonWidth - 10, rect.y + 34, recordButtonWidth, 24),
+       "공부 기록 (F9)", hudButton))
+    records.ToggleHistory();
+  }
+
+  void DrawLobbyMenu()
+  {
+   var color = GUI.color;
+   GUI.color = new Color(0.035f, 0.045f, 0.055f, 0.6f);
+   GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), Texture2D.whiteTexture);
+   GUI.color = color;
+
+   bool hasNotice = !string.IsNullOrEmpty(gate.Message);
+   float width = Mathf.Min(348, Screen.width - 32);
+   float height = hasNotice ? 246 : 196;
+   GUILayout.BeginArea(new Rect((Screen.width - width) / 2, (Screen.height - height) / 2, width, height), panel);
+   GUILayout.Label("로비 메뉴", heading);
+   if (hasNotice) GUILayout.Label(gate.Message, notice);
+   GUILayout.Space(12);
+   if (Button("계속하기")) showLobbyMenu = false;
+   bool enabled = GUI.enabled;
+   GUI.enabled = enabled && !gate.Busy;
+   if (Button("로그아웃")) LogoutFromLobbyMenu();
+   GUI.enabled = enabled;
+   GUILayout.EndArea();
   }
  }
 }

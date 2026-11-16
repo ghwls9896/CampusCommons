@@ -40,6 +40,7 @@ namespace CampusCommons.Webcam
         public StudyTracker Tracker { get; private set; }
         public string SyncStatus { get; private set; } = "기록 준비 중";
         public bool Available => store != null && !storageFailed;
+        public bool CanShowHistory => owner != null;
         public long SessionMilliseconds { get; private set; }
         public long TodayMilliseconds { get; private set; }
 
@@ -313,15 +314,23 @@ namespace CampusCommons.Webcam
             RefreshToday();
         }
 
-        void ToggleHistory()
+        public void ToggleHistory()
         {
+            if (!CanShowHistory || AccountGate.LobbyMenuOwnsInput) return;
             showHistory = !showHistory;
             if (showHistory) RequestSummary();
         }
 
+        internal bool CloseHistory()
+        {
+            if (!showHistory) return false;
+            showHistory = false;
+            return true;
+        }
+
         void LateUpdate()
         {
-            if (owner == null) return;
+            if (!CanShowHistory || AccountGate.LobbyMenuOwnsInput) return;
             if (Input.GetKeyDown(KeyCode.F9)) ToggleHistory();
             if (showHistory && Application.isFocused)
             {
@@ -332,7 +341,7 @@ namespace CampusCommons.Webcam
 
         void OnGUI()
         {
-            if (owner == null) return;
+            if (!CanShowHistory || !showHistory || AccountGate.LobbyMenuOwnsInput) return;
             if (text == null)
             {
                 font = Resources.Load<Font>("KIT/NotoSansKR");
@@ -342,11 +351,7 @@ namespace CampusCommons.Webcam
 
             var old = GUI.matrix;
             GUI.matrix = Matrix4x4.identity;
-            var header = new Rect(Mathf.Max(8, Screen.width - 320), 12, 304, 64);
-            GUI.Box(header, GUIContent.none);
-            GUI.Label(new Rect(header.x + 10, 16, 284, 26), "오늘 공부  " + StudyTime.Clock(TodayMilliseconds), text);
-            if (GUI.Button(new Rect(header.x + 10, 43, 284, 26), "공부 기록 (F9)", button)) ToggleHistory();
-            if (showHistory) DrawHistory();
+            DrawHistory();
             GUI.matrix = old;
         }
 
