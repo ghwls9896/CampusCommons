@@ -9,6 +9,7 @@ import httpx
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
+from mafia import MafiaRooms, mafia_router
 
 from quiz import (QuizError, generate_quiz, grade_answers, pdf_page_count,
                   select_pdf_range, MAX_SELECTED_PAGES, GradingRequest, validate_grades)
@@ -33,9 +34,11 @@ class Settings:
                    daily_limit=max(1, int(os.getenv('DAILY_GENERATION_LIMIT', '30'))))
 
 
-def create_app(settings: Settings | None = None, generator=generate_quiz, grader=grade_answers) -> FastAPI:
+def create_app(settings: Settings | None = None, generator=generate_quiz, grader=grade_answers,
+               mafia_rooms: MafiaRooms | None = None) -> FastAPI:
     settings = settings or Settings.from_env()
     api = FastAPI(title='Campus Commons PDF Quiz', docs_url=None, redoc_url=None, openapi_url=None)
+    api.include_router(mafia_router(settings.access_token, mafia_rooms or MafiaRooms()))
     busy = False
     budget_day = ''
     used = 0
