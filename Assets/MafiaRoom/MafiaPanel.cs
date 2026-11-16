@@ -300,7 +300,10 @@ namespace CampusCommons.Mafia
             GUILayout.Label(view.round + "라운드  |  " + phase, label);
             scroll = GUILayout.BeginScrollView(scroll, GUILayout.ExpandHeight(true));
             foreach (var line in view.messages)
-                GUILayout.Label(line.speaker + "  " + line.text, label);
+            {
+                var speaker = line.source == "scripted" ? line.speaker + " · 준비 대사" : line.speaker;
+                GUILayout.Label(speaker + "  " + line.text, label);
+            }
             GUILayout.EndScrollView();
             if (view.pending) GUILayout.Label("AI 대사를 생성하고 있습니다.", label);
             if (view.phase == "finished") GUILayout.Label(view.result + "  교수는 " + view.revealed_professor + "입니다.", label);
