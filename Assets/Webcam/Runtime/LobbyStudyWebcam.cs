@@ -10,23 +10,36 @@ namespace CampusCommons.Webcam
 {
     public sealed class LobbyStudyWebcam : MonoBehaviour
     {
+        public static LobbyStudyWebcam Instance { get; private set; }
+
         readonly StudySession session=new StudySession();
         Seat[] seats=Array.Empty<Seat>(); Player player; Seat activeSeat;
         LocalStudyProcess local; WebCamTexture cameraTexture; UnityWebRequest request;
-        bool previewAttempted; bool focused=true; string message=""; float scanAt;
-        GUIStyle text,button; Font font;
+        bool previewAttempted, openingPreview; bool focused=true; string message="", failure; float scanAt;
+        GUIStyle timerText, noticeText, button;
         public bool IsAvailable {get;private set;}
         public bool IsRunning=>session.Running;
         public bool PreviewReady=>cameraTexture && cameraTexture.isPlaying && cameraTexture.width>16;
-        public string Status=>message.Length>0?message:session.Label;
+        public string Status=>failure ?? (message.Length>0?message:session.Label);
+        internal bool ShowsSeatHud => IsAvailable && !AccountGate.LobbyOverlayOwnsInput;
+        bool CanStartFromSeat => IsAvailable && focused && !IsRunning && !openingPreview && StudyRuntimeBootstrap.Ready;
 
+        internal string StatusFor(Player character) =>
+            IsAvailable && IsRunning && character && character == player ? Status : null;
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void ResetInstance() { Instance = null; }
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void Install()
         {
             if(FindAnyObjectByType<LobbyStudyWebcam>())return;
             var go=new GameObject("Local study webcam");DontDestroyOnLoad(go);go.AddComponent<LobbyStudyWebcam>();
         }
-        void Awake(){Application.runInBackground=true;focused=Application.isFocused;SceneManager.sceneLoaded+=SceneLoaded;Scan();}
+        void Awake()
+        {
+            Instance = this;
+            Application.runInBackground=true;focused=Application.isFocused;SceneManager.sceneLoaded+=SceneLoaded;Scan();
+        }
         void SceneLoaded(Scene scene,LoadSceneMode mode){StopStudy();Scan();}
         void Scan(){player=FindAnyObjectByType<Player>();seats=FindObjectsByType<Seat>(FindObjectsSortMode.None);}
         void Update()
@@ -49,17 +62,26 @@ namespace CampusCommons.Webcam
         {
             if(IsAvailable && focused){Cursor.lockState=CursorLockMode.None;Cursor.visible=true;}
         }
-        void OpenPreview()
+        void OpenPreview(bool startAfterPreview = false)
         {
-            previewAttempted=true;StartCoroutine(PreparePreview());
+            previewAttempted = openingPreview = true;
+            failure = null;
+            StartCoroutine(PreparePreview(startAfterPreview));
         }
-        public void ToggleStudy(){if(IsRunning)EndStudy();else StartStudy();}
+        public void ToggleStudy(){if(IsRunning)EndStudy();else StartFromSeat();}
+        void StartFromSeat()
+        {
+            if (!CanStartFromSeat) return;
+            if (PreviewReady) StartStudy();
+            else OpenPreview(startAfterPreview: true);
+        }
         public void StartStudy()
         {
-            if(!StudyRuntimeBootstrap.Ready){message="공부 인식 준비가 끝나면 시작할 수 있습니다.";return;}
+            if(!StudyRuntimeBootstrap.Ready){failure="공부 인식 준비가 끝나면 시작할 수 있습니다.";return;}
             if(!PreviewReady || session.Running || !IsAvailable || !focused)return;
-            if(!StudyRecordService.Instance || !StudyRecordService.Instance.Begin()){message="로그인과 기록 저장 상태를 확인해 주세요.";return;}
+            if(!StudyRecordService.Instance || !StudyRecordService.Instance.Begin()){failure="로그인과 기록 저장 상태를 확인해 주세요.";return;}
             if(!session.Begin(IsAvailable,focused)){StudyRecordService.Instance.Finish();return;}
+            failure = null;
             message="모델 준비 중";StartCoroutine(Run(session.Epoch));
         }
         void ReleaseSeat()
@@ -76,12 +98,13 @@ namespace CampusCommons.Webcam
         public void StopStudy()
         {
             session.Stop();StudyRecordService.Instance?.Finish();StopAllCoroutines();
+            openingPreview = false;
             if(request!=null){request.Abort();request.Dispose();request=null;}
             if(cameraTexture){cameraTexture.Stop();Destroy(cameraTexture);cameraTexture=null;}
-            local?.Dispose();local=null;message="";
+            local?.Dispose();local=null;message="";failure=null;
         }
-        void Fail(string value){StopStudy();previewAttempted=true;message=value;}
-        IEnumerator PreparePreview()
+        void Fail(string value){StopStudy();previewAttempted=true;failure=value;}
+        IEnumerator PreparePreview(bool startAfterPreview)
         {
             message="카메라 권한 확인 중";
             yield return Application.RequestUserAuthorization(UserAuthorization.WebCam);
@@ -94,7 +117,9 @@ namespace CampusCommons.Webcam
                 if(Time.realtimeSinceStartup>deadline){Fail("카메라 영상을 받지 못했습니다.");yield break;}
                 yield return null;
             }
-            message="시작을 누르면 공부 상태를 분석합니다.";
+            openingPreview = false;
+            message = "";
+            if (startAfterPreview) StartStudy();
         }
         IEnumerator Run(int epoch)
         {
@@ -165,50 +190,98 @@ namespace CampusCommons.Webcam
         void OnApplicationFocus(bool value){focused=value;}
         void OnApplicationPause(bool value){if(value)StopStudy();else previewAttempted=false;}
         void OnDisable(){EndStudy();}
-        void OnDestroy(){SceneManager.sceneLoaded-=SceneLoaded;StopStudy();}
+        void OnDestroy()
+        {
+            SceneManager.sceneLoaded -= SceneLoaded;
+            StopStudy();
+            if (Instance == this) Instance = null;
+        }
         void OnApplicationQuit(){StopStudy();}
         void OnGUI()
         {
-            if(!IsAvailable || AccountGate.LobbyOverlayOwnsInput)return;
-            if(text==null){
-                font=Resources.Load<Font>("KIT/NotoSansKR");
-                text=new GUIStyle(GUI.skin.label){font=font,fontSize=18,wordWrap=true};
-                button=new GUIStyle(GUI.skin.button){font=font,fontSize=18};
-            }
-            var old=GUI.matrix;GUI.matrix=Matrix4x4.identity;
-            var rect=new Rect(Mathf.Max(8,Screen.width-320),Mathf.Max(80,Screen.height-540),304,520);
-            GUI.Box(rect,GUIContent.none);GUILayout.BeginArea(new Rect(rect.x+14,rect.y+12,276,495));
-            GUILayout.Label("공부 인식",text);GUILayout.Space(8);
-            var preview=GUILayoutUtility.GetRect(276,146);
-            if(PreviewReady)
+            if (!ShowsSeatHud) return;
+            if (button == null)
             {
-                var matrix=GUI.matrix;
-                GUIUtility.RotateAroundPivot(-cameraTexture.videoRotationAngle,preview.center);
-                if(cameraTexture.videoVerticallyMirrored)GUIUtility.ScaleAroundPivot(new Vector2(1,-1),preview.center);
-                GUI.DrawTexture(preview,cameraTexture,ScaleMode.ScaleToFit);
-                GUI.matrix=matrix;
+                var font = Resources.Load<Font>("KIT/NotoSansKR");
+                timerText = new GUIStyle(GUI.skin.label)
+                {
+                    font = font, fontSize = 17, fontStyle = FontStyle.Bold, wordWrap = true,
+                    alignment = TextAnchor.MiddleCenter, padding = new RectOffset(10, 10, 4, 4)
+                };
+                noticeText = new GUIStyle(timerText) { fontSize = 15, fontStyle = FontStyle.Normal };
+                button = new GUIStyle(GUI.skin.button) { font = font, fontSize = 17 };
             }
-            else GUI.Label(preview,"카메라 미리보기",text);
-            GUILayout.Label(Status,text,GUILayout.Height(46));
-            var records=StudyRecordService.Instance;
-            if(records){
-                GUILayout.Label("이번 공부  "+StudyTime.Clock(records.SessionMilliseconds),text);
-                GUILayout.Label("오늘 누적  "+StudyTime.Clock(records.TodayMilliseconds),text);
-                GUILayout.Label(records.SyncStatus,text,GUILayout.Height(42));
-            }
-            GUILayout.BeginHorizontal();
-            if(!session.Running)
+
+            var matrix = GUI.matrix;
+            GUI.matrix = Matrix4x4.identity;
+            DrawStudyTimers();
+            DrawSeatControls();
+            GUI.matrix = matrix;
+        }
+
+        void DrawStudyTimers()
+        {
+            var records = StudyRecordService.Instance;
+            long elapsed = IsRunning ? records?.SessionMilliseconds ?? 0 : 0;
+            string current = "이번 공부  " + StudyTime.Clock(elapsed);
+            string today = "오늘 누적  " + StudyTime.Clock(records?.TodayMilliseconds ?? 0);
+            var content = new GUIContent(current + "     " + today);
+            float space = Screen.width - 24;
+            if (timerText.CalcSize(content).x > space) content.text = current + "\n" + today;
+            float width = Mathf.Min(Mathf.Ceil(timerText.CalcSize(content).x) + 10, space);
+            float height = Mathf.Max(38, Mathf.Ceil(timerText.CalcHeight(content, width)) + 4);
+            var rect = new Rect((Screen.width - width) / 2, 12, width, height);
+            GUI.Box(rect, GUIContent.none);
+            GUI.Label(rect, content, timerText);
+
+            string notice = failure ?? (player && player.IsFirstPerson ? StatusFor(player) : null);
+            if (notice == null) return;
+            content.text = notice;
+            width = Mathf.Min(460, space);
+            height = Mathf.Max(28, Mathf.Ceil(noticeText.CalcHeight(content, width)));
+            var note = new Rect((Screen.width - width) / 2, rect.yMax + 6, width, height);
+            GUI.Box(note, GUIContent.none);
+            GUI.Label(note, content, noticeText);
+        }
+
+        void DrawSeatControls()
+        {
+            const float margin = 12, gap = 8, buttonHeight = 36;
+            float width = Mathf.Min(288, Screen.width - margin * 2);
+            float height = Mathf.Min(width * 9 / 16, Screen.height * .35f);
+            float x = Screen.width - width - margin;
+            float buttonY = Screen.height - margin - buttonHeight;
+            var preview = new Rect(x, buttonY - gap - height, width, height);
+            GUI.DrawTexture(preview, Texture2D.blackTexture);
+            if (PreviewReady) DrawPreview(preview);
+
+            float buttonWidth = (width - gap) / 2;
+            bool enabled = GUI.enabled;
+            GUI.enabled = enabled && CanStartFromSeat;
+            if (GUI.Button(new Rect(x, buttonY, buttonWidth, buttonHeight), "시작", button)) StartFromSeat();
+            GUI.enabled = enabled;
+            if (GUI.Button(new Rect(x + buttonWidth + gap, buttonY, buttonWidth, buttonHeight), "일어나기", button))
+                EndStudy();
+        }
+
+        void DrawPreview(Rect bounds)
+        {
+            GUI.BeginGroup(bounds);
+            var matrix = GUI.matrix;
+            var rect = new Rect(0, 0, bounds.width, bounds.height);
+            int angle = cameraTexture.videoRotationAngle;
+            GUIUtility.RotateAroundPivot(-angle, rect.center);
+            if (cameraTexture.videoVerticallyMirrored)
+                GUIUtility.ScaleAroundPivot(new Vector2(1, -1), rect.center);
+            if (angle % 180 != 0)
             {
-                GUI.enabled=PreviewReady && StudyRuntimeBootstrap.Ready;
-                if(GUILayout.Button("시작 (F8)",button,GUILayout.Height(38)))StartStudy();
-                GUI.enabled=true;
-                if(!PreviewReady && GUILayout.Button("재시도",button,GUILayout.Height(38))){StopStudy();OpenPreview();}
+                Vector2 center = rect.center;
+                rect.size = new Vector2(bounds.height, bounds.width);
+                rect.center = center;
             }
-            if(GUILayout.Button("종료 · 일어나기",button,GUILayout.Height(38)))EndStudy();
-            GUILayout.EndHorizontal();
-            if(StudyRuntimeBootstrap.Instance && !StudyRuntimeBootstrap.Instance.Preparing && !session.Running && GUILayout.Button("공부 인식 다시 준비",button)) StudyRuntimeBootstrap.Instance.Retry();
-            GUILayout.Space(10);GUILayout.Label("다른 창에서도 측정합니다 · 영상 저장 없음\n종료하면 카메라를 끄고 일어납니다.",text);
-            GUILayout.EndArea();GUI.matrix=old;
+            GUI.DrawTexture(rect, cameraTexture, ScaleMode.ScaleToFit);
+            GUI.matrix = matrix;
+            GUI.EndGroup();
         }
     }
 }

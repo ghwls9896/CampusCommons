@@ -35,14 +35,12 @@ namespace CampusCommons.Account
    button=new GUIStyle(GUI.skin.button){font=font,fontSize=17,fixedHeight=38};
    choice=new GUIStyle(button){fontSize=26,fontStyle=FontStyle.Bold,fixedHeight=96};
    panel=new GUIStyle(GUI.skin.box){padding=new RectOffset(24,24,24,24)};
-   nameplateName = new GUIStyle(label)
+   nameplateName = new GUIStyle
    {
-    alignment = TextAnchor.MiddleCenter, wordWrap = false, fontStyle = FontStyle.Bold
+    font = font, fontSize = 17, fontStyle = FontStyle.Bold, alignment = TextAnchor.MiddleCenter,
+    clipping = TextClipping.Overflow, normal = { textColor = Color.white }
    };
-   nameplateLevel = new GUIStyle(nameplateName)
-   {
-    fontSize = 15, normal = { textColor = new Color(.98f, .79f, .41f) }
-   };
+   nameplateLevel = new GUIStyle(nameplateName) { fontSize = 15 };
    myButton = new GUIStyle(button) { fontStyle = FontStyle.Bold, fontSize = 17, fixedHeight = 0 };
   }
 
@@ -241,16 +239,31 @@ namespace CampusCommons.Account
 
   void DrawNameplate()
   {
+   if (Event.current.type != EventType.Repaint) return;
    var profile = gate.Session.Profile;
    if (profile == null || !localPlayer || !localPlayer.TryGetNameplateScreenPoint(out Vector2 point)) return;
 
-   string name = profile.nickname;
-   float width = Mathf.Clamp(nameplateName.CalcSize(new GUIContent(name)).x + 24, 78, 244);
-   var rect = new Rect(point.x - width / 2, point.y - 44, width, 43);
-   if (rect.yMax <= 0 || rect.xMax <= 0 || rect.x >= Screen.width) return;
-   GUI.Box(rect, GUIContent.none);
-   GUI.Label(new Rect(rect.x, rect.y + 1, width, 19), $"Lv.{profile.level}", nameplateLevel);
-   GUI.Label(new Rect(rect.x, rect.y + 20, width, 20), name, nameplateName);
+   Color tint = GUI.color;
+   Color contentTint = GUI.contentColor;
+   GUI.color = GUI.contentColor = Color.white;
+   float bottom = DrawNameplateLine(profile.nickname, nameplateName, point.x, point.y);
+   bottom = DrawNameplateLine($"Lv.{profile.level}", nameplateLevel, point.x, bottom);
+   var study = LobbyStudyWebcam.Instance;
+   string status = study ? study.StatusFor(localPlayer) : null;
+   if (status != null) DrawNameplateLine(status, nameplateLevel, point.x, bottom);
+   GUI.color = tint;
+   GUI.contentColor = contentTint;
+  }
+
+  static float DrawNameplateLine(string value, GUIStyle style, float center, float bottom)
+  {
+   var content = new GUIContent(value);
+   var size = style.CalcSize(content);
+   float width = Mathf.Ceil(size.x) + 8;
+   float height = Mathf.Ceil(Mathf.Max(size.y, style.lineHeight)) + 4;
+   float top = bottom - height;
+   style.Draw(new Rect(center - width / 2, top, width, height), content, false, false, false, false);
+   return top;
   }
 
   void DimWorld()
@@ -276,6 +289,7 @@ namespace CampusCommons.Account
    GUILayout.EndHorizontal();
 
    GUILayout.Space(10);
+   GUILayout.Label($"Lv.{profile.level}/15", label);
    GUILayout.BeginHorizontal();
    GUILayout.Label("닉네임  " + profile.nickname, label);
    if (!editingNickname && GUILayout.Button("닉네임 수정", button, GUILayout.Width(128)))

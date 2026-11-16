@@ -9,6 +9,7 @@
     "Assets/Account/Scripts/AccountView.cs",
     "Assets/GrandLibrary/Scripts/Player.cs",
     "Assets/Webcam/Runtime/LobbyStudyWebcam.cs",
+    "Assets/Webcam/Runtime/StudyRuntimeBootstrap.cs",
     "Assets/Webcam/Runtime/StudyRecordService.cs",
     "Assets/IntegrationAudit/Editor/LobbyAccountMenuVerification.cs",
     "Assets/IntegrationAudit/Editor/LobbyAccountMenuVerification.cs.meta",
@@ -32,6 +33,7 @@
     "Existing integration checks for account, quiz, webcam, and inventory",
     "Team scope check against origin/main",
     "Direct returning login, saved default nickname on verified signup, in-world rename",
-    "MY with study summary, avatar nameplate projection, first-person visibility"
+    "MY with study summary and level, avatar nameplate projection, first-person visibility",
+    "Seated HUD timers, five activity labels, standing cleanup, and visual layout"
   ]
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -131,10 +132,11 @@ public static class LobbyAccountMenuVerification
             Check(player.TryGetNameplateScreenPoint(out Vector2 nameplate), "Third-person nameplate must follow the avatar");
             Vector3 chest = Camera.main.WorldToScreenPoint(player.transform.position + Vector3.up * 1.35f);
             Check(nameplate.y < Screen.height - chest.y, "Nameplate should appear above the avatar");
+            CheckSeatedStudy(player);
             player.SetFirstPerson(true);
             Check(!player.TryGetNameplateScreenPoint(out _), "First-person view should hide its own nameplate");
 
-            Check(ToggleMy() && OwnsInput() && Cursor.visible && records.TodayMilliseconds == 65000,
+            Check(ToggleMy() && OwnsInput() && Cursor.visible && records.TodayMilliseconds >= 65000,
                 "MY did not open with the account's study summary");
             Check(!player.CanUseInventory, "MY must block other lobby inputs while editing");
             Check(PressEscape() && !OwnsInput(), "Esc must close MY before opening the logout menu");
@@ -150,7 +152,7 @@ public static class LobbyAccountMenuVerification
                 "Logout must clear the account and show the sign-in form");
             Check(!player.enabled && !OwnsInput() && transport.LogoutCount == 1,
                 "Logout did not release the menu and block world input");
-            Debug.Log("LOBBY_ACCOUNT_MENU_PASS: nameplate, MY records, overlay input priority, logout to login");
+            Debug.Log("LOBBY_ACCOUNT_MENU_PASS: nameplate, seated activity and timers, MY records, overlay input priority, logout to login");
             Finish(0);
         }
         catch (Exception error)
@@ -158,6 +160,46 @@ public static class LobbyAccountMenuVerification
             Debug.LogException(error);
             Finish(1);
         }
+    }
+
+    static void CheckSeatedStudy(Player player)
+    {
+        var study = LobbyStudyWebcam.Instance;
+        Check(study, "Lobby study component is missing");
+        study.SendMessage("OnApplicationFocus", false);
+
+        var seat = UnityEngine.Object.FindObjectsByType<Seat>().First(item =>
+            !item.occupant && Mathf.Abs(item.transform.position.x) < 30);
+        var body = player.GetComponent<CharacterController>();
+        body.enabled = false;
+        player.transform.position = seat.transform.position - Vector3.up * .6f;
+        body.enabled = true;
+        Check(player.TrySit(seat), "Could not sit in the actual lobby");
+        typeof(LobbyStudyWebcam).GetMethod("Update", Private).Invoke(study, null);
+        player.RefreshView();
+        Check(study.IsAvailable && player.TryGetNameplateScreenPoint(out _),
+            "The seat should show study controls and project the seated avatar's nameplate");
+
+        var statusFor = typeof(LobbyStudyWebcam).GetMethod("StatusFor", Private);
+        string Status() => (string)statusFor.Invoke(study, new object[] { player });
+        Check(!study.IsRunning && Status() == null, "Sitting must wait for Start");
+
+        var records = StudyRecordService.Instance;
+        var session = (StudySession)typeof(LobbyStudyWebcam).GetField("session", Private).GetValue(study);
+        Check(records.Begin() && session.Begin(true, true), "The fixture session could not start");
+        double captured = Time.realtimeSinceStartupAsDouble;
+        for (int i = 0; i < 5; i++) records.Observe(captured + i, new[] { 1d, 0d, 0d, 0d, 0d });
+        Check(records.SessionMilliseconds > 0 && records.TodayMilliseconds > 65000,
+            "The session and daily timers should include classified study time");
+        foreach (var state in new[] { "studying", "drowsy", "away", "phone", "other" })
+        {
+            Check(session.Apply(session.Epoch, state) && Status() == StudySession.LabelFor(state),
+                "The seated nameplate must show the current classification " + state);
+        }
+
+        study.EndStudy();
+        Check(!seat.occupant && !study.IsAvailable && !study.IsRunning && !study.PreviewReady && Status() == null,
+            "Standing must hide the seat HUD and clear its study state");
     }
 
     static void Finish(int code)
