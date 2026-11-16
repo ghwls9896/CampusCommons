@@ -173,7 +173,10 @@ namespace CampusCommons.TeamProgression
             CurrentUserId = null;
 
             if (changed)
+            {
+                Debug.Log("[CampusCommons] Account level cleared (cosmetic unlocks locked).");
                 Changed?.Invoke();
+            }
         }
 
         void Unbind()
