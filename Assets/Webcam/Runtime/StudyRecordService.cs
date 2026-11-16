@@ -316,7 +316,7 @@ namespace CampusCommons.Webcam
 
         public void ToggleHistory()
         {
-            if (!CanShowHistory || AccountGate.LobbyMenuOwnsInput) return;
+            if (!CanShowHistory || AccountGate.LobbyOverlayOwnsInput) return;
             showHistory = !showHistory;
             if (showHistory) RequestSummary();
         }
@@ -330,8 +330,7 @@ namespace CampusCommons.Webcam
 
         void LateUpdate()
         {
-            if (!CanShowHistory || AccountGate.LobbyMenuOwnsInput) return;
-            if (Input.GetKeyDown(KeyCode.F9)) ToggleHistory();
+            if (!CanShowHistory || AccountGate.LobbyOverlayOwnsInput) return;
             if (showHistory && Application.isFocused)
             {
                 Cursor.lockState = CursorLockMode.None;
@@ -341,33 +340,46 @@ namespace CampusCommons.Webcam
 
         void OnGUI()
         {
-            if (!CanShowHistory || !showHistory || AccountGate.LobbyMenuOwnsInput) return;
-            if (text == null)
-            {
-                font = Resources.Load<Font>("KIT/NotoSansKR");
-                text = new GUIStyle(GUI.skin.label) { font = font, fontSize = 16, wordWrap = true };
-                button = new GUIStyle(GUI.skin.button) { font = font, fontSize = 16 };
-            }
-
-            var old = GUI.matrix;
+            if (!CanShowHistory || !showHistory || AccountGate.LobbyOverlayOwnsInput) return;
+            EnsureStyles();
+            var matrix = GUI.matrix;
             GUI.matrix = Matrix4x4.identity;
-            DrawHistory();
-            GUI.matrix = old;
-        }
-
-        void DrawHistory()
-        {
             float width = Mathf.Min(600, Screen.width - 24);
             float height = Mathf.Min(500, Screen.height - 100);
             var rect = new Rect((Screen.width - width) / 2, 80, width, height);
             GUI.Box(rect, GUIContent.none);
             GUILayout.BeginArea(new Rect(rect.x + 14, rect.y + 12, width - 28, height - 24));
-            GUILayout.Label("내 공부 기록 · 한국시간 기준", text);
-            GUILayout.Label(SyncStatus, text);
+            if (GUILayout.Button("닫기 (F9)", button)) CloseHistory();
+            DrawHistoryContents();
+            GUILayout.EndArea();
+            GUI.matrix = matrix;
+        }
+
+        internal void RefreshHistory() => RequestSummary();
+
+        void EnsureStyles()
+        {
+            if (text != null) return;
+            font = Resources.Load<Font>("KIT/NotoSansKR");
+            text = new GUIStyle(GUI.skin.label) { font = font, fontSize = 16, wordWrap = true };
+            button = new GUIStyle(GUI.skin.button) { font = font, fontSize = 16 };
+        }
+
+        internal void DrawHistoryContents()
+        {
+            EnsureStyles();
+            GUILayout.Label("공부 기록 · 한국시간 기준", text);
+            if (!CanShowHistory)
+            {
+                GUILayout.Label("공부 기록을 불러오는 중입니다.", text);
+                return;
+            }
+
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button("동기화", button)) RetrySync();
-            if (GUILayout.Button("닫기 (F9)", button)) showHistory = false;
+            GUILayout.Label("오늘 공부  " + StudyTime.Clock(TodayMilliseconds), text);
+            if (GUILayout.Button("동기화", button, GUILayout.Width(84))) RetrySync();
             GUILayout.EndHorizontal();
+            GUILayout.Label(SyncStatus, text);
             scroll = GUILayout.BeginScrollView(scroll);
             if (history.Length == 0) GUILayout.Label("동기화된 기록이 없습니다.", text);
             foreach (var row in history)
@@ -379,7 +391,6 @@ namespace CampusCommons.Webcam
                 GUILayout.Space(12);
             }
             GUILayout.EndScrollView();
-            GUILayout.EndArea();
         }
 
         void OnApplicationQuit() { Finish(); Persist(); }

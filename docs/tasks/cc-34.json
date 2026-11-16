@@ -1,6 +1,6 @@
 {
   "id": "cc-34",
-  "title": "로비 Esc 로그아웃 메뉴와 공부 기록 배치",
+  "title": "로비 자동 입장과 머리 위 이름표, MY와 Esc 로그아웃",
   "owner": "HIGHCHOI",
   "branch": "fix/cc-34-lobby-menu",
   "issue": "https://github.com/ghwls9896/CampusCommons/issues/34",
@@ -12,7 +12,14 @@
     "Assets/Webcam/Runtime/StudyRecordService.cs",
     "Assets/IntegrationAudit/Editor/LobbyAccountMenuVerification.cs",
     "Assets/IntegrationAudit/Editor/LobbyAccountMenuVerification.cs.meta",
-    "docs/tasks/cc-34.md"
+    "docs/tasks/cc-34.md",
+    "Assets/Account/Editor/AccountFlowTests.cs",
+    "Assets/IntegrationAudit/Editor/IntegratedQuizFlowTest.cs",
+    "Assets/IntegrationAudit/Editor/LocalIntegrationAudit.cs",
+    "Assets/IntegrationAudit/Editor/StudySyncVerification.cs",
+    "docs/account/SETUP.md",
+    "docs/account/INTEGRATION.md",
+    "docs/study/RECORDS.md"
   ],
   "shared_files": [
     "Assets/GrandLibrary/Scripts/Player.cs"
@@ -23,6 +30,8 @@
   "validation": [
     "Unity 6000.4.5f1 real lobby scene, fixture account menu/logout and owned input regression",
     "Existing integration checks for account, quiz, webcam, and inventory",
-    "Team scope check against origin/main"
+    "Team scope check against origin/main",
+    "Direct returning login, saved default nickname on verified signup, in-world rename",
+    "MY with study summary, avatar nameplate projection, first-person visibility"
   ]
 }

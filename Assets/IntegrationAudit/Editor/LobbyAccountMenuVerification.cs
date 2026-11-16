@@ -66,7 +66,6 @@ public static class LobbyAccountMenuVerification
     static async Task Enter()
     {
         await gate.LoginAsync("lobby@example.test", "fixture-password");
-        await gate.EnterAsync("로비메뉴테스트");
     }
 
     static void Check(bool condition, string reason)
@@ -97,14 +96,16 @@ public static class LobbyAccountMenuVerification
             var view = gate.GetComponent<AccountView>();
             var escape = typeof(AccountView).GetMethod("HandleLobbyEscape", Private);
             var logout = typeof(AccountView).GetMethod("LogoutFromLobbyMenu", Private);
-            var menu = typeof(AccountGate).GetProperty("LobbyMenuOwnsInput");
-            Check(escape != null && logout != null && menu != null, "Lobby Escape menu is missing");
+            var my = typeof(AccountView).GetMethod("ToggleMy", Private);
+            var menu = typeof(AccountGate).GetProperty("LobbyOverlayOwnsInput");
+            Check(escape != null && logout != null && menu != null && my != null, "Lobby menu or MY is missing");
             bool PressEscape() => (bool)escape.Invoke(view, null);
             bool OwnsInput() => (bool)menu.GetValue(null);
+            bool ToggleMy() => (bool)my.Invoke(view, null);
 
             inventory.SetOpen(true);
             Check(inventory.OwnsInput, "Inventory did not acquire lobby input");
-            Check(!PressEscape() && !OwnsInput(), "Esc should be left to the open inventory");
+            Check(!PressEscape() && !ToggleMy() && !OwnsInput(), "The open inventory must keep its input");
             inventory.SetOpen(false);
 
             var records = StudyRecordService.Instance;
@@ -126,7 +127,18 @@ public static class LobbyAccountMenuVerification
                 Check(!PressEscape() && !OwnsInput(), "Lobby menu opened outside the library");
             }
             player.currentSpace = Portal.Space.Library;
+            player.SetFirstPerson(false);
+            Check(player.TryGetNameplateScreenPoint(out Vector2 nameplate), "Third-person nameplate must follow the avatar");
+            Vector3 chest = Camera.main.WorldToScreenPoint(player.transform.position + Vector3.up * 1.35f);
+            Check(nameplate.y < Screen.height - chest.y, "Nameplate should appear above the avatar");
             player.SetFirstPerson(true);
+            Check(!player.TryGetNameplateScreenPoint(out _), "First-person view should hide its own nameplate");
+
+            Check(ToggleMy() && OwnsInput() && Cursor.visible && records.TodayMilliseconds == 65000,
+                "MY did not open with the account's study summary");
+            Check(!player.CanUseInventory, "MY must block other lobby inputs while editing");
+            Check(PressEscape() && !OwnsInput(), "Esc must close MY before opening the logout menu");
+
             Check(PressEscape() && OwnsInput() && gate.Ready, "Esc must open a menu before logout");
             Check(!player.CanUseInventory && Cursor.visible && Cursor.lockState == CursorLockMode.None,
                 "The menu must own lobby input and make its pointer usable");
@@ -138,7 +150,7 @@ public static class LobbyAccountMenuVerification
                 "Logout must clear the account and show the sign-in form");
             Check(!player.enabled && !OwnsInput() && transport.LogoutCount == 1,
                 "Logout did not release the menu and block world input");
-            Debug.Log("LOBBY_ACCOUNT_MENU_PASS: inventory/history priority, lobby only, first-person cursor, logout to login");
+            Debug.Log("LOBBY_ACCOUNT_MENU_PASS: nameplate, MY records, overlay input priority, logout to login");
             Finish(0);
         }
         catch (Exception error)

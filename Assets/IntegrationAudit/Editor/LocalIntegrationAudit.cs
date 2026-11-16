@@ -65,7 +65,7 @@ public static class LocalIntegrationAudit
   var study=UnityEngine.Object.FindAnyObjectByType<LobbyStudyWebcam>();if(study)study.SendMessage("OnApplicationFocus",SessionState.GetString(Key,"")=="live");
   if(begun && SessionState.GetString(Key,"")=="live"){LiveTick(study);return;}
   if(begun)return;begun=true;
-  try{var gate=AccountGate.Instance;gate.Configure(new Fixture());await gate.LoginAsync("audit@example.test","fixture-password");await gate.EnterAsync("통합검사");Debug.Log("INTEGRATION_FIXTURE_AUTH_READY");}
+  try{var gate=AccountGate.Instance;gate.Configure(new Fixture());await gate.LoginAsync("audit@example.test","fixture-password");Debug.Log("INTEGRATION_FIXTURE_AUTH_READY");}
   catch(Exception e){Debug.LogException(e);SessionState.EraseString(Key);EditorApplication.Exit(1);}
  }
 }

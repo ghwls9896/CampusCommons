@@ -11,6 +11,8 @@ namespace CampusCommons.GrandLibrary
         public Portal.Space currentSpace = Portal.Space.Library;
         CharacterController body;
         Transform model, leftLeg, rightLeg, leftArm, rightArm;
+        Transform nameplateHead;
+        Animator[] nameplateAnimators = System.Array.Empty<Animator>();
 
 
         LibraryAvatarMotion avatarMotion;
@@ -32,7 +34,7 @@ namespace CampusCommons.GrandLibrary
         public bool IsExitConfirmOpen=>exitConfirm;
         public bool IsFirstPerson=>firstPerson;
         public bool CanUseInventory => isActiveAndEnabled && currentSpace == Portal.Space.Library &&
-            !exitConfirm && !AccountGate.LobbyMenuOwnsInput && (avatarUI == null || !avatarUI.IsOpen);
+            !exitConfirm && !AccountGate.LobbyOverlayOwnsInput && (avatarUI == null || !avatarUI.IsOpen);
 
         public static Player Create(Transform parent = null)
         {
@@ -86,6 +88,7 @@ namespace CampusCommons.GrandLibrary
                     avatarPrefab, model, false);
 
                 avatar.name = "AvatarVisual";
+                nameplateAnimators = avatar.GetComponentsInChildren<Animator>(true);
 
                 // 걷기·달리기·손 흔들기
                 avatarMotion =
@@ -120,7 +123,7 @@ namespace CampusCommons.GrandLibrary
             var shoes=Material("Shoes",new Color(.78f,.75f,.68f));
             var hair=Material("Hair",new Color(.10f,.08f,.07f));
             Part("Body",PrimitiveType.Capsule,model,new Vector3(0,1.03f,0),new Vector3(.59f,.4f,.4f),shirt);
-            Part("Head",PrimitiveType.Sphere,model,new Vector3(0,1.56f,0),Vector3.one*.43f,skin);
+            nameplateHead=Part("Head",PrimitiveType.Sphere,model,new Vector3(0,1.56f,0),Vector3.one*.43f,skin);
             Part("Hair",PrimitiveType.Sphere,model,new Vector3(0,1.7f,-.025f),new Vector3(.45f,.23f,.43f),hair);
             for (int i=-1;i<=1;i+=2)
             {
@@ -138,7 +141,7 @@ namespace CampusCommons.GrandLibrary
         }
         void Update()
         {
-            if (AccountGate.LobbyMenuOwnsInput)
+            if (AccountGate.LobbyOverlayOwnsInput)
             {
                 AnimateAvatar(Vector3.zero, false);
                 return;
@@ -298,6 +301,35 @@ namespace CampusCommons.GrandLibrary
                     0, 0,
                     -140 + Mathf.Sin(Time.time * 14) * 20)
                 : Quaternion.Euler(swing * .7f, 0, 0);
+        }
+
+        public bool TryGetNameplateScreenPoint(out Vector2 point)
+        {
+            point = default;
+            if (!isActiveAndEnabled || firstPerson || !cameraView || !cameraView.isActiveAndEnabled ||
+                !model || !model.gameObject.activeInHierarchy || !body) return false;
+
+            if (!nameplateHead || !nameplateHead.gameObject.activeInHierarchy)
+            {
+                // Changing gender can switch which avatar rig is active.
+                nameplateHead = null;
+                foreach (var animator in nameplateAnimators)
+                {
+                    if (!animator || !animator.isActiveAndEnabled || !animator.avatar ||
+                        !animator.avatar.isValid || !animator.isHuman) continue;
+                    nameplateHead = animator.GetBoneTransform(HumanBodyBones.Head);
+                    if (nameplateHead) break;
+                }
+            }
+
+            Vector3 anchor = nameplateHead ? nameplateHead.position + Vector3.up * .29f :
+                model.position + Vector3.up * (body.height + .09f);
+            Vector3 projected = cameraView.WorldToScreenPoint(anchor);
+            if (projected.z <= cameraView.nearClipPlane || projected.x < 0 || projected.x > Screen.width ||
+                projected.y < 0 || projected.y > Screen.height) return false;
+
+            point = new Vector2(projected.x, Screen.height - projected.y);
+            return true;
         }
 
         public void ToggleView(){SetFirstPerson(!firstPerson);}

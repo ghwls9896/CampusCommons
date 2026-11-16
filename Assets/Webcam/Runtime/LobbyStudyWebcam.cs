@@ -43,7 +43,7 @@ namespace CampusCommons.Webcam
             }
             IsAvailable=seated;
             if(IsAvailable && focused && !previewAttempted)OpenPreview();
-            if(IsAvailable && focused && !AccountGate.LobbyMenuOwnsInput && Input.GetKeyDown(KeyCode.F8))ToggleStudy();
+            if(IsAvailable && focused && !AccountGate.LobbyOverlayOwnsInput && Input.GetKeyDown(KeyCode.F8))ToggleStudy();
         }
         void LateUpdate()
         {
@@ -169,7 +169,7 @@ namespace CampusCommons.Webcam
         void OnApplicationQuit(){StopStudy();}
         void OnGUI()
         {
-            if(!IsAvailable || AccountGate.LobbyMenuOwnsInput)return;
+            if(!IsAvailable || AccountGate.LobbyOverlayOwnsInput)return;
             if(text==null){
                 font=Resources.Load<Font>("KIT/NotoSansKR");
                 text=new GUIStyle(GUI.skin.label){font=font,fontSize=18,wordWrap=true};

@@ -8,16 +8,23 @@ namespace CampusCommons.Account
  [DefaultExecutionOrder(-100)]
  public sealed class AccountView : MonoBehaviour
  {
-  AccountGate gate;string email="",password="",confirm="",code="",nickname="";Vector2 scroll;AccountSession observed;AccountProfile observedProfile;
-  GUIStyle heading,label,field,button,notice,choice,panel;AccountGate.Screen last;
-  GUIStyle hudLabel, hudLevel, hudButton;
+  enum LobbyPanel { None, Menu, My }
+
+  AccountGate gate;
+  AccountSession observed;
+  AccountGate.Screen last;
+  string email = "", password = "", confirm = "", code = "", nicknameEdit = "";
+  Vector2 scroll;
+  GUIStyle heading, label, field, button, notice, choice, panel;
+  GUIStyle nameplateName, nameplateLevel, myButton;
   Player localPlayer;
-  bool showLobbyMenu;
+  LobbyPanel lobbyPanel;
+  bool editingNickname;
 
-  internal bool LobbyMenuOpen => showLobbyMenu && gate.Ready && IsInLobby;
   bool IsInLobby => localPlayer && localPlayer.isActiveAndEnabled && localPlayer.currentSpace == Portal.Space.Library;
+  internal bool LobbyOverlayOpen => lobbyPanel != LobbyPanel.None && gate.Ready && IsInLobby;
 
-  void Awake(){gate=GetComponent<AccountGate>();}
+  void Awake() { gate = GetComponent<AccountGate>(); }
   void Styles()
   {
    if(heading!=null)return;
@@ -28,21 +35,40 @@ namespace CampusCommons.Account
    button=new GUIStyle(GUI.skin.button){font=font,fontSize=17,fixedHeight=38};
    choice=new GUIStyle(button){fontSize=26,fontStyle=FontStyle.Bold,fixedHeight=96};
    panel=new GUIStyle(GUI.skin.box){padding=new RectOffset(24,24,24,24)};
-   hudLabel = new GUIStyle(label) { fontSize = 16, wordWrap = false, clipping = TextClipping.Clip };
-   hudLevel = new GUIStyle(hudLabel) { alignment = TextAnchor.MiddleRight };
-   hudButton = new GUIStyle(button) { fontSize = 15, fixedHeight = 0 };
+   nameplateName = new GUIStyle(label)
+   {
+    alignment = TextAnchor.MiddleCenter, wordWrap = false, fontStyle = FontStyle.Bold
+   };
+   nameplateLevel = new GUIStyle(nameplateName)
+   {
+    fontSize = 15, normal = { textColor = new Color(.98f, .79f, .41f) }
+   };
+   myButton = new GUIStyle(button) { fontStyle = FontStyle.Bold, fontSize = 17, fixedHeight = 0 };
   }
+
   void Update()
   {
-   if(gate.Session!=observed){if(observed!=null)observed.Changed-=ClearWhenSignedOut;observed=gate.Session;if(observed!=null)observed.Changed+=ClearWhenSignedOut;}
-   if(last!=gate.Page){password=confirm=code="";if(gate.Page==AccountGate.Screen.Nickname)nickname=gate.Session.Profile?.nickname??"";last=gate.Page;}
-   // The profile arrives after the screen transition during real HTTP requests.
-   if(gate.Session.Profile!=observedProfile){observedProfile=gate.Session.Profile;if(gate.Page==AccountGate.Screen.Nickname)nickname=observedProfile?.nickname??"";}
+   if (gate.Session != observed)
+   {
+    if (observed != null) observed.Changed -= ClearWhenSignedOut;
+    observed = gate.Session;
+    if (observed != null) observed.Changed += ClearWhenSignedOut;
+   }
+   if (last != gate.Page)
+   {
+    password = confirm = code = "";
+    last = gate.Page;
+   }
 
    if (gate.Ready && !localPlayer) localPlayer = FindAnyObjectByType<Player>();
-   if (!gate.Ready || !IsInLobby) showLobbyMenu = false;
+   if (!gate.Ready || !IsInLobby) CloseLobbyPanel();
    if (UnityEngine.Input.GetKeyDown(KeyCode.Escape)) HandleLobbyEscape();
-   if (LobbyMenuOpen) ShowPointer();
+   else if (gate.Ready && UnityEngine.Input.GetKeyDown(KeyCode.F9))
+   {
+    if (IsInLobby) ToggleMy();
+    else if (StudyRecordService.Instance) StudyRecordService.Instance.ToggleHistory();
+   }
+   if (LobbyOverlayOpen) ShowPointer();
   }
 
   bool PlayerOverlayOpen()
@@ -55,20 +81,47 @@ namespace CampusCommons.Account
   bool HandleLobbyEscape()
   {
    if (!gate.Ready || !IsInLobby) return false;
-   if (showLobbyMenu)
+   if (LobbyOverlayOpen)
    {
-    showLobbyMenu = false;
+    CloseLobbyPanel();
     return true;
    }
 
-   // Inventory and avatar customization handle their own Escape input.
+   // Let the open inventory, character settings, or records consume Escape first.
    if (PlayerOverlayOpen() || localPlayer.IsExitConfirmOpen) return false;
    var records = StudyRecordService.Instance;
    if (records && records.CloseHistory()) return true;
 
-   showLobbyMenu = true;
+   lobbyPanel = LobbyPanel.Menu;
    ShowPointer();
    return true;
+  }
+
+  bool ToggleMy()
+  {
+   if (!gate.Ready || !IsInLobby || lobbyPanel == LobbyPanel.Menu || PlayerOverlayOpen()) return false;
+   if (lobbyPanel == LobbyPanel.My)
+   {
+    CloseLobbyPanel();
+    return true;
+   }
+
+   lobbyPanel = LobbyPanel.My;
+   var records = StudyRecordService.Instance;
+   if (records)
+   {
+    records.CloseHistory();
+    records.RefreshHistory();
+   }
+   ShowPointer();
+   return true;
+  }
+
+  void CloseLobbyPanel()
+  {
+   lobbyPanel = LobbyPanel.None;
+   editingNickname = false;
+   nicknameEdit = "";
   }
 
   static void ShowPointer()
@@ -79,11 +132,19 @@ namespace CampusCommons.Account
 
   void LogoutFromLobbyMenu()
   {
-   if (!LobbyMenuOpen || gate.Busy) return;
-   showLobbyMenu = false;
+   if (!LobbyOverlayOpen || lobbyPanel != LobbyPanel.Menu || gate.Busy) return;
+   CloseLobbyPanel();
    Run(gate.LogoutAsync);
   }
-  void ClearWhenSignedOut(){if(!gate.Session.IsAuthenticated&&!gate.Session.RecoveryPending){password=confirm=code=nickname="";}}
+
+  void ClearWhenSignedOut()
+  {
+   if (!gate.Session.IsAuthenticated && !gate.Session.RecoveryPending)
+   {
+    password = confirm = code = "";
+    CloseLobbyPanel();
+   }
+  }
   void OnDestroy(){if(observed!=null)observed.Changed-=ClearWhenSignedOut;}
   string Input(string title,string value,bool secret=false){GUILayout.Label(title,label);return secret?GUILayout.PasswordField(value,'●',128,field):GUILayout.TextField(value,254,field);}
   bool Button(string title)=>GUILayout.Button(title,button);
@@ -102,8 +163,16 @@ namespace CampusCommons.Account
    {
     if (gate.Ready)
     {
-     if (LobbyMenuOpen) DrawLobbyMenu();
-     else if (!PlayerOverlayOpen()) DrawHud();
+     if (LobbyOverlayOpen)
+     {
+      if (lobbyPanel == LobbyPanel.My) DrawMy();
+      else DrawLobbyMenu();
+     }
+     else if (!PlayerOverlayOpen())
+     {
+      DrawNameplate();
+      if (IsInLobby) DrawMyButton();
+     }
     }
     else DrawSignIn();
    }
@@ -149,12 +218,15 @@ namespace CampusCommons.Account
     case AccountGate.Screen.NewPassword:
      GUILayout.Label("새 비밀번호",heading);password=Input("새 비밀번호 · 12~128자",password,true);confirm=Input("새 비밀번호 확인",confirm,true);
      if(Button("비밀번호 변경"))PasswordAction(p=>gate.ResetPasswordAsync(p));Back();break;
-    case AccountGate.Screen.Nickname:
-     GUILayout.Label("입장 닉네임",heading);nickname=Input("닉네임 · 2~12자",nickname);
-     if(gate.Session.Profile!=null){var p=gate.Session.Profile;GUILayout.Label("Lv. "+p.level+" / 15",label);}
-     if(Button("로비 입장")){var n=nickname;Run(()=>gate.EnterAsync(n));}
-     if(Button("내 정보 다시 불러오기"))Run(async()=>{await gate.Session.ReadProfileAsync();nickname=gate.Session.Profile.nickname;});
-     if(Button("다른 계정으로 로그인"))Run(()=>gate.LogoutAsync());break;
+    case AccountGate.Screen.LoadingProfile:
+     GUILayout.Label("계정 연결", heading);
+     if (gate.Busy) GUILayout.Label("내 정보를 불러오고 있습니다.", label);
+     else
+     {
+      if (Button("다시 연결")) Run(gate.LoadProfileAndEnterAsync);
+      if (Button("다른 계정으로 로그인")) Run(gate.LogoutAsync);
+     }
+     break;
    }
    GUI.enabled=true;
    if(gate.Busy)GUILayout.Label("처리 중입니다…",label);
@@ -162,37 +234,90 @@ namespace CampusCommons.Account
    GUILayout.EndScrollView();GUILayout.EndArea();
   }
   void Back(){if(Button("시작 화면으로")){gate.Session.Clear();gate.Page=AccountGate.Screen.Start;}}
-  void DrawHud()
+  void DrawMyButton()
   {
-   var profile = gate.Session.Profile;
-   if (profile == null) return;
-
-   var records = StudyRecordService.Instance;
-   bool showStudy = records && records.CanShowHistory;
-   float width = Mathf.Min(328, Screen.width - 24);
-   var rect = new Rect(Screen.width - width - 12, 12, width, showStudy ? 64 : 34);
-   GUI.Box(rect, GUIContent.none);
-
-   const float levelWidth = 122;
-   GUI.Label(new Rect(rect.x + 10, rect.y + 4, width - levelWidth - 24, 25), profile.nickname, hudLabel);
-   string level = $"Lv. {profile.level} / 15" + (profile.level == 15 ? " · MAX" : "");
-   GUI.Label(new Rect(rect.xMax - levelWidth - 10, rect.y + 4, levelWidth, 25), level, hudLevel);
-   if (!showStudy) return;
-
-   const float recordButtonWidth = 126;
-   GUI.Label(new Rect(rect.x + 10, rect.y + 34, width - recordButtonWidth - 24, 24),
-       "오늘 공부  " + StudyTime.Clock(records.TodayMilliseconds), hudLabel);
-   if (GUI.Button(new Rect(rect.xMax - recordButtonWidth - 10, rect.y + 34, recordButtonWidth, 24),
-       "공부 기록 (F9)", hudButton))
-    records.ToggleHistory();
+   if (GUI.Button(new Rect(Screen.width - 82, 12, 70, 34), "MY", myButton)) ToggleMy();
   }
 
-  void DrawLobbyMenu()
+  void DrawNameplate()
+  {
+   var profile = gate.Session.Profile;
+   if (profile == null || !localPlayer || !localPlayer.TryGetNameplateScreenPoint(out Vector2 point)) return;
+
+   string name = profile.nickname;
+   float width = Mathf.Clamp(nameplateName.CalcSize(new GUIContent(name)).x + 24, 78, 244);
+   var rect = new Rect(point.x - width / 2, point.y - 44, width, 43);
+   if (rect.yMax <= 0 || rect.xMax <= 0 || rect.x >= Screen.width) return;
+   GUI.Box(rect, GUIContent.none);
+   GUI.Label(new Rect(rect.x, rect.y + 1, width, 19), $"Lv.{profile.level}", nameplateLevel);
+   GUI.Label(new Rect(rect.x, rect.y + 20, width, 20), name, nameplateName);
+  }
+
+  void DimWorld()
   {
    var color = GUI.color;
    GUI.color = new Color(0.035f, 0.045f, 0.055f, 0.6f);
    GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), Texture2D.whiteTexture);
    GUI.color = color;
+  }
+
+  void DrawMy()
+  {
+   var profile = gate.Session.Profile;
+   if (profile == null) return;
+   DimWorld();
+   float width = Mathf.Min(560, Screen.width - 32);
+   float height = Mathf.Min(540, Screen.height - 32);
+   GUILayout.BeginArea(new Rect((Screen.width - width) / 2, (Screen.height - height) / 2, width, height), panel);
+   GUILayout.BeginHorizontal();
+   GUILayout.Label("MY", heading);
+   GUILayout.FlexibleSpace();
+   if (GUILayout.Button("닫기", button, GUILayout.Width(76))) CloseLobbyPanel();
+   GUILayout.EndHorizontal();
+
+   GUILayout.Space(10);
+   GUILayout.BeginHorizontal();
+   GUILayout.Label("닉네임  " + profile.nickname, label);
+   if (!editingNickname && GUILayout.Button("닉네임 수정", button, GUILayout.Width(128)))
+   {
+    nicknameEdit = profile.nickname;
+    editingNickname = true;
+   }
+   GUILayout.EndHorizontal();
+
+   if (editingNickname) DrawNicknameEditor();
+   if (!string.IsNullOrEmpty(gate.Message)) GUILayout.Label(gate.Message, notice);
+
+   GUILayout.Space(14);
+   var records = StudyRecordService.Instance;
+   if (records) records.DrawHistoryContents();
+   else GUILayout.Label("공부 기록을 불러오는 중입니다.", label);
+   GUILayout.EndArea();
+  }
+
+  void DrawNicknameEditor()
+  {
+   bool enabled = GUI.enabled;
+   GUI.enabled = enabled && !gate.Busy;
+   nicknameEdit = Input("새 닉네임 · 2~12자", nicknameEdit);
+   GUILayout.BeginHorizontal();
+   if (Button("저장"))
+   {
+    string nickname = nicknameEdit;
+    Run(async () =>
+    {
+     await gate.ChangeNicknameAsync(nickname);
+     editingNickname = false;
+    });
+   }
+   if (Button("취소")) editingNickname = false;
+   GUILayout.EndHorizontal();
+   GUI.enabled = enabled;
+  }
+
+  void DrawLobbyMenu()
+  {
+   DimWorld();
 
    bool hasNotice = !string.IsNullOrEmpty(gate.Message);
    float width = Mathf.Min(348, Screen.width - 32);
@@ -201,7 +326,7 @@ namespace CampusCommons.Account
    GUILayout.Label("로비 메뉴", heading);
    if (hasNotice) GUILayout.Label(gate.Message, notice);
    GUILayout.Space(12);
-   if (Button("계속하기")) showLobbyMenu = false;
+   if (Button("계속하기")) CloseLobbyPanel();
    bool enabled = GUI.enabled;
    GUI.enabled = enabled && !gate.Busy;
    if (Button("로그아웃")) LogoutFromLobbyMenu();
