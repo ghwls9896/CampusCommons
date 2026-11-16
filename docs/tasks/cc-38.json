@@ -1,0 +1,11 @@
+{
+  "id": "cc-38",
+  "title": "탈출 학교 씬의 원본 문틀·벽 변경 통합",
+  "owner": "ghwls9896",
+  "branch": "codex/cc-38-escape-scene",
+  "issue": "https://github.com/ghwls9896/CampusCommons/issues/38",
+  "scope": ["Assets/StudyImmersive/Scenes/GrandLibrary_Living.unity", "docs/tasks/cc-38.json", "docs/tasks/cc-38.md"],
+  "shared_files": ["Assets/StudyImmersive/Scenes/GrandLibrary_Living.unity"],
+  "depends_on": [],
+  "validation": ["원본·기준·main 씬 3방향 비교", "Unity 6000.4.5f1 씬 무결성과 로비·탈출맵 검사", "팀 범위 검사"]
+}
