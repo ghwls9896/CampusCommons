@@ -94,3 +94,36 @@ if (unlocks != null && unlocks.IsReady)
 ```
 
 실제 표시 오브젝트는 게임 플레이어의 아바타 자식에 연결해야 하며, `Changed` 발생 시 토글하고 로그아웃 시 반드시 숨긴다. 이 상태는 클라이언트 UI 표시 용도이며 XP 지급/서버 권한 근거가 아니다.
+
+
+## 레벨별 캐릭터 외형 1차 구현 (Unity Play Mode 검증 전)
+
+`Assets/TeamProgression/LevelCosmeticVisuals.cs`는 공유 `Player.cs`를 수정하지 않고, 로그인 완료 시 플레이어의 `Student character` 하위에 표시용 오브젝트를 자동 생성한다. Sunbox 에셋을 직접 참조하지 않아 미설치 환경에서도 컴파일하도록 설계했다. 생성된 재질·망토 메시·파티클은 런타임 오브젝트이며 파일로 저장되지 않는다.
+
+| 레벨 | 초안 표시 |
+|---|---|
+| Lv.1–4 | 기본 캐릭터, 보상 외형 없음 |
+| Lv.5–9 | 발밑 푸른 원형 룬 2개 + 작은 상승 입자 |
+| Lv.10–14 | Lv.5 아우라 + 어깨에서 내려오는 파란 망토, 금색 테두리 |
+| Lv.15 | Lv.10 외형 + 금빛 마법진, 양쪽 날개 윤곽, 금색 입자 |
+
+`LevelCosmeticVisuals` 컴포넌트에는 아우라 색상 Blue/Purple/Green, 망토 색상 Blue/Red/White가 있다. 이 색상은 아직 사용자 계정에 저장되지 않는다. Unity 에디터에서는 **로그인 후에만** `Preview In Editor`를 체크하고 `Preview Level` (1~15)을 바꿔 눈으로 확인할 수 있다. `#if UNITY_EDITOR`로 보호된 로컬 미리보기이므로 실제 계정 XP/레벨, 서버 보상과는 무관하며 빌드에는 포함되지 않는다.
+
+### 실제 테스트 순서 (Windows / Unity 6000.4.5f1)
+
+1. GitHub Desktop에서 담당 브랜치 `feat/cc-32-level-progression`을 유지하고 `Fetch origin` → `Pull origin`한다. 로컬 `ProjectSettings/ProjectSettings.asset`의 `CAMPUS_SUNBOX_AVATAR` 미커밋 설정과 `.git/info/exclude`, Sunbox 원본 에셋은 보존하고, 충돌/overwrite 경고 시 진행을 중단한다.
+2. Unity 에디터에서 `Assets/TeamProgression/LevelCosmeticVisuals.cs`와 `.meta`를 확인하고 컴파일 오류가 없는지 검사한다.
+3. `GrandLibrary_Living` 씬 Play → 실제 계정 로그인 → 닉네임 입력 → 로비 입장. (처음 Lv.1이라면 외형 효과가 없는 것이 정상.)
+4. Play 상태 Hierarchy에서 `Campus level cosmetics` GameObject를 찾아 클릭한다. Inspector의 `Level Cosmetic Visuals`에서 `Preview In Editor`를 체크한다.
+5. `Preview Level` 5 → 10 → 15 순서로 바꾼다. Game 화면/Hierarchy에서 마법진 → 망토 → 금색 날개·파티클을 확인한다. `Aura Palette`, `Cape Palette`로 각각 세 가지 색상도 볼 수 있다.
+6. 체크를 해제하면 실제 서버 계정 레벨에 맞춘 외형으로 돌아간다. 로그아웃하면 효과가 전부 숨겨지는지 확인한다.
+7. Play 종료 후에도 계정 DB·실제 레벨·XP는 바뀌지 않는다. 에디터 인스펙터 미리보기 값은 영구 저장하지 않는다.
+
+### 구현 경계/제약
+
+- 이미지로 만든 레벨별 외형은 컨셉 시안이다. 현재 구현은 Unity 기본 메시·LineRenderer·ParticleSystem만 사용한 **1차 3D 프로토타입**이며 망토 물리·고급 날개 메시·발광 포스트프로세싱은 아직 없다.
+- 망토 높이/길이는 모델마다 다를 수 있으며 착석/성별/헤어 프리셋과의 겹침은 Unity에서 확인 후 수정한다.
+- 모델은 1인칭일 때 기존 Player 설정에 따라 숨겨지므로 외형 효과도 함께 숨겨진다.
+- 이 스크립트와 원본 레벨 규칙은 캐릭터를 꾸미는 **표시 기능**이다. 보상 지급 API는 계속 비활성화 상태이다.
+- 실제 Lv.5/10/15 자동 해금 동작, Sunbox 설치/미설치, 씬 이동, 로그아웃/다른 계정 로그인, 성능은 사용자 Unity 테스트가 남아 있다.
+- 새 코드는 `Assets/TeamProgression/`만 수정한다. Sunbox 원본/복제 에셋이나 프로젝트 공통 설정은 공개 저장소에 추가하지 않는다.
