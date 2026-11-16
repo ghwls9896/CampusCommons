@@ -130,7 +130,7 @@ namespace CampusCommons.TeamProgression
         {
             visualRoot = Child(model, "CC Level Cosmetics");
             lineMaterial = MakeMaterial("CC cosmetic glow lines", Color.white);
-            capeMaterial = MakeMaterial("CC cosmetic cape", CapeColor());
+            capeMaterial = MakeMaterial("CC cosmetic cape", CapeColor(), true);
             BuildAura();
             BuildCape();
             BuildSpecial();
@@ -347,9 +347,12 @@ namespace CampusCommons.TeamProgression
             return go;
         }
 
-        static Material MakeMaterial(string name, Color color)
+        static Material MakeMaterial(string name, Color color, bool cloth = false)
         {
-            Shader shader = Shader.Find("Sprites/Default");
+            // The cape needs an ordinary 3D mesh shader; the glowing lines and
+            // particles use a transparent sprite shader when available.
+            Shader shader = cloth ? Shader.Find("Standard")
+                                  : Shader.Find("Sprites/Default");
             if (shader == null) shader = Shader.Find("Unlit/Color");
             if (shader == null) shader = Shader.Find("Standard");
             var material = new Material(shader) { name = name, color = color };
