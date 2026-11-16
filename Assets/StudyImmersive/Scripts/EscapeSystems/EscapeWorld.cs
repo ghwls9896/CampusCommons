@@ -99,6 +99,7 @@ namespace CampusCommons.StudyImmersive
             workerSprite=Resources.Load<Sprite>("EscapePixels/MaintenanceWorker");
             if(!map || !player)return;
             EscapePlayerFootsteps.Create(game, player, transform);
+            FinalNotebookMusic.Create(game, transform);
             usedPositions.Add(player.position);
             if(game.monster)usedPositions.Add(game.monster.transform.position);
             foreach(var p in game.PendingSheetPositions)usedPositions.Add(p);
