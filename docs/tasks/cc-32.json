@@ -1,0 +1,27 @@
+{
+  "id": "cc-32",
+  "title": "계정 Lv.1~15 경험치 정책 및 5/10/15 외형 해금 준비",
+  "owner": "GongBeak",
+  "branch": "feat/cc-32-level-progression",
+  "issue": "https://github.com/ghwls9896/CampusCommons/issues/32",
+  "scope": [
+    "Assets/TeamProgression/",
+    "Assets/TeamProgression.meta",
+    "docs/tasks/cc-32.json",
+    "docs/LEVEL_PROGRESSION.md"
+  ],
+  "shared_files": [],
+  "depends_on": [
+    "cc-8",
+    "cc-19",
+    "cc-21",
+    "cc-24"
+  ],
+  "validation": [
+    "Lv.1~15 누적 XP 임계값과 승/패/무/탈출 보상 규칙 단위 검증",
+    "기존 계정·공부 기록·퀴즈·탈출룸 공유 파일 변경 없음 확인",
+    "Unity 6000.4.5f1 C# 컴파일 및 Sunbox 미설치/설치 환경 회귀 검사(추후)",
+    "계정/DB API는 HIGHCHOI 및 탈출룸 결과 이벤트는 ghwls9896와 계약 확정 후 별도 구현",
+    "python Tools/team/check.py --base origin/main"
+  ]
+}
