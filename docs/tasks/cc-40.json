@@ -1,0 +1,24 @@
+{
+  "id": "cc-40",
+  "title": "같은 마피아룸의 캐릭터별 AI 대화",
+  "owner": "HIGHCHOI",
+  "branch": "feat/cc-40-mafia-dialogue",
+  "issue": "https://github.com/ghwls9896/CampusCommons/issues/40",
+  "scope": [
+    "Assets/MafiaRoom.meta",
+    "Assets/MafiaRoom/",
+    "backend/app.py",
+    "backend/mafia.py",
+    "backend/modal_mafia.py",
+    "backend/tests/test_mafia.py",
+    "docs/mafia/"
+  ],
+  "shared_files": ["backend/app.py"],
+  "depends_on": [],
+  "validation": [
+    "두 클라이언트의 공개 대화 순서와 숨은 역할 분리 확인",
+    "비인가 요청·중복 호출·AI 한도 초과·Modal 불가 시 대체 대사 확인",
+    "Unity 6000.4.5f1 컴파일 및 마피아룸 진입 테스트",
+    "Modal 실결제 한도 확인 뒤 실제 GPU와 Render 배포 검증"
+  ]
+}
