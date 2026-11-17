@@ -17,7 +17,7 @@ public static class CodexLocalQuizFixture {
  public static void RunMusic(){SessionState.SetBool(K,true);CodexMusicCheck.Run();}
  public static void RunBreaker(){SessionState.SetBool(K,true);CodexBreakerCheck.Run();}
  [InitializeOnLoadMethod]static void Resume(){EditorApplication.delayCall+=()=>{if(SessionState.GetBool(K,false))EditorApplication.update+=Tick;};}
- static async void Tick(){if(!EditorApplication.isPlaying||begun||!AccountGate.Instance)return;begun=true;try{var gate=AccountGate.Instance;gate.Configure(new Fixture());await gate.LoginAsync("audit@example.test","fixture-password");await gate.EnterAsync("검증사용자");Debug.Log("LOCAL_FIXTURE_AUTH_PASS");SessionState.SetBool(K,false);EditorApplication.update-=Tick;}catch(Exception e){Debug.LogException(e);SessionState.SetBool(K,false);EditorApplication.Exit(1);}}
+ static async void Tick(){if(!EditorApplication.isPlaying||begun||!AccountGate.Instance)return;begun=true;try{var gate=AccountGate.Instance;gate.Configure(new Fixture());await gate.LoginAsync("audit@example.test","fixture-password");Debug.Log("LOCAL_FIXTURE_AUTH_PASS");SessionState.SetBool(K,false);EditorApplication.update-=Tick;}catch(Exception e){Debug.LogException(e);SessionState.SetBool(K,false);EditorApplication.Exit(1);}}
 }
 
 
