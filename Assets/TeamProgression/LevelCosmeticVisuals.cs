@@ -41,7 +41,8 @@ namespace CampusCommons.TeamProgression
         Material lineMaterial;
         Material capeMaterial;
         Mesh capeMesh;
-        ParticleSystem auraParticles;
+        readonly List<LineRenderer> auraMotes = new List<LineRenderer>();
+        readonly List<LineRenderer> specialMotes = new List<LineRenderer>();
         readonly List<LineRenderer> auraLines = new List<LineRenderer>();
         float nextRefresh;
         int displayedLevel = -1;
@@ -124,6 +125,11 @@ namespace CampusCommons.TeamProgression
             if (capeRoot != null && capeRoot.activeSelf && capePivot != null)
                 capePivot.localRotation =
                     Quaternion.Euler(Mathf.Sin(Time.time * 1.8f) * 2f, 0f, 0f);
+
+            if (auraRoot != null && auraRoot.activeSelf)
+                AnimateMotes(auraMotes, Time.time, 0.57f, 1.0f);
+            if (specialRoot != null && specialRoot.activeSelf)
+                AnimateMotes(specialMotes, Time.time, 0.85f, 1.5f);
         }
 
         void BuildVisuals(Transform model)
@@ -157,8 +163,8 @@ namespace CampusCommons.TeamProgression
                                    AuraColor(), 0.018f));
             }
 
-            auraParticles = Particles(auraRoot.transform, "Rising blue dust",
-                                      AuraColor(), 22f, 0.60f, 0.045f);
+            BuildMotes(auraRoot.transform, "Rising blue dust",
+                       AuraColor(), 22, auraMotes, auraLines);
             auraRoot.SetActive(false);
         }
 
@@ -280,9 +286,8 @@ namespace CampusCommons.TeamProgression
                         }, gold, 0.026f);
                 }
             }
-            var sparkles = Particles(specialRoot.transform, "Golden sparkles",
-                                     gold, 32f, 0.90f, 0.055f);
-            sparkles.transform.localPosition = new Vector3(0f, 0.25f, 0f);
+            BuildMotes(specialRoot.transform, "Golden sparkles",
+                       gold, 32, specialMotes, null);
             specialRoot.SetActive(false);
         }
 
@@ -304,7 +309,7 @@ namespace CampusCommons.TeamProgression
                 capeMaterial.color = CapeColor();
                 appliedCape = capePalette;
             }
-            if (auraParticles != null && (appliedAura != auraPalette || displayedLevel < 0))
+            if (auraMotes.Count > 0 && (appliedAura != auraPalette || displayedLevel < 0))
             {
                 Color tint = AuraColor();
                 foreach (var line in auraLines)
@@ -313,8 +318,6 @@ namespace CampusCommons.TeamProgression
                     line.startColor = tint;
                     line.endColor = tint;
                 }
-                var main = auraParticles.main;
-                main.startColor = tint;
                 appliedAura = auraPalette;
             }
         }
@@ -393,31 +396,38 @@ namespace CampusCommons.TeamProgression
             if (register != null) register.Add(line);
         }
 
-        ParticleSystem Particles(Transform parent, string name, Color tint,
-                                 float perSecond, float radius, float size)
+        // Moving luminous strokes avoid the team's optional ParticleSystem module.
+        void BuildMotes(Transform root, string name, Color tint, int count,
+                        List<LineRenderer> motes, List<LineRenderer> recolor)
         {
-            var go = Child(parent, name);
-            var system = go.AddComponent<ParticleSystem>();
-            var main = system.main;
-            main.duration = 2f;
-            main.loop = true;
-            main.playOnAwake = true;
-            main.startLifetime = 1.5f;
-            main.startSpeed = 0.35f;
-            main.startSize = size;
-            main.startColor = tint;
-            main.maxParticles = 100;
-            main.simulationSpace = ParticleSystemSimulationSpace.Local;
-            var emission = system.emission;
-            emission.rateOverTime = perSecond;
-            var shape = system.shape;
-            shape.enabled = true;
-            shape.shapeType = ParticleSystemShapeType.Circle;
-            shape.radius = radius;
-            var renderer = system.GetComponent<ParticleSystemRenderer>();
-            renderer.sharedMaterial = lineMaterial;
-            renderer.shadowCastingMode = ShadowCastingMode.Off;
-            return system;
+            var cluster = Child(root, name);
+            for (int i = 0; i < count; ++i)
+            {
+                var line = Line(cluster.transform, "Luminous mote " + i,
+                    new[] { Vector3.zero, new Vector3(0f, 0.065f, 0f) },
+                    tint, 0.025f);
+                motes.Add(line);
+                if (recolor != null) recolor.Add(line);
+            }
+        }
+
+        static void AnimateMotes(List<LineRenderer> motes, float time,
+                                 float radius, float height)
+        {
+            for (int i = 0; i < motes.Count; ++i)
+            {
+                var line = motes[i];
+                if (line == null) continue;
+                float fraction = (i + 0.5f) / motes.Count;
+                float phase = time * (0.42f + (i % 4) * 0.04f) +
+                              fraction * 1.618f;
+                float angle = fraction * Mathf.PI * 2f * 4f + time * 0.5f;
+                float distance = radius * (0.28f + 0.7f * Mathf.Abs(Mathf.Sin(fraction * 14f)));
+                line.transform.localPosition =
+                    new Vector3(Mathf.Cos(angle) * distance,
+                                Mathf.Repeat(phase, height),
+                                Mathf.Sin(angle) * distance);
+            }
         }
 
         void ForgetModel()
@@ -428,7 +438,8 @@ namespace CampusCommons.TeamProgression
             if (lineMaterial != null) Destroy(lineMaterial);
             visualRoot = auraRoot = capeRoot = specialRoot = null;
             auraSpin = magicSpin = capePivot = null;
-            auraParticles = null;
+            auraMotes.Clear();
+            specialMotes.Clear();
             capeMaterial = lineMaterial = null;
             capeMesh = null;
             attachedModel = null;
