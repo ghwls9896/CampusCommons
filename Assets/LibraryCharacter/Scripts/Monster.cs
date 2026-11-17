@@ -239,6 +239,17 @@ namespace CampusCommons.LibraryCharacter
             UpdateVisibilityAndChase(dt);
             UpdateSearchAndInvestigation(dt);
             UpdatePathPlan(dt);
+            // Follow the moving player directly at close range when the route is clear.
+            // Grid waypoints behind a moving target can otherwise cause brief reversals.
+            if (state == Behaviour.Chase && !pastLastSeen && !waitingDoor &&
+                HorizontalDistance(transform.position, target.position) < 3f &&
+                CanSeeTarget() && CanTraverse(transform.position, target.position))
+            {
+                path.Clear();
+                path.Add(target.position);
+                next = 0;
+                repathRemaining = .45f;
+            }
             MoveAlongPath(dt);
             Vector3 monsterNow=transform.position, playerNow=target.position;
             Vector3 monsterBefore=hasPreviousCapturePositions?previousMonsterPosition:monsterNow;

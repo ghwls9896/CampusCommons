@@ -61,7 +61,7 @@ namespace CampusCommons.StudyImmersive
             float target = active ? Mathf.InverseLerp(FarDistance, NearDistance, Vector3.Distance(player.position, monster.transform.position)) : 0f;
             intensity = Mathf.MoveTowards(intensity, target, Time.deltaTime * (target > intensity ? 1.5f : .45f));
             if (!heartbeat || !heartbeat.clip) return;
-            heartbeat.volume = intensity * .55f;
+            heartbeat.volume = intensity * .7f;
             heartbeat.pitch = Mathf.Lerp(.85f, 1.3f, intensity);
             if (intensity > .001f && !heartbeat.isPlaying) heartbeat.Play();
             else if (intensity <= .001f && heartbeat.isPlaying) heartbeat.Stop();
