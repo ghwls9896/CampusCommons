@@ -4,8 +4,24 @@
   "owner": "HIGHCHOI",
   "branch": "chore/cc-42-release-cleanup",
   "issue": "https://github.com/ghwls9896/CampusCommons/issues/42",
-  "scope": ["README.md", "docs/tasks/", "docs/distribution/"],
-  "shared_files": [],
-  "depends_on": ["https://github.com/ghwls9896/CampusCommons/pull/39"],
-  "validation": ["Unity 6000.4.5f1 macOS ARM64 빌드", "동봉 런타임 해시·실행본 기동 확인", "팀 검사 및 문서 링크 확인", "원격 PR·이슈와 정리 대상 대조"]
+  "scope": [
+    "README.md",
+    "docs/tasks/",
+    "docs/distribution/",
+    ".github/workflows/windows-runtime.yml"
+  ],
+  "shared_files": [
+    ".github/workflows/windows-runtime.yml"
+  ],
+  "depends_on": [
+    "https://github.com/ghwls9896/CampusCommons/pull/39"
+  ],
+  "validation": [
+    "Unity 6000.4.5f1 macOS ARM64 빌드",
+    "동봉 런타임 해시·실행본 기동 확인",
+    "팀 검사 및 문서 링크 확인",
+    "원격 PR·이슈와 정리 대상 대조",
+    "Windows runner에서 동봉 모델 오프라인 실제 추론",
+    "Unity Windows x64 빌드 및 PE/패키지 검사"
+  ]
 }
