@@ -1,0 +1,26 @@
+{
+  "id": "cc-36",
+  "title": "탈출룸 추격·음향·고정 배전함 후속 수정",
+  "owner": "ghwls9896",
+  "branch": "codex/cc-36-escape-final",
+  "issue": "https://github.com/ghwls9896/CampusCommons/issues/36",
+  "scope": [
+    "Assets/LibraryCharacter/Scripts/Monster.cs",
+    "Assets/StudyImmersive/Scripts/EscapeGame.cs",
+    "Assets/StudyImmersive/Scripts/EscapeSystems/EscapeWorld.cs",
+    "Assets/StudyImmersive/Scripts/EscapeSystems/MonsterProximityEffect.cs",
+    "Assets/StudyImmersive/Scripts/EscapeSystems/FinalNotebookMusic.cs",
+    "Assets/StudyImmersive/Scripts/EscapeSystems/FinalNotebookMusic.cs.meta",
+    "Assets/StudyImmersive/Scripts/EscapeSystems/WallBreakerVisual.cs",
+    "Assets/StudyImmersive/Scripts/EscapeSystems/WallBreakerVisual.cs.meta",
+    "Assets/StudyImmersive/Scripts/EscapeSystems/Editor/CodexFinalEscapeVerification.cs",
+    "Assets/StudyImmersive/Scripts/EscapeSystems/Editor/CodexFinalEscapeVerification.cs.meta",
+    "Assets/StudyImmersive/Resources/EscapeSounds/FinalChase.mp3",
+    "Assets/StudyImmersive/Resources/EscapeSounds/FinalChase.mp3.meta",
+    "docs/tasks/cc-36.json",
+    "docs/tasks/cc-36.md"
+  ],
+  "shared_files": [],
+  "depends_on": ["https://github.com/ghwls9896/CampusCommons/pull/31"],
+  "validation": ["Unity 6000.4.5f1 추격·벽 차단 및 배전함·음악 자동 검사", "팀 범위 검사"]
+}

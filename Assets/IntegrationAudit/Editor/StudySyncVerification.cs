@@ -86,7 +86,6 @@ public static class StudySyncVerification
                 var account = AccountGate.Instance;
                 account.Configure(transport);
                 await account.LoginAsync("study@example.test", "fixture");
-                await account.EnterAsync("테스트");
             }
             else if (stage == 1 && service.TodayMilliseconds == 1000)
             {
