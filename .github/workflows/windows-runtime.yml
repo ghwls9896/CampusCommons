@@ -17,10 +17,25 @@ jobs:
         with:
           persist-credentials: false
       - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          version: "0.13.9"
+          enable-cache: false
       - name: Prepare and verify Windows runtime offline
         shell: pwsh
         run: |
           uv run --no-project --python 3.12.11 python Tools/distribution/prepare_runtime.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          # QEV's pinned source declares a CUDA index. Replace only the two
+          # matching-version wheels explicitly, then rerun offline relocation.
+          $runtime = ".distribution-work/windows-x64/payload"
+          $python = "$runtime/python/python.exe"
+          uv pip install --python $python --reinstall --no-deps --index-url https://download.pytorch.org/whl/cpu torch==2.10.0+cpu torchvision==0.25.0+cpu
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & $python -I -c "import torch; assert torch.version.cuda is None and torch.__version__.endswith('+cpu'); print('WINDOWS_CPU_WHEEL_PASS', torch.__version__)"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          uv pip freeze --python $python | Set-Content -Encoding utf8 "$runtime/DEPENDENCIES.txt"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          uv run --no-project --python 3.12.11 python Tools/distribution/prepare_runtime.py --reuse-prepared
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:

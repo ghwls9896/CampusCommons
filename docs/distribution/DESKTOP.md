@@ -52,8 +52,8 @@ Intel Mac 및 Windows ARM은 현재 지원 대상으로 검증하지 않았습�
 
 ## Windows CPU 패키지를 GitHub에서 준비하기
 
-`.github/workflows/windows-runtime.yml`은 Windows runner에서 기존 `prepare_runtime.py`를 실행하고, 경로를 옮긴 뒤 네트워크 없이 모델을 실제 실행해 통과한 패키지만 artifact로 올립니다. `UV_TORCH_BACKEND=cpu`로 NVIDIA GPU 라이브러리가 없는 일반 CPU 패키지를 만듭니다. 게임·계정 설정·사용자 영상은 이 workflow에 올리지 않습니다. artifact 보관 기간은 3일입니다.
+`.github/workflows/windows-runtime.yml`은 Windows runner에서 기존 `prepare_runtime.py`를 실행하고, 경로를 옮긴 뒤 네트워크 없이 모델을 실제 실행해 통과한 패키지만 artifact로 올립니다. QEV의 고정 소스가 CUDA index를 지정하므로, 같은 버전의 `torch/torchvision +cpu` wheel을 공식 CPU index에서 명시적으로 설치한 뒤 CUDA 미포함과 오프라인 추론을 다시 확인합니다. 게임·계정 설정·사용자 영상은 이 workflow에 올리지 않습니다. artifact 보관 기간은 3일입니다.
 
 workflow가 main에 통합된 뒤 Actions → Windows study runtime → Run workflow로 실행합니다. 산출물은 런타임 패키지이며 게임 실행 파일 자체가 아닙니다. `manifest.json`과 `payload.zip`을 `Assets/StreamingAssets/StudyRuntime/`에 놓고 Unity Windows 빌드 메뉴를 실행합니다. `DistributionBuild`가 플랫폼·길이·SHA256을 검사합니다. Mac에서 Windows Mono 모듈로 빌드할 수 있지만 Windows의 GUI·카메라 검증을 대신하지 않습니다.
 
-Windows PC에서 전체 빌드 스크립트를 사용할 때 같은 CPU 배포를 재현하려면 PowerShell에서 `$env:UV_TORCH_BACKEND = "cpu"`를 설정한 뒤 기존 명령을 실행합니다. GPU 가속이 필요한 별도 배포는 별도 검증합니다.
+일반 빌드 스크립트는 QEV의 기본 의존성을 사용합니다. CPU 전용 배포를 재현할 때는 위 workflow의 검증된 artifact를 사용하거나 같은 wheel 교체·동결 목록 갱신·재검증 단계를 수행합니다. GPU 가속 배포와 CPU 배포의 용량·실행 성능을 구분합니다.
