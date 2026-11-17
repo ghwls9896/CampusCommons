@@ -7,8 +7,11 @@
   "scope": [
     "Assets/MafiaRoom.meta",
     "Assets/MafiaRoom/",
+    "Tools/mafia-web/",
     "backend/app.py",
     "backend/mafia.py",
+    "backend/mafia_demo.py",
+    "backend/mafia_dialogue.py",
     "backend/modal_mafia.py",
     "backend/tests/test_mafia.py",
     "docs/mafia/"
@@ -19,6 +22,7 @@
     "두 클라이언트의 공개 대화 순서와 숨은 역할 분리 확인",
     "비인가 요청·중복 호출·AI 한도 초과·Modal 불가 시 대체 대사 확인",
     "Unity 6000.4.5f1 컴파일 및 마피아룸 진입 테스트",
+    "Qwen3.5 2B로 브라우저 두 탭의 여섯 인물 대화, 질문, 채팅 및 최종 지목 검증",
     "Modal 실결제 한도 확인 뒤 실제 GPU와 Render 배포 검증"
   ]
 }

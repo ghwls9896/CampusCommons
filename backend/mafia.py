@@ -5,7 +5,6 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 import hmac
 import os
-import re
 import secrets
 import time
 from typing import Literal
@@ -15,14 +14,43 @@ import httpx
 from fastapi import APIRouter, HTTPException, Request, Response
 from pydantic import BaseModel, Field, ValidationError
 
+from mafia_dialogue import FOCUSES, grounded_line
+
+
+@dataclass(frozen=True)
+class Character:
+    name: str
+    trait: str
+    style: str
+    observation: str
+
 
 CHARACTERS = {
-    "A": ("신중하고 존댓말을 쓴다", "나는 밤에 도서관 창가에서 책을 읽었다."),
-    "B": ("직설적이고 짧게 말한다", "나는 밤에 복도를 걸었고 빈 의자가 놓인 것을 봤다."),
-    "C": ("시간 순서대로 침착하게 설명한다", "나는 시계 종소리 뒤에 열람실에 도착했다."),
-    "D": ("조심스럽게 반문한다", "나는 계단 쪽에서 발소리를 들었지만 얼굴은 보지 못했다."),
-    "E": ("차분하게 세부를 확인하는 말투", "나는 불이 꺼지기 전에 책을 반납했다."),
-    "F": ("편한 말투를 쓰고 다른 의견도 확인한다", "나는 입구에서 멈춰 있었고 책 넘기는 소리를 들었다."),
+    "A": Character("한서연", "신중한 기록 담당", "존댓말로 사실과 추측을 구분한다.",
+                   "아홉 시에 자료실 불이 꺼지는 걸 복도 창가에서 봤어요. 문 안은 못 봤어요."),
+    "B": Character("이도윤", "직설적인 체육부원", "짧고 단호한 반말을 쓴다.",
+                   "복도에서 급한 발소리만 들었어. 누군지는 못 봤어."),
+    "C": Character("윤하린", "시간을 따지는 반장", "장소나 순서를 정확히 정리해 말한다.",
+                   "복도 시계가 아홉 시 오 분일 때 열람실 앞에 도착했어요. 그전 일은 몰라요."),
+    "D": Character("고은재", "질문이 많은 토론부원", "확인한 사실을 먼저 말하고 짧게 되묻는다.",
+                   "계단 아래에서 문 닫는 소리를 들었어요. 어느 문인지는 못 봤어요."),
+    "E": Character("정민호", "물건을 잘 기억하는 도서부원", "물건의 위치나 모습에 주목하며 차분히 말한다.",
+                   "불이 꺼지기 전에 책을 반납했어요. 반납대에 파란 노트가 있었어요."),
+    "F": Character("서지우", "분위기를 풀어 주는 막내", "짧고 편한 입말로 말한다.",
+                   "난 입구에 있었어. 책장 넘기는 소리는 났는데, 문 쪽은 잘 안 보였어."),
+}
+CASE_INTRO = "어젯밤 자료실 출입카드가 사라졌습니다. 여섯 사람 중 한 명은 학생으로 위장한 교수입니다."
+DEMO_TESTIMONIES = {
+    "C": "아홉 시 오 분에 열람실 앞에 도착했어요. 아래층 계단 방화문은 그때도 잠겨 있었어요.",
+    "D": "아홉 시 오 분에 아래층 계단 방화문을 지나왔어요. 자료실 쪽으로는 안 갔어요.",
+}
+FOLLOW_UPS = {
+    "A": ("그 시간을 어떻게 확인했나요?", "정확히 어느 쪽에 있었나요?", "직접 확인한 물건이 있나요?", "같은 일을 봤거나 들은 분 있나요?"),
+    "B": ("몇 시였는지 딱 기억나?", "어느 쪽이었어?", "뭐 눈에 띈 물건 없어?", "그거 확인해 줄 사람 있어?"),
+    "C": ("그게 불이 꺼지기 전인가요, 후인가요?", "복도와 열람실 중 어디였나요?", "그 물건은 언제부터 거기 있었나요?", "같은 시간에 다른 분은 어디에 있었나요?"),
+    "D": ("그 시각을 같이 확인한 사람이 있나요?", "지나간 길을 짚어 볼 수 있나요?", "그 물건이 단서가 될 만한 근거가 있나요?", "서로 다르게 기억하는 부분이 있나요?"),
+    "E": ("책을 반납하기 전에도 그랬나요?", "그게 반납대에 가까운 쪽이었나요?", "그 물건의 색이나 위치가 기억나나요?", "같은 물건을 보신 분이 있나요?"),
+    "F": ("혹시 그게 몇 시쯤이었어?", "잠깐, 어디에서 있었던 일이야?", "그때 주변에 뭐가 놓여 있었어?", "다른 사람도 그렇게 기억해?"),
 }
 MAX_ROUNDS = 3
 ROOM_IDLE_SECONDS = 45 * 60
@@ -82,7 +110,7 @@ class ModalDialogue:
                     "Modal-Key": self.key, "Modal-Secret": self.secret,
                 })
                 response.raise_for_status()
-                return response.json().get("utterance")
+                return response.json()
         except (httpx.HTTPError, ValueError, AttributeError) as exc:
             billing_block = isinstance(exc, httpx.HTTPStatusError) and exc.response.status_code in (402, 403, 429)
             self.retry_after = time.monotonic() + (900 if billing_block else 20)
@@ -127,9 +155,12 @@ class Room:
     pending: bool = False
     result: str = ""
 
-    def add_message(self, speaker, text, source):
+    def add_message(self, speaker, text, source, elapsed_ms=None):
         self.sequence += 1
-        self.messages.append({"sequence": self.sequence, "speaker": speaker, "text": text, "source": source})
+        line = {"sequence": self.sequence, "speaker": speaker, "text": text, "source": source}
+        if elapsed_ms is not None:
+            line["elapsed_ms"] = elapsed_ms
+        self.messages.append(line)
 
     def public_state(self, member):
         snapshot = {
@@ -144,8 +175,12 @@ class Room:
 
 
 class MafiaRooms:
-    def __init__(self, dialogue=None):
+    def __init__(self, dialogue=None, *, dialogue_source="modal", demo_professor=None):
         self.dialogue = dialogue or ModalDialogue.from_env()
+        self.dialogue_source = dialogue_source
+        if demo_professor is not None and demo_professor not in CHARACTERS:
+            raise ValueError("Unknown demo professor")
+        self.demo_professor = demo_professor
         self.rooms = {}
         self.tasks = set()
 
@@ -163,7 +198,13 @@ class MafiaRooms:
         while room_id in self.rooms:
             room_id = secrets.token_hex(5).upper()
         token = secrets.token_urlsafe(24)
-        room = Room(room_id, secrets.choice(list(CHARACTERS)), {token: Member(nickname)}, token)
+        professor = self.demo_professor or secrets.choice(list(CHARACTERS))
+        room = Room(room_id, professor, {token: Member(nickname)}, token)
+        if self.demo_professor:
+            # The browser benchmark starts at the first discussion with the
+            # whole cast and a repeatable scenario for model comparisons.
+            room.phase = "day"
+            room.add_message("진행", CASE_INTRO, "system")
         self.rooms[room_id] = room
         return room, token
 
@@ -246,36 +287,51 @@ class MafiaRooms:
             raise HTTPException(422, "현재 남아 있는 학생을 골라 주세요.")
 
     def generate(self, room, speaker, question):
-        personality, memory = CHARACTERS[speaker]
+        character = CHARACTERS[speaker]
         is_professor = speaker == room.professor
+        testimony = DEMO_TESTIMONIES.get(speaker, character.observation) if self.demo_professor else character.observation
+        memory = testimony
+        if is_professor:
+            memory = "공개용 알리바이 " + memory + " 비밀 행동은 자료실 출입카드를 가져갔다."
+            if room.attacked:
+                memory += f" 이번 밤에 {room.attacked}을(를) 공격했다."
         context = {
             "speaker": speaker, "role": "교수" if is_professor else "학생",
-            "personality": personality,
-            "memory": memory + (f" 실제로는 이번 밤에 {room.attacked}을(를) 공격했다. 공개 발언에서 비밀로 한다." if is_professor else ""),
+            "personality": f"{character.name}. {character.trait}. {character.style}",
+            "memory": memory,
             "public_dialogue": [
                 {"speaker": msg["speaker"], "text": msg["text"]} for msg in room.messages
-                if msg["source"] != "player"
-            ][-6:],
+                if msg["source"] in (self.dialogue_source, self.dialogue_source + "_choice", "scripted")
+                or (msg["source"] == "system" and msg["text"].startswith("밤사이"))
+            ][-3:],
             "question": question,
         }
         room.pending = True
-        task = asyncio.create_task(self.finish_turn(room, context, memory))
+        task = asyncio.create_task(self.finish_turn(room, context, testimony))
         self.tasks.add(task)
         task.add_done_callback(self.tasks.discard)
 
     async def finish_turn(self, room, context, fallback):
+        started = time.monotonic()
         try:
-            utterance = await asyncio.wait_for(self.dialogue(context), timeout=40)
-        except (TimeoutError, httpx.HTTPError, ValueError, AttributeError):
-            utterance = None
+            reply = await asyncio.wait_for(self.dialogue(context), timeout=40)
+        except (TimeoutError, httpx.HTTPError, ValueError, AttributeError, KeyError, TypeError):
+            reply = None
         finally:
             room.pending = False
             room.revision += 1
-        if (isinstance(utterance, str) and 0 < len(utterance.strip()) <= 180
-                and not re.search(r"(?:저는|제가|나는|내가|난)\s*교수(?:입니다|예요|에요|다|였)", utterance)):
-            room.add_message(context["speaker"], " ".join(utterance.split()), "modal")
+        elapsed = round((time.monotonic() - started) * 1000)
+        speaker = context["speaker"]
+        speech = reply.get("utterance") if isinstance(reply, dict) else reply
+        focus = reply.get("focus") if isinstance(reply, dict) else None
+        line = grounded_line(fallback, speech)
+        if line:
+            room.add_message(speaker, line, self.dialogue_source, elapsed)
+        elif focus in FOCUSES:
+            line = fallback + " " + FOLLOW_UPS[speaker][FOCUSES.index(focus)]
+            room.add_message(speaker, line, self.dialogue_source + "_choice", elapsed)
         else:
-            room.add_message(context["speaker"], fallback, "scripted")
+            room.add_message(speaker, fallback, "scripted", elapsed)
 
 
 def clean_text(value):

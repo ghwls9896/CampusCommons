@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>교수를 찾아라 | CampusCommons</title>
+  <link rel="stylesheet" href="/assets/style.css">
+  <script defer src="/assets/app.js"></script>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <p class="brand">CAMPUSCOMMONS</p>
+      <div class="masthead">
+        <div>
+          <h1>교수를 찾아라</h1>
+          <p class="intro">여섯 사람의 증언을 듣고, 학생으로 위장한 교수를 찾아보세요.</p>
+        </div>
+        <div class="engine">
+          <span id="engine-status" role="status">모델 확인 중</span>
+          <strong id="engine-model">Qwen3.5 2B</strong>
+        </div>
+      </div>
+    </header>
+    <form id="entry" class="panel entry">
+      <label>닉네임 <input id="nickname" required maxlength="20" value="감사관"></label>
+      <button id="create" class="primary" type="submit" disabled>방 만들기</button>
+      <label>방 코드 <input id="join-code" maxlength="10" autocomplete="off"></label>
+      <button id="join" type="submit" disabled>참가</button>
+    </form>
+    <div id="room-bar" class="panel room-bar" hidden>
+      <div><small>방 코드</small><strong id="room-code"></strong></div>
+      <div><small>참가자</small><span id="members"></span></div>
+      <button id="leave" type="button">나가기</button>
+    </div>
+    <p id="notice" role="alert" hidden></p>
+    <div class="layout">
+      <section class="panel cast">
+        <div class="panel-title"><h2>등장인물</h2><span>6명</span></div>
+        <div id="cast" class="roster" aria-label="질문하거나 지목할 인물"></div>
+      </section>
+      <section class="panel conversation">
+        <div class="panel-title">
+          <div><h2>공개 대화</h2><span id="phase">첫 번째 낮</span></div>
+          <div id="counts" class="counts"></div>
+        </div>
+        <div id="transcript" class="transcript" role="log" aria-label="공개 대화">
+          <p class="empty">방을 만들거나 참가하면 같은 방의 대화가 여기에 표시됩니다.</p>
+        </div>
+        <div id="pending" class="pending" role="status" hidden>AI가 답변을 생성하고 있습니다.</div>
+        <div id="game-actions" class="actions" hidden>
+          <button id="auto" class="primary" type="button">6명 발언 시작</button>
+          <button id="speak" type="button">한 명씩 발언</button>
+          <button id="night" type="button">다음 밤</button>
+          <button id="protect" type="button" hidden>선택한 인물 보호</button>
+          <button id="guess" type="button" class="guess">선택한 인물 지목</button>
+        </div>
+        <form id="composer" class="composer" hidden>
+          <label class="sr-only" for="message">질문 또는 채팅</label>
+          <input id="message" maxlength="160" placeholder="팀 채팅 또는 선택한 인물에게 질문">
+          <button id="question" type="submit">AI에게 질문</button>
+          <button id="chat" type="submit">팀 채팅</button>
+        </form>
+      </section>
+    </div>
+  </main>
+</body>
+</html>

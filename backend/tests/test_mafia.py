@@ -7,6 +7,8 @@ from fastapi.testclient import TestClient
 
 from app import Settings, create_app
 from mafia import MafiaRooms, ModalDialogue
+from mafia_demo import create_demo
+from mafia_dialogue import OllamaDialogue, grounded_line, ollama_payload
 
 
 def join_headers(token=None):
@@ -57,7 +59,7 @@ def test_two_clients_share_dialogue_but_only_speaker_knows_own_clue():
 
     async def model(context):
         calls.append(context)
-        return "복도에 머물렀어요."
+        return "다들 어디에 있었나요?"
 
     client, rooms = make_clients(model)
     with client:
@@ -93,7 +95,7 @@ def test_two_clients_share_dialogue_but_only_speaker_knows_own_clue():
 def test_pending_room_is_not_charged_twice_and_other_users_cannot_read():
     async def model(_):
         await asyncio.sleep(0.2)
-        return "기억을 다시 짚어 볼게요."
+        return "누가 시간을 확인했나요?"
 
     client, _ = make_clients(model)
     with client:
@@ -146,7 +148,7 @@ def test_modal_disabled_and_monthly_limit_prevent_network_calls(monkeypatch):
         assert not sent
         monkeypatch.setenv("MAFIA_MODAL_BUDGET_VERIFIED", "true")
         dialogue = ModalDialogue.from_env(transport=transport)
-        assert await dialogue({"speaker": "B"}) == "B의 대사입니다."
+        assert await dialogue({"speaker": "B"}) == {"utterance": "B의 대사입니다."}
         assert await dialogue({"speaker": "B"}) is None
         assert len(sent) == 1
 
@@ -170,3 +172,67 @@ def test_provider_budget_error_suppresses_further_gpu_calls():
         assert len(attempts) == 1
 
     asyncio.run(test())
+
+
+def test_browser_demo_generates_six_distinct_turns_with_isolated_role_context():
+    turns = []
+
+    async def ollama(request):
+        if request.url.path == "/api/tags":
+            return httpx.Response(200, json={"models": [{"name": "replaceable-model"}]})
+        payload = json.loads(request.content)
+        assert payload["model"] == "replaceable-model"
+        assert payload["format"]["required"] == ["focus", "utterance"]
+        context = json.loads(payload["messages"][1]["content"])
+        turns.append(context)
+        follow_up = "제가 직접 봤는데, 누가 믿어줄래요?" if context["speaker"] == "B" else "누가 시간을 확인했나요?"
+        return httpx.Response(200, json={"message": {"content": json.dumps({"focus": "time", "utterance": follow_up})}})
+
+    model = OllamaDialogue("replaceable-model", transport=httpx.MockTransport(ollama))
+    with TestClient(create_demo(model), base_url="http://localhost") as client:
+        page = client.get("/")
+        assert page.status_code == 200 and "교수를 찾아라" in page.text
+        config = client.get("/demo/config").json()
+        assert config["ready"] and config["model"] == "replaceable-model"
+        assert len({person["name"] for person in config["characters"]}) == 6
+        assert all(set(person) == {"id", "name", "trait"} for person in config["characters"])
+        client.headers["x-quiz-token"] = config["token"]
+        created = client.post("/v1/mafia/rooms", json={"nickname": "감사관"}).json()
+        route = "/v1/mafia/rooms/" + created["room_id"]
+        client.headers["x-mafia-member"] = created["member_token"]
+        opening = state(client, route, {})
+        assert opening["phase"] == "day" and len(opening["alive"]) == 6
+        assert "revealed_professor" not in opening
+        for _ in range(6):
+            assert action(client, route, {}, "speak").status_code == 200
+            final = idle_state(client, route, {})
+        assert [turn["speaker"] for turn in turns] == list("ABCDEF")
+        assert [turn["role"] for turn in turns].count("교수") == 1
+        assert [turn["role"] for turn in turns].count("학생") == 5
+        assert len({turn["memory"] for turn in turns}) == 6
+        assert all("출입카드를 가져갔다" not in t["memory"] for t in turns if t["role"] == "학생")
+        assert len(turns[0]["public_dialogue"]) < len(turns[4]["public_dialogue"])
+        live = [item for item in final["messages"] if item["source"] in ("ollama", "ollama_choice")]
+        assert len(live) == 6 and not final["can_speak"]
+        assert all(isinstance(item["elapsed_ms"], int) for item in live)
+        assert len({item["text"] for item in live}) == 6
+        assert live[1]["source"] == "ollama_choice"
+        assert live[1]["text"].endswith("몇 시였는지 딱 기억나?")
+
+
+def test_generated_follow_up_cannot_replace_testimony_or_disclose_role():
+    clue = "복도에서 급한 발소리만 들었어. 얼굴은 못 봤어."
+    assert grounded_line(clue, "복도에 누가 있었어?") == clue + " 복도에 누가 있었어?"
+    assert grounded_line(clue, "E가 가져가는 걸 직접 봤어.") is None
+    assert grounded_line(clue, "제가 직접 봤는데, 누가 믿어줄래요?") is None
+    assert grounded_line(clue, "내가 가져갔는데 누가 봤어?") is None
+
+
+def test_model_swapping_changes_only_model_id_in_the_shared_prompt():
+    context = {"speaker": "B", "role": "학생", "personality": "짧고 직설적", "memory": "발소리만 들었다",
+               "public_dialogue": [], "question": "교수를 봤나?"}
+    qwen = ollama_payload("qwen3.5:2b-q4_K_M", context)
+    gemma = ollama_payload("gemma4:e2b-it-q4_K_M", context)
+    assert qwen["model"] != gemma["model"]
+    assert qwen["messages"] == gemma["messages"]
+    assert qwen["format"] == gemma["format"]
