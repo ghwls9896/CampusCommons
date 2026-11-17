@@ -1,0 +1,11 @@
+{
+  "id": "cc-42",
+  "title": "최신 main 실행본과 문서·완료 작업 정리",
+  "owner": "HIGHCHOI",
+  "branch": "chore/cc-42-release-cleanup",
+  "issue": "https://github.com/ghwls9896/CampusCommons/issues/42",
+  "scope": ["README.md", "docs/tasks/", "docs/distribution/"],
+  "shared_files": [],
+  "depends_on": ["https://github.com/ghwls9896/CampusCommons/pull/39"],
+  "validation": ["Unity 6000.4.5f1 macOS ARM64 빌드", "동봉 런타임 해시·실행본 기동 확인", "팀 검사 및 문서 링크 확인", "원격 PR·이슈와 정리 대상 대조"]
+}
