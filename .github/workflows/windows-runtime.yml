@@ -1,9 +1,6 @@
 name: Windows study runtime
 on:
   workflow_dispatch:
-  push:
-    branches: [chore/cc-42-release-cleanup]
-    paths: [.github/workflows/windows-runtime.yml]
 permissions:
   contents: read
 jobs:
