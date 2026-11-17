@@ -103,9 +103,9 @@ if (unlocks != null && unlocks.IsReady)
 | 레벨 | 초안 표시 |
 |---|---|
 | Lv.1–4 | 기본 캐릭터, 보상 외형 없음 |
-| Lv.5–9 | 발밑 푸른 원형 룬 2개 + 작은 상승 입자 |
+| Lv.5–9 | 발밑 푸른 원형 룬 2개 + 작은 상승 빛 점 |
 | Lv.10–14 | Lv.5 아우라 + 어깨에서 내려오는 파란 망토, 금색 테두리 |
-| Lv.15 | Lv.10 외형 + 금빛 마법진, 양쪽 날개 윤곽, 금색 입자 |
+| Lv.15 | Lv.10 외형 + 금빛 마법진, 양쪽 날개 윤곽, 금색 빛 점 |
 
 `LevelCosmeticVisuals` 컴포넌트에는 아우라 색상 Blue/Purple/Green, 망토 색상 Blue/Red/White가 있다. 이 색상은 아직 사용자 계정에 저장되지 않는다. Unity 에디터에서는 **로그인 후에만** `Preview In Editor`를 체크하고 `Preview Level` (1~15)을 바꿔 눈으로 확인할 수 있다. `#if UNITY_EDITOR`로 보호된 로컬 미리보기이므로 실제 계정 XP/레벨, 서버 보상과는 무관하며 빌드에는 포함되지 않는다.
 
@@ -121,9 +121,16 @@ if (unlocks != null && unlocks.IsReady)
 
 ### 구현 경계/제약
 
-- 이미지로 만든 레벨별 외형은 컨셉 시안이다. 현재 구현은 Unity 기본 메시·LineRenderer·ParticleSystem만 사용한 **1차 3D 프로토타입**이며 망토 물리·고급 날개 메시·발광 포스트프로세싱은 아직 없다.
+- 이미지로 만든 레벨별 외형은 컨셉 시안이다. 현재 구현은 Unity 기본 메시·LineRenderer(움직이는 빛 점 포함)만 사용한 **1차 3D 프로토타입**이며 망토 물리·고급 날개 메시·발광 포스트프로세싱은 아직 없다.
 - 망토 높이/길이는 모델마다 다를 수 있으며 착석/성별/헤어 프리셋과의 겹침은 Unity에서 확인 후 수정한다.
 - 모델은 1인칭일 때 기존 Player 설정에 따라 숨겨지므로 외형 효과도 함께 숨겨진다.
 - 이 스크립트와 원본 레벨 규칙은 캐릭터를 꾸미는 **표시 기능**이다. 보상 지급 API는 계속 비활성화 상태이다.
 - 실제 Lv.5/10/15 자동 해금 동작, Sunbox 설치/미설치, 씬 이동, 로그아웃/다른 계정 로그인, 성능은 사용자 Unity 테스트가 남아 있다.
 - 새 코드는 `Assets/TeamProgression/`만 수정한다. Sunbox 원본/복제 에셋이나 프로젝트 공통 설정은 공개 저장소에 추가하지 않는다.
+
+### Unity Safe Mode에서 보고된 컴파일 오류 조치 (2026-11-17)
+
+- 사용자 Unity 6000.4.5f1에서 `LevelCosmeticVisuals.cs`의 `ParticleSystem` 참조에 대한 CS1069 오류가 확인되었다.
+- 공유 `Packages/manifest.json`에는 Particle System 모듈이 없으므로, 팀 공통 패키지를 변경하지 않고 외형 프로토타입의 빛 입자를 `LineRenderer` 기반 이동 광점으로 바꿨다. 이 수정은 작업 브랜치 커밋 `84153da`에만 있다.
+- 사용자 PC는 Unity Safe Mode 상태이므로 재차 `git pull`하고 컴파일/플레이 검증하기 전까지 완료로 간주하지 않는다.
+- 동시에 보고된 `CampusCommons.LibraryCharacter` 네임스페이스 누락 오류는 외형 파일과 무관하다. `Assets/LibraryCharacter/Scripts/Monster.cs` 등 파일은 Windows 파일시스템에 존재하지만 Unity Project 창에 폴더가 누락되는 현상이다. 원인을 확인하기 전에는 파일 또는 `.meta`를 이동/삭제하지 않는다.
