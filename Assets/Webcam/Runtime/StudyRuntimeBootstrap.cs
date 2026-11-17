@@ -107,7 +107,9 @@ namespace CampusCommons.Webcam
             }
             var matrix = GUI.matrix; GUI.matrix = Matrix4x4.identity;
             float width = Mathf.Min(560, Screen.width - 24);
-            var rect = new Rect((Screen.width - width) / 2, 12, width, Failed ? 120 : 104);
+            var study = LobbyStudyWebcam.Instance;
+            float top = study && study.ShowsSeatHud ? 88 : 12;
+            var rect = new Rect((Screen.width - width) / 2, top, width, Failed ? 120 : 104);
             GUI.Box(rect, GUIContent.none); GUILayout.BeginArea(new Rect(rect.x + 12, rect.y + 10, width - 24, rect.height - 16));
             GUILayout.Label(Status + (Preparing ? "  " + Mathf.RoundToInt(Progress * 100) + "%" : ""), text);
             GUILayout.Label("처음 한 번만 준비합니다. 로그인과 퀴즈는 먼저 이용할 수 있어요.", text);

@@ -1,11 +1,11 @@
 # 계정과 독립 레벨 연동 계약
 
-`AccountGate.Instance`는 실행 시 생성되고 SceneLoaded에서 기존/생성된 Player의 이동·컨트롤러·QuizRoom 입력을 로그인 완료 전 차단합니다. 기존 GameStart/Player/씬 파일을 수정하지 않습니다. 새 캐릭터/방 모듈 도입 시 AccountWorldGate 차단 대상도 검증합니다. 클라이언트 입장 차단과 별도로 서버는 모든 계정 요청을 인증합니다.
+`AccountGate.Instance`는 실행 시 생성되고 SceneLoaded에서 기존/생성된 Player의 이동·컨트롤러·QuizRoom 입력을 로그인 완료 전 차단합니다. Player는 아바타 머리 위치를 제공하며 MY 또는 Esc 메뉴가 열려 있는 동안 로비 입력을 넘깁니다. 새 캐릭터/방 모듈 도입 시 AccountWorldGate 차단 대상도 검증합니다. 클라이언트 입장 차단과 별도로 서버는 모든 계정 요청을 인증합니다.
 
-- `EntryReady(AccountProfile)`: 이메일 인증·닉네임 서버 저장 완료 후 발생
+- `EntryReady(AccountProfile)`: 이메일 인증과 프로필 확인 후 월드에 들어갈 때 발생
 - `EntryRevoked`: 로그아웃 또는 인증 갱신 거부 시 로컬 퀴즈/탈출 게임을 종료하고 입력 차단
 - `ReadProfileAsync()`: 로그인한 본인의 UUID·마지막 닉네임·레벨 조회
-- `EnterAsync(nickname)`: 본인 닉네임을 저장하고 같은 계정의 레벨 반환
+- `AccountSession.EnterAsync(nickname)`: 본인 닉네임을 저장하고 같은 계정의 레벨 반환. 최초 기본 닉네임과 MY의 닉네임 수정에 사용
 - 신규 회원은 Lv.1, DB와 Unity 모두 유효 범위는 Lv.1~15
 - 다른 계정 공개 프로필/랭킹, 자동 레벨 상승, 재화, 5·10·15레벨 외형 보상은 이번 범위에 없음
 
