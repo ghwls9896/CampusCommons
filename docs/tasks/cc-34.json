@@ -1,0 +1,39 @@
+{
+  "id": "cc-34",
+  "title": "로비 자동 입장과 머리 위 이름표, MY와 Esc 로그아웃",
+  "owner": "HIGHCHOI",
+  "branch": "fix/cc-34-lobby-menu",
+  "issue": "https://github.com/ghwls9896/CampusCommons/issues/34",
+  "scope": [
+    "Assets/Account/Scripts/AccountGate.cs",
+    "Assets/Account/Scripts/AccountView.cs",
+    "Assets/GrandLibrary/Scripts/Player.cs",
+    "Assets/Webcam/Runtime/LobbyStudyWebcam.cs",
+    "Assets/Webcam/Runtime/StudyRuntimeBootstrap.cs",
+    "Assets/Webcam/Runtime/StudyRecordService.cs",
+    "Assets/IntegrationAudit/Editor/LobbyAccountMenuVerification.cs",
+    "Assets/IntegrationAudit/Editor/LobbyAccountMenuVerification.cs.meta",
+    "docs/tasks/cc-34.md",
+    "Assets/Account/Editor/AccountFlowTests.cs",
+    "Assets/IntegrationAudit/Editor/IntegratedQuizFlowTest.cs",
+    "Assets/IntegrationAudit/Editor/LocalIntegrationAudit.cs",
+    "Assets/IntegrationAudit/Editor/StudySyncVerification.cs",
+    "docs/account/SETUP.md",
+    "docs/account/INTEGRATION.md",
+    "docs/study/RECORDS.md"
+  ],
+  "shared_files": [
+    "Assets/GrandLibrary/Scripts/Player.cs"
+  ],
+  "depends_on": [
+    "https://github.com/ghwls9896/CampusCommons/pull/23"
+  ],
+  "validation": [
+    "Unity 6000.4.5f1 real lobby scene, fixture account menu/logout and owned input regression",
+    "Existing integration checks for account, quiz, webcam, and inventory",
+    "Team scope check against origin/main",
+    "Direct returning login, saved default nickname on verified signup, in-world rename",
+    "MY with study summary and level, avatar nameplate projection, first-person visibility",
+    "Seated HUD timers, five activity labels, standing cleanup, and visual layout"
+  ]
+}

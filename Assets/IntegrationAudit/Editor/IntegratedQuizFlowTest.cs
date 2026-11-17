@@ -88,7 +88,7 @@ public static class IntegratedQuizFlowTest
                 session = (QuizSession)typeof(QuizRoom).GetField("session", Private).GetValue(quiz);
                 gate.Configure(new Fixture()); pending = gate.LoginAsync("integration@example.test", "fixture-password"); Next();
             }
-            else if (step == 1) { pending = gate.EnterAsync("통합검사"); Next(); }
+            else if (step == 1) { Check(gate.Ready, "Login did not enter directly"); Next(); }
             else if (step == 2)
             {
                 Check(gate.Ready && player.enabled && quiz.enabled, "Login did not release quiz/player");
@@ -116,7 +116,7 @@ public static class IntegratedQuizFlowTest
                 Check(!player.GetComponent<CharacterController>().enabled, "Logout re-enabled controller");
                 pending = gate.LoginAsync("integration@example.test", "fixture-password"); Next();
             }
-            else if (step == 5) { pending = gate.EnterAsync("통합검사"); Next(); }
+            else if (step == 5) { Check(gate.Ready, "Relogin did not enter directly"); Next(); }
             else if (step == 6)
             {
                 Check(quiz.enabled && gate.Ready && session.Data == null, "Relogin did not reset quiz");

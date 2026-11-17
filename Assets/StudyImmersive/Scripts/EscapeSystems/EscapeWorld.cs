@@ -513,9 +513,26 @@ namespace CampusCommons.StudyImmersive
         }
         public void HandleInventoryKeys()
         {
-            if(Input.GetKeyDown(KeyCode.Alpha1))UseItem(0);
-            if(Input.GetKeyDown(KeyCode.Alpha2))UseItem(1);
-            if(Input.GetKeyDown(KeyCode.Alpha3))UseItem(2);
+            if(Input.GetKeyDown(KeyCode.Alpha1) || Input.GetKeyDown(KeyCode.Keypad1))UseItem(0);
+            if(Input.GetKeyDown(KeyCode.Alpha2) || Input.GetKeyDown(KeyCode.Keypad2))UseItem(1);
+            if(Input.GetKeyDown(KeyCode.Alpha3) || Input.GetKeyDown(KeyCode.Keypad3))UseItem(2);
+        }
+        static int InventorySlotForKey(KeyCode key)
+        {
+            if(key==KeyCode.Alpha1 || key==KeyCode.Keypad1)return 0;
+            if(key==KeyCode.Alpha2 || key==KeyCode.Keypad2)return 1;
+            if(key==KeyCode.Alpha3 || key==KeyCode.Keypad3)return 2;
+            return -1;
+        }
+        bool TryUseProfessorKey(KeyCode key)
+        {
+            int slot=InventorySlotForKey(key);
+            return BlocksMovement && slot>=0 && UseItem(slot);
+        }
+        int ExcuseNoteSlot()
+        {
+            for(int i=0;i<3;i++)if(game.ItemAt(i)==EscapeGame.InventoryItem.ExcuseNote)return i;
+            return -1;
         }
         public bool UseItem(int slot)
         {
@@ -597,12 +614,19 @@ namespace CampusCommons.StudyImmersive
         }
         public void DrawProfessor(GUIStyle title,GUIStyle text,GUIStyle button,bool korean)
         {
+            var keyEvent=Event.current;
+            if(keyEvent!=null && keyEvent.type==EventType.KeyDown && TryUseProfessorKey(keyEvent.keyCode))
+            {keyEvent.Use();return;}
             var old=GUI.color;GUI.color=new Color(.08f,.08f,.07f,.96f);GUI.DrawTexture(new Rect(270,110,740,505),Texture2D.whiteTexture);GUI.color=old;
             GUI.Label(new Rect(305,130,660,45),korean?"교수님의 즉석 질문":"PROFESSOR'S QUESTION",title);
+            int noteSlot=ExcuseNoteSlot();
+            if(noteSlot>=0 && GUI.Button(new Rect(475,530,330,60),
+                korean?"공결증 사용 ("+(noteSlot+1)+"번)":"USE EXCUSE NOTE ("+(noteSlot+1)+")",button))
+            {if(UseItem(noteSlot))return;}
             if(reviewRemaining>0f)
             {
                 GUI.Label(new Rect(310,205,650,80),(korean?"오답입니다. 복습 중: ":"Reviewing: ")+Mathf.CeilToInt(reviewRemaining)+(korean?"초":"s"),text);
-                GUI.Label(new Rect(310,295,650,70),korean?"공결증이 있으면 숫자 키로 바로 사용할 수 있습니다.":"Use an excuse note with its number key.",text);return;
+                GUI.Label(new Rect(310,295,650,70),korean?"공결증은 아래 버튼이나 해당 숫자 키로 사용할 수 있습니다.":"Use the button or its number key for the excuse note.",text);return;
             }
             if(question==null)return;
             GUI.Label(new Rect(310,185,650,145),question.Prompt,text);
