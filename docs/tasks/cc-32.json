@@ -4,12 +4,17 @@
   "owner": "GongBeak",
   "branch": "feat/cc-32-level-progression",
   "issue": "https://github.com/ghwls9896/CampusCommons/issues/32",
+
   "scope": [
     "Assets/TeamProgression/",
     "Assets/TeamProgression.meta",
+    "Assets/Resources.meta",
+    "Assets/Resources/TeamProgression.meta",
+    "Assets/Resources/TeamProgression/",
     "docs/tasks/cc-32.json",
     "docs/LEVEL_PROGRESSION.md"
   ],
+
   "shared_files": [],
   "depends_on": [
     "cc-8",
