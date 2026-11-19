@@ -17,6 +17,8 @@ namespace CampusCommons.Multiplayer
         AccountGate gate;
         Player player;
         string user, nickname, selfId, status;
+        LobbyPeer[] roster;
+        Portal.Space visibleSpace;
         bool visiting, blocked, firstEntrance, enteringWorld;
         float retryAt, nextSample, retryDelay;
         long revision;
@@ -66,7 +68,7 @@ namespace CampusCommons.Multiplayer
                     if (player.IsExitConfirmOpen || player.RequestRoomExit()) player.ConfirmRoomExit();
                 }
             }
-            if (!InLibrary())
+            if (!InSharedSpace())
             {
                 if (visiting) LeaveVisit();
                 return;
@@ -79,6 +81,8 @@ namespace CampusCommons.Multiplayer
                 profileLevel = profile.level;
             }
 
+            if (roster != null && visibleSpace != player.currentSpace)
+                ShowRoom();
             visiting = true;
             if (connection == null && !blocked && Time.unscaledTime >= retryAt)
                 _ = JoinAsync();
@@ -90,9 +94,10 @@ namespace CampusCommons.Multiplayer
             avatars.Tick();
         }
 
-        bool InLibrary()
+        bool InSharedSpace()
         {
-            return player && player.isActiveAndEnabled && player.currentSpace == Portal.Space.Library &&
+            return player && player.isActiveAndEnabled &&
+                (player.currentSpace == Portal.Space.Library || player.currentSpace == Portal.Space.Quiz) &&
                 player.gameObject.scene.path == LibraryScene && SceneManager.GetActiveScene().path == LibraryScene;
         }
 
@@ -103,7 +108,7 @@ namespace CampusCommons.Multiplayer
             status = "공용 로비 연결 중…";
             int code = await joining.RunAsync(gate.Session, user, frame =>
             {
-                if (connection == joining && gate.Ready && gate.Session.UserId == user && InLibrary())
+                if (connection == joining && gate.Ready && gate.Session.UserId == user && InSharedSpace())
                     Apply(frame);
             });
             if (connection != joining) return;
@@ -155,17 +160,26 @@ namespace CampusCommons.Multiplayer
             selfId = id;
             if (welcome)
             {
-                if (firstEntrance) avatars.PlaceAtEntry(own.slot);
+                if (firstEntrance && player.currentSpace == Portal.Space.Library) avatars.PlaceAtEntry(own.slot);
                 firstEntrance = false;
                 retryDelay = 0;
                 nextSample = 0;
             }
-            status = "공용 로비  " + frame.players.Length + " / 8";
-            avatars.Apply(selfId, frame.players);
+            roster = frame.players;
+            ShowRoom();
+        }
+
+        void ShowRoom()
+        {
+            if (visibleSpace != player.currentSpace) avatars.Clear();
+            visibleSpace = player.currentSpace;
+            int present = 1 + avatars.Apply(selfId, roster);
+            status = visibleSpace == Portal.Space.Quiz ? $"퀴즈룸  {present}명" : $"공용 로비  {present} / 8";
         }
 
         void ClearRoster()
         {
+            roster = null;
             selfId = null;
             revision = -1;
             avatars.Clear();
@@ -192,7 +206,7 @@ namespace CampusCommons.Multiplayer
 
         void OnGUI()
         {
-            if (!visiting || !gate || !gate.Ready || !InLibrary() || AccountGate.LobbyOverlayOwnsInput ||
+            if (!visiting || !gate || !gate.Ready || !InSharedSpace() || AccountGate.LobbyOverlayOwnsInput ||
                 Event.current.type != EventType.Repaint) return;
             if (statusStyle == null)
             {
@@ -211,7 +225,7 @@ namespace CampusCommons.Multiplayer
 
         internal void DrawVisibleNameplates(Action<Vector2, string, int> draw)
         {
-            if (visiting && selfId != null && InLibrary())
+            if (visiting && selfId != null && InSharedSpace())
                 avatars.DrawVisibleNameplates(Camera.main, draw);
         }
 

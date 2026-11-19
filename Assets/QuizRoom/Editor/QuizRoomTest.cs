@@ -20,6 +20,7 @@ namespace CampusCommons.Quiz.Editor
         static Player player;
         static QuizRoom room;
         static Seat chair;
+        static Canvas board;
         static Task signingIn;
         sealed class FixtureAccount : IAccountTransport
         {
@@ -95,6 +96,12 @@ namespace CampusCommons.Quiz.Editor
                 if (step == 2)
                 {
                     Check(!room.BlocksMovement && room.Match == null, "Walking into the quiz room started a match");
+                    board = UnityEngine.Object.FindObjectsByType<Canvas>(FindObjectsSortMode.None)
+                        .Single(c => c.name == "Quiz chalkboard");
+                    Check(board.renderMode == RenderMode.WorldSpace && board.worldCamera == Camera.main &&
+                        board.transform.parent.name == "Quiz Screen Structure", "Rules are not on the classroom board");
+                    Check(board.GetComponentsInChildren<UnityEngine.UI.Text>().Any(t => t.text.Contains("객관식 10초")),
+                        "Entering the classroom did not show its timing rules");
                     var seats = UnityEngine.Object.FindObjectsByType<Seat>().Where(s => s.name.StartsWith("Quiz Seat ")).ToArray();
                     Check(seats.Length == 2, "Expected two physical quiz seats");
                     chair = seats.OrderBy(s => s.transform.position.x).First();
@@ -107,6 +114,8 @@ namespace CampusCommons.Quiz.Editor
                 if (step == 3)
                 {
                     Check(room.BlocksMovement && chair.occupant == player, "Seated quiz did not take input");
+                    Check(board.GetComponentsInChildren<UnityEngine.UI.Button>().Any(b => b.name == "일어나기" && b.interactable),
+                        "The seated player cannot interact with the classroom board");
                     Check(player.RequestRoomExit() && player.CancelRoomExit(), "Exit cancellation failed");
                     Check(chair.occupant == player, "Cancel exit lost the seat");
                     Check(player.RequestRoomExit() && player.ConfirmRoomExit(), "Exit did not return to lobby");

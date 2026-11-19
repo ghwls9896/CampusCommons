@@ -14,7 +14,9 @@
     "Assets/Webcam/Editor/DistributionBuild.cs",
     "README.md",
     "docs/QUIZ_ROOM_SETUP.md",
-    "docs/distribution/DESKTOP.md"
+    "docs/distribution/DESKTOP.md",
+    "Assets/Multiplayer/",
+    "Assets/Account/Scripts/AccountView.cs"
   ],
   "shared_files": [],
   "depends_on": [
@@ -24,6 +26,7 @@
   "validation": [
     "Unity 6000.4.5f1 실제 도서관·2개 좌석에서 입장·대기·퇴실",
     "서버 AI 테스트 응답 경로와 단계별 풀이·결과 검증",
-    "macOS 실행본 빌드와 배포 설정 확인"
+    "macOS 실행본 빌드와 배포 설정 확인",
+    "두 클라이언트의 교실 아바타 이동·착석, 월드 칠판과 데스크톱 PDF 선택"
   ]
 }
