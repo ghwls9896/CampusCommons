@@ -7,6 +7,7 @@
   "scope": [
     "Assets/Account/Scripts/AccountSession.cs",
     "Assets/Account/Scripts/AccountGate.cs",
+    "Assets/Account/Scripts/AccountView.cs",
     "Assets/Multiplayer.meta",
     "Assets/Multiplayer/",
     "Tools/account/SessionTests.cs",

@@ -20,6 +20,7 @@ namespace CampusCommons.Multiplayer
         bool visiting, blocked, firstEntrance, enteringWorld;
         float retryAt, nextSample, retryDelay;
         long revision;
+        int profileLevel;
         GUIStyle statusStyle;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
@@ -52,6 +53,7 @@ namespace CampusCommons.Multiplayer
                 ForgetAccount();
                 user = profile.user_id;
                 nickname = profile.nickname;
+                profileLevel = profile.level;
             }
             if (!player && SceneManager.GetActiveScene().path == LibraryScene)
                 player = FindAnyObjectByType<Player>();
@@ -70,10 +72,11 @@ namespace CampusCommons.Multiplayer
                 return;
             }
             if (!avatars.Bind(player)) return;
-            if (nickname != profile.nickname)
+            if (nickname != profile.nickname || profileLevel != profile.level)
             {
-                LeaveVisit(); // Server reads the new nickname on the next authenticated join.
+                LeaveVisit(); // The server reads both public profile fields on admission.
                 nickname = profile.nickname;
+                profileLevel = profile.level;
             }
 
             visiting = true;
@@ -204,7 +207,12 @@ namespace CampusCommons.Multiplayer
             // Leave the MY button and the library title panel accessible.
             var rect = new Rect((Screen.width - width) / 2, 12, width, 30);
             statusStyle.Draw(rect, content, false, false, false, false);
-            avatars.DrawNames();
+        }
+
+        internal void DrawVisibleNameplates(Action<Vector2, string, int> draw)
+        {
+            if (visiting && selfId != null && InLibrary())
+                avatars.DrawVisibleNameplates(Camera.main, draw);
         }
 
         void OnDestroy()

@@ -31,7 +31,7 @@ namespace CampusCommons.Multiplayer
     internal sealed class LobbyPeer
     {
         public string id, nickname;
-        public int slot;
+        public int slot, level;
         public LobbyMove pose;
     }
 
