@@ -41,6 +41,7 @@ class Seat:
 @dataclass
 class Sheet:
     pdf: bytes | None = None
+    applied_level: int | None = None
     pages: int = 0
     first_page: int = 1
     uploading: bool = False
@@ -90,8 +91,9 @@ class Round:
 
 
 class Duel:
-    def __init__(self, settings, generator, grader, use_budget, worker):
+    def __init__(self, settings, generator, grader, use_budget, worker, hosted_quiz=None):
         self.settings = settings
+        self.hosted_quiz = hosted_quiz
         self.generator = generator
         self.grader = grader
         self.use_budget = use_budget
@@ -192,7 +194,13 @@ class Duel:
                 review.append({'level': i + 1, 'prompt': q['prompt'], 'answer': answer,
                                'model_answer': q['model_answer'], 'explanation': q['explanation'],
                                'source_page': q['source_page'], 'score': me.points[i], 'feedback': me.feedback[i]})
-        return {'phase': phase, 'round_id': rd.id, 'self_slot': seat.slot, 'players': players, 'review': review,
+        difficulty_mode = 'account'
+        if self.hosted_quiz:
+            if not all(sheet.questions for sheet in rd.sheets):
+                difficulty_mode = 'pending'
+            elif any(sheet.applied_level is None for sheet in rd.sheets):
+                difficulty_mode = 'standard'
+        return {'difficulty_mode': difficulty_mode, 'phase': phase, 'round_id': rd.id, 'self_slot': seat.slot, 'players': players, 'review': review,
                 'question': question, 'remaining_ms': remain, 'results': rd.results,
                 'message': rd.message, 'target_level': rd.target_level,
                 'can_upload': rd.phase == 'upload' or (rd.phase == 'error' and rd.failed_at == 'generating')}
@@ -215,20 +223,32 @@ class Duel:
 
     async def run_job(self, rd, phase):
         try:
-            if not self.settings.api_key:
+            if not self.hosted_quiz and not self.settings.api_key:
                 raise QuizError('server_configuration', '퀴즈 서버의 AI 설정이 필요합니다.', 503)
             async with self.worker, httpx.AsyncClient() as client:
                 for sheet in rd.sheets:
                     if phase == 'generating' and not sheet.questions:
                         self.use_budget()
-                        async with asyncio.timeout(self.settings.generation_timeout):
-                            quiz = await self.generator(sheet.pdf, sheet.pages, self.settings.api_key,
-                                                        self.settings.model, client, rd.target_level)
+                        timeout = self.settings.generation_timeout + (90 if self.hosted_quiz else 0)
+                        async with asyncio.timeout(timeout):
+                            if self.hosted_quiz:
+                                # If an older deployment produced the other set, keep both on
+                                # the same three standard stages, even during a Render rollout.
+                                other = next((s for s in rd.sheets if s.questions), None)
+                                target = other.applied_level if other else rd.target_level
+                                quiz = await self.hosted_quiz.generate(sheet.pdf, sheet.pages, client, target)
+                                sheet.applied_level = quiz.get('target_level')
+                                if other and sheet.applied_level != other.applied_level:
+                                    raise QuizError('quiz_service_changed', '출제 중 서버 버전이 바뀌었습니다. 두 사람이 다시 착석해 주세요.', 503)
+                            else:
+                                quiz = await self.generator(sheet.pdf, sheet.pages, self.settings.api_key,
+                                                            self.settings.model, client, rd.target_level)
                         sheet.questions = [dict(q, source_page=q['source_page'] + sheet.first_page - 1)
                                            for q in quiz['questions']]
                         sheet.pdf = None
                     elif phase == 'grading' and not sheet.points:
-                        async with asyncio.timeout(self.settings.grading_timeout):
+                        timeout = self.settings.grading_timeout + (90 if self.hosted_quiz else 0)
+                        async with asyncio.timeout(timeout):
                             sheet.points, sheet.feedback = await self.score(sheet, client)
             if self.round is not rd:
                 return
@@ -259,7 +279,10 @@ class Duel:
                                     grading_criteria=sheet.questions[i]['grading_criteria'],
                                     answer=sheet.answers[i]) for i in (1, 2)]
         self.use_budget()
-        result = await self.grader(answers, self.settings.api_key, self.settings.model, client)
+        if self.hosted_quiz:
+            result = await self.hosted_quiz.grade(answers, client)
+        else:
+            result = await self.grader(answers, self.settings.api_key, self.settings.model, client)
         grades = validate_grades(result, answers)['grades']
         return [choice] + [g['score'] for g in grades], [first_feedback] + [g['feedback'] for g in grades]
 
@@ -299,8 +322,8 @@ class Duel:
             sheet.record(answer.choice, answer.text.strip(), now - sheet.started)
 
 
-def duel_router(settings, account_transport, generator, grader, use_budget, read_body, worker):
-    table = Duel(settings, generator, grader, use_budget, worker)
+def duel_router(settings, account_transport, generator, grader, use_budget, read_body, worker, hosted_quiz=None):
+    table = Duel(settings, generator, grader, use_budget, worker, hosted_quiz)
     router = APIRouter(prefix='/v1/duel')
     no_store = {'Cache-Control': 'no-store'}
 

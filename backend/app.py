@@ -6,11 +6,12 @@ import hmac
 import os
 
 import httpx
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Query, Request
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 
 from duel import duel_router
+from hosted_quiz import HostedQuiz
 from lobby import lobby_router
 from quiz import (QuizError, generate_quiz, grade_answers, pdf_page_count,
                   select_pdf_range, MAX_SELECTED_PAGES, GradingRequest, validate_grades)
@@ -36,7 +37,8 @@ class Settings:
 
 
 def create_app(settings: Settings | None = None, generator=generate_quiz, grader=grade_answers,
-               *, lobby_account_transport: httpx.AsyncBaseTransport | None = None) -> FastAPI:
+               *, lobby_account_transport: httpx.AsyncBaseTransport | None = None,
+               hosted_quiz: HostedQuiz | None = None) -> FastAPI:
     settings = settings or Settings.from_env()
     api = FastAPI(title='Campus Commons PDF Quiz', docs_url=None, redoc_url=None, openapi_url=None)
     api.include_router(lobby_router(lobby_account_transport))
@@ -85,14 +87,14 @@ def create_app(settings: Settings | None = None, generator=generate_quiz, grader
         return bytes(data)
 
     @api.post('/v1/quizzes')
-    async def quizzes(request: Request):
-        return await process_pdf(request, inspect_only=False)
+    async def quizzes(request: Request, target_level: int | None = Query(default=None, ge=1, le=15)):
+        return await process_pdf(request, inspect_only=False, target_level=target_level)
 
     @api.post('/v1/pdfs/inspect')
     async def inspect_pdf(request: Request):
         return await process_pdf(request, inspect_only=True)
 
-    async def process_pdf(request: Request, inspect_only: bool):
+    async def process_pdf(request: Request, inspect_only: bool, target_level: int | None = None):
         authorize(request, 'application/pdf')
         await worker.acquire()
         try:
@@ -113,7 +115,11 @@ def create_app(settings: Settings | None = None, generator=generate_quiz, grader
             async with httpx.AsyncClient() as client:
                 try:
                     async with asyncio.timeout(settings.generation_timeout):
-                        result = await generator(selected, last-first+1, settings.api_key, settings.model, client)
+                        if target_level is None:
+                            result = await generator(selected, last-first+1, settings.api_key, settings.model, client)
+                        else:
+                            result = await generator(selected, last-first+1, settings.api_key, settings.model, client, target_level)
+                            result['target_level'] = target_level
                 except TimeoutError as exc:
                     raise QuizError('generation_timeout', 'AI 응답이 오래 걸립니다. 다시 생성해 주세요.', 504) from exc
             for question in result['questions']:
@@ -147,7 +153,7 @@ def create_app(settings: Settings | None = None, generator=generate_quiz, grader
         finally:
             worker.release()
 
-    api.include_router(duel_router(settings, lobby_account_transport, generator, grader, use_budget, read_body, worker))
+    api.include_router(duel_router(settings, lobby_account_transport, generator, grader, use_budget, read_body, worker, hosted_quiz))
     return api
 
 app = create_app()

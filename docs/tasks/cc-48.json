@@ -9,7 +9,9 @@
     "backend/app.py",
     "backend/quiz.py",
     "backend/tests/",
-    "docs/multiplayer/QUIZ_DUEL.md"
+    "docs/multiplayer/QUIZ_DUEL.md",
+    "backend/hosted_quiz.py",
+    "Tools/distribution/run_quiz_pair.py"
   ],
   "shared_files": [
     "backend/app.py"
@@ -19,6 +21,7 @@
   ],
   "validation": [
     "두 좌석과 2개 PDF 시작 장벽, 공통 난이도와 독립 출제",
-    "서버 시간·권한·정답률·이탈·재시도·일일 AI 한도 회귀 검사"
+    "서버 시간·권한·정답률·이탈·재시도·일일 AI 한도 회귀 검사",
+    "Render 기존 퀴즈 API를 사용하는 Mac 모드에서 키 입력 없이 출제·채점 경로와 두 창 실행 확인"
   ]
 }

@@ -23,4 +23,8 @@
 
 기존 Render 서비스에 로그인용 SUPABASE_URL·SUPABASE_PUBLISHABLE_KEY와 출제·채점용 GEMINI_API_KEY가 필요하다. GEMINI_MODEL, DAILY_GENERATION_LIMIT는 기존 운영값을 사용한다. 1인용 호환 API와 2인 경기는 일일 AI 사용 한도를 공유한다. 실제 PDF를 제출하기 전 업로드할 수 있는 자료인지 확인한다.
 
+Mac 두 창 시연에서는 좌석과 타이머만 Mac에서 관리한다. 동봉된 `run_quiz_pair.py`가 기존 퀴즈 서비스의 접속 설정으로 `HostedQuiz`를 구성한다. PDF 출제는 Render의 `POST /v1/quizzes`, 주관식 채점은 `POST /v1/quizzes/grade`를 사용한다. Gemini 키는 Render에서 관리한다.
+
+배포 구성 시 `Tools/distribution/run_quiz_pair.py`를 시연 폴더의 `server/`에 복사하고, 기존 운영자용 `QuizConnection.json`을 같은 폴더에 준비한다. 키·접속 코드·개인 PDF를 저장소나 로그에 기록하지 않는다. 새 서비스는 선택적 `target_level`(1~15)을 적용한 경우에만 응답에 그 값을 담는다. 두 PDF에 공통 계정 난이도를 적용했는지 클라이언트는 `difficulty_mode`로 확인할 수 있다. `pending`은 확인 대기, `standard`는 기존 서비스의 기본 3단계, `account`는 계정 기준 출제를 뜻한다.
+
 `backend` 디렉터리에서 `python -m pytest -q`를 실행한다. 외부 계정·모델 응답은 테스트 데이터로 주입한다. 실제 서비스 확인에는 서로 다른 계정 두 개와 서로 다른 시험용 PDF 두 개를 사용한다.
