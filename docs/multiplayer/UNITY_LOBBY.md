@@ -27,3 +27,7 @@ Mac 두 창 시연용 빌드는 컴파일 기호 `CAMPUS_LOBBY_LOCAL`로 같은 
 - 로그아웃·개인방 입장에서 진행 중인 연결을 취소한다. 일시적 단절은 2~30초 간격으로 재시도한다. 서버가 같은 계정의 새 연결로 교체한 창은 자동 접속을 중단한다.
 
 [서버 구현과 통신 규격](https://github.com/ghwls9896/CampusCommons/pull/45) · [2단계 작업 이슈](https://github.com/ghwls9896/CampusCommons/issues/46)
+
+## 에디터 회귀 검사
+
+Unity 6000.4.5f1에서 `-batchmode -nographics -projectPath <프로젝트> -executeMethod CampusCommons.Multiplayer.LobbyAvatarVerification.Run -logFile <로그>`로 실행한다. 검사가 Play Mode에서 끝나면 에디터가 종료 코드를 반환한다. 테스트는 실제 도서관 씬에서 입장 슬롯, 같은 닉네임의 다른 참가자, 아직 위치가 없는 참가자, 로컬 전용 컴포넌트와 퇴장 처리를 확인한다. 계정과 네트워크가 없어도 이 검사를 실행할 수 있다.
