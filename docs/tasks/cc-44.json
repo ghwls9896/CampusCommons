@@ -10,9 +10,10 @@
     "backend/requirements.txt",
     "backend/.env.example",
     "backend/tests/test_lobby.py",
+    "render.yaml",
     "docs/multiplayer/LOBBY.md"
   ],
-  "shared_files": ["backend/app.py"],
+  "shared_files": ["backend/app.py", "render.yaml"],
   "depends_on": [],
   "validation": [
     "기존 계정 Edge read의 인증·오류·공개 필드 계약 검사",
