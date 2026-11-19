@@ -1,0 +1,11 @@
+{
+  "id": "cc-52",
+  "title": "황혼의 대도서관 전체 화면 계정 UI와 입장 바",
+  "owner": "HIGHCHOI",
+  "branch": "codex/cc-52-auth-ui",
+  "issue": "https://github.com/ghwls9896/CampusCommons/issues/52",
+  "scope": ["Assets/Account/Scripts/AccountView.cs", "Assets/Account/Scripts/AccountAccessView.cs", "Assets/Account/Scripts/AccountAccessView.cs.meta", "Assets/Account/Resources/TwilightLibrary.jpg", "Assets/Account/Resources/TwilightLibrary.jpg.meta"],
+  "shared_files": [],
+  "depends_on": [],
+  "validation": ["Unity 6000.4.5f1 계정 Play Mode 검사", "macOS 한 창에서 로그인과 회원가입 및 해상도별 표시 확인", "입장 바와 오류 복귀 확인"]
+}
