@@ -261,9 +261,17 @@ source_page는 첨부된 PDF의 첫 장을1로 센 페이지 번호, source_quot
 
 
 async def generate_quiz(data: bytes, pages: int, api_key: str, model: str,
-                        client: httpx.AsyncClient) -> dict:
+                        client: httpx.AsyncClient, target_level: int | None = None) -> dict:
+    instructions = PROMPT
+    if target_level is not None:
+        band = '기초 용어와 단일 개념' if target_level <= 5 else (
+            '배운 개념의 친숙한 사례 적용' if target_level <= 10 else '두 개념의 연결과 근거 추론')
+        instructions += (f'\n두 참가자의 공통 계정 수준은 15단계 중 {target_level}입니다. '
+                         f'이 학습 수준({band})을 기준으로 쉬운 확인 → 적용 → 비교·추론의 '
+                         '3개 단계를 구성하세요. 과목별 전문용어의 희소성으로 난이도를 높이지 마세요. '
+                         '각 단계 제한 시간은 10/15/20초이며 자료가 달라도 같은 인지 부담과 답의 길이를 유지하세요.')
     body = {
-        'systemInstruction': {'parts': [{'text': PROMPT}]},
+        'systemInstruction': {'parts': [{'text': instructions}]},
         'contents': [{'role': 'user', 'parts': [
             {'inlineData': {'mimeType': 'application/pdf', 'data': base64.b64encode(data).decode('ascii')}},
             {'text': f'이 PDF는 총 {pages}페이지입니다. 레벨 1, 2, 3 문제를 각 하나씩 생성하세요.'},
