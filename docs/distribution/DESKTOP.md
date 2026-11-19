@@ -9,7 +9,7 @@
 - 준비 진행률과 실패 시 재시도를 표시합니다. 준비 중에도 로그인·퀴즈 화면을 쓸 수 있습니다. 다음 실행은 준비된 환경을 재사용합니다.
 - 좌석에 앉으면 카메라 미리보기, **시작**을 누르면 로컬 QEV 추론, **종료·일어나기**를 누르면 추론/카메라 종료 및 기립입니다. 운영체제의 카메라 허용은 사용자가 직접 해야 합니다.
 - 로그인/회원가입·PDF 퀴즈는 인터넷과 운영 중인 서버가 필요합니다. 모델은 설치 및 실행 시 인터넷이 필요 없습니다. 회원가입 이메일 확인 정책은 현재 서버 설정을 따릅니다.
-- `AccountConnection.json`과 `QuizConnection.json`은 Unity Resources로 빌드에 포함합니다. 플레이어가 파일을 만들거나 서버 주소를 입력할 필요가 없습니다.
+- 배포본에는 계정 프로젝트의 공개 `AccountConnection.json`을 포함합니다. 공용 로비와 2인 퀴즈는 고정 서비스 주소로 접속합니다.
 
 Windows 팀원은 [검토·실행 순서](WINDOWS_TEAM.md)를 먼저 확인하세요.
 
@@ -18,7 +18,7 @@ Windows 팀원은 [검토·실행 순서](WINDOWS_TEAM.md)를 먼저 확인하�
 각 운영체제에서 해당 배포본을 만듭니다. 빌드 PC만 Unity **6000.4.5f1** 및 해당 Standalone Build Support, [uv](https://docs.astral.sh/uv/getting-started/installation/), Git과 인터넷이 필요합니다. 게임에는 빌드 도구가 필요 없습니다.
 
 1. 통합 소스를 받습니다. 필요한 씬/팀 에셋도 포함되어 있어야 합니다.
-2. `Assets/Account/Resources/AccountConnection.json`을 확인하고, 팀의 비공개 `Assets/QuizRoom/Resources/QuizConnection.json`을 안전한 경로로 받아 넣습니다. 기존 빌드 PC에는 이미 있습니다. 퀴즈 토큰 파일은 Git에 커밋하지 않습니다. Gemini/API 서비스 비밀 키나 Supabase service_role 키를 클라이언트에 넣지 않습니다. 클라이언트에 동봉한 데모 접근 토큰은 추출 가능하며 서버 측 사용량 제한이 필요합니다.
+2. `Assets/Account/Resources/AccountConnection.json`의 공개 계정 설정을 확인합니다. 깨끗한 체크아웃에서 그대로 2인 퀴즈 클라이언트를 빌드할 수 있습니다. Gemini API 키는 서버에서 관리합니다.
 3. 해당 OS에서 실행합니다. Unity에서 이 프로젝트가 열려 있으면 먼저 저장하고 닫습니다.
 
 macOS 터미널:

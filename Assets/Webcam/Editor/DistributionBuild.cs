@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using System.Threading;
 using CampusCommons.Account;
-using CampusCommons.Quiz;
 using UnityEditor;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
@@ -14,12 +13,10 @@ namespace CampusCommons.Webcam.Editor
     {
         public int callbackOrder => 0;
         const string Package = "Assets/StreamingAssets/StudyRuntime";
-        public static void ValidateConnections(string account, string quiz)
+        public static void ValidateAccountConnection(string account)
         {
             if (string.IsNullOrWhiteSpace(account) || JsonUtility.FromJson<AccountConnection>(account)?.IsValid() != true)
                 throw new BuildFailedException("Valid AccountConnection.json is required in Assets/Account/Resources.");
-            if (string.IsNullOrWhiteSpace(quiz) || JsonUtility.FromJson<QuizDeployment>(quiz)?.IsValid() != true)
-                throw new BuildFailedException("Valid private QuizConnection.json is required in Assets/QuizRoom/Resources. Do not commit its token.");
         }
         public void OnPreprocessBuild(BuildReport report)
         {
@@ -30,7 +27,7 @@ namespace CampusCommons.Webcam.Editor
             if (report.summary.platform == BuildTarget.StandaloneOSX && UnityEditor.OSXStandalone.UserBuildSettings.architecture != OSArchitecture.ARM64)
                 throw new BuildFailedException("The macOS runtime requires ARM64. Use CampusCommons > Distribution > Build macOS.");
 #endif
-            ValidateConnections(Resources.Load<TextAsset>("AccountConnection")?.text, Resources.Load<TextAsset>("QuizConnection")?.text);
+            ValidateAccountConnection(Resources.Load<TextAsset>("AccountConnection")?.text);
             try
             {
                 var manifest = JsonUtility.FromJson<RuntimePackageManifest>(File.ReadAllText(Path.Combine(Package, "manifest.json")));
@@ -99,11 +96,10 @@ namespace CampusCommons.Webcam.Editor
         public static void CheckConfigurationGate()
         {
             const string account = "{\"url\":\"https://example.supabase.co\",\"publishableKey\":\"sb_publishable_fixture_only\"}";
-            const string quiz = "{\"server_url\":\"https://example.onrender.com\",\"access_token\":\"fixture\"}";
-            ValidateConnections(account, quiz);
+            ValidateAccountConnection(account);
             int rejected = 0;
-            foreach (var pair in new[] { new[] { "", quiz }, new[] { account, "" }, new[] { "{}", quiz }, new[] { account, "{}" } })
-                try { ValidateConnections(pair[0], pair[1]); } catch (BuildFailedException) { rejected++; }
+            foreach (var invalid in new[] { "", "{}", account.Replace("https://", "http://"), account.Replace("sb_publishable_fixture_only", "invalid") })
+                try { ValidateAccountConnection(invalid); } catch (BuildFailedException) { rejected++; }
             if (rejected != 4) throw new Exception("Incomplete client configuration accepted");
             string previousMinimum = MacMinimum("15.0");
             try { if (MacMinimum(null) != "15.0") throw new Exception("Minimum macOS setting not applied"); }

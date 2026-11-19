@@ -5,10 +5,12 @@ using System.Threading.Tasks;
 namespace CampusCommons.Account
 {
  // Tokens only live in this object; never persisted or logged.
- public sealed class AccountSession : IDisposable
+ public sealed partial class AccountSession : IDisposable
  {
   // The bearer is scoped to this service. Only a dedicated local build uses loopback.
-#if CAMPUS_LOBBY_LOCAL
+#if CAMPUS_QUIZ_PAIR_LOCAL
+  static readonly Uri LobbyEndpoint=new Uri("ws://127.0.0.1:18648/v1/lobby/ws");
+#elif CAMPUS_LOBBY_LOCAL
   static readonly Uri LobbyEndpoint=new Uri("ws://127.0.0.1:18646/v1/lobby/ws");
 #else
   static readonly Uri LobbyEndpoint=new Uri("wss://campuscommons-quiz.onrender.com/v1/lobby/ws");

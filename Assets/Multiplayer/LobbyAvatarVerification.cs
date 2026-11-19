@@ -49,9 +49,13 @@ namespace CampusCommons.Multiplayer
                 var avatars = new LobbyAvatars();
                 if (!avatars.Bind(player)) return;
 
-                try { CheckRoster(avatars, player); }
+                try
+                {
+                    CheckRoster(avatars, player);
+                    CheckQuizRoom(avatars, player);
+                }
                 finally { avatars.Clear(); }
-                Debug.Log("PASS lobby avatar placement, names and levels, initial poses, controls and departure");
+                Debug.Log("PASS lobby/quiz avatar visibility, names, chair pose, room changes and departure");
                 Finish(0);
             }
             catch (Exception ex)
@@ -92,6 +96,61 @@ namespace CampusCommons.Multiplayer
             CheckNameplates(avatars, welcome.self_id, other);
             avatars.Apply(welcome.self_id, new[] { welcome.players[0] });
             Require(!avatar.gameObject.activeSelf, "Departed avatar remained visible.");
+        }
+
+        static void CheckQuizRoom(LobbyAvatars avatars, Player player)
+        {
+            var portal = Array.Find(Object.FindObjectsByType<Portal>(FindObjectsSortMode.None),
+                point => point.destination == Portal.Space.Quiz);
+            Require(player.TryUsePortal(portal), "The actual quiz portal must admit the local player.");
+            var chair = GameObject.Find("Quiz Seat 02").GetComponent<Seat>();
+            var body = player.GetComponent<CharacterController>();
+            body.enabled = false;
+            player.transform.position = chair.transform.position + new Vector3(0, -.6f, -.8f);
+            body.enabled = true;
+            Physics.SyncTransforms();
+            Require(player.TrySit(chair), "Could not sit on the actual quiz chair.");
+            var seated = avatars.Sample();
+            Require(seated.motion == "idle", "A seated player must send a supported idle pose.");
+            player.Stand();
+
+            var quizPeer = new LobbyPeer { id = "quiz", nickname = "퀴즈 친구", level = 4, pose = avatars.Sample() };
+            var lobbyPeer = new LobbyPeer { id = "lobby", nickname = "로비 친구", pose = new LobbyMove { x = 0, motion = "idle" } };
+            var mafiaPeer = new LobbyPeer { id = "mafia", nickname = "마피아 친구", pose = new LobbyMove { x = 100, motion = "idle" } };
+            var peers = new[] { quizPeer, lobbyPeer, mafiaPeer };
+            Require(avatars.Apply("self", peers) == 1, "Quiz room must show only the other quiz participant.");
+            var remote = Participants()[0];
+            var prefabVisual = remote.GetComponent<LibraryAvatarMotion>() ? remote.GetChild(0) : null;
+            var leg = remote.Find("Left leg");
+            Vector3 standingOffset = prefabVisual ? prefabVisual.localPosition : Vector3.zero;
+            quizPeer.pose = seated;
+            avatars.Apply("self", peers);
+            avatars.Tick();
+            Require(prefabVisual ? prefabVisual.localPosition.y < standingOffset.y - .2f :
+                leg && Quaternion.Angle(leg.localRotation, Quaternion.identity) > 65f,
+                "A participant on the real quiz chair must visibly sit.");
+
+            var camera = new GameObject("Quiz nameplate test camera").AddComponent<Camera>();
+            try
+            {
+                camera.transform.position = remote.position + new Vector3(0, 1.3f, -4);
+                var names = new List<string>();
+                avatars.DrawVisibleNameplates(camera, (point, name, level) => names.Add(name));
+                Require(names.Count == 1 && names[0] == quizPeer.nickname,
+                    "Only the quiz participant's nameplate should be projected.");
+            }
+            finally { Object.Destroy(camera.gameObject); }
+
+            quizPeer.pose = avatars.Sample();
+            avatars.Apply("self", peers);
+            avatars.Tick();
+            Require(prefabVisual ? prefabVisual.localPosition == standingOffset :
+                leg && Quaternion.Angle(leg.localRotation, Quaternion.identity) < .01f,
+                "A participant who has left the chair must resume standing.");
+
+            Require(player.RequestRoomExit() && player.ConfirmRoomExit(), "Could not return to the library.");
+            Require(avatars.Apply("self", peers) == 1 && !remote.gameObject.activeSelf,
+                "Returning to the library must replace quiz participants with lobby participants.");
         }
 
         static void CheckNameplates(LobbyAvatars avatars, string self, LobbyPeer other)

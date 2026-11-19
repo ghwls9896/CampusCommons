@@ -252,7 +252,7 @@ namespace CampusCommons.Account
     var study = LobbyStudyWebcam.Instance;
     DrawPlayerNameplate(point, profile.nickname, profile.level, study ? study.StatusFor(localPlayer) : null);
    }
-   if (IsInLobby && libraryLobby) libraryLobby.DrawVisibleNameplates(DrawRemoteNameplate);
+   if (libraryLobby) libraryLobby.DrawVisibleNameplates(DrawRemoteNameplate);
    GUI.color = tint;
    GUI.contentColor = contentTint;
   }
