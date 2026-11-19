@@ -59,10 +59,26 @@ namespace CampusCommons.Account
   public async Task LoginAsync(string email, string password)
   {
    Revoke();
-   await Session.SignInAsync(email, password);
+   try { await Session.SignInAsync(email, password); }
+   catch (AccountException e) when (e.Code == "email_not_confirmed")
+   {
+    Page = Screen.SignupCode;
+    throw;
+   }
    await LoadProfileAndEnterAsync();
   }
-  public async Task SignupAsync(string email,string password){Revoke();await Session.SignUpAsync(email,password);Page=Screen.SignupCode;Message="메일의 확인 코드를 입력해 주세요.";}
+  public async Task SignupAsync(string email, string password)
+  {
+   Revoke();
+   try { await Session.SignUpAsync(email, password); }
+   catch (AccountException e) when (e.Code == "user_already_exists" || e.Code == "email_exists")
+   {
+    Page = Screen.Login;
+    throw;
+   }
+   Page = Screen.SignupCode;
+   Message = "메일로 받은 인증 코드를 입력해 주세요. 이미 가입한 이메일이라면 로그인해 주세요.";
+  }
   public async Task VerifySignupAsync(string email, string code)
   {
    await Session.VerifySignupCodeAsync(email, code);
@@ -71,6 +87,16 @@ namespace CampusCommons.Account
   public async Task RecoverAsync(string email){Revoke();await Session.BeginPasswordRecoveryAsync(email);Page=Screen.RecoveryCode;Message="등록된 이메일이라면 재설정 코드가 전송됩니다.";}
   public async Task VerifyRecoveryAsync(string email,string code){await Session.VerifyRecoveryCodeAsync(email,code);Page=Screen.NewPassword;}
   public async Task ResetPasswordAsync(string password){await Session.UpdatePasswordAsync(password);Page=Screen.Login;Message="비밀번호를 변경했습니다. 다시 로그인해 주세요.";}
+  internal void OpenAccessPage(Screen page)
+  {
+   Message = "";
+   Page = page;
+  }
+  internal async Task ResendSignupCodeAsync(string email)
+  {
+   await Session.ResendSignupAsync(email);
+   Message = "인증 메일을 확인해 주세요. 이미 가입한 이메일이라면 로그인해 주세요.";
+  }
   public async Task LoadProfileAndEnterAsync()
   {
    var session = Session;
@@ -123,12 +149,13 @@ namespace CampusCommons.Account
    switch(e.Code)
    {
     case "configuration_required":return "Supabase 연결 설정이 필요합니다. 설정 안내를 확인해 주세요.";
+    case "user_already_exists":case "email_exists":return "이미 가입한 이메일입니다. 로그인하거나 비밀번호를 찾아 주세요.";
     case "invalid_email":return "올바른 이메일 주소를 입력해 주세요.";
     case "password_mismatch":return "비밀번호 확인 값이 일치하지 않습니다.";
     case "weak_password":return "비밀번호는 12~128자로 입력해 주세요.";
     case "invalid_nickname":return "닉네임은 2~12자로 입력해 주세요. 줄바꿈·태그·제어문자는 사용할 수 없습니다.";
     case "invalid_code":case "otp_expired":return "확인 코드가 올바르지 않거나 만료됐습니다. 코드를 다시 확인하거나 재전송해 주세요.";
-    case "email_not_confirmed":return "이메일 확인 후 로그인해 주세요. 확인 코드 재전송을 이용할 수 있습니다.";
+    case "email_not_confirmed":return "이메일 인증이 필요합니다. 메일로 받은 코드를 입력하거나 인증 코드를 다시 받아 주세요.";
     case "invalid_credentials":return "이메일 또는 비밀번호가 맞지 않습니다.";
     case "over_email_send_rate_limit":case "over_request_rate_limit":return "요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.";
     case "invalid_profile":return "사용자 정보를 확인하지 못했습니다. 다시 불러와 주세요.";

@@ -20,6 +20,7 @@ namespace CampusCommons.Account.Editor
         {
             public string Nickname = "이전닉네임";
             public bool RefreshFails;
+            public string AuthErrorCode;
             public int NicknameWrites;
             public TaskCompletionSource<AccountProfile> DelayedRead = new TaskCompletionSource<AccountProfile>();
 
@@ -31,6 +32,8 @@ namespace CampusCommons.Account.Editor
             public Task<T> SendAsync<T>(string method, string path, object body, string token, CancellationToken ct)
                 where T : class
             {
+                if (AuthErrorCode != null && (path == "/auth/v1/signup" || path.EndsWith("grant_type=password")))
+                    throw new AccountException(400, AuthErrorCode);
                 if (path.Contains("refresh_token") && RefreshFails)
                     throw new AccountException(503, "connection_failed");
                 if (body is ReadRequest && DelayedRead != null)
@@ -172,6 +175,22 @@ namespace CampusCommons.Account.Editor
                     Check(BackdropVisible() && Cursor.visible, "Sign-in screen lost its backdrop or pointer");
                     fixture = new Fixture { Nickname = "", DelayedRead = null };
                     gate.Configure(fixture);
+                    foreach (var code in new[] { "email_exists", "user_already_exists" })
+                    {
+                        fixture.AuthErrorCode = code;
+                        gate.Page = AccountGate.Screen.Signup;
+                        gate.Perform(() => gate.SignupAsync("existing@example.test", "password12345"));
+                        Check(!gate.Ready && gate.Page == AccountGate.Screen.Login && gate.Message.Contains("이미 가입한 이메일"),
+                            "Explicit duplicate must offer login and password recovery.");
+                    }
+                    fixture.AuthErrorCode = "email_not_confirmed";
+                    gate.Perform(() => gate.LoginAsync("new@example.test", "password12345"));
+                    Check(gate.Page == AccountGate.Screen.SignupCode && !gate.Ready,
+                        "An unconfirmed login must reach verification without a separate start-screen link.");
+                    fixture.AuthErrorCode = null;
+                    gate.Perform(() => gate.SignupAsync("new@example.test", "password12345"));
+                    Check(gate.Page == AccountGate.Screen.SignupCode && gate.Message.Contains("이미 가입한 이메일이라면"),
+                        "A successful signup response must also guide returning users.");
                     pending = gate.VerifySignupAsync("new@example.test", "123456");
                 }
                 else
