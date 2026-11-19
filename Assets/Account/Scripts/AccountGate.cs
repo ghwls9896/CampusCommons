@@ -7,7 +7,7 @@ namespace CampusCommons.Account
  [DefaultExecutionOrder(-32000)]
  public sealed class AccountGate : MonoBehaviour
  {
-  public enum Screen { Start,Login,Signup,SignupCode,RecoveryEmail,RecoveryCode,NewPassword,LoadingProfile,World }
+  public enum Screen { Start,Login,Signup,SignupCode,RecoveryEmail,RecoveryCode,NewPassword,LoadingProfile,World,SignupReceipt }
   public static AccountGate Instance {get;private set;}
   public static bool LobbyOverlayOwnsInput => Instance && Instance.view && Instance.view.LobbyOverlayOpen;
   public AccountSession Session {get;private set;}
@@ -76,8 +76,7 @@ namespace CampusCommons.Account
     Page = Screen.Login;
     throw;
    }
-   Page = Screen.SignupCode;
-   Message = "메일로 받은 인증 코드를 입력해 주세요. 이미 가입한 이메일이라면 로그인해 주세요.";
+   OpenAccessPage(Screen.SignupReceipt);
   }
   public async Task VerifySignupAsync(string email, string code)
   {
@@ -127,7 +126,7 @@ namespace CampusCommons.Account
    if (session != Session || !Ready) throw new OperationCanceledException();
    Message = "닉네임을 저장했습니다.";
   }
-  public async Task LogoutAsync(){operation++;Busy=false;Revoke();Page=Screen.Login;Message="로그아웃했습니다.";await Session.SignOutAsync();}
+  public async Task LogoutAsync(){operation++;Busy=false;Revoke();Page=Screen.Login;Message="";await Session.SignOutAsync();}
   public async void Perform(Func<Task> action)
   {
    if(Busy)return;int id=++operation;Busy=true;Message="";
@@ -152,6 +151,7 @@ namespace CampusCommons.Account
     case "user_already_exists":case "email_exists":return "이미 가입한 이메일입니다. 로그인하거나 비밀번호를 찾아 주세요.";
     case "invalid_email":return "올바른 이메일 주소를 입력해 주세요.";
     case "password_mismatch":return "비밀번호 확인 값이 일치하지 않습니다.";
+    case "same_password":return "기존 비밀번호와 같습니다. 다른 비밀번호를 입력해 주세요.";
     case "weak_password":return "비밀번호는 12~128자로 입력해 주세요.";
     case "invalid_nickname":return "닉네임은 2~12자로 입력해 주세요. 줄바꿈·태그·제어문자는 사용할 수 없습니다.";
     case "invalid_code":case "otp_expired":return "확인 코드가 올바르지 않거나 만료됐습니다. 코드를 다시 확인하거나 재전송해 주세요.";

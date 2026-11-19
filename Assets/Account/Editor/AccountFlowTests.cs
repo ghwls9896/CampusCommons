@@ -34,6 +34,8 @@ namespace CampusCommons.Account.Editor
             {
                 if (AuthErrorCode != null && (path == "/auth/v1/signup" || path.EndsWith("grant_type=password")))
                     throw new AccountException(400, AuthErrorCode);
+                if (path == "/auth/v1/user" && AuthErrorCode == "same_password")
+                    throw new AccountException(422, AuthErrorCode);
                 if (path.Contains("refresh_token") && RefreshFails)
                     throw new AccountException(503, "connection_failed");
                 if (body is ReadRequest && DelayedRead != null)
@@ -172,6 +174,7 @@ namespace CampusCommons.Account.Editor
                 {
                     Check(!gate.Ready && !gate.Session.IsAuthenticated && gate.Page == AccountGate.Screen.Login,
                         "Logout must return to the sign-in screen");
+                    Check(string.IsNullOrEmpty(gate.Message), "Logout should clear the lobby notice.");
                     Check(BackdropVisible() && Cursor.visible, "Sign-in screen lost its backdrop or pointer");
                     fixture = new Fixture { Nickname = "", DelayedRead = null };
                     gate.Configure(fixture);
@@ -189,8 +192,16 @@ namespace CampusCommons.Account.Editor
                         "An unconfirmed login must reach verification without a separate start-screen link.");
                     fixture.AuthErrorCode = null;
                     gate.Perform(() => gate.SignupAsync("new@example.test", "password12345"));
-                    Check(gate.Page == AccountGate.Screen.SignupCode && gate.Message.Contains("이미 가입한 이메일이라면"),
-                        "A successful signup response must also guide returning users.");
+                    Check(gate.Page == AccountGate.Screen.SignupReceipt && string.IsNullOrEmpty(gate.Message),
+                        "An ambiguous signup response must let the user choose login or code entry.");
+                    gate.Perform(() => gate.VerifyRecoveryAsync("new@example.test", "123456"));
+                    fixture.AuthErrorCode = "same_password";
+                    gate.Perform(() => gate.ResetPasswordAsync("password12345"));
+                    Check(gate.Page == AccountGate.Screen.NewPassword && gate.Session.RecoveryPending &&
+                        gate.Message.Contains("다른 비밀번호"), "Password reuse must allow a retry in the recovery session.");
+                    fixture.AuthErrorCode = null;
+                    gate.Perform(() => gate.ResetPasswordAsync("replacement12345"));
+                    Check(gate.Page == AccountGate.Screen.Login && !gate.Session.HasSession, "New password must finish recovery.");
                     pending = gate.VerifySignupAsync("new@example.test", "123456");
                 }
                 else

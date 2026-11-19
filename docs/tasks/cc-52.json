@@ -7,5 +7,5 @@
   "scope": ["Assets/Account/Editor/AccountFlowTests.cs", "Assets/Account/Scripts/AccountView.cs", "Assets/Account/Scripts/AccountGate.cs", "Assets/Account/Scripts/AccountAccessView.cs", "Assets/Account/Scripts/AccountAccessView.cs.meta", "Assets/Account/Resources/TwilightLibrary.jpg", "Assets/Account/Resources/TwilightLibrary.jpg.meta"],
   "shared_files": [],
   "depends_on": [],
-  "validation": ["Unity 6000.4.5f1 계정 Play Mode 검사", "macOS 한 창에서 로그인과 회원가입 및 해상도별 표시 확인", "입장 바와 오류 복귀 확인"]
+  "validation": ["Unity 6000.4.5f1 계정 Play Mode 검사", "macOS 한 창에서 로그인과 회원가입 및 해상도별 표시 확인", "버튼 로딩 애니메이션, 가입 후 선택, 비밀번호 재사용, 입장 바와 로그아웃 확인"]
 }

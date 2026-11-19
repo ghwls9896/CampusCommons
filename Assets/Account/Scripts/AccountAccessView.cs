@@ -14,7 +14,7 @@ namespace CampusCommons.Account
         Texture2D libraryArt, shade, bookMark;
         Font displayFace;
         GUIStyle titleFace, headingFace, copyFace, smallFace, entryFace, tabFace, actionFace;
-        bool requestingEntry;
+        bool resending;
         Vector2 accessScroll;
         float formX, formWidth, rowY;
 
@@ -165,9 +165,10 @@ namespace CampusCommons.Account
 
         string AccessTitle(Page p)
         {
-            if (requestingEntry || p == Page.LoadingProfile) return "대도서관 입장";
+            if (p == Page.LoadingProfile) return "대도서관 입장";
             switch (p) {
                 case Page.Signup: return "계정 만들기";
+                case Page.SignupReceipt: return "메일 확인";
                 case Page.SignupCode: return "이메일 인증";
                 case Page.RecoveryEmail: return "비밀번호 찾기";
                 case Page.RecoveryCode: return "재설정 코드 확인";
@@ -179,10 +180,10 @@ namespace CampusCommons.Account
         void DrawAccessPanel(Rect panelRect)
         {
             var page = gate.Page;
-            bool entering = requestingEntry || page == Page.LoadingProfile;
+            bool entering = page == Page.LoadingProfile;
             bool tabs = !entering && (IsLogin(page) || page == Page.Signup);
             float width = Mathf.Min(406, panelRect.width - 76);
-            float rows = entering ? (requestingEntry || gate.Busy ? 270 : 340) : (page == Page.Signup ? 550 : 492);
+            float rows = entering ? (gate.Busy ? 270 : 340) : (page == Page.Signup ? 550 : 492);
             float top = Mathf.Max(24, (panelRect.height - rows) * .5f);
             // The content can scroll when an OS window is unusually short or an error wraps.
             Rect window = new Rect(panelRect.x + (panelRect.width - width) / 2 - 9,
@@ -261,7 +262,8 @@ namespace CampusCommons.Account
             Color brass = hover ? new Color(1, .87f, .60f) : Gold;
             Paint(hit, brass);
             Paint(new Rect(hit.x, hit.y, hit.width, 1.5f), Cream);
-            GUI.Label(hit, title, actionFace);
+            if (gate.Busy && !resending) DrawSpinner(hit.center, Ink);
+            else GUI.Label(hit, title, actionFace);
             rowY += 13;
             var ev = Event.current;
             bool enter = GUI.enabled && ev.type == EventType.KeyDown && (ev.keyCode == KeyCode.Return || ev.keyCode == KeyCode.KeypadEnter) && string.IsNullOrEmpty(UnityEngine.Input.compositionString);
@@ -279,19 +281,37 @@ namespace CampusCommons.Account
             return GUI.Button(hit, GUIContent.none, GUIStyle.none);
         }
 
-        void BeginEntry(Func<Task> action)
+        static void DrawSpinner(Vector2 center, Color color)
         {
-            Run(async () => {
-                requestingEntry = true;
-                accessScroll = Vector2.zero;
-                try { await action(); }
-                finally { requestingEntry = false; }
+            if (Event.current.type != EventType.Repaint) return;
+            const int count = 12;
+            float phase = Mathf.Repeat(Time.unscaledTime * 1.15f, 1);
+            for (int i = 0; i < count; i++) {
+                float turn = (float)i / count;
+                float angle = turn * Mathf.PI * 2;
+                float intensity = 1 - Mathf.Repeat(phase - turn, 1);
+                float radius = 1.3f + intensity * .8f;
+                Vector2 point = center + new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * 9;
+                color.a = .23f + .77f * intensity;
+                GUI.DrawTexture(new Rect(point.x - radius, point.y - radius, 2 * radius, 2 * radius),
+                    Texture2D.whiteTexture, ScaleMode.StretchToFill, true, 0, color, 0, radius);
+            }
+        }
+
+        void ResendLink(string title, Func<Task> resend)
+        {
+            var hit = Row(31);
+            if (resending) DrawSpinner(hit.center, Gold);
+            else if (Link(hit, title)) Run(async () => {
+                resending = true;
+                try { await resend(); }
+                finally { resending = false; }
             });
         }
 
         void DrawFields(Page p)
         {
-            if (p != Page.NewPassword) email = AccessField("이메일", email);
+            if (p != Page.NewPassword && p != Page.SignupReceipt) email = AccessField("이메일", email);
             if (IsLogin(p) || p == Page.Signup || p == Page.NewPassword)
                 password = AccessField(IsLogin(p) ? "비밀번호" : "비밀번호  ·  12~128자", password, true);
             if (p == Page.Signup || p == Page.NewPassword) confirm = AccessField("비밀번호 확인", confirm, true);
@@ -299,45 +319,45 @@ namespace CampusCommons.Account
 
             switch (p) {
                 case Page.Start: case Page.Login:
-                    if (Submit("로그인하고 입장")) { string e = email, pass = password; BeginEntry(() => gate.LoginAsync(e, pass)); }
+                    if (Submit("로그인하고 입장")) { string e = email, pass = password; Run(() => gate.LoginAsync(e, pass)); }
                     if (Link(Row(33), "비밀번호 찾기", true)) Navigate(Page.RecoveryEmail);
                     break;
                 case Page.Signup:
                     if (Submit("가입하고 인증 코드 받기")) PasswordAction(pass => gate.SignupAsync(email, pass));
                     break;
+                case Page.SignupReceipt:
+                    GUI.Label(Row(66), "가입 메일을 받으셨다면 인증 코드를 입력해 주세요. 이미 가입한 계정은 바로 로그인할 수 있습니다.", copyFace);
+                    if (Submit("인증 코드 입력")) Navigate(Page.SignupCode);
+                    break;
                 case Page.SignupCode:
-                    if (Submit("인증하고 입장")) { string e = email, c = code; BeginEntry(() => gate.VerifySignupAsync(e, c)); }
-                    if (Link(Row(31), "인증 코드 다시 받기")) Run(() => gate.ResendSignupCodeAsync(email));
+                    if (Submit("인증하고 입장")) { string e = email, c = code; Run(() => gate.VerifySignupAsync(e, c)); }
+                    ResendLink("인증 코드 다시 받기", () => gate.ResendSignupCodeAsync(email));
                     break;
                 case Page.RecoveryEmail:
                     if (Submit("재설정 코드 받기")) Run(() => gate.RecoverAsync(email));
                     break;
                 case Page.RecoveryCode:
                     if (Submit("코드 확인")) Run(() => gate.VerifyRecoveryAsync(email, code));
-                    if (Link(Row(31), "재설정 코드 다시 받기")) Run(() => gate.RecoverAsync(email));
+                    ResendLink("재설정 코드 다시 받기", () => gate.RecoverAsync(email));
                     break;
                 case Page.NewPassword:
                     if (Submit("비밀번호 변경")) PasswordAction(pass => gate.ResetPasswordAsync(pass));
                     break;
             }
-            if (!IsLogin(p) && p != Page.Signup && Link(Row(32), "로그인으로 돌아가기")) {
+            if (!IsLogin(p) && p != Page.Signup && Link(Row(38), "←  로그인으로 돌아가기")) {
                 gate.Session.Clear(); Navigate(Page.Login);
             }
-            if (gate.Busy) GUI.Label(Row(30), "요청을 처리하고 있습니다…", smallFace);
         }
 
         void DrawEntryProgress()
         {
-            bool profile = gate.Page == Page.LoadingProfile;
-            bool loading = requestingEntry || gate.Busy;
-            GUI.Label(Row(44), !loading ? "입장 준비가 중단되었습니다." :
-                profile ? "프로필을 불러오고 있습니다…" : "계정을 확인하고 있습니다…", copyFace);
+            bool loading = gate.Busy;
             var track = Row(6);
             Paint(track, new Color(.15f, .25f, .23f));
             float half = track.width * .5f;
-            if (profile) Paint(new Rect(track.x, track.y, half, 6), Gold);
+            Paint(new Rect(track.x, track.y, half, 6), Gold);
             if (loading) {
-                float x = (profile ? half : 0) + Mathf.PingPong(Time.unscaledTime * 95, half - 40);
+                float x = half + Mathf.PingPong(Time.unscaledTime * 95, half - 40);
                 Paint(new Rect(track.x + x, track.y, 40, 6), Cream);
             }
             rowY += 8;
@@ -345,8 +365,8 @@ namespace CampusCommons.Account
             GUI.Label(captions, "계정 인증", smallFace);
             GUI.Label(new Rect(captions.x + half, captions.y, half, captions.height), "프로필 연결", smallFace);
             if (!loading) {
-                if (Submit("다시 연결")) BeginEntry(gate.LoadProfileAndEnterAsync);
-                if (Link(Row(32), "다른 계정으로 로그인")) Run(gate.LogoutAsync);
+                if (Submit("다시 연결")) Run(gate.LoadProfileAndEnterAsync);
+                if (Link(Row(38), "←  다른 계정으로 로그인")) Run(gate.LogoutAsync);
             }
         }
     }
