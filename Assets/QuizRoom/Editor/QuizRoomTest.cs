@@ -122,6 +122,12 @@ namespace CampusCommons.Quiz.Editor
         }
         static void CheckQuizModels()
         {
+            var difficulty = new QuizDuelState { target_level = 7, difficulty_mode = "pending" };
+            Check(!difficulty.DifficultyLabel.Contains("Lv."), "Unconfirmed target displayed as applied");
+            difficulty.difficulty_mode = "standard";
+            Check(difficulty.DifficultyLabel == "기본 3단계 난이도", "Legacy Render difficulty not displayed");
+            difficulty.difficulty_mode = "account";
+            Check(difficulty.DifficultyLabel == "공통 난이도 Lv.7", "Acknowledged account level missing");
             var doc = new QuizDocument();
             doc.Select("/tmp/분할정복.pdf", 2048);
             Check(doc.Name == "분할정복.pdf", "Decomposed Korean filename was not composed");

@@ -16,13 +16,26 @@ namespace CampusCommons.Quiz
 
     [Serializable] public sealed class QuizDuelState
     {
-        public string phase, round_id, message;
+        public string phase, round_id, message, difficulty_mode;
         public int self_slot, target_level, remaining_ms;
         public bool can_upload;
         public QuizDuelPlayer[] players;
         public QuizDuelQuestion question;
         public QuizDuelResult[] results;
         public QuizDuelReview[] review;
+
+        public string DifficultyLabel
+        {
+            get
+            {
+                switch (difficulty_mode)
+                {
+                    case "account": return "공통 난이도 Lv." + target_level;
+                    case "standard": return "기본 3단계 난이도";
+                    default: return "객관식 · 단답형 · 서술형";
+                }
+            }
+        }
 
         public QuizDuelPlayer Self => Array.Find(players, p => p != null && p.slot == self_slot);
     }

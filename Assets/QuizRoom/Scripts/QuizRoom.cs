@@ -418,7 +418,7 @@ namespace CampusCommons.Quiz
                     break;
                 case "generating":
                     Label("두 사람의 문제를 만들고 있습니다…", theme.Heading);
-                    Label("공통 난이도 Lv." + state.target_level + "  ·  객관식, 단답형, 서술형", theme.Body);
+                    Label(state.DifficultyLabel, theme.Body);
                     break;
                 case "playing":
                     DrawQuestion();
@@ -453,7 +453,7 @@ namespace CampusCommons.Quiz
                 return;
             }
             Label("내 PDF 선택", theme.Heading);
-            Label("공통 난이도 Lv." + state.target_level + "  ·  각자 자기 PDF로 3문제를 풉니다.", theme.Small);
+            Label(state.DifficultyLabel + "  ·  각자 자기 PDF로 3문제를 풉니다.", theme.Small);
             GUILayout.Space(12);
             GUI.enabled = !acting;
             if (Button(documentBytes == null ? "PDF 선택하기" : "다른 PDF 선택하기", theme.Secondary)) ChoosePdf();
@@ -485,7 +485,7 @@ namespace CampusCommons.Quiz
             double remaining = Math.Max(0, state.remaining_ms / 1000d - (Time.realtimeSinceStartupAsDouble - receivedAt));
             GUILayout.BeginHorizontal(); GUILayout.BeginVertical();
             Label(q.level + "단계  ·  " + new[]{"객관식", "단답형", "서술형"}[q.level - 1], theme.Title);
-            Label("제한 " + limit + "초  ·  10점 만점", theme.Small);
+            Label(state.DifficultyLabel + "  ·  제한 " + limit + "초  ·  10점 만점", theme.Small);
             GUILayout.EndVertical(); GUILayout.FlexibleSpace();
             var clock = GUILayoutUtility.GetRect(82, 80, GUILayout.Width(82), GUILayout.Height(80));
             theme.Countdown(clock, remaining, limit); GUILayout.EndHorizontal();
