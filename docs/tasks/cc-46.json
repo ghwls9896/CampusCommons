@@ -6,10 +6,10 @@
   "issue": "https://github.com/ghwls9896/CampusCommons/issues/46",
   "scope": [
     "Assets/Account/Scripts/AccountSession.cs",
+    "Assets/Account/Scripts/AccountGate.cs",
     "Assets/Multiplayer.meta",
     "Assets/Multiplayer/",
-    "Tools/account/",
-    "Tools/multiplayer/",
+    "Tools/account/SessionTests.cs",
     "docs/multiplayer/UNITY_LOBBY.md"
   ],
   "shared_files": [],

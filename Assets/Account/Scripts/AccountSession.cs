@@ -1,4 +1,5 @@
 using System;
+using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
 namespace CampusCommons.Account
@@ -6,6 +7,12 @@ namespace CampusCommons.Account
  // Tokens only live in this object; never persisted or logged.
  public sealed class AccountSession : IDisposable
  {
+  // The bearer is scoped to this service. Only a dedicated local build uses loopback.
+#if CAMPUS_LOBBY_LOCAL
+  static readonly Uri LobbyEndpoint=new Uri("ws://127.0.0.1:18646/v1/lobby/ws");
+#else
+  static readonly Uri LobbyEndpoint=new Uri("wss://campuscommons-quiz.onrender.com/v1/lobby/ws");
+#endif
   readonly IAccountTransport transport;
   CancellationTokenSource lifetime=new CancellationTokenSource();
   int generation;string access,refresh;long expires;
@@ -105,6 +112,36 @@ namespace CampusCommons.Account
    }
   }
   public Task<AccountProfile> ReadProfileAsync(CancellationToken ct=default(CancellationToken))=>ProfileCall(new ReadRequest(),ct);
+  public async Task<ClientWebSocket> OpenLobbyAsync(string expectedUser, CancellationToken ct)
+  {
+   ct.ThrowIfCancellationRequested();
+   if (!HasSession || RecoveryPending || UserId != expectedUser)
+    throw new AccountException(401, "not_signed_in");
+   if (Profile == null || Profile.user_id != expectedUser || string.IsNullOrWhiteSpace(Profile.nickname))
+    throw new AccountException(403, "profile_not_ready");
+
+   int expectedGeneration = generation;
+   using (var linked = CancellationTokenSource.CreateLinkedTokenSource(ct, lifetime.Token))
+   {
+    await EnsureFreshAsync(linked.Token);
+    Current(expectedGeneration, linked.Token);
+    if (!IsAuthenticated) throw new AccountException(401, "not_signed_in");
+
+    var socket = new ClientWebSocket();
+    try
+    {
+     socket.Options.SetRequestHeader("Authorization", "Bearer " + access);
+     await socket.ConnectAsync(LobbyEndpoint, linked.Token);
+     Current(expectedGeneration, linked.Token);
+     return socket;
+    }
+    catch
+    {
+     socket.Dispose();
+     throw;
+    }
+   }
+  }
   public Task<AccountProfile> EnterAsync(string nickname,CancellationToken ct=default(CancellationToken))=>ProfileCall(new ProfileRequest{action="enter",nickname=AccountRules.Nickname(nickname)},ct);
   public async Task SignOutAsync(CancellationToken ct=default(CancellationToken))
   {
