@@ -17,7 +17,6 @@ namespace CampusCommons.Multiplayer
         bool leftEntrance;
         Vector2 lastSamplePosition;
         double lastSampleTime = -1;
-        GUIStyle nameStyle;
 
         public bool Bind(Player player)
         {
@@ -103,34 +102,15 @@ namespace CampusCommons.Multiplayer
             foreach (var remote in remotes.Values) remote.Animate(blend);
         }
 
-        public void DrawNames()
+        public void DrawVisibleNameplates(Camera camera, System.Action<Vector2, string, int> draw)
         {
-            if (remotes.Count == 0 || Event.current.type != EventType.Repaint) return;
-            var camera = Camera.main;
-            if (!camera) return;
-            if (nameStyle == null)
-            {
-                nameStyle = new GUIStyle(GUI.skin.label) {
-                    font = Resources.Load<Font>("KIT/NotoSansKR"),
-                    fontSize = 14, fontStyle = FontStyle.Bold,
-                    alignment = TextAnchor.MiddleCenter, richText = false
-                };
-                nameStyle.normal.textColor = Color.white;
-            }
-            var previousColor = GUI.color;
+            if (!camera || !camera.isActiveAndEnabled) return;
             foreach (var remote in remotes.Values)
             {
-                Vector3 p = camera.WorldToScreenPoint(remote.NameAnchor);
-                if (p.z <= camera.nearClipPlane || p.x < 0 || p.x > Screen.width || p.y < 0 || p.y > Screen.height)
-                    continue;
-                float width = nameStyle.CalcSize(remote.Name).x + 12;
-                var rect = new Rect(p.x - width / 2, Screen.height - p.y - 24, width, 24);
-                GUI.color = new Color(.07f, .15f, .16f, .85f);
-                GUI.DrawTexture(rect, Texture2D.whiteTexture);
-                GUI.color = Color.white;
-                nameStyle.Draw(rect, remote.Name, false, false, false, false);
+                var p = camera.WorldToScreenPoint(remote.NameAnchor);
+                if (p.z > camera.nearClipPlane && p.x >= 0 && p.x <= Screen.width && p.y >= 0 && p.y <= Screen.height)
+                    draw(new Vector2(p.x, Screen.height - p.y), remote.Nickname, remote.Level);
             }
-            GUI.color = previousColor;
         }
 
         public void Clear()
@@ -149,8 +129,10 @@ namespace CampusCommons.Multiplayer
             Vector3 target;
             Quaternion rotation;
             string motion;
-            public readonly GUIContent Name = new GUIContent();
-            public Vector3 NameAnchor => root.position + Vector3.up * 2.05f;
+            readonly Transform head;
+            public string Nickname { get; private set; }
+            public int Level { get; private set; }
+            public Vector3 NameAnchor => head ? head.position + Vector3.up * .29f : root.position + Vector3.up * 1.89f;
 
             public RemoteAvatar(Transform localVisual, GameObject prefab, LobbyPeer peer)
             {
@@ -160,11 +142,18 @@ namespace CampusCommons.Multiplayer
                     var avatar = Object.Instantiate(prefab, root, false);
                     animation = root.gameObject.AddComponent<LibraryAvatarMotion>();
                     animation.Initialize(avatar);
+                    foreach (var animator in avatar.GetComponentsInChildren<Animator>())
+                    {
+                        if (!animator.isActiveAndEnabled || !animator.avatar || !animator.avatar.isValid || !animator.isHuman) continue;
+                        head = animator.GetBoneTransform(HumanBodyBones.Head);
+                        if (head) break;
+                    }
                 }
                 else
                 {
                     // Only copy meshes and joints. Local controls, colliders, and cameras stay local.
                     CopyMeshes(localVisual, root);
+                    head = root.Find("Head");
                     leftLeg = root.Find("Left leg");
                     rightLeg = root.Find("Right leg");
                     leftArm = root.Find("Left arm");
@@ -195,7 +184,8 @@ namespace CampusCommons.Multiplayer
 
             public void SetTarget(LobbyPeer peer)
             {
-                Name.text = peer.nickname;
+                Nickname = peer.nickname;
+                Level = peer.level;
                 target = new Vector3(peer.pose.x, peer.pose.y, peer.pose.z);
                 rotation = Quaternion.Euler(0, peer.pose.yaw, 0);
                 motion = peer.pose.motion;

@@ -1,5 +1,6 @@
 #if UNITY_EDITOR
 using System;
+using System.Collections.Generic;
 using CampusCommons.Account;
 using CampusCommons.GrandLibrary;
 using UnityEditor;
@@ -50,7 +51,7 @@ namespace CampusCommons.Multiplayer
 
                 try { CheckRoster(avatars, player); }
                 finally { avatars.Clear(); }
-                Debug.Log("PASS lobby avatar placement, identity, initial poses, controls and departure");
+                Debug.Log("PASS lobby avatar placement, names and levels, initial poses, controls and departure");
                 Finish(0);
             }
             catch (Exception ex)
@@ -88,8 +89,42 @@ namespace CampusCommons.Multiplayer
             Require(!avatar.GetComponentInChildren<Player>(true) && !avatar.GetComponentInChildren<Camera>(true) &&
                 !avatar.GetComponentInChildren<Collider>(true) && !avatar.GetComponentInChildren<AudioListener>(true),
                 "Remote avatar duplicated local gameplay, camera, physics, or audio.");
+            CheckNameplates(avatars, welcome.self_id, other);
             avatars.Apply(welcome.self_id, new[] { welcome.players[0] });
             Require(!avatar.gameObject.activeSelf, "Departed avatar remained visible.");
+        }
+
+        static void CheckNameplates(LobbyAvatars avatars, string self, LobbyPeer other)
+        {
+            var second = JsonUtility.FromJson<LobbyPeer>(
+                "{\"id\":\"c\",\"nickname\":\"다른 학생\",\"level\":15,\"slot\":2," +
+                "\"pose\":{\"x\":1,\"y\":0.1,\"z\":-8,\"motion\":\"idle\"}}");
+            var camera = new GameObject("Nameplate test camera").AddComponent<Camera>();
+            try
+            {
+                camera.transform.position = new Vector3(0, 1.8f, -14);
+                camera.transform.rotation = Quaternion.identity;
+                var observed = new Dictionary<string, int>();
+                Action<Vector2, string, int> collect = (point, nickname, level) => observed.Add(nickname, level);
+                var peers = new[] { other, second };
+                avatars.Apply(self, peers);
+                avatars.DrawVisibleNameplates(camera, collect);
+                Require(observed.Count == 2 && observed["학생"] == 0 && observed["다른 학생"] == 15,
+                    "Two nameplates must keep each account's own nickname and optional level.");
+
+                observed.Clear();
+                other.level = 3;
+                other.nickname = "바뀐이름";
+                avatars.Apply(self, peers);
+                avatars.DrawVisibleNameplates(camera, collect);
+                Require(observed.Count == 2 && observed["바뀐이름"] == 3 && observed["다른 학생"] == 15,
+                    "Profile changes must update the existing nameplate.");
+                observed.Clear();
+                camera.transform.rotation = Quaternion.Euler(0, 180, 0);
+                avatars.DrawVisibleNameplates(camera, collect);
+                Require(observed.Count == 0, "Nameplates behind the camera must stay hidden.");
+            }
+            finally { Object.Destroy(camera.gameObject); }
         }
 
         static Transform[] Participants() => Array.FindAll(
