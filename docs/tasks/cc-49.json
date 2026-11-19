@@ -1,0 +1,25 @@
+{
+  "id": "cc-49",
+  "title": "두 명 착석 후 각자의 PDF로 3단계 퀴즈 플레이",
+  "owner": "HIGHCHOI",
+  "branch": "codex/cc-49-quiz-pair",
+  "issue": "https://github.com/ghwls9896/CampusCommons/issues/49",
+  "scope": [
+    "Assets/QuizRoom/",
+    "Assets/Account/Scripts/AccountSession.cs",
+    "Assets/Account/Scripts/QuizSeatSession.cs",
+    "Assets/Account/Scripts/QuizSeatSession.cs.meta",
+    "Assets/IntegrationAudit/Editor/IntegratedQuizFlowTest.cs",
+    "docs/multiplayer/QUIZ_PLAY.md"
+  ],
+  "shared_files": [],
+  "depends_on": [
+    "#47",
+    "#48"
+  ],
+  "validation": [
+    "Unity 6000.4.5f1 실제 도서관·2개 좌석에서 입장·대기·퇴실",
+    "서버 AI 테스트 응답 경로와 단계별 풀이·결과 검증",
+    "macOS 실행본 빌드와 배포 설정 확인"
+  ]
+}
