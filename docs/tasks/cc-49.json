@@ -10,7 +10,11 @@
     "Assets/Account/Scripts/QuizSeatSession.cs",
     "Assets/Account/Scripts/QuizSeatSession.cs.meta",
     "Assets/IntegrationAudit/Editor/IntegratedQuizFlowTest.cs",
-    "docs/multiplayer/QUIZ_PLAY.md"
+    "docs/multiplayer/QUIZ_PLAY.md",
+    "Assets/Webcam/Editor/DistributionBuild.cs",
+    "README.md",
+    "docs/QUIZ_ROOM_SETUP.md",
+    "docs/distribution/DESKTOP.md"
   ],
   "shared_files": [],
   "depends_on": [
