@@ -122,14 +122,16 @@ def test_lobby_requires_account_even_when_quiz_can_start():
 
 def test_two_clients_and_late_join_receive_current_public_roster(live_lobby, accounts):
     first, second, third = (accounts.issue(n) for n in (1, 2, 3))
+    accounts.profiles[second]['level'] = 15
     with join(live_lobby, first) as (a, own):
         aid = own['self_id']
-        assert own['players'] == [{'id': aid, 'nickname': '학생', 'slot': 0, 'pose': None}]
+        assert own['players'] == [{'id': aid, 'nickname': '학생', 'level': 1, 'slot': 0, 'pose': None}]
         with join(live_lobby, second) as (b, other):
             bid = other['self_id']
             assert aid != bid and {p['id'] for p in other['players']} == {aid, bid}
             assert len({p['slot'] for p in other['players']}) == 2
-            wait_roster(a, lambda players: len(players) == 2)
+            roster = wait_roster(a, lambda players: len(players) == 2)
+            assert {p['id']: p['level'] for p in roster} == {aid: 1, bid: 15}
             a.send(json.dumps(MOVE))
             a.send(json.dumps({**MOVE, 'seq': 1, 'x': 99}))
             expected_pose = {k: v for k, v in MOVE.items() if k != 'type'}
@@ -165,7 +167,7 @@ def test_eight_seats_replacement_and_first_player_departure(live_lobby, accounts
 
 
 @pytest.mark.parametrize('change', [
-    {'seq': -1}, {'x': float('nan')}, {'z': True}, {'motion': 'unknown'}, {'id': 'other'},
+    {'seq': -1}, {'level': 12}, {'x': float('nan')}, {'z': True}, {'motion': 'unknown'}, {'id': 'other'},
 ])
 def test_invalid_move_only_removes_its_sender(live_lobby, accounts, change):
     with join(live_lobby, accounts.issue(1)) as (a, own), join(live_lobby, accounts.issue(2)) as (b, _):
@@ -187,6 +189,8 @@ def test_token_expiry_and_denial_never_keep_seats(live_lobby, accounts):
 @pytest.mark.parametrize('response', [
     httpx.Response(503), httpx.Response(429), httpx.Response(403), httpx.Response(200, text='unavailable'),
     httpx.Response(200, json={'nickname': '학생', 'user_id': 'bad'}),
+    *(httpx.Response(200, json={'nickname': '학생', 'user_id': str(UUID(int=1)), **extra})
+      for extra in ({}, {'level': 0}, {'level': 16}, {'level': True}, {'level': '12'})),
 ])
 def test_account_service_errors_are_retryable_and_quiz_remains_available(accounts, response):
     transport = httpx.MockTransport(lambda _: response)

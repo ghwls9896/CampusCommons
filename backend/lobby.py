@@ -31,6 +31,7 @@ class Account:
     user_id: UUID
     nickname: str
     expires_at: int
+    level: int
 
 
 async def read_account(header: str, transport: httpx.AsyncBaseTransport | None) -> Account:
@@ -58,6 +59,9 @@ async def read_account(header: str, transport: httpx.AsyncBaseTransport | None) 
             raise LobbyClose(4403, 'profile_not_ready')
         if not isinstance(nickname, str) or not 2 <= len(nickname) <= 12:
             raise ValueError
+        level = profile['level']
+        if type(level) is not int or not 1 <= level <= 15:
+            raise ValueError
     except (httpx.HTTPError, httpx.InvalidURL, ValueError, KeyError, TypeError, AttributeError) as exc:
         raise LobbyClose(1013, 'account_unavailable') from exc
 
@@ -71,7 +75,7 @@ async def read_account(header: str, transport: httpx.AsyncBaseTransport | None) 
             raise ValueError
     except (ValueError, TypeError, KeyError) as exc:
         raise LobbyClose(4401, 'unauthorized') from exc
-    return Account(user_id, nickname, expires)
+    return Account(user_id=user_id, nickname=nickname, expires_at=expires, level=level)
 
 
 Coordinate = Annotated[float, Field(ge=-10000, le=10000, allow_inf_nan=False)]
@@ -96,7 +100,7 @@ class Member:
     pose: Move | None = None
 
     def public_state(self) -> dict:
-        return {'id': self.peer_id, 'nickname': self.account.nickname, 'slot': self.slot,
+        return {'id': self.peer_id, 'nickname': self.account.nickname, 'level': self.account.level, 'slot': self.slot,
                 'pose': self.pose.model_dump(exclude={'type'}) if self.pose else None}
 
 
