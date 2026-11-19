@@ -18,8 +18,60 @@ public static class SessionTests
  static AuthResponse Auth(string id="a",long expiry=4000000000) {return new AuthResponse{access_token="access-"+id,refresh_token="refresh-"+id,expires_at=expiry,user=new AuthUser{id=id,email="a@example.test",email_confirmed_at="date"}};}
  static AccountProfile Profile(string id="a",int level=1){return new AccountProfile{user_id=id,nickname="닉네임",level=level};}
  public static int Main(){Run().GetAwaiter().GetResult();Console.WriteLine("ACCOUNT_SESSION_PASS "+checks+" checks");return 0;}
+ static async Task CheckLobbyRefused(AccountSession session,string user,string code)
+ {
+  try
+  {
+   using(await session.OpenLobbyAsync(user,CancellationToken.None)) {}
+   throw new Exception("Unexpected lobby connection");
+  }
+  catch(AccountException e){Check(e.Code==code,"lobby guard "+code);}
+ }
+ static async Task CheckLobbySession()
+ {
+  var transport=new Fake();
+  using(var session=new AccountSession(transport))
+  {
+   await CheckLobbyRefused(session,"a","not_signed_in");
+   transport.Reply=(path,body)=>Task.FromResult<object>(Auth());
+   await session.SignInAsync("a@example.test","password12345");
+   await CheckLobbyRefused(session,"a","profile_not_ready");
+   var blank=Profile();blank.nickname=" ";
+   transport.Reply=(path,body)=>Task.FromResult<object>(blank);
+   await session.ReadProfileAsync();
+   await CheckLobbyRefused(session,"a","profile_not_ready");
+   transport.Reply=(path,body)=>Task.FromResult<object>(Profile());
+   await session.ReadProfileAsync();
+   await CheckLobbyRefused(session,"b","not_signed_in");
+   using(var canceled=new CancellationTokenSource())
+   {
+    canceled.Cancel();
+    try{using(await session.OpenLobbyAsync("a",canceled.Token)){} throw new Exception("Canceled lobby opened");}
+    catch(OperationCanceledException){Check(true,"canceled lobby skips connect");}
+   }
+   transport.Reply=(path,body)=>Task.FromResult<object>(Auth());
+   await session.VerifyRecoveryCodeAsync("a@example.test","123456");
+   await CheckLobbyRefused(session,"a","not_signed_in");
+
+   var expiring=Auth("a",DateTimeOffset.UtcNow.ToUnixTimeSeconds()+40);
+   transport.Reply=(path,body)=>Task.FromResult<object>(expiring);
+   await session.SignInAsync("a@example.test","password12345");
+   transport.Reply=(path,body)=>Task.FromResult<object>(path.Contains("refresh_token")?(object)expiring:Profile());
+   await session.ReadProfileAsync();
+   var refresh=new TaskCompletionSource<object>();
+   transport.Reply=(path,body)=>refresh.Task;
+   var opening=session.OpenLobbyAsync("a",CancellationToken.None);
+   Check(!opening.IsCompleted,"lobby waits for bearer refresh");
+   transport.Reply=(path,body)=>Task.FromResult<object>(Auth("b"));
+   await session.SignInAsync("b@example.test","password12345");
+   refresh.SetResult(Auth());
+   try{using(await opening){} throw new Exception("Old account opened a lobby");}
+   catch(OperationCanceledException){Check(session.UserId=="b","account switch during lobby refresh cancels A");}
+  }
+ }
  static async Task Run()
  {
+  await CheckLobbySession();
   var f=new Fake(); f.Reply=(p,b)=>Task.FromResult<object>(Auth());var s=new AccountSession(f);
   Check(!s.IsAuthenticated,"starts signed out");await s.SignInAsync(" a@example.test ","password12345");Check(s.IsAuthenticated && s.UserId=="a","sign in");
   f.Reply=(p,b)=>Task.FromResult<object>(Profile());await s.ReadProfileAsync();Check(s.Profile.level==1,"load persistent profile");

@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using CampusCommons.GrandLibrary;
+using CampusCommons.Multiplayer;
 using CampusCommons.Webcam;
 using UnityEngine;
 namespace CampusCommons.Account
@@ -18,6 +19,7 @@ namespace CampusCommons.Account
   GUIStyle heading, label, field, button, notice, choice, panel;
   GUIStyle nameplateName, nameplateLevel, myButton;
   Player localPlayer;
+  LibraryLobby libraryLobby;
   LobbyPanel lobbyPanel;
   bool editingNickname;
 
@@ -59,6 +61,7 @@ namespace CampusCommons.Account
    }
 
    if (gate.Ready && !localPlayer) localPlayer = FindAnyObjectByType<Player>();
+   if (gate.Ready && !libraryLobby) libraryLobby = FindAnyObjectByType<LibraryLobby>();
    if (!gate.Ready || !IsInLobby) CloseLobbyPanel();
    if (UnityEngine.Input.GetKeyDown(KeyCode.Escape)) HandleLobbyEscape();
    else if (gate.Ready && UnityEngine.Input.GetKeyDown(KeyCode.F9))
@@ -168,7 +171,7 @@ namespace CampusCommons.Account
      }
      else if (!PlayerOverlayOpen())
      {
-      DrawNameplate();
+      DrawNameplates();
       if (IsInLobby) DrawMyButton();
      }
     }
@@ -237,22 +240,34 @@ namespace CampusCommons.Account
    if (GUI.Button(new Rect(Screen.width - 82, 12, 70, 34), "MY", myButton)) ToggleMy();
   }
 
-  void DrawNameplate()
+  void DrawNameplates()
   {
    if (Event.current.type != EventType.Repaint) return;
-   var profile = gate.Session.Profile;
-   if (profile == null || !localPlayer || !localPlayer.TryGetNameplateScreenPoint(out Vector2 point)) return;
-
    Color tint = GUI.color;
    Color contentTint = GUI.contentColor;
    GUI.color = GUI.contentColor = Color.white;
-   float bottom = DrawNameplateLine(profile.nickname, nameplateName, point.x, point.y);
-   bottom = DrawNameplateLine($"Lv.{profile.level}", nameplateLevel, point.x, bottom);
-   var study = LobbyStudyWebcam.Instance;
-   string status = study ? study.StatusFor(localPlayer) : null;
-   if (status != null) DrawNameplateLine(status, nameplateLevel, point.x, bottom);
+   var profile = gate.Session.Profile;
+   if (profile != null && localPlayer && localPlayer.TryGetNameplateScreenPoint(out Vector2 point))
+   {
+    var study = LobbyStudyWebcam.Instance;
+    DrawPlayerNameplate(point, profile.nickname, profile.level, study ? study.StatusFor(localPlayer) : null);
+   }
+   if (IsInLobby && libraryLobby) libraryLobby.DrawVisibleNameplates(DrawRemoteNameplate);
    GUI.color = tint;
    GUI.contentColor = contentTint;
+  }
+
+  void DrawRemoteNameplate(Vector2 point, string nickname, int level)
+  {
+   DrawPlayerNameplate(point, nickname, level);
+  }
+
+  void DrawPlayerNameplate(Vector2 point, string nickname, int level, string studyStatus = null)
+  {
+   float bottom = DrawNameplateLine(nickname, nameplateName, point.x, point.y);
+   // Older lobby servers send only the nickname.
+   if (level >= 1 && level <= 15) bottom = DrawNameplateLine($"Lv.{level}", nameplateLevel, point.x, bottom);
+   if (studyStatus != null) DrawNameplateLine(studyStatus, nameplateLevel, point.x, bottom);
   }
 
   static float DrawNameplateLine(string value, GUIStyle style, float center, float bottom)
