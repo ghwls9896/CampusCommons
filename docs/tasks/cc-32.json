@@ -1,6 +1,6 @@
 {
   "id": "cc-32",
-  "title": "계정 Lv.1~15 경험치 정책 및 5/10/15 외형 해금 준비",
+  "title": "캐릭터 외형 퀄리티 개선 및 아우라·망토·특수 이펙트 정리",
   "owner": "GongBeak",
   "branch": "feat/cc-32-level-progression",
   "issue": "https://github.com/ghwls9896/CampusCommons/issues/32",
@@ -22,11 +22,15 @@
     "cc-21",
     "cc-24"
   ],
+
   "validation": [
-    "Lv.1~15 누적 XP 임계값과 승/패/무/탈출 보상 규칙 단위 검증",
-    "기존 계정·공부 기록·퀴즈·탈출룸 공유 파일 변경 없음 확인",
-    "Unity 6000.4.5f1 C# 컴파일 및 Sunbox 미설치/설치 환경 회귀 검사(추후)",
-    "계정/DB API는 HIGHCHOI 및 탈출룸 결과 이벤트는 ghwls9896와 계약 확정 후 별도 구현",
+    "XP 지급, HUD, 게임 결과 연동 코드가 PR에서 제거되었는지 확인",
+    "캐릭터 외형 및 읽기 전용 계정 레벨 조회 유지",
+    "Unity 6000.4.5f1 C# 컴파일 확인",
+    "기본/Lv.5/Lv.10/Lv.15 외형 프리뷰 검증",
+    "남녀 캐릭터와 이동·달리기·착석 시 외형 간섭 검증",
+    "Sunbox 미설치 환경의 컴파일 호환성 확인",
+    "외부 라이선스 에셋 및 팀 공통 파일 미포함 확인",
     "python Tools/team/check.py --base origin/main"
   ]
 }

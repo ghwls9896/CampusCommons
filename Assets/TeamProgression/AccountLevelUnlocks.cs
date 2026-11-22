@@ -20,13 +20,24 @@ namespace CampusCommons.TeamProgression
         public bool IsReady { get; private set; }
         public int CurrentLevel { get; private set; }
         public string CurrentUserId { get; private set; }
+        // 캐릭터 외형 표시 기준 (XP 계산과 무관)
+private const int MinCosmeticLevel = 1;
+private const int MaxCosmeticLevel = 15;
 
-        public bool AuraUnlocked =>
-            IsReady && LevelProgressionRules.HasAura(CurrentLevel);
-        public bool CapeUnlocked =>
-            IsReady && LevelProgressionRules.HasCape(CurrentLevel);
-        public bool SpecialEffectUnlocked =>
-            IsReady && LevelProgressionRules.HasSpecialEffect(CurrentLevel);
+private const int AuraLevel = 5;
+private const int CapeLevel = 10;
+private const int SpecialLevel = 15;
+
+        
+public bool AuraUnlocked =>
+    IsReady && CurrentLevel >= AuraLevel;
+
+public bool CapeUnlocked =>
+    IsReady && CurrentLevel >= CapeLevel;
+
+public bool SpecialEffectUnlocked =>
+    IsReady && CurrentLevel >= SpecialLevel;
+
 
         AccountGate gate;
         AccountSession session;
@@ -140,8 +151,8 @@ namespace CampusCommons.TeamProgression
                 !session.IsAuthenticated || profile == null ||
                 string.IsNullOrEmpty(profile.user_id) ||
                 profile.user_id != session.UserId ||
-                profile.level < LevelProgressionRules.MinLevel ||
-                profile.level > LevelProgressionRules.MaxLevel)
+                profile.level < MinCosmeticLevel ||
+                profile.level > MaxCosmeticLevel)
             {
                 Clear();
                 return;

@@ -1,136 +1,273 @@
-# CampusCommons — Lv.1~15 / XP / 외형 보상 정책 초안
+# CampusCommons — 캐릭터 외형 및 코스메틱 퀄리티 개선
 
-관련 작업: [Issue #32](https://github.com/ghwls9896/CampusCommons/issues/32). 담당: GongBeak.
+관련 작업: [Issue #32](https://github.com/ghwls9896/CampusCommons/issues/32)  
+관련 PR: [PR #33](https://github.com/ghwls9896/CampusCommons/pull/33)  
+담당: GongBeak  
+개발 환경: Unity 6000.4.5f1
 
-## 현재 상태와 작업 경계
+---
 
-- 계정별 레벨은 이미 Supabase `player_progress.level`에 독립 정수(1..15)로 저장된다.
-- `player_progress.total_xp`와 `xp_events` 이력은 보존되어 있지만 자동 지급 기능은 **비활성**이다.
-- `/functions/v1/progression`은 409 `progression_not_enabled`를 반환하고, DB 보상 함수는 SQLSTATE 55000을 발생시킨다.
-- 이 브랜치의 `Assets/TeamProgression/LevelProgressionRules.cs`는 **순수 정책 함수**만 제공한다. `AccountLevelUnlocks.cs`는 서버 확인이 끝난 계정 프로필의 레벨을 읽어 외형 해금 플래그만 제공한다. 레벨 저장, 서버 지급, Sunbox 모델, 공통 씬은 수정하지 않는다.
-- 실제 XP 발급 및 DB migration/API 계약 변경은 계정 담당 HIGHCHOI, 탈출 결과는 ghwls9896와 조율한 후 별도 변경으로 진행한다.
+## 1. 작업 개요
 
-## 제안한 경험치 정책
+팀 피드백을 반영하여 기존 경험치 및 레벨업 시스템 중심의 작업을 캐릭터 외형과 코스메틱 퀄리티 개선 중심으로 변경한다.
 
-| 결과 | XP |
-| --- | ---: |
-| 퀴즈 승리 | +100 |
-| 퀴즈 패배 | +30 |
-| 퀴즈 무승부 | +50 |
-| 탈출 성공 | +100 |
-| 탈출 실패 | +30 |
+이번 작업의 핵심 목표는 캐릭터의 시각적 완성도를 높이고, 아우라·망토·특수 이펙트가 실제 아바타에 자연스럽게 적용되도록 개선하는 것이다.
 
-공부 10분당 +20 XP는 **후속 검토안**이며 이번 정책 코드에 포함하지 않는다. 공부 기록은 30초마다 재전송될 수 있으므로 서버가 확인한 유효 공부 구간을 기준으로 중복 지급을 막아야 한다.
+각 게임의 경험치 지급 기준과 게임 결과 연동은 해당 게임 및 계정 담당자의 작업으로 분리한다.
 
-## 레벨 기준
+이번 작업에서는 서버 경험치 지급, 데이터베이스 수정, 게임 결과 처리 및 경험치 UI를 구현하지 않는다.
 
-Lv.N 도달 누적 XP = `50 × (N − 1) × N`.
+---
 
-| 레벨 | 도달 누적 XP | 외형 해금 |
-| --- | ---: | --- |
-| 1 | 0 | 기본 캐릭터 |
-| 5 | 1,000 | 아우라 |
-| 10 | 4,500 | 망토 |
-| 15 | 10,500 | 특별 이펙트 |
+## 2. 작업 범위
 
-최고 레벨은 15다. 15레벨 도달 이후 XP 총합 저장을 계속할지 상한을 둘지는 팀과 합의한다. 이미 DB에 저장된 레벨이 XP 환산 레벨보다 높아도 기존 레벨을 자동 하향하지 않는다.
+### 유지할 기능
 
-## 서버 연동 계약 (미구현·조율 필요)
+- 기존 계정의 레벨 정보를 읽어 외형 표시
+- 아우라, 망토 및 특수 이펙트 생성
+- 캐릭터 외형 단계별 미리보기
+- 아우라 및 망토 색상 변경
+- 캐릭터 커스터마이징 및 애니메이션과 외형 통합
 
-- Unity 클라이언트가 `reward_xp`, 승패, 사용자 ID를 임의로 보내는 것만으로 DB XP를 올리지 않는다.
-- 퀴즈/탈출의 **신뢰할 수 있는 결과 발생 지점**이 종료 이벤트마다 UUID 등 고유 이벤트 ID를 생성해 검증 및 기록한다.
-- 서버는 access token을 Supabase Auth로 검증해 계정 주체를 확정한다.
-- `xp_events(user_id,source,source_event_id)`의 중복 제약으로 재전송 시 한 번만 지급한다.
-- 서버의 단일 트랜잭션에서 XP/레벨을 갱신하고 신규 레벨·누적 XP·지급 XP·중복 여부를 반환한다.
-- `AccountProfile` 응답에 XP 정보를 추가할 때 이전 응답 및 계정 HUD 소비자와 호환성·배포 순서를 검토한다.
-- 서버 승인 전까지 현재의 409/55000 지급 차단은 유지한다.
+### 제외할 기능
 
-## 외형 보상 연동 (미구현·조율 필요)
+- 게임 승리·패배에 따른 경험치 지급
+- 탈출게임 결과에 따른 경험치 지급
+- 경험치 HUD 및 경험치 게이지
+- 개발용 경험치 누적
+- 경험치 기반 레벨업 알림
+- 경험치 지급 요청 및 중복 처리 Gateway
+- 서버 XP 지급 및 데이터베이스 연동
 
-서버에서 조회한 로그인 계정의 레벨로 아우라(5), 망토(10), 특별 이펙트(15) 사용 가능 여부를 계산한다. 로그인/로그아웃/계정 전환 때 아바타 상태를 다시 설정해야 한다. Sunbox 무료 에셋 설치 유무를 모두 지원하고, Sunbox 원본 또는 파생 파일을 라이선스 확인 없이 공개 저장소에 커밋하지 않는다.
+기존에 구현한 경험치 관련 기능은 이번 PR에서 제거하고, 캐릭터 외형 기능만 유지하도록 정리한다.
 
-## 검증 예정
+---
 
-1. 경계값: Lv.1 0 XP, Lv.5 1000 XP, Lv.10 4500 XP, Lv.15 10500 XP.
-2. Lv.15 초과 방지, 0/16 레벨 및 음수 XP 입력 거절, 기존 저장 레벨 비하향.
-3. QuizWin/Loss/Draw와 EscapeSuccess/Failure 각각 XP 값 검사.
-4. 신뢰된 서버 결과만 보상; 같은 이벤트 중복 수신/재접속/타인 계정 요청 차단.
-5. Unity 6000.4.5f1 설치·미설치 Sunbox 환경 검증, 기존 커스터마이징/인벤토리 회귀 검사.
-6. `python Tools/team/check.py --base origin/main` 및 PR 팀 검사.
+## 3. 현재 캐릭터 외형 구현 상태
 
-**현재 이 문서는 구현 설계 기록이며, CI나 Unity 검증 완료를 의미하지 않는다.**
+현재 구현된 코스메틱은 세 가지 단계로 구성된다.
 
-
-## 계정 레벨 읽기 브리지 — 구현됨 (아직 Unity 실행 검증 전)
-
-소스: `Assets/TeamProgression/AccountLevelUnlocks.cs` 및 동일 이름 `.meta`.
-
-- 씬·Player 수정 없이 Unity 시작 시 `Campus level unlocks` 오브젝트가 자동 생성된다.
-- 기존 `CampusCommons.Account.AccountGate.EntryReady`와 `EntryRevoked` 이벤트를 구독한다. 프로필 조회 갱신 시 `AccountSession.Changed`도 반영한다.
-- `AccountGate.Ready`, 인증 상태, 반환된 `user_id`와 현재 세션 ID의 일치, 레벨 1~15를 모두 확인한 뒤 **외형 표시용으로만** 저장한다.
-- 로그인 전/로그아웃/재인증 실패/씬 전환에는 계정/레벨 캐시를 비운다. 다른 계정의 외형을 보여주지 않는다.
-- 외부 소비자는 `AccountLevelUnlocks.Instance.IsReady`, `CurrentLevel`, `AuraUnlocked`, `CapeUnlocked`, `SpecialEffectUnlocked`, `Changed` 이벤트를 읽는다.
-- 서버의 실제 XP 지급/레벨 수정과 무관하다. `AccountProfile` 응답에는 아직 XP가 없고 기존 지급 차단 409/55000은 유지한다.
-
-### Unity 확인 순서 (6000.4.5f1)
-
-1. 수정 파일이 있다면 먼저 보존한다. 터미널에서 `git status`를 보고, 정리된 상태에서 `git fetch origin` → `git switch feat/cc-32-level-progression` → `git pull --ff-only origin feat/cc-32-level-progression`을 실행한다.
-2. 프로젝트를 Unity 6000.4.5f1로 열고 `Assets/TeamProgression/`의 `LevelProgressionRules.cs`, `AccountLevelUnlocks.cs`와 각 `.meta`를 확인한다.
-3. `Assets/StudyImmersive/Scenes/GrandLibrary_Living.unity` 씬을 열고 Console에 컴파일 오류가 없는지 확인한다.
-4. Play 후 로그인/닉네임 입력/로비 입장을 완료한다. Console에 `[CampusCommons] Account level loaded: Lv.1 (cosmetic display only).` 등 본인 레벨 로그가 표시되어야 한다. 민감 정보는 로그에 출력하지 않는다.
-5. 게임에서 로그아웃한 뒤에는 해금 상태가 초기화되어야 한다. 이후 서로 다른 계정으로 입장하면 해당 계정 레벨을 기준으로 다시 계산한다.
-6. 이 단계에서 아우라/망토/이펙트 모델은 아직 자동 표시되지 않는다. 별도 외형 프리팹/오브젝트 연결이 후속 작업이다. 로그인만으로 XP는 지급되지 않는다.
-
-### 후속 외형 컴포넌트 연결 예시
-
-```csharp
-var unlocks = CampusCommons.TeamProgression.AccountLevelUnlocks.Instance;
-if (unlocks != null && unlocks.IsReady)
-{
-    bool canUseAura = unlocks.AuraUnlocked;
-    bool canUseCape = unlocks.CapeUnlocked;
-    bool canUseSpecial = unlocks.SpecialEffectUnlocked;
-}
-```
-
-실제 표시 오브젝트는 게임 플레이어의 아바타 자식에 연결해야 하며, `Changed` 발생 시 토글하고 로그아웃 시 반드시 숨긴다. 이 상태는 클라이언트 UI 표시 용도이며 XP 지급/서버 권한 근거가 아니다.
-
-
-## 레벨별 캐릭터 외형 1차 구현 (Unity Play Mode 검증 전)
-
-`Assets/TeamProgression/LevelCosmeticVisuals.cs`는 공유 `Player.cs`를 수정하지 않고, 로그인 완료 시 플레이어의 `Student character` 하위에 표시용 오브젝트를 자동 생성한다. Sunbox 에셋을 직접 참조하지 않아 미설치 환경에서도 컴파일하도록 설계했다. 생성된 재질·망토 메시·파티클은 런타임 오브젝트이며 파일로 저장되지 않는다.
-
-| 레벨 | 초안 표시 |
+| 외형 단계 | 현재 구현 내용 |
 |---|---|
-| Lv.1–4 | 기본 캐릭터, 보상 외형 없음 |
-| Lv.5–9 | 발밑 푸른 원형 룬 2개 + 작은 상승 빛 점 |
-| Lv.10–14 | Lv.5 아우라 + 어깨에서 내려오는 파란 망토, 금색 테두리 |
-| Lv.15 | Lv.10 외형 + 금빛 마법진, 양쪽 날개 윤곽, 금색 빛 점 |
+| 기본 캐릭터 | 기존 아바타 및 커스터마이징 |
+| Lv.5 아우라 | 발밑 회전 마법진과 상승하는 푸른 광점 |
+| Lv.10 망토 | 네이비색 망토, 금색 테두리, 중앙 마스코트 문양 |
+| Lv.15 특수 이펙트 | 금빛 날개 윤곽, 마법진, 움직이는 금색 광점 |
 
-`LevelCosmeticVisuals` 컴포넌트에는 아우라 색상 Blue/Purple/Green, 망토 색상 Blue/Red/White가 있다. 이 색상은 아직 사용자 계정에 저장되지 않는다. Unity 에디터에서는 **로그인 후에만** `Preview In Editor`를 체크하고 `Preview Level` (1~15)을 바꿔 눈으로 확인할 수 있다. `#if UNITY_EDITOR`로 보호된 로컬 미리보기이므로 실제 계정 XP/레벨, 서버 보상과는 무관하며 빌드에는 포함되지 않는다.
+외형은 현재 서버에서 조회한 계정 레벨을 기준으로 표시한다.
 
-### 실제 테스트 순서 (Windows / Unity 6000.4.5f1)
+단, 레벨에 따른 외형 표시와 경험치 지급은 별개의 기능이며, 이 시스템은 실제 계정 XP 또는 레벨을 변경하지 않는다.
 
-1. GitHub Desktop에서 담당 브랜치 `feat/cc-32-level-progression`을 유지하고 `Fetch origin` → `Pull origin`한다. 로컬 `ProjectSettings/ProjectSettings.asset`의 `CAMPUS_SUNBOX_AVATAR` 미커밋 설정과 `.git/info/exclude`, Sunbox 원본 에셋은 보존하고, 충돌/overwrite 경고 시 진행을 중단한다.
-2. Unity 에디터에서 `Assets/TeamProgression/LevelCosmeticVisuals.cs`와 `.meta`를 확인하고 컴파일 오류가 없는지 검사한다.
-3. `GrandLibrary_Living` 씬 Play → 실제 계정 로그인 → 닉네임 입력 → 로비 입장. (처음 Lv.1이라면 외형 효과가 없는 것이 정상.)
-4. Play 상태 Hierarchy에서 `Campus level cosmetics` GameObject를 찾아 클릭한다. Inspector의 `Level Cosmetic Visuals`에서 `Preview In Editor`를 체크한다.
-5. `Preview Level` 5 → 10 → 15 순서로 바꾼다. Game 화면/Hierarchy에서 마법진 → 망토 → 금색 날개·파티클을 확인한다. `Aura Palette`, `Cape Palette`로 각각 세 가지 색상도 볼 수 있다.
-6. 체크를 해제하면 실제 서버 계정 레벨에 맞춘 외형으로 돌아간다. 로그아웃하면 효과가 전부 숨겨지는지 확인한다.
-7. Play 종료 후에도 계정 DB·실제 레벨·XP는 바뀌지 않는다. 에디터 인스펙터 미리보기 값은 영구 저장하지 않는다.
+Unity Editor에서는 Preview 기능을 통해 외형 단계를 확인할 수 있다.
 
-### 구현 경계/제약
+---
 
-- 이미지로 만든 레벨별 외형은 컨셉 시안이다. 현재 구현은 Unity 기본 메시·LineRenderer(움직이는 빛 점 포함)만 사용한 **1차 3D 프로토타입**이며 망토 물리·고급 날개 메시·발광 포스트프로세싱은 아직 없다.
-- 망토 높이/길이는 모델마다 다를 수 있으며 착석/성별/헤어 프리셋과의 겹침은 Unity에서 확인 후 수정한다.
-- 모델은 1인칭일 때 기존 Player 설정에 따라 숨겨지므로 외형 효과도 함께 숨겨진다.
-- 이 스크립트와 원본 레벨 규칙은 캐릭터를 꾸미는 **표시 기능**이다. 보상 지급 API는 계속 비활성화 상태이다.
-- 실제 Lv.5/10/15 자동 해금 동작, Sunbox 설치/미설치, 씬 이동, 로그아웃/다른 계정 로그인, 성능은 사용자 Unity 테스트가 남아 있다.
-- 새 코드는 `Assets/TeamProgression/`만 수정한다. Sunbox 원본/복제 에셋이나 프로젝트 공통 설정은 공개 저장소에 추가하지 않는다.
+## 4. 주요 스크립트 및 리소스
 
-### Unity Safe Mode에서 보고된 컴파일 오류 조치 (2026-11-17)
+### AccountLevelUnlocks.cs
 
-- 사용자 Unity 6000.4.5f1에서 `LevelCosmeticVisuals.cs`의 `ParticleSystem` 참조에 대한 CS1069 오류가 확인되었다.
-- 공유 `Packages/manifest.json`에는 Particle System 모듈이 없으므로, 팀 공통 패키지를 변경하지 않고 외형 프로토타입의 빛 입자를 `LineRenderer` 기반 이동 광점으로 바꿨다. 이 수정은 작업 브랜치 커밋 `84153da`에만 있다.
-- 사용자 PC는 Unity Safe Mode 상태이므로 재차 `git pull`하고 컴파일/플레이 검증하기 전까지 완료로 간주하지 않는다.
-- 동시에 보고된 `CampusCommons.LibraryCharacter` 네임스페이스 누락 오류는 외형 파일과 무관하다. `Assets/LibraryCharacter/Scripts/Monster.cs` 등 파일은 Windows 파일시스템에 존재하지만 Unity Project 창에 폴더가 누락되는 현상이다. 원인을 확인하기 전에는 파일 또는 `.meta`를 이동/삭제하지 않는다.
+경로: `Assets/TeamProgression/AccountLevelUnlocks.cs`
+
+- 로그인 계정의 레벨을 읽는 기능
+- 실제 계정의 인증 상태 확인
+- 읽어온 레벨에 따라 외형 표시 조건 결정
+- 로그아웃 및 계정 변경 시 상태 초기화
+- 경험치 지급 및 계정 레벨 변경 기능 없음
+
+### LevelCosmeticVisuals.cs
+
+경로: `Assets/TeamProgression/LevelCosmeticVisuals.cs`
+
+- 캐릭터 외형 효과 생성 및 관리
+- 아우라와 회전 마법진 구현
+- 망토 메시 및 금색 테두리 생성
+- 망토 중앙 마스코트 문양 적용
+- 금빛 날개와 특수 이펙트 구현
+- 외형 색상 변경
+- Unity Editor 미리보기 제공
+
+공유 Player.cs나 기존 씬을 수정하지 않고, 실행 중 캐릭터의 하위 오브젝트에 외형 효과를 생성한다.
+
+### CampusMascot.png
+
+경로: `Assets/Resources/TeamProgression/CampusMascot.png`
+
+망토 중앙에 표시하는 마스코트 문양이다.
+
+망토의 곡면에 맞춘 별도의 메시를 이용해 이미지가 표시된다.
+
+이미지 공유 권한 및 라이선스는 공개 저장소 반영 전에 확인한다.
+
+---
+
+## 5. 캐릭터 퀄리티 개선 계획
+
+### 5.1 기본 캐릭터 및 커스터마이징
+
+기존 아바타의 외형이 도서관 환경과 자연스럽게 어울리도록 개선한다.
+
+**개선 목표**
+
+- 남녀 캐릭터의 외형 균형 확인
+- 헤어스타일과 의상 조합 점검
+- 의상 색상과 코스메틱 색상의 조화
+- 캐릭터 체형에 맞는 아이템 크기 조절
+- 걷기·달리기·앉기 애니메이션과 코스메틱 간섭 최소화
+
+### 5.2 Lv.5 아우라 개선
+
+현재 아우라는 LineRenderer 기반 회전 마법진과 움직이는 광점으로 구현되어 있다.
+
+**개선 목표**
+
+- 이중 마법진의 크기 및 두께 조정
+- 마법진의 색상과 밝기 개선
+- 광점 크기 및 이동 속도 조정
+- 캐릭터 발 위치에 정확하게 정렬
+- 도서관 조명 아래에서도 자연스럽게 표시
+- 과도한 효과로 캐릭터를 가리지 않도록 개선
+
+파란색과 청록색을 중심으로 통일된 디자인을 적용한다.
+
+### 5.3 Lv.10 마스코트 망토 개선
+
+현재 망토는 Unity에서 생성하는 메시를 기반으로 구현되어 있다.
+
+**개선 목표**
+
+- 어깨와 망토의 연결 위치 조정
+- 망토의 길이 및 좌우 폭 개선
+- 천의 곡면과 주름 표현 강화
+- 네이비색 원단과 금색 테두리의 조화
+- 중앙 마스코트 문양의 비율과 위치 조정
+- 걷기·달리기·앉기 상태에서 몸통 관통 최소화
+- 남녀 캐릭터 모두에서 자연스러운 실루엣 구현
+
+망토가 캐릭터 뒤에 단순히 붙어 있는 평면처럼 보이지 않고, 실제 의상 일부처럼 보이도록 개선한다.
+
+### 5.4 Lv.15 특수 이펙트 개선
+
+현재 특수 이펙트는 금빛 날개 윤곽과 회전 마법진, 움직이는 광점으로 구성되어 있다.
+
+**개선 목표**
+
+- 날개 실루엣 개선
+- 깃털이 겹치는 형태로 입체감 강화
+- 금색과 아이보리 계열의 색상 조합
+- 캐릭터 등과 날개 연결 위치 개선
+- 마법진과 날개의 시각적 통일성 확보
+- 광점의 크기와 개수 조절
+- 화면 가림 및 성능 저하 최소화
+
+최종 단계에 어울리는 화려함을 확보하면서도 다른 캐릭터와 배경이 잘 보이도록 한다.
+
+---
+
+## 6. Unity 외형 테스트 방법
+
+### 테스트 환경
+
+- Unity 버전: 6000.4.5f1
+- 메인 씬: `Assets/StudyImmersive/Scenes/GrandLibrary_Living.unity`
+- 작업 폴더: `Assets/TeamProgression/`
+
+### 기본 테스트 절차
+
+1. Unity 프로젝트를 실행한다.
+2. Console에 컴파일 오류가 없는지 확인한다.
+3. GrandLibrary_Living 씬을 실행한다.
+4. 계정 로그인 후 로비에 입장한다.
+5. Hierarchy에서 `Campus level cosmetics` 오브젝트를 검색한다.
+6. Inspector에서 `Preview In Editor`를 활성화한다.
+7. `Preview Level` 값을 변경하여 코스메틱을 확인한다.
+
+### 외형별 테스트
+
+| Preview Level | 확인 내용 |
+|---|---|
+| 1 | 기본 캐릭터 |
+| 5 | 아우라 및 마법진 |
+| 10 | 아우라 + 마스코트 망토 |
+| 15 | 아우라 + 망토 + 금빛 날개 및 특수 이펙트 |
+
+### 추가 검증 항목
+
+- 남성·여성 캐릭터 각각 확인
+- 정면·측면·후면 카메라 확인
+- 걷기 및 달리기 동작 확인
+- 앉기 동작 시 망토 위치 확인
+- 헤어스타일 변경 시 의상 간섭 확인
+- 아우라 및 망토 색상 변경 확인
+- 1인칭·3인칭 카메라 전환 확인
+- 로그인 해제 시 외형 숨김 확인
+- Console 오류 및 성능 확인
+
+---
+
+## 7. 구현 상태 및 검증 현황
+
+### 기존 프로토타입에서 확인한 기능
+
+- 기본 캐릭터 커스터마이징
+- 걷기·달리기 등 기본 애니메이션
+- Lv.5 아우라 표시
+- Lv.10 마스코트 망토 표시
+- Lv.15 금빛 특수 이펙트 표시
+- Unity Editor 외형 미리보기
+- 실제 계정 레벨 읽기
+
+### 추가 검증 및 개선이 필요한 기능
+
+- [ ] 경험치 관련 코드 제거 후 컴파일 재확인
+- [ ] 망토 어깨 위치 및 메시 개선
+- [ ] 망토 움직임과 의상 관통 개선
+- [ ] 아우라의 색상·밝기·광점 개선
+- [ ] Lv.15 날개 및 특수 이펙트 개선
+- [ ] 남녀 캐릭터별 외형 검증
+- [ ] 착석·달리기·카메라 전환 통합 검증
+- [ ] Sunbox 미설치 환경 컴파일
+- [ ] 최종 성능 및 GitHub CI 확인
+
+기존 기능의 정상 동작 확인과 최종 품질 개선 검증은 구분하여 관리한다.
+
+---
+
+## 8. 기술적 제약 및 주의사항
+
+현재 외형은 기본 Mesh 및 LineRenderer를 활용한 1차 프로토타입이다.
+
+- 고급 망토 물리 시뮬레이션은 미적용 상태이다.
+- 날개는 기본 윤곽선 표현으로 구현되어 있으며 개선이 필요하다.
+- 본격적인 발광 후처리 효과는 아직 구현하지 않았다.
+- 모델별 체형에 따라 망토의 위치와 크기 조정이 필요할 수 있다.
+- 기존 ParticleSystem 컴파일 문제를 피하기 위해 움직이는 광점은 LineRenderer 방식으로 구현했다.
+
+Sunbox 원본 또는 파생 에셋은 라이선스 확인 없이 공개 GitHub에 추가하지 않는다.
+
+다음 팀 공통 파일은 사전 협의 없이 변경하지 않는다.
+
+- Player.cs
+- Account 및 서버 API 관련 파일
+- QuizRoom 관련 파일
+- StudyImmersive 게임 로직
+- 공유 Unity 씬
+- ProjectSettings 및 Packages
+
+---
+
+## 9. 최종 작업 목표
+
+이번 작업의 최종 목표는 경험치 시스템이 아니라 **캐릭터와 코스메틱의 시각적 완성도 향상**이다.
+
+이를 위해 다음 결과물을 완성한다.
+
+1. 자연스러운 형태와 재질을 갖춘 마스코트 망토
+2. 캐릭터 발밑에서 자연스럽게 표현되는 아우라
+3. 입체감과 화려함을 갖춘 최종 특수 이펙트
+4. 남녀 캐릭터와 애니메이션에 어울리는 코스메틱
+5. 외형 개선 전후 비교 스크린샷 및 실행 영상
+6. Unity 테스트 및 GitHub 코드 검증 결과
+
+경험치 지급이나 게임 결과 연동 없이도 캐릭터의 외형 완성도를 독립적으로 확인할 수 있도록 구현한다.
+
+해당 작업은 팀 검토 및 최종 품질 검증 전까지 Draft PR 상태로 유지한다.
