@@ -260,9 +260,9 @@ namespace CampusCommons.TeamProgression
                 capeRoot.transform,
                 "Cape shoulder anchor").transform;
 
-            // ¸ÁÅä¸¦ ¾î±ú¿¡ °¡±îÀÌ ¹èÄ¡
+            // ë§í†  ì–´ê¹¨ ë†’ì´ ë° ëª¸í†µê³¼ì˜ ê°„ê²©
             capePivot.localPosition =
-                new Vector3(0f, 1.4f, -0.15f);
+    new Vector3(0f, 1.38f, -0.13f);
 
             var cloth = Child(capePivot, "Cloth mesh");
 
@@ -276,7 +276,7 @@ namespace CampusCommons.TeamProgression
             renderer.shadowCastingMode =
                 ShadowCastingMode.Off;
 
-            // ¸ÁÅä Áß¾Ó¿¡ ¸¶½ºÄÚÆ® »ı¼º
+            // ë§í†  ì¤‘ì•™ì— ë§ˆìŠ¤ì½”íŠ¸ ìƒì„±
             BuildCapeMascot();
 
             Color gold =
@@ -338,20 +338,20 @@ namespace CampusCommons.TeamProgression
                 return;
             }
 
-            // ¸¶½ºÄÚÆ® ¿øº» ºñÀ² À¯Áö
+            // ë§ˆìŠ¤ì½”íŠ¸ ì›ë³¸ ë¹„ìœ¨ ìœ ì§€
             float aspect =
                 texture.width /
                 (float)Mathf.Max(1, texture.height);
 
-            float logoHeight = 0.65f;
+            float logoHeight = 0.48f;
             float logoWidth =
-                Mathf.Min(0.95f, logoHeight * aspect);
+                Mathf.Min(0.42f, logoHeight * aspect);
 
-            // ¸ÁÅä Áß¾Ó ³ôÀÌ
+            // ë§í†  ì¤‘ì•™ ë†’ì´
             float centerY = -0.59f;
 
-            const int cols = 8;
-            const int rows = 8;
+            const int cols = 24;
+            const int rows = 24;
 
             var vertices =
                 new Vector3[(cols + 1) * (rows + 1)];
@@ -372,8 +372,7 @@ namespace CampusCommons.TeamProgression
                 float capeV =
                     Mathf.Clamp01(-localY / 1.18f);
 
-                float capeWidth =
-                    Mathf.Lerp(0.58f, 1.13f, capeV);
+                float capeWidth = CapeWidth(capeV);
 
                 for (int x = 0; x <= cols; x++)
                 {
@@ -388,8 +387,8 @@ namespace CampusCommons.TeamProgression
                     Vector3 pos =
                         CapeVertex(capeU, capeV);
 
-                    // ¸ÁÅä ¹Ù±ùÂÊ¿¡ »ìÂ¦ ¶ç¿ö °ãÄ§ ¹æÁö
-                    pos.z -= 0.012f;
+                    // ë§í†  ë°”ê¹¥ìª½ì— ë„ì›Œ ê²¹ì¹¨ ë°©ì§€
+                    pos.z -= 0.018f;
 
                     int i = y * (cols + 1) + x;
 
@@ -479,26 +478,51 @@ namespace CampusCommons.TeamProgression
         // CAPE MESH
         // ========================================
 
+
+
+        static float CapeWidth(float v)
+        {
+            v = Mathf.Clamp01(v);
+
+            const float shoulderWidth = 0.53f;
+            const float bottomWidth = 0.76f;
+
+            float spread = Mathf.SmoothStep(0f, 1f, v);
+
+            return Mathf.Lerp(
+                shoulderWidth,
+                bottomWidth,
+                spread
+            );
+        }
+
         static Vector3 CapeVertex(float u, float v)
         {
-            float width =
-                Mathf.Lerp(0.58f, 1.13f, v);
+            u = Mathf.Clamp01(u);
+            v = Mathf.Clamp01(v);
 
+            float width = CapeWidth(v);
             float x = (u - 0.5f) * width;
             float y = -1.18f * v;
+            float across = (u - 0.5f) * 2f;
 
-            float z =
-                -0.025f -
-                v * v * 0.23f +
-                0.035f * Mathf.Abs(u - 0.5f);
+            // ì•„ë˜ìª½ìœ¼ë¡œ ê°ˆìˆ˜ë¡ ìì—°ìŠ¤ëŸ¬ìš´ ê³¡ë¥ ê³¼ ì£¼ë¦„ì„ ì ìš©
+            float backCurve = -0.025f - 0.23f * v * v;
+            float shoulderCurve =
+                0.035f * across * across * (1f - v);
+            float folds =
+                Mathf.Cos(across * Mathf.PI * 3f) *
+                0.024f * v * v;
 
+            float z = backCurve + shoulderCurve + folds;
             return new Vector3(x, y, z);
         }
 
+
         static Mesh CreateCapeMesh()
         {
-            const int columns = 9;
-            const int rows = 9;
+            const int columns = 25;
+            const int rows = 25;
 
             int count = columns * rows;
 
@@ -987,3 +1011,4 @@ namespace CampusCommons.TeamProgression
         }
     }
 }
+
