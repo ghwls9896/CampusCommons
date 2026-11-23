@@ -16,6 +16,7 @@ namespace CampusCommons.Multiplayer
         Portal.Space lastSampleSpace;
         Transform model;
         GameObject avatarPrefab;
+        LobbyAvatarStyle localStyle;
         bool leftEntrance;
         Vector2 lastSamplePosition;
         double lastSampleTime = -1;
@@ -31,6 +32,7 @@ namespace CampusCommons.Multiplayer
                 controller = player.GetComponent<CharacterController>();
                 seats = Object.FindObjectsByType<Seat>(FindObjectsSortMode.None);
                 avatarPrefab = Resources.Load<GameObject>("TeamAvatar/LibraryAvatar");
+                localStyle = new LobbyAvatarStyle(model);
                 leftEntrance = false;
                 lastSampleTime = -1;
             }
@@ -75,6 +77,8 @@ namespace CampusCommons.Multiplayer
                 yaw = Mathf.Repeat(model.eulerAngles.y, 360f), motion = motion
             };
         }
+
+        public LobbyAppearance SampleAppearance() => localStyle?.Capture();
 
         // The current library, mafia, quiz and escape maps are centered at world X 0, 100, 200 and 500.
         // Older servers accept only world coordinates and idle/walk/run.
@@ -154,10 +158,13 @@ namespace CampusCommons.Multiplayer
             string motion;
             bool seated;
             readonly Transform visual;
-            readonly Transform[] seatBones;
-            readonly Quaternion[] standingPose;
+            readonly LobbyAvatarStyle style;
+            LobbyAppearance appliedAppearance;
+            Animator rig;
+            Transform[] seatBones;
+            Quaternion[] standingPose;
             readonly Vector3 standingOffset;
-            readonly Transform head;
+            Transform head;
             public string Nickname { get; private set; }
             public int Level { get; private set; }
             public Vector3 NameAnchor => head ? head.position + Vector3.up * .29f : root.position + Vector3.up * 1.89f;
@@ -172,17 +179,8 @@ namespace CampusCommons.Multiplayer
                     standingOffset = visual.localPosition;
                     animation = root.gameObject.AddComponent<LibraryAvatarMotion>();
                     animation.Initialize(avatar);
-                    foreach (var animator in avatar.GetComponentsInChildren<Animator>())
-                    {
-                        if (!animator.isActiveAndEnabled || !animator.avatar || !animator.avatar.isValid || !animator.isHuman) continue;
-                        head = animator.GetBoneTransform(HumanBodyBones.Head);
-                        seatBones = new[] {
-                            animator.GetBoneTransform(HumanBodyBones.LeftUpperLeg), animator.GetBoneTransform(HumanBodyBones.RightUpperLeg),
-                            animator.GetBoneTransform(HumanBodyBones.LeftLowerLeg), animator.GetBoneTransform(HumanBodyBones.RightLowerLeg)
-                        };
-                        standingPose = new Quaternion[seatBones.Length];
-                        break;
-                    }
+                    style = new LobbyAvatarStyle(visual);
+                    RefreshRig();
                 }
                 else
                 {
@@ -196,6 +194,31 @@ namespace CampusCommons.Multiplayer
                 }
                 SetTarget(peer, sitting);
                 root.SetPositionAndRotation(target, rotation);
+            }
+
+            void RefreshRig()
+            {
+                Animator active = null;
+                foreach (var animator in visual.GetComponentsInChildren<Animator>())
+                    if (animator.isActiveAndEnabled && animator.avatar && animator.avatar.isValid && animator.isHuman)
+                    {
+                        active = animator;
+                        break;
+                    }
+                if (rig == active) return;
+                if (seated) SetSeatPose(false);
+                rig = active;
+                head = null;
+                seatBones = null;
+                standingPose = null;
+                if (!rig) return;
+                head = rig.GetBoneTransform(HumanBodyBones.Head);
+                seatBones = new[] {
+                    rig.GetBoneTransform(HumanBodyBones.LeftUpperLeg), rig.GetBoneTransform(HumanBodyBones.RightUpperLeg),
+                    rig.GetBoneTransform(HumanBodyBones.LeftLowerLeg), rig.GetBoneTransform(HumanBodyBones.RightLowerLeg)
+                };
+                standingPose = new Quaternion[seatBones.Length];
+                if (seated) SetSeatPose(true);
             }
 
             static void CopyMeshes(Transform source, Transform destination)
@@ -224,14 +247,25 @@ namespace CampusCommons.Multiplayer
                 target = new Vector3(peer.pose.x, peer.pose.y, peer.pose.z);
                 rotation = Quaternion.Euler(0, peer.pose.yaw, 0);
                 motion = peer.pose.motion;
+                if (style != null && peer.appearance != null && !peer.appearance.Matches(appliedAppearance) &&
+                    style.Apply(peer.appearance))
+                {
+                    appliedAppearance = peer.appearance;
+                    RefreshRig();
+                }
                 if (seated == sitting) return;
                 seated = sitting;
                 if (visual) visual.localPosition = standingOffset + (seated ? new Vector3(0f, -.24f, -.05f) : Vector3.zero);
+                SetSeatPose(seated);
+            }
+
+            void SetSeatPose(bool remember)
+            {
                 if (seatBones == null) return;
                 for (int i = 0; i < seatBones.Length; i++)
                 {
                     if (!seatBones[i]) continue;
-                    if (seated) standingPose[i] = seatBones[i].localRotation;
+                    if (remember) standingPose[i] = seatBones[i].localRotation;
                     else seatBones[i].localRotation = standingPose[i];
                 }
             }

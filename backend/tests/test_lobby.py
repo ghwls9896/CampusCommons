@@ -109,6 +109,8 @@ def assert_close(peer, code, reason):
 
 
 MOVE = {'type': 'move', 'seq': 2, 'x': 2, 'y': .08, 'z': -3, 'yaw': 90, 'motion': 'walk'}
+APPEARANCE = {'type': 'appearance', 'body': 1, 'skin': 2, 'hair': 3, 'hair_color': 1,
+              'items': ['Blouse', 'Long Skirt', 'Flats', '', 'Beanie'], 'colors': [1, 0, 0, 0, 2]}
 
 
 def test_lobby_requires_account_even_when_quiz_can_start():
@@ -118,6 +120,35 @@ def test_lobby_requires_account_even_when_quiz_can_start():
             with client.websocket_connect('/v1/lobby/ws') as socket:
                 socket.receive_json()
         assert (failure.value.code, failure.value.reason) == (4401, 'unauthorized')
+
+
+def test_stationary_appearance_changes_and_late_join_get_the_current_outfit(live_lobby, accounts):
+    first, second, third = (accounts.issue(n) for n in (1, 2, 3))
+    with join(live_lobby, first) as (a, own), join(live_lobby, second) as (b, _):
+        assert own['appearance_version'] == 1
+        aid = own['self_id']
+        a.send(json.dumps(MOVE))
+        a.send(json.dumps(APPEARANCE))
+        seen = wait_roster(b, lambda players: any(p.get('appearance') for p in players))
+        peer = next(p for p in seen if p['id'] == aid)
+        assert peer['appearance'] == {k: v for k, v in APPEARANCE.items() if k != 'type'}
+        changed = {**APPEARANCE, 'colors': [2, 0, 0, 0, 0], 'items': ['Blouse', 'Long Skirt', 'Flats', '', '']}
+        a.send(json.dumps(changed))
+        seen = wait_roster(b, lambda players: any(p.get('appearance', {}).get('colors') == changed['colors'] for p in players))
+        latest = next(p for p in seen if p['id'] == aid)
+        assert latest['pose'] == peer['pose']
+        with join(live_lobby, third) as (_, late):
+            assert next(p for p in late['players'] if p['id'] == aid) == latest
+
+
+@pytest.mark.parametrize('changes', [{'colors': [0]}, {'body': 2}, {'items': ['../outside'] * 5}])
+def test_malformed_appearance_does_not_change_other_player(live_lobby, accounts, changes):
+    with join(live_lobby, accounts.issue(1)) as (healthy, own), join(live_lobby, accounts.issue(2)) as (peer, _):
+        peer.send(json.dumps({**APPEARANCE, **changes}))
+        assert_close(peer, 1008, 'invalid_move')
+        healthy.send(json.dumps(MOVE))
+        players = wait_roster(healthy, lambda players: len(players) == 1 and players[0]['pose'] is not None)
+        assert players[0]['id'] == own['self_id'] and 'appearance' not in players[0]
 
 
 def test_two_clients_and_late_join_receive_current_public_roster(live_lobby, accounts):
