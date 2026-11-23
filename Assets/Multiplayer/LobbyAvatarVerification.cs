@@ -51,6 +51,15 @@ namespace CampusCommons.Multiplayer
 
                 try
                 {
+                    foreach (var size in new[] { new Vector2(741, 580), new Vector2(1280, 720), new Vector2(1920, 1080) })
+                    {
+                        var status = LibraryLobby.StatusRect(size.x, size.y, 122, Portal.Space.Library);
+                        float scale = Mathf.Min(size.x / 1280, size.y / 720);
+                        var title = new Rect((size.x - 1280 * scale) / 2 + 20 * scale,
+                            (size.y - 720 * scale) / 2 + 20 * scale, 335 * scale, 77 * scale);
+                        Require(status.x <= 16 && status.yMax < size.y / 3 && !status.Overlaps(title),
+                            "Lobby population must stay at upper left without overlapping the library title.");
+                    }
                     CheckRoster(avatars, player);
                     CheckQuizRoom(avatars, player);
                 }

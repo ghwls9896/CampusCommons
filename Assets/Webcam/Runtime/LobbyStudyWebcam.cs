@@ -79,7 +79,10 @@ namespace CampusCommons.Webcam
         {
             if(!StudyRuntimeBootstrap.Ready){failure="공부 인식 준비가 끝나면 시작할 수 있습니다.";return;}
             if(!PreviewReady || session.Running || !IsAvailable || !focused)return;
-            if(!StudyRecordService.Instance || !StudyRecordService.Instance.Begin()){failure="로그인과 기록 저장 상태를 확인해 주세요.";return;}
+            var gate = AccountGate.Instance;
+            if (!gate || !gate.Ready || !gate.Session.IsAuthenticated) { failure="공부를 시작하려면 로그인해 주세요."; return; }
+            var records = StudyRecordService.Instance;
+            if (!records || !records.Begin()) { failure=records ? records.SyncStatus : "공부 기록을 준비하고 있습니다. 다시 시도해 주세요."; return; }
             if(!session.Begin(IsAvailable,focused)){StudyRecordService.Instance.Finish();return;}
             failure = null;
             message="모델 준비 중";StartCoroutine(Run(session.Epoch));

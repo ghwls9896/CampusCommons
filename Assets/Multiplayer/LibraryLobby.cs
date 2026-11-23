@@ -218,9 +218,21 @@ namespace CampusCommons.Multiplayer
             }
             var content = new GUIContent(status);
             float width = statusStyle.CalcSize(content).x + 16;
-            // Leave the MY button and the library title panel accessible.
-            var rect = new Rect((Screen.width - width) / 2, 12, width, 30);
+            var rect = StatusRect(Screen.width, Screen.height, width, player.currentSpace);
             statusStyle.Draw(rect, content, false, false, false, false);
+        }
+
+        internal static Rect StatusRect(float screenWidth, float screenHeight, float width, Portal.Space room)
+        {
+            if (room != Portal.Space.Library)
+                return new Rect((screenWidth - width) / 2, 12, width, 30);
+            var rect = new Rect(12, 12, Mathf.Min(width, screenWidth - 24), 30);
+            // Player draws the library title in a centered 1280 x 720 reference frame.
+            float scale = Mathf.Min(screenWidth / 1280f, screenHeight / 720f);
+            var title = new Rect((screenWidth - 1280 * scale) / 2 + 20 * scale,
+                (screenHeight - 720 * scale) / 2 + 20 * scale, 335 * scale, 77 * scale);
+            if (rect.Overlaps(title)) rect.y = title.yMax + 6;
+            return rect;
         }
 
         internal void DrawVisibleNameplates(Action<Vector2, string, int> draw)
