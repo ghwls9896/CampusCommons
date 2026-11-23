@@ -1,0 +1,25 @@
+{
+  "id": "cc-60",
+  "title": "2인 퀴즈 대기 화면·제한 시간·채점과 경험치",
+  "owner": "HIGHCHOI",
+  "branch": "codex/cc-60-quiz-rules",
+  "issue": "https://github.com/ghwls9896/CampusCommons/issues/60",
+  "scope": [
+    "Assets/QuizRoom/",
+    "Assets/IntegrationAudit/Editor/IntegratedQuizFlowTest.cs",
+    "backend/duel.py",
+    "backend/quiz.py",
+    "backend/tests/test_duel.py",
+    "backend/tests/test_quiz.py",
+    "docs/multiplayer/QUIZ_DUEL.md",
+    "docs/multiplayer/QUIZ_PLAY.md",
+    "README.md"
+  ],
+  "shared_files": [],
+  "depends_on": [],
+  "validation": [
+    "서버의 15·30·60초 타이머와 문제별 채점·경험치",
+    "Unity 6000.4.5f1 첫 착석 카메라 조작, 두 번째 착석과 상대 이탈",
+    "실제 2인 로컬 경로와 이전 API 호환"
+  ]
+}
