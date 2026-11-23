@@ -31,7 +31,8 @@ namespace CampusCommons.Account
   public void Clear()
   {
    generation++;lifetime.Cancel();lifetime.Dispose();lifetime=new CancellationTokenSource();
-   access=refresh=null;expires=0;User=null;Profile=null;RecoveryPending=false;refreshTask=null;Changed?.Invoke();
+   access=refresh=null;expires=0;User=null;Profile=null;RecoveryPending=false;refreshTask=null;
+   ClearAvatarSave();Changed?.Invoke();
   }
   void Current(int expected,CancellationToken ct){ct.ThrowIfCancellationRequested();if(generation!=expected)throw new OperationCanceledException();}
   void Accept(AuthResponse response,bool recovery=false)
@@ -147,6 +148,10 @@ namespace CampusCommons.Account
   public Task<AccountProfile> EnterAsync(string nickname,CancellationToken ct=default(CancellationToken))=>ProfileCall(new ProfileRequest{action="enter",nickname=AccountRules.Nickname(nickname)},ct);
   public async Task SignOutAsync(CancellationToken ct=default(CancellationToken))
   {
+   int expected=generation;
+   if (IsAuthenticated && AvatarSavePending)
+    await Task.WhenAny(FlushAvatarAppearanceAsync(),Task.Delay(3000,ct));
+   if (expected!=generation) return;
    string previous=access;Clear();if(string.IsNullOrEmpty(previous))return;
    try{await transport.SendAsync<EmptyResponse>("POST","/auth/v1/logout?scope=local",null,previous,ct);}catch(AccountException){/* Local signout is immediate even when the remote service is unavailable. */}
   }

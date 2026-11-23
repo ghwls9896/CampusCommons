@@ -1,6 +1,9 @@
 #if CAMPUS_SUNBOX_AVATAR
 
+using System;
 using System.Collections.Generic;
+using CampusCommons.Account;
+using CampusCommons.Multiplayer;
 using UnityEngine;
 using Sunbox.Avatars;
 
@@ -10,6 +13,10 @@ namespace CampusCommons.GrandLibrary
     {
         private AvatarCustomization avatar;
         private Vector2 scroll;
+        private LobbyAvatarStyle style;
+        private LobbyAppearance defaultAppearance, currentAppearance, pendingAppearance;
+        private AccountSession appearanceSession;
+        private string appearanceUser, appearanceKey;
 
         public bool IsOpen { get; private set; }
 
@@ -17,6 +24,7 @@ namespace CampusCommons.GrandLibrary
         {
             avatar = avatarVisual.GetComponentInChildren
                 <AvatarCustomization>(true);
+            style = new LobbyAvatarStyle(avatarVisual.transform);
 
             if (avatar == null)
                 Debug.LogError("AvatarCustomization을 찾지 못했습니다.");
@@ -31,6 +39,69 @@ namespace CampusCommons.GrandLibrary
         public void Close()
         {
             IsOpen = false;
+        }
+
+        private void LateUpdate()
+        {
+            var gate = AccountGate.Instance;
+            var session = gate && gate.Ready && gate.Session.IsAuthenticated ? gate.Session : null;
+            if (session == null)
+            {
+                appearanceSession = null;
+                appearanceUser = appearanceKey = null;
+                Close();
+                return;
+            }
+
+            defaultAppearance ??= style?.Capture();
+            if (defaultAppearance == null) return;
+            if (appearanceSession != session || appearanceUser != session.UserId)
+                RestoreAppearance(session);
+            if (pendingAppearance != null && pendingAppearance.Matches(session.SavedAvatarAppearance))
+            {
+                pendingAppearance = null;
+                PlayerPrefs.DeleteKey(appearanceKey);
+                PlayerPrefs.Save();
+            }
+        }
+
+        private static string PendingKey(AccountSession session) => "CampusCommons.Avatar.Pending.v1." + session.UserId;
+
+        private void RestoreAppearance(AccountSession session)
+        {
+            appearanceSession = session;
+            appearanceUser = session.UserId;
+            appearanceKey = PendingKey(session);
+            pendingAppearance = ReadPendingAppearance(appearanceKey);
+            style.Apply(defaultAppearance);
+            if (pendingAppearance == null || !style.Apply(pendingAppearance))
+            {
+                pendingAppearance = null;
+                style.Apply(session.SavedAvatarAppearance);
+            }
+            else if (!pendingAppearance.Matches(session.SavedAvatarAppearance))
+                session.QueueAvatarAppearance(pendingAppearance);
+            currentAppearance = style.Capture();
+        }
+
+        private static LobbyAppearance ReadPendingAppearance(string key)
+        {
+            var stored = PlayerPrefs.GetString(key);
+            if (string.IsNullOrEmpty(stored)) return null;
+            try { return JsonUtility.FromJson<LobbyAppearance>(stored); }
+            catch (ArgumentException) { return null; }
+        }
+
+        private void SaveAppearance()
+        {
+            if (appearanceSession == null || !appearanceSession.IsAuthenticated ||
+                appearanceUser != appearanceSession.UserId) return;
+            var selected = style.Capture();
+            if (selected == null || selected.Matches(currentAppearance)) return;
+            currentAppearance = pendingAppearance = selected;
+            PlayerPrefs.SetString(appearanceKey, JsonUtility.ToJson(selected));
+            PlayerPrefs.Save();
+            appearanceSession.QueueAvatarAppearance(selected);
         }
 
         private int Wrap(int value, int count)
@@ -107,6 +178,7 @@ namespace CampusCommons.GrandLibrary
                     SlotType.Glasses, avatar.ClothingItemGlasses, gender);
 
             avatar.SetGender(gender);
+            SaveAppearance();
         }
 
         private void ChangeHair(int direction)
@@ -119,6 +191,7 @@ namespace CampusCommons.GrandLibrary
 
             avatar.HairMaterialIndex = 0;
             avatar.UpdateCustomization();
+            SaveAppearance();
         }
 
         private void ChangeHairColor()
@@ -138,6 +211,7 @@ namespace CampusCommons.GrandLibrary
                 hair.Variations.Length);
 
             avatar.UpdateCustomization();
+            SaveAppearance();
         }
 
         private void ChangeSkin()
@@ -153,6 +227,7 @@ namespace CampusCommons.GrandLibrary
                 avatar.SkinMaterialIndex + 1, count);
 
             avatar.UpdateCustomization();
+            SaveAppearance();
         }
 
         private void ChangeClothing(
@@ -168,6 +243,7 @@ namespace CampusCommons.GrandLibrary
                 Wrap(index + direction, options.Count);
 
             avatar.AttachClothingItem(options[next], 0);
+            SaveAppearance();
         }
 
         private void ChangeClothingColor(SlotType slot)
@@ -180,6 +256,7 @@ namespace CampusCommons.GrandLibrary
             int next = Wrap(current + 1, item.Variations.Length);
 
             avatar.SetClothingItemVariation(slot, next);
+            SaveAppearance();
         }
 
         private void ClothingRow(string title, SlotType slot)
@@ -225,6 +302,12 @@ namespace CampusCommons.GrandLibrary
 
             if (GUILayout.Button("닫기"))
                 Close();
+            if (appearanceSession?.AvatarSaveFailed == true)
+            {
+                if (GUILayout.Button("외형 저장 다시 시도")) _ = appearanceSession.FlushAvatarAppearanceAsync();
+            }
+            else if (appearanceSession?.AvatarSavePending == true)
+                GUILayout.Label("외형 저장 중…");
 
             GUILayout.Label("성별 선택");
             GUILayout.BeginHorizontal();

@@ -7,7 +7,7 @@ using Sunbox.Avatars;
 namespace CampusCommons.Multiplayer
 {
     [Serializable]
-    internal sealed class LobbyAppearance
+    public sealed class LobbyAppearance
     {
         public string type = "appearance";
         public int body, skin, hair, hair_color;
