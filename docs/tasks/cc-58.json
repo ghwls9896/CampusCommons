@@ -1,0 +1,13 @@
+{
+  "id": "cc-58",
+  "title": "공용 로비와 퀴즈룸에서 아바타 외형 실시간 동기화",
+  "owner": "HIGHCHOI",
+  "branch": "codex/cc-58-avatar-sync",
+  "issue": "https://github.com/ghwls9896/CampusCommons/issues/58",
+  "scope": ["Assets/Multiplayer/", "backend/lobby.py", "backend/tests/test_lobby.py",
+    "docs/multiplayer/LOBBY.md", "docs/AVATAR_SETUP.md", "README.md"],
+  "shared_files": [],
+  "depends_on": [],
+  "validation": ["실제 로비 WebSocket의 외형 메시지·늦은 입장·구버전 이동",
+    "Unity 6000.4.5f1 기본 및 Sunbox 아바타의 의상·색상·공간 이동"]
+}
