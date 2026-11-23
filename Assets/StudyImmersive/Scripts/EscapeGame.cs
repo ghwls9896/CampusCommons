@@ -149,11 +149,28 @@ namespace CampusCommons.StudyImmersive
             jumpAudio=gameObject.AddComponent<AudioSource>();jumpAudio.playOnAwake=false;jumpAudio.spatialBlend=0;
             if(schoolGrid)
             {
+                PrepareInteriorShadows();
                 SchoolUpperTrim.Create(schoolRoot);SchoolHallDecorations.Create(schoolRoot);elevators=SchoolElevators.Create(this,schoolRoot);
             }
             if(schoolRoot){var school=schoolRoot.Find("Escape School");if(school)breaker=WallBreakerVisual.Create(school);}
             if(exitDoor)exitDoor.RetireExitDesignation();
         }
+        void PrepareInteriorShadows()
+        {
+            if (!schoolRoot) return;
+            foreach (var surface in schoolRoot.GetComponentsInChildren<MeshRenderer>(true))
+            {
+                foreach (var material in surface.sharedMaterials)
+                {
+                    if (!material || (material.name != "Campus Ceiling" &&
+                        material.name != "Campus Wall" && material.name != "Campus Plain Wall")) continue;
+                    // Imported wall and ceiling panels are open meshes. Block light from either side.
+                    surface.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.TwoSided;
+                    break;
+                }
+            }
+        }
+
         void OnTriggerEnter(Collider other){var local=other.GetComponent<Player>();if(local)BeginSelection(local);}
         void OnTriggerStay(Collider other)
         {
