@@ -133,6 +133,8 @@ namespace CampusCommons.Quiz
             view.transform.SetPositionAndRotation(page.position - Vector3.forward * distance, Quaternion.identity);
         }
 
+        internal void SetVisible(bool visible) => canvas.enabled = visible;
+
         internal void SetInteraction(bool active)
         {
             if (acceptingInput && !active && EventSystem.current)

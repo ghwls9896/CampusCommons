@@ -57,20 +57,21 @@ namespace CampusCommons.Quiz
 
     [Serializable] public sealed class QuizDuelResult
     {
-        public int slot, score, correct, elapsed_ms;
+        public int slot, score, correct, elapsed_ms, max_points, xp;
         public string nickname;
-        public float accuracy;
+        public float accuracy, accuracy_percent, earned_points;
         public QuizDuelStage[] stages;
     }
 
-    [Serializable] public sealed class QuizDuelStage
+    [Serializable] public class QuizDuelStage
     {
-        public int level, score, elapsed_ms;
+        public int level, score, elapsed_ms, max_points, xp;
+        public float accuracy_percent, earned_points;
     }
 
-    [Serializable] public sealed class QuizDuelReview
+    [Serializable] public sealed class QuizDuelReview : QuizDuelStage
     {
-        public int level, source_page, score;
+        public int source_page;
         public string prompt, answer, model_answer, explanation, feedback;
     }
 
