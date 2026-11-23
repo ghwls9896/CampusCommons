@@ -47,8 +47,8 @@ namespace CampusCommons.Webcam
         StudyHistory[] history = Array.Empty<StudyHistory>();
         StudyStore store;
         StudyRecord active;
-        string owner;
-        double timeAnchor, nextSave, nextSync;
+        string owner, legacyPath;
+        double timeAnchor, nextSave, nextSync, nextOpen;
         long utcAnchor, summaryDay = -1, displayedDay = -1;
         bool syncing, storageFailed, summaryRequested, retryRejected;
         bool showHistory;
@@ -80,19 +80,44 @@ namespace CampusCommons.Webcam
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            legacyPath = StoragePath();
+        }
+
+        void UseAccount(string current)
+        {
+            if (current == owner) return;
+            Finish();
+            store?.Dispose();
+            store = null;
+            owner = current;
+            storageFailed = false;
+            nextOpen = 0;
+            summaryDay = -1;
+            history = Array.Empty<StudyHistory>();
+            SessionMilliseconds = TodayMilliseconds = 0;
+            showHistory = retryRejected = false;
+            SyncStatus = current == null ? "로그인 후 기록을 불러옵니다." : "기록 준비 중";
+            RequestSummary();
+        }
+
+        void OpenStore()
+        {
+            nextOpen = Time.realtimeSinceStartupAsDouble + 2;
             try
             {
-                store = StudyStore.Load(StoragePath());
+                store = StudyStore.OpenForAccount(legacyPath, owner);
+                storageFailed = false;
                 // On restart, recover only the time observed before the last durable save.
                 foreach (var record in store.Data.sessions)
                     if (record.ended_ms == 0) record.ended_ms = LastObservedEnd(record);
-                SyncStatus = "로그인 후 기록을 불러옵니다.";
+                SyncStatus = "기록 불러옴";
                 Persist();
+                RefreshToday();
             }
             catch (Exception)
             {
                 storageFailed = true;
-                SyncStatus = "기록 파일을 열 수 없습니다. 다른 게임 창과 저장 공간을 확인해 주세요.";
+                SyncStatus = "기록 파일을 열 수 없습니다. 같은 계정으로 열린 다른 창이나 저장 공간을 확인해 주세요.";
             }
         }
 
@@ -102,9 +127,14 @@ namespace CampusCommons.Webcam
         public bool Begin()
         {
             var gate = AccountGate.Instance;
-            if (!Available || !gate || !gate.Ready || !gate.Session.IsAuthenticated) return false;
+            if (!gate || !gate.Ready || !gate.Session.IsAuthenticated) return false;
+            UseAccount(gate.Session.UserId);
+            if (store == null) OpenStore();
+            else if (storageFailed) { storageFailed = false; Persist(); }
+            if (!Available) return false;
 
             Finish();
+            if (!Available) return false;
             utcAnchor = UtcNow;
             timeAnchor = Time.realtimeSinceStartupAsDouble;
             active = store.Begin(gate.Session.UserId, utcAnchor);
@@ -166,17 +196,9 @@ namespace CampusCommons.Webcam
         {
             var gate = AccountGate.Instance;
             string current = gate && gate.Ready && gate.Session.IsAuthenticated ? gate.Session.UserId : null;
-            if (current != owner)
-            {
-                Finish();
-                owner = current;
-                summaryDay = -1;
-                history = Array.Empty<StudyHistory>();
-                SessionMilliseconds = 0;
-                showHistory = retryRejected = false;
-                RequestSummary();
-                RefreshToday();
-            }
+            UseAccount(current);
+            if (owner != null && store == null && Time.realtimeSinceStartupAsDouble >= nextOpen)
+                OpenStore();
 
             if (storageFailed)
             {
@@ -213,16 +235,17 @@ namespace CampusCommons.Webcam
             RequestSummary();
         }
 
-        bool IsCurrent(AccountSession account, string user)
+        bool IsCurrent(AccountSession account, string user, StudyStore source)
         {
             var gate = AccountGate.Instance;
             return this && gate && gate.Ready && gate.Session == account &&
-                account.IsAuthenticated && account.UserId == user && owner == user;
+                account.IsAuthenticated && account.UserId == user && owner == user && store == source;
         }
 
         async Task Sync(AccountSession account, string user)
         {
             syncing = true;
+            var source = store;
             bool requested = summaryRequested || summaryDay != displayedDay;
             bool tryRejected = retryRejected;
             summaryRequested = retryRejected = false;
@@ -252,7 +275,7 @@ namespace CampusCommons.Webcam
                     catch (AccountException error) when (error.Code == "record_conflict" ||
                         error.Code == "invalid_record" || error.Code == "forbidden")
                     {
-                        if (!IsCurrent(account, user)) return;
+                        if (!IsCurrent(account, user, source)) return;
                         record.sync_error = error.Code;
                         Persist();
                         RefreshToday();
@@ -260,7 +283,7 @@ namespace CampusCommons.Webcam
                         continue;
                     }
 
-                    if (!IsCurrent(account, user)) return;
+                    if (!IsCurrent(account, user, source)) return;
                     if (reply == null || reply.user_id != user || reply.session_id != record.session_id ||
                         reply.ack_sequence != expected)
                         throw new InvalidDataException("Invalid study acknowledgement");
@@ -283,7 +306,7 @@ namespace CampusCommons.Webcam
                 if (requested && !receivedSummary)
                 {
                     var reply = await account.StudyCallAsync<StudyReply>(user, new StudySummaryRequest());
-                    if (!IsCurrent(account, user)) return;
+                    if (!IsCurrent(account, user, source)) return;
                     if (reply == null || reply.user_id != user) throw new InvalidDataException("Invalid study summary");
                     store.SetTotal(user, reply.day_ms, reply.today_ms);
                     ApplySummary(reply);
@@ -297,7 +320,7 @@ namespace CampusCommons.Webcam
             }
             catch (Exception)
             {
-                if (IsCurrent(account, user))
+                if (IsCurrent(account, user, source))
                 {
                     summaryRequested |= requested;
                     SyncStatus = "기기에 보관 중 · 연결되면 재전송";

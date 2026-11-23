@@ -6,10 +6,13 @@ import hmac
 import os
 
 import httpx
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Query, Request
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 
+from duel import duel_router
+from hosted_quiz import HostedQuiz
+from lobby import lobby_router
 from quiz import (QuizError, generate_quiz, grade_answers, pdf_page_count,
                   select_pdf_range, MAX_SELECTED_PAGES, GradingRequest, validate_grades)
 
@@ -33,10 +36,13 @@ class Settings:
                    daily_limit=max(1, int(os.getenv('DAILY_GENERATION_LIMIT', '30'))))
 
 
-def create_app(settings: Settings | None = None, generator=generate_quiz, grader=grade_answers) -> FastAPI:
+def create_app(settings: Settings | None = None, generator=generate_quiz, grader=grade_answers,
+               *, lobby_account_transport: httpx.AsyncBaseTransport | None = None,
+               hosted_quiz: HostedQuiz | None = None) -> FastAPI:
     settings = settings or Settings.from_env()
     api = FastAPI(title='Campus Commons PDF Quiz', docs_url=None, redoc_url=None, openapi_url=None)
-    busy = False
+    api.include_router(lobby_router(lobby_account_transport))
+    worker = asyncio.Lock()
     budget_day = ''
     used = 0
 
@@ -56,7 +62,7 @@ def create_app(settings: Settings | None = None, generator=generate_quiz, grader
             raise QuizError('unauthorized', '참가 코드가 맞지 않습니다. 연결 설정을 확인해 주세요.', 401)
         if request.headers.get('content-type', '').split(';')[0].strip().lower() != content_type:
             raise QuizError('unsupported_file', '올바른 요청 형식이 아닙니다.', 415)
-        if busy:
+        if worker.locked():
             raise QuizError('busy', '다른 학습 자료를 처리 중입니다. 잠시 후 다시 시도해 주세요.', 429)
 
     def use_budget():
@@ -81,17 +87,16 @@ def create_app(settings: Settings | None = None, generator=generate_quiz, grader
         return bytes(data)
 
     @api.post('/v1/quizzes')
-    async def quizzes(request: Request):
-        return await process_pdf(request, inspect_only=False)
+    async def quizzes(request: Request, target_level: int | None = Query(default=None, ge=1, le=15)):
+        return await process_pdf(request, inspect_only=False, target_level=target_level)
 
     @api.post('/v1/pdfs/inspect')
     async def inspect_pdf(request: Request):
         return await process_pdf(request, inspect_only=True)
 
-    async def process_pdf(request: Request, inspect_only: bool):
-        nonlocal busy
+    async def process_pdf(request: Request, inspect_only: bool, target_level: int | None = None):
         authorize(request, 'application/pdf')
-        busy = True
+        await worker.acquire()
         try:
             data = await read_body(request, settings.max_pdf_bytes)
             if inspect_only:
@@ -110,7 +115,11 @@ def create_app(settings: Settings | None = None, generator=generate_quiz, grader
             async with httpx.AsyncClient() as client:
                 try:
                     async with asyncio.timeout(settings.generation_timeout):
-                        result = await generator(selected, last-first+1, settings.api_key, settings.model, client)
+                        if target_level is None:
+                            result = await generator(selected, last-first+1, settings.api_key, settings.model, client)
+                        else:
+                            result = await generator(selected, last-first+1, settings.api_key, settings.model, client, target_level)
+                            result['target_level'] = target_level
                 except TimeoutError as exc:
                     raise QuizError('generation_timeout', 'AI 응답이 오래 걸립니다. 다시 생성해 주세요.', 504) from exc
             for question in result['questions']:
@@ -118,13 +127,12 @@ def create_app(settings: Settings | None = None, generator=generate_quiz, grader
             result['page_range'] = {'start_page': first, 'end_page': last, 'total_pages': total}
             return JSONResponse(result, headers={'Cache-Control': 'no-store'})
         finally:
-            busy = False
+            worker.release()
 
     @api.post('/v1/quizzes/grade')
     async def grades(request: Request):
-        nonlocal busy
         authorize(request, 'application/json')
-        busy = True
+        await worker.acquire()
         try:
             data = await read_body(request, 48 * 1024)
             try:
@@ -143,8 +151,9 @@ def create_app(settings: Settings | None = None, generator=generate_quiz, grader
                         raise QuizError('grading_timeout', '채점이 지연되고 있습니다. 결과 화면에서 다시 채점해 주세요.',504) from exc
             return JSONResponse(validate_grades(result, answers), headers={'Cache-Control': 'no-store'})
         finally:
-            busy = False
+            worker.release()
 
+    api.include_router(duel_router(settings, lobby_account_transport, generator, grader, use_budget, read_body, worker, hosted_quiz))
     return api
 
 app = create_app()

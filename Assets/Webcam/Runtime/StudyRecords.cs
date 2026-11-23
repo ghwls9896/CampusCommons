@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
+using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
 
@@ -53,24 +55,59 @@ namespace CampusCommons.Webcam
 
         public StudyArchive Data { get; private set; } = new StudyArchive();
 
-        StudyStore(string path)
+        StudyStore(string path, bool readOnly)
         {
             this.path = path;
             Directory.CreateDirectory(Path.GetDirectoryName(path));
             bool windows = Environment.OSVersion.Platform == PlatformID.Win32NT;
-            lease = new FileStream(path + ".lock", FileMode.OpenOrCreate, FileAccess.ReadWrite,
-                windows ? FileShare.None : FileShare.ReadWrite);
+            lease = new FileStream(path + ".lock", FileMode.OpenOrCreate,
+                readOnly ? FileAccess.Read : FileAccess.ReadWrite,
+                windows ? (readOnly ? FileShare.Read : FileShare.None) : FileShare.ReadWrite);
             // macOS Unity Mono needs the OS lock across separate game processes.
-            if (!windows && flock(lease.SafeFileHandle.DangerousGetHandle().ToInt32(), 2 | 4) != 0)
+            const int shared = 1, exclusive = 2, nonBlocking = 4;
+            if (!windows && flock(lease.SafeFileHandle.DangerousGetHandle().ToInt32(),
+                (readOnly ? shared : exclusive) | nonBlocking) != 0)
             {
                 Dispose();
                 throw new IOException("Study records already in use");
             }
         }
 
-        public static StudyStore Load(string path)
+        public static StudyStore OpenForAccount(string legacyPath, string user)
         {
-            var store = new StudyStore(path);
+            if (string.IsNullOrWhiteSpace(user)) throw new ArgumentException("Missing study account", nameof(user));
+            string key;
+            using (var hash = SHA256.Create())
+                key = BitConverter.ToString(hash.ComputeHash(Encoding.UTF8.GetBytes(user))).Replace("-", "");
+            string path = Path.Combine(Path.GetDirectoryName(legacyPath), "study-accounts", key + ".xml");
+            var account = Load(path);
+            try
+            {
+                // Check after acquiring the account lease. The first durable save completes migration.
+                if (File.Exists(path) || File.Exists(path + ".bak")) return account;
+                if (File.Exists(legacyPath) || File.Exists(legacyPath + ".bak"))
+                {
+                    using (var legacy = Load(legacyPath, true))
+                    {
+                        account.Data.sessions.AddRange(legacy.Data.sessions.Where(record => record.user_id == user));
+                        account.Data.totals.AddRange(legacy.Data.totals.Where(entry => entry.user_id == user));
+                    }
+                }
+                account.Save();
+                return account;
+            }
+            catch
+            {
+                account.Dispose();
+                throw;
+            }
+        }
+
+        public static StudyStore Load(string path) => Load(path, false);
+
+        static StudyStore Load(string path, bool readOnly)
+        {
+            var store = new StudyStore(path, readOnly);
             if (!File.Exists(path) && !File.Exists(path + ".bak")) return store;
 
             foreach (string candidate in new[] { path, path + ".bak" })
