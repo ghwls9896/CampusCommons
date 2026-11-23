@@ -91,7 +91,6 @@ namespace CampusCommons.Quiz
                 framed = true;
             }
             else RestoreBoardView();
-            theme.SetVisible(!IsSeated || showMatch);
             theme.SetInteraction(showMatch && !player.IsExitConfirmOpen && !AccountGate.LobbyOverlayOwnsInput);
             RefreshBoard();
         }

@@ -116,15 +116,13 @@ namespace CampusCommons.Quiz.Editor
                 }
                 if (step == 3)
                 {
-                    Check(!room.BlocksMovement && !board.enabled && chair.occupant == player,
-                        "The first player should wait seated with the board hidden");
+                    CheckWaitingBoard("The first player should wait seated with the wall rules visible");
                     Apply(Round("waiting", false));
                     step++; changed = Time.time; return;
                 }
                 if (step == 4)
                 {
-                    Check(!room.BlocksMovement && !board.enabled && chair.occupant == player,
-                        "Confirmed solo waiting should keep the seated view");
+                    CheckWaitingBoard("Confirmed solo waiting should keep the seated view and wall rules");
                     Apply(Round("upload", true));
                     step++; changed = Time.time; return;
                 }
@@ -139,8 +137,7 @@ namespace CampusCommons.Quiz.Editor
                 }
                 if (step == 6)
                 {
-                    Check(!room.BlocksMovement && !board.enabled && chair.occupant == player,
-                        "A departing partner should leave the remaining player seated");
+                    CheckWaitingBoard("A departing partner should restore the seated view and wall rules");
                     var results = Round("results", true);
                     results.results = new[] { new QuizDuelResult {
                         nickname = "퀴즈검사", max_points = 10, earned_points = 6.86f, xp = 61,
@@ -169,6 +166,13 @@ namespace CampusCommons.Quiz.Editor
             }
             catch(Exception ex) { Debug.LogException(ex); Finish(1); }
         }
+        static void CheckWaitingBoard(string reason)
+        {
+            Check(!room.BlocksMovement && board.enabled && chair.occupant == player &&
+                board.GetComponentsInChildren<UnityEngine.UI.Text>().Any(t => t.text.Contains("객관식 15초")) &&
+                !board.GetComponentsInChildren<UnityEngine.UI.Button>().Any(b => b.name == "일어나기"), reason);
+        }
+
         static QuizDuelState Round(string phase, bool paired)
         {
             var self = new QuizDuelPlayer { slot = 0, nickname = "퀴즈검사", level = 2 };
