@@ -150,14 +150,27 @@ class Duel:
         return seat
 
     def identify(self, request):
-        self.sweep()
         scheme, _, token = request.headers.get('authorization', '').partition(' ')
-        if scheme.lower() == 'bearer' and token.isascii() and 0 < len(token) <= 128:
+        seat = self.seat_for_ticket(token if scheme.lower() == 'bearer' else '')
+        self.touch(seat)
+        return seat
+
+    def seat_for_ticket(self, ticket):
+        self.sweep()
+        if ticket.isascii() and 0 < len(ticket) <= 128:
             for seat in self.seats.values():
-                if secrets.compare_digest(seat.ticket, token):
-                    self.touch(seat)
+                if secrets.compare_digest(seat.ticket, ticket):
                     return seat
         raise QuizError('seat_expired', '좌석 연결이 종료되었습니다. 다시 앉아 주세요.', 401)
+
+    def renew(self, ticket, account):
+        seat = self.seat_for_ticket(ticket)
+        if seat.account.user_id != account.user_id:
+            raise QuizError('seat_owner_mismatch', '이 계정으로 연결한 좌석이 아닙니다.', 403)
+        if account.expires_at >= seat.account.expires_at:
+            seat.account = account
+        self.touch(seat)
+        return seat
 
     def update(self):
         rd = self.round
@@ -327,17 +340,28 @@ def duel_router(settings, account_transport, generator, grader, use_budget, read
     router = APIRouter(prefix='/v1/duel')
     no_store = {'Cache-Control': 'no-store'}
 
+    async def verified_account(request):
+        try:
+            return await read_account(request.headers.get('authorization', ''), account_transport)
+        except LobbyClose as exc:
+            status = {4401: 401, 4403: 403}.get(exc.code, 503)
+            raise QuizError(exc.reason, '로그인 상태와 계정 서버 연결을 확인해 주세요.', status) from exc
+
+    def admission(seat):
+        return JSONResponse({'ticket': seat.ticket, 'account_expires_at': seat.account.expires_at,
+                             'state': table.state(seat)}, headers=no_store)
+
     @router.post('/seats/{slot}')
     async def join(slot: int, request: Request):
         if slot not in (0, 1):
             raise QuizError('invalid_seat', '퀴즈 좌석을 선택해 주세요.')
-        try:
-            account = await read_account(request.headers.get('authorization', ''), account_transport)
-        except LobbyClose as exc:
-            status = {4401: 401, 4403: 403}.get(exc.code, 503)
-            raise QuizError(exc.reason, '로그인 상태와 계정 서버 연결을 확인해 주세요.', status) from exc
-        seat = table.join(slot, account)
-        return JSONResponse({'ticket': seat.ticket, 'state': table.state(seat)}, headers=no_store)
+        return admission(table.join(slot, await verified_account(request)))
+
+    @router.post('/seat/renew')
+    async def renew(request: Request):
+        ticket = request.headers.get('x-quiz-seat-ticket', '')
+        table.seat_for_ticket(ticket)
+        return admission(table.renew(ticket, await verified_account(request)))
 
     @router.get('/state')
     async def state(request: Request):
@@ -358,7 +382,6 @@ def duel_router(settings, account_transport, generator, grader, use_budget, read
             raise QuizError('upload_busy', '자료를 확인 중입니다. 잠시 후 다시 제출해 주세요.', 429)
         table.pending_uploads += 1
         sheet.uploading = True
-        sheet.pdf, sheet.questions = None, []
         try:
             # At most two seated upload handlers can wait. Serialize PDF parsing and model
             # work with the legacy quiz API on the same single-worker free instance.
@@ -373,6 +396,8 @@ def duel_router(settings, account_transport, generator, grader, use_budget, read
             table.identify(request)
             table.round.check_id(round_id)
             sheet.pdf, sheet.pages, sheet.first_page = selected, last - first + 1, first
+            sheet.questions = []
+            sheet.applied_level = None
         finally:
             table.pending_uploads -= 1
             sheet.uploading = False

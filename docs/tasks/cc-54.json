@@ -61,10 +61,12 @@
     "backend/tests/test_lobby.py",
     "docs/QUIZ_ROOM_SETUP.md",
     "docs/distribution/DESKTOP.md",
+    "docs/distribution/WINDOWS_TEAM.md",
     "docs/multiplayer/LOBBY.md",
     "docs/multiplayer/QUIZ_DUEL.md",
     "docs/multiplayer/QUIZ_PLAY.md",
     "docs/multiplayer/UNITY_LOBBY.md",
+    "docs/study/RECORDS.md",
     "docs/tasks/cc-44.json",
     "docs/tasks/cc-44.md",
     "docs/tasks/cc-46.json",
@@ -75,7 +77,6 @@
     "docs/tasks/cc-49.md",
     "docs/tasks/cc-52.json",
     "docs/tasks/cc-52.md",
-    "docs/study/RECORDS.md",
     "render.yaml"
   ],
   "shared_files": [
@@ -93,6 +94,7 @@
     "Unity 6000.4.5f1 실제 도서관 Play Mode 및 Mac 두 창 기동",
     "다른 두 계정의 동시에 열린 기록 저장소, 기존 기록 승계와 재실행, 같은 계정 중복 접근",
     "로비 제목, 좌측 인원 표시와 공부 시간 위치 검사",
-    "기존 백엔드와 팀 검사 및 사용자 두 계정 로비·퀴즈 시연"
+    "기존 백엔드와 팀 검사 및 사용자 두 계정 로비·퀴즈 시연",
+    "좌석 갱신 중 라운드·답안·타이머 보존, 잘못된 PDF 교체 후 재시도, 세 번째 계정 좌석 거부 및 이전 토큰 빌드 차단"
   ]
 }

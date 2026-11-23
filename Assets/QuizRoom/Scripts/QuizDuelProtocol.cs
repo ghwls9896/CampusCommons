@@ -11,6 +11,7 @@ namespace CampusCommons.Quiz
     [Serializable] public sealed class QuizSeatAdmission
     {
         public string ticket;
+        public long account_expires_at;
         public QuizDuelState state;
     }
 

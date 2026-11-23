@@ -141,6 +141,7 @@ namespace CampusCommons.Quiz
                     throw new QuizDuelFailure(502, "좌석 정보를 확인하지 못했습니다.");
                 ticket = admission.ticket;
                 Apply(admission.state);
+                long accountExpiry = admission.account_expires_at;
                 while (true)
                 {
                     await Task.Delay(500, ct);
@@ -153,6 +154,8 @@ namespace CampusCommons.Quiz
                         // Keep the seat lease alive during uploads. A concurrent poll
                         // may have read the state before a newer accepted command.
                         if (!acting && before == actionVersion) Apply(latest);
+                        if (accountExpiry > 0 && accountExpiry <= DateTimeOffset.UtcNow.ToUnixTimeSeconds() + 45)
+                            accountExpiry = await session.RenewQuizSeatAsync(slot, admission.ticket, ct);
                     }
                     catch (QuizDuelFailure e) when (e.Status == 401) { throw; }
                     catch (Exception) when (!ct.IsCancellationRequested)

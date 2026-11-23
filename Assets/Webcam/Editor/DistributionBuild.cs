@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using CampusCommons.Account;
@@ -18,6 +19,16 @@ namespace CampusCommons.Webcam.Editor
             if (string.IsNullOrWhiteSpace(account) || JsonUtility.FromJson<AccountConnection>(account)?.IsValid() != true)
                 throw new BuildFailedException("Valid AccountConnection.json is required in Assets/Account/Resources.");
         }
+        static void ValidateQuizResources(IEnumerable<string> assetPaths)
+        {
+            foreach (string path in assetPaths)
+            {
+                if (path.IndexOf("/Resources/", StringComparison.OrdinalIgnoreCase) >= 0 &&
+                    string.Equals(Path.GetFileName(path), "QuizConnection.json", StringComparison.OrdinalIgnoreCase))
+                    throw new BuildFailedException("Move the legacy QuizConnection.json outside Unity Resources before building: " + path);
+            }
+        }
+
         public void OnPreprocessBuild(BuildReport report)
         {
             string platform = report.summary.platform == BuildTarget.StandaloneOSX ? "macos-arm64" :
@@ -27,6 +38,7 @@ namespace CampusCommons.Webcam.Editor
             if (report.summary.platform == BuildTarget.StandaloneOSX && UnityEditor.OSXStandalone.UserBuildSettings.architecture != OSArchitecture.ARM64)
                 throw new BuildFailedException("The macOS runtime requires ARM64. Use CampusCommons > Distribution > Build macOS.");
 #endif
+            ValidateQuizResources(AssetDatabase.GetAllAssetPaths());
             ValidateAccountConnection(Resources.Load<TextAsset>("AccountConnection")?.text);
             try
             {
@@ -101,6 +113,12 @@ namespace CampusCommons.Webcam.Editor
             foreach (var invalid in new[] { "", "{}", account.Replace("https://", "http://"), account.Replace("sb_publishable_fixture_only", "invalid") })
                 try { ValidateAccountConnection(invalid); } catch (BuildFailedException) { rejected++; }
             if (rejected != 4) throw new Exception("Incomplete client configuration accepted");
+            ValidateQuizResources(new[] { "Assets/QuizRoom/Resources/QuizConnection.example.json",
+                "Assets/Account/Resources/AccountConnection.json" });
+            foreach (string legacy in new[] { "Assets/QuizRoom/Resources/QuizConnection.json",
+                "Assets/Other/Resources/Legacy/quizconnection.JSON" })
+                try { ValidateQuizResources(new[] { legacy }); } catch (BuildFailedException) { rejected++; }
+            if (rejected != 6) throw new Exception("Legacy quiz token resource accepted");
             string previousMinimum = MacMinimum("15.0");
             try { if (MacMinimum(null) != "15.0") throw new Exception("Minimum macOS setting not applied"); }
             finally { MacMinimum(previousMinimum); }

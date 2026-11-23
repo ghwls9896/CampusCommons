@@ -20,7 +20,9 @@ class Game:
         monkeypatch.setenv('SUPABASE_URL', 'https://accounts.example.test')
         monkeypatch.setenv('SUPABASE_PUBLISHABLE_KEY', 'sb_publishable_test')
         self.now = 100.
-        monkeypatch.setattr(duel, 'time', SimpleNamespace(monotonic=lambda: self.now, time=time.time))
+        self.epoch = time.time() - self.now
+        monkeypatch.setattr(duel, 'time', SimpleNamespace(monotonic=lambda: self.now,
+                                                         time=lambda: self.epoch + self.now))
         self.accounts = Accounts()
         self.credentials = [self.accounts.issue(n) for n in (1, 2, 3)]
         for token, level in zip(self.credentials, (2, 11, 15)):
@@ -208,6 +210,65 @@ def test_seat_lease_expiration_frees_chair_and_discards_private_files(game):
         assert game.client.get('/v1/duel/state', headers=game.tickets[0]).status_code == 401
         assert game.join(2, 0).is_success
         assert not any(player['ready'] for player in game.state(1)['players'])
+
+
+def test_renewing_the_same_seat_keeps_round_answer_and_original_deadline(game):
+    original_expiry = int(game.epoch + game.now) + 15
+    game.credentials[0] = game.accounts.issue(1, original_expiry)
+    with game.open():
+        game.prepare()
+        original_round = game.wait('playing')['round_id']
+        game.now += 5
+        assert game.move(0, 1, choice=0).is_success
+
+        def renew(credential, ticket):
+            return game.client.post('/v1/duel/seat/renew', headers={
+                'Authorization': 'Bearer ' + credential, 'X-Quiz-Seat-Ticket': ticket,
+            })
+
+        ticket = game.tickets[0]['Authorization'].removeprefix('Bearer ')
+        assert renew(game.credentials[1], ticket).status_code == 403
+        fresh_expiry = original_expiry + 300
+        fresh = game.accounts.issue(1, fresh_expiry)
+        data = renew(fresh, ticket).json()
+        assert data['account_expires_at'] == fresh_expiry and data['ticket'] == ticket
+        assert renew(game.credentials[0], ticket).json()['account_expires_at'] == fresh_expiry
+
+        game.now += 11
+        state = game.state(0)
+        assert state['round_id'] == original_round and game.state(1)['round_id'] == original_round
+        assert state['question']['level'] == 2 and state['remaining_ms'] == 4000
+        for user in (0, 1):
+            assert game.move(user, 2, text='정답').is_success
+            assert game.move(user, 3, text='정답').is_success
+        assert game.wait('results')['results'][0]['score'] == 30
+        assert game.leave(0).status_code == 204
+        assert renew(fresh, ticket).status_code == 401
+
+
+def test_third_account_cannot_take_either_chair_or_change_a_running_match(game):
+    with game.open():
+        game.prepare()
+        original = game.wait('playing')
+        for slot in (0, 1):
+            denied = game.join(2, slot)
+            assert denied.status_code == 409 and denied.json()['error']['code'] == 'seat_taken'
+        assert game.state(0) == original
+        assert game.state(1)['round_id'] == original['round_id']
+
+
+def test_invalid_pdf_replacement_keeps_ready_questions_and_allows_retry(game):
+    with game.open():
+        game.fail_generate_once = True
+        game.prepare()
+        previous = game.wait('error')
+        assert previous['players'][0]['ready']
+        assert game.upload(0, start_page=8, end_page=9).status_code == 422
+        assert game.state(0) == previous
+        assert game.retry().is_success
+        state = game.wait('playing')
+        assert state['question']['prompt'].startswith('PDF 3,')
+        assert game.generated == [(3, 7), (4, 7), (4, 7)]
 
 
 def test_leaving_during_generation_cancels_old_job_before_seat_reuse(game):

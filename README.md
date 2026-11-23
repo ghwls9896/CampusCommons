@@ -5,7 +5,7 @@ Unity 기반 학습·탈출 게임입니다. 로그인한 학생들은 공용 �
 ## 현재 기준
 
 - 기존 배포본 기준: 2026-11-17 `main` [`38a8568`](https://github.com/ghwls9896/CampusCommons/commit/38a8568f79f2de92d43f5745276073ad1bb4a76c). #31, #35, #37, #39 통합 완료.
-- 공용 로비 및 2인 퀴즈의 서버·클라이언트 통합 상태는 [로비 PR #47](https://github.com/ghwls9896/CampusCommons/pull/47)과 [퀴즈룸 PR #51](https://github.com/ghwls9896/CampusCommons/pull/51)에서 확인합니다.
+- 계정 UI, 공용 로비, 공부 좌석과 2인 퀴즈는 [통합 PR #55](https://github.com/ghwls9896/CampusCommons/pull/55)에서 검토합니다.
 - Unity **6000.4.5f1**.
 - 현재 메인 씬: `Assets/StudyImmersive/Scenes/GrandLibrary_Living.unity`.
 - #33(레벨 성장·보상)는 보류 중이며 main에 포함되지 않습니다.
@@ -37,14 +37,13 @@ Unity 기반 학습·탈출 게임입니다. 로그인한 학생들은 공용 �
 - 로그인·계정 기록·PDF 퀴즈에는 인터넷과 해당 서버가 필요합니다.
 - 동봉 웹캠 모델은 기기에서 실행합니다. 카메라 허용은 사용자가 직접 선택합니다.
 
-### 개발자
+### 팀 개발
 
-1. 저장소를 clone하고 Unity 6000.4.5f1로 엽니다.
-2. `GrandLibrary_Living.unity` 씬을 엽니다.
-3. [계정 설정](docs/account/SETUP.md), [퀴즈 설정](docs/QUIZ_ROOM_SETUP.md)을 확인합니다. 2인 퀴즈는 로그인한 계정으로 좌석을 인증합니다.
-4. 상세 아바타는 [설치 안내](docs/AVATAR_SETUP.md)에 따라 준비합니다. 미설치 시 기본 캐릭터가 동작합니다.
-5. 웹캠 런타임과 배포는 [데스크톱 안내](docs/distribution/DESKTOP.md)를 따릅니다.
-6. Play로 실행합니다. 기존 씬을 생성 메뉴로 덮어쓰지 않습니다.
+1. #55 병합 후 처음 받는 팀원은 `git clone https://github.com/ghwls9896/CampusCommons.git`으로 받습니다. 기존 작업이 있으면 커밋한 뒤 `git fetch origin`으로 최신 상태를 가져옵니다.
+2. 새 작업은 `origin/main`에서 이슈별 브랜치를 만들고 별도 작업 폴더에서 진행합니다. 진행 중인 자기 브랜치에 최신 통합 코드를 반영하려면 해당 브랜치에서 `git merge origin/main`을 실행합니다. [팀 작업 절차](CONTRIBUTING.md) · [기능 담당표](docs/team/OWNERSHIP.md)
+3. Mac과 Windows에서 Unity Hub로 저장소의 프로젝트 폴더를 추가하고 **6000.4.5f1**로 엽니다. `Assets/StudyImmersive/Scenes/GrandLibrary_Living.unity`를 열고 **Play**를 누릅니다.
+4. 공용 로비와 퀴즈를 함께 테스트할 때는 각자 다른 계정으로 로그인합니다. 공개 계정 연결 설정은 프로젝트에 포함돼 있습니다. [계정 설정](docs/account/SETUP.md) · [2인 퀴즈와 방 동작](docs/multiplayer/QUIZ_PLAY.md)
+5. 상세 아바타는 [설치 안내](docs/AVATAR_SETUP.md), 공부 인식 런타임은 [데스크톱 안내](docs/distribution/DESKTOP.md)를 확인합니다. 상세 아바타를 설치하지 않은 상태에서도 기본 캐릭터로 테스트할 수 있습니다. 팀 개발과 Play Mode 실행에는 GitHub Releases가 필요 없습니다.
 
 ## 주요 조작
 
