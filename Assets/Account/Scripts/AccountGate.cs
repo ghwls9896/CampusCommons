@@ -13,6 +13,7 @@ namespace CampusCommons.Account
   public AccountSession Session {get;private set;}
   public Screen Page {get;set;}=Screen.Start;
   public bool Ready {get;private set;}
+  public bool LobbyEnabled {get; private set;} = true;
   public bool Busy {get;private set;}
   public string Message {get;private set;}="";
   public bool Configured {get;private set;}
@@ -53,7 +54,15 @@ namespace CampusCommons.Account
    if(Session!=null){Session.Changed-=SessionChanged;Session.Dispose();}Session=new AccountSession(transport);Session.Changed+=SessionChanged;
   }
   // Dependency injection for editor fixtures and future platform transports, not an auth bypass.
-  public void Configure(IAccountTransport transport){Revoke();SetSession(transport);Configured=true;Page=Screen.Start;}
+  public void Configure(IAccountTransport transport) => Configure(transport, false);
+  public void Configure(IAccountTransport transport, bool enableLobby)
+  {
+   Revoke();
+   LobbyEnabled = enableLobby;
+   SetSession(transport);
+   Configured = true;
+   Page = Screen.Start;
+  }
   void SessionChanged(){if(!Session.IsAuthenticated&&Ready){Revoke();Page=Screen.Login;}}
   public void Revoke(){bool wasReady=Ready;Ready=false;if(backdrop)backdrop.enabled=true;if(World)World.Block();if(wasReady)EntryRevoked?.Invoke();}
   public async Task LoginAsync(string email, string password)

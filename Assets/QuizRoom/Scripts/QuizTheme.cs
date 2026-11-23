@@ -1,119 +1,311 @@
-using System.Collections.Generic;
+using System;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
+using Object = UnityEngine.Object;
 
 namespace CampusCommons.Quiz
 {
-    // Local IMGUI theme; shared scene and global GUI skin are never modified.
-    internal sealed class QuizTheme
+    // All quiz graphics, including the controls, are on the existing wall board.
+    internal sealed class QuizTheme : IDisposable
     {
-        internal static readonly Color Ink = new Color(.10f,.15f,.23f);
-        internal static readonly Color Muted = new Color(.43f,.48f,.55f);
-        internal static readonly Color Navy = new Color(.15f,.24f,.37f);
-        internal static readonly Color Green = new Color(.12f,.43f,.34f);
-        internal readonly GUIStyle Title, Heading, Body, Small, Caption, FileName, Input, TimerNumber, TimerCaption;
-        internal readonly GUIStyle Panel, Card, WhiteCard, ErrorCard, SuccessCard, Shadow;
-        internal readonly GUIStyle Primary, Secondary, Quiet, Choice, SelectedChoice, CorrectChoice, WrongChoice;
-        internal readonly GUIStyle Step, ActiveStep, Warning, Positive;
-        internal readonly GUISkin Skin;
-        readonly List<Texture2D> textures = new List<Texture2D>();
-        readonly Texture2D dot;
+        internal static readonly Color Chalk = new Color(.96f, .96f, .86f);
+        internal static readonly Color Mint = new Color(.69f, .88f, .77f);
+        internal static readonly Color Amber = new Color(1f, .84f, .48f);
+        internal static readonly Color Slate = new Color(.075f, .16f, .145f);
+        internal static readonly Color Control = new Color(.15f, .29f, .25f);
+        internal static readonly Color Selected = new Color(.30f, .47f, .38f);
+        internal const float PageWidth = 1020, PageHeight = 570;
 
-        internal QuizTheme()
+        readonly Canvas canvas;
+        readonly RectTransform page, content, body, rule;
+        readonly VerticalLayoutGroup layout;
+        readonly ScrollRect scroll;
+        readonly CanvasGroup interaction;
+        readonly Font font;
+        readonly Text heading, footer;
+        readonly Button leave;
+        readonly Renderer[] oldSigns;
+        readonly bool[] signVisibility;
+        GameObject ownedEvents;
+        bool acceptingInput;
+
+        internal QuizTheme(Renderer surface, Camera view, Action stand)
         {
-            Skin=Object.Instantiate(GUI.skin); Skin.hideFlags=HideFlags.HideAndDontSave;
-            Skin.verticalScrollbar=new GUIStyle {fixedWidth=6,margin=new RectOffset(10,0,0,0)};
-            Skin.verticalScrollbarThumb=Box(new Color(.79f,.82f,.86f),3,0);
-            Skin.verticalScrollbarUpButton=new GUIStyle {fixedHeight=0};
-            Skin.verticalScrollbarDownButton=new GUIStyle {fixedHeight=0};
-            var font = Resources.Load<Font>("KIT/NotoSansKR");
-            Title = Label(font,24,Ink,true); Heading = Label(font,32,Ink,true);
-            Body = Label(font,18,Ink); Small = Label(font,15,Muted); Caption = Label(font,13,Muted,true);
-            FileName = Label(font,21,Ink,true);
-            TimerNumber=Label(font,27,Ink,true);TimerNumber.alignment=TextAnchor.MiddleCenter;
-            TimerCaption=Label(font,11,Muted);TimerCaption.alignment=TextAnchor.MiddleCenter;
-            Panel = Box(Color.white,22,0); Shadow = Box(new Color(0,0,0,.11f),22,0);
-            Card = Box(new Color(.96f,.97f,.98f),14,24);
-            WhiteCard = Box(Color.white,14,22);
-            ErrorCard = Box(new Color(1,.94f,.93f),12,18);
-            SuccessCard = Box(new Color(.92f,.97f,.95f),12,20);
-            Primary = Button(font,Navy,Color.white,new Color(.20f,.31f,.46f));
-            Secondary = Button(font,new Color(.92f,.94f,.96f),Ink,new Color(.87f,.90f,.93f));
-            Quiet = Button(font,Color.white,Muted,new Color(.96f,.97f,.98f));
-            Choice = Button(font,new Color(.96f,.97f,.98f),Ink,new Color(.91f,.94f,.97f));
-            SelectedChoice = Button(font,new Color(.88f,.92f,.97f),Navy,new Color(.84f,.89f,.95f));
-            CorrectChoice = Button(font,new Color(.88f,.95f,.91f),Green,new Color(.88f,.95f,.91f));
-            WrongChoice = Button(font,new Color(1,.91f,.90f),new Color(.66f,.21f,.18f),new Color(1,.91f,.90f));
-            foreach(var s in new[]{Choice,SelectedChoice,CorrectChoice,WrongChoice}) {
-                s.alignment=TextAnchor.MiddleLeft; s.padding=new RectOffset(20,20,16,16); s.fontSize=18;
+            var bounds = surface.bounds;
+            var root = new GameObject("Quiz chalkboard", typeof(RectTransform), typeof(Canvas), typeof(GraphicRaycaster));
+            var rect = (RectTransform)root.transform;
+            // The imported mesh has a distant pivot and a rotated, 100x parent.
+            // Work in world bounds. Preserve metres when parenting it to that mesh.
+            // Tools/build_grand_library.py builds a 9.5 x 2.4 m writing face
+            // on the 10 x 2.9 m frame. The face projects 5 cm in front of it.
+            var face = new Vector2(bounds.size.x - .5f, bounds.size.y - .5f);
+            rect.position = new Vector3(bounds.center.x, bounds.center.y, bounds.min.z - .06f);
+            float metresPerUnit = Mathf.Min(face.y / (PageHeight + 24), face.x / (PageWidth + 24));
+            rect.sizeDelta = (face - Vector2.one * .008f) / metresPerUnit;
+            rect.localScale = Vector3.one * metresPerUnit;
+            rect.SetParent(surface.transform, true);
+            canvas = root.GetComponent<Canvas>();
+            canvas.renderMode = RenderMode.WorldSpace;
+            canvas.worldCamera = view;
+            font = Resources.Load<Font>("KIT/NotoSansKR");
+            var background = root.AddComponent<Image>();
+            background.color = Slate;
+            background.raycastTarget = false;
+            // The original title meshes sit in front of the writing surface.
+            var group = surface.transform.parent;
+            oldSigns = new[] { Sign(group, "SIGN_Quiz_QUIZ  1  VS  1"), Sign(group, "SIGN_Quiz_READY  /  THINK  /  ANSWER") };
+            signVisibility = new bool[oldSigns.Length];
+            for (int i = 0; i < oldSigns.Length; i++)
+            {
+                if (!oldSigns[i]) continue;
+                signVisibility[i] = oldSigns[i].enabled;
+                oldSigns[i].enabled = false;
             }
-            Step = Label(font,14,Muted,true); ActiveStep=Label(font,14,Navy,true);
-            Warning=Label(font,16,new Color(.66f,.21f,.18f)); Positive=Label(font,17,Green,true);
-            Input=Button(font,Color.white,Ink,new Color(.99f,.99f,1));Input.fontStyle=FontStyle.Normal;Input.fontSize=20;Input.alignment=TextAnchor.UpperLeft;Input.padding=new RectOffset(16,16,12,12);
-            Skin.settings.cursorColor=Navy;Skin.settings.selectionColor=new Color(.72f,.82f,.95f);
-            dot=Rounded(Color.white,16);
+
+            page = Child(rect, "Writing area");
+            page.sizeDelta = new Vector2(PageWidth, PageHeight);
+            interaction = page.gameObject.AddComponent<CanvasGroup>();
+            heading = TextAt(page, "Board title", 32, Chalk, true);
+            Place(heading.rectTransform, 16, 2, 760, 58);
+            leave = MakeButton(page, "일어나기", stand, false);
+            Place((RectTransform)leave.transform, PageWidth - 152, 8, 132, 42);
+            rule = Child(page, "Chalk line");
+            Place(rule, 16, 64, PageWidth - 36, 2);
+            rule.gameObject.AddComponent<Image>().color = Mint;
+
+            body = Child(page, "Board scroll area");
+            Place(body, 16, 78, PageWidth - 34, PageHeight - 142);
+            var hitSurface = body.gameObject.AddComponent<Image>();
+            hitSurface.color = Color.clear;
+            scroll = body.gameObject.AddComponent<ScrollRect>();
+            scroll.horizontal = false;
+            scroll.movementType = ScrollRect.MovementType.Clamped;
+            scroll.scrollSensitivity = 42;
+            var clip = Child(body, "Viewport");
+            Stretch(clip, 0, 0, 20, 0);
+            clip.gameObject.AddComponent<RectMask2D>();
+            content = Child(clip, "Board content");
+            content.anchorMin = new Vector2(0, 1);
+            content.anchorMax = Vector2.one;
+            content.pivot = new Vector2(.5f, 1);
+            content.sizeDelta = Vector2.zero;
+            layout = content.gameObject.AddComponent<VerticalLayoutGroup>();
+            layout.childControlWidth = layout.childControlHeight = true;
+            layout.childForceExpandWidth = true;
+            layout.childForceExpandHeight = false;
+            layout.spacing = 9;
+            var fitter = content.gameObject.AddComponent<ContentSizeFitter>();
+            fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+            scroll.viewport = clip;
+            scroll.content = content;
+            var track = Child(body, "Scroll track");
+            track.anchorMin = new Vector2(1, 0);
+            track.anchorMax = Vector2.one;
+            track.offsetMin = new Vector2(-12, 0);
+            track.offsetMax = Vector2.zero;
+            track.gameObject.AddComponent<Image>().color = Control;
+            var handle = Child(track, "Handle");
+            Stretch(handle);
+            var thumb = handle.gameObject.AddComponent<Image>();
+            thumb.color = Mint;
+            var scrollbar = track.gameObject.AddComponent<Scrollbar>();
+            scrollbar.targetGraphic = thumb;
+            scrollbar.handleRect = handle;
+            scrollbar.direction = Scrollbar.Direction.BottomToTop;
+            scroll.verticalScrollbar = scrollbar;
+            scroll.verticalScrollbarVisibility = ScrollRect.ScrollbarVisibility.AutoHide;
+            footer = TextAt(page, "Board status", 19, Amber);
+            Place(footer.rectTransform, 16, PageHeight - 61, PageWidth - 32, 60);
         }
-        static GUIStyle Label(Font font,int size,Color color,bool bold=false)
+
+        static Renderer Sign(Transform parent, string name)
         {
-            var style=new GUIStyle(GUI.skin.label) {font=font,fontSize=size,wordWrap=true,richText=false,
-                fontStyle=bold?FontStyle.Bold:FontStyle.Normal,padding=new RectOffset(0,0,0,0)};
-            foreach(var state in new[]{style.normal,style.hover,style.active,style.focused,style.onNormal,style.onHover,style.onActive,style.onFocused})
-                state.textColor=color;
-            return style;
+            foreach (Transform child in parent)
+                if (child.name == name) return child.GetComponent<Renderer>();
+            return null;
         }
-        GUIStyle Box(Color color,int radius,int padding)
+
+        internal void Frame(Camera view)
         {
-            return new GUIStyle {normal={background=Rounded(color,radius)},border=new RectOffset(radius,radius,radius,radius),
-                padding=new RectOffset(padding,padding,padding,padding),margin=new RectOffset(0,0,0,0)};
+            float halfHeight = Mathf.Max(PageHeight, PageWidth / Mathf.Max(.1f, view.aspect)) * .54f * page.lossyScale.y;
+            float distance = halfHeight / Mathf.Tan(view.fieldOfView * Mathf.Deg2Rad * .5f);
+            view.transform.SetPositionAndRotation(page.position - Vector3.forward * distance, Quaternion.identity);
         }
-        GUIStyle Button(Font font,Color color,Color text,Color hover)
+
+        internal void SetInteraction(bool active)
         {
-            var normal=Rounded(color,10); var over=Rounded(hover,10);
-            return new GUIStyle {font=font,fontSize=17,fontStyle=FontStyle.Bold,wordWrap=true,richText=false,
-                alignment=TextAnchor.MiddleCenter,border=new RectOffset(10,10,10,10),
-                padding=new RectOffset(22,22,14,14),margin=new RectOffset(0,0,0,0),
-                normal={background=normal,textColor=text},hover={background=over,textColor=text},
-                active={background=over,textColor=text},focused={background=over,textColor=text},
-                onNormal={background=normal,textColor=text},onHover={background=over,textColor=text},
-                onActive={background=over,textColor=text},onFocused={background=over,textColor=text}};
-        }
-        Texture2D Rounded(Color color,int radius)
-        {
-            int size=radius*2+4;
-            var texture=new Texture2D(size,size,TextureFormat.RGBA32,false) {hideFlags=HideFlags.HideAndDontSave,filterMode=FilterMode.Bilinear,wrapMode=TextureWrapMode.Clamp};
-            var pixels=new Color[size*size];
-            for(int y=0;y<size;y++) for(int x=0;x<size;x++) {
-                float dx=Mathf.Max(radius-x-.5f,x+.5f-(size-radius));
-                float dy=Mathf.Max(radius-y-.5f,y+.5f-(size-radius));
-                float distance=Mathf.Sqrt(Mathf.Pow(Mathf.Max(dx,0),2)+Mathf.Pow(Mathf.Max(dy,0),2));
-                var c=color; c.a*=Mathf.Clamp01(radius-distance+.5f); pixels[y*size+x]=c;
+            if (acceptingInput && !active && EventSystem.current)
+            {
+                var selected = EventSystem.current.currentSelectedGameObject;
+                if (selected && selected.transform.IsChildOf(page)) EventSystem.current.SetSelectedGameObject(null);
             }
-            texture.SetPixels(pixels);texture.Apply(false,true);textures.Add(texture);return texture;
-        }
-        internal void Countdown(Rect rect,double remaining,int limit)
-        {
-            var before=GUI.color;float fraction=Mathf.Clamp01((float)(remaining/limit));
-            Color active=remaining<=3?new Color(.77f,.25f,.20f):Navy;
-            for(int i=0;i<60;i++) {
-                float angle=(i*6-90)*Mathf.Deg2Rad;
-                GUI.color=i<60*fraction?active:new Color(.89f,.91f,.94f);
-                GUI.DrawTexture(new Rect(rect.center.x+Mathf.Cos(angle)*34-1.8f,rect.center.y+Mathf.Sin(angle)*34-1.8f,3.6f,3.6f),dot);
+            acceptingInput = active;
+            interaction.interactable = interaction.blocksRaycasts = active;
+            if (ownedEvents) ownedEvents.SetActive(active);
+            if (active && !EventSystem.current)
+            {
+                ownedEvents = new GameObject("Quiz board input", typeof(EventSystem), typeof(QuizBoardInput));
+                var module = ownedEvents.AddComponent<StandaloneInputModule>();
+                module.inputOverride = ownedEvents.GetComponent<QuizBoardInput>();
             }
-            GUI.color=Color.white;
-            GUI.Label(new Rect(rect.x,rect.y+16,rect.width,33),System.Math.Ceiling(remaining).ToString("00"),TimerNumber);
-            GUI.Label(new Rect(rect.x,rect.y+48,rect.width,18),"남은 시간",TimerCaption);
-            GUI.color=before;
         }
-        internal void Spinner(Rect rect,float time)
+
+        internal void BeginPage(string title, bool seated)
         {
-            var before=GUI.color;
-            for(int i=0;i<12;i++) {
-                float angle=(i*30-90)*Mathf.Deg2Rad;
-                float alpha=.18f+.82f*Mathf.Repeat((time*1.6f-i/12f),1);
-                GUI.color=new Color(Navy.r,Navy.g,Navy.b,alpha);
-                GUI.DrawTexture(new Rect(rect.center.x+Mathf.Cos(angle)*19-3,rect.center.y+Mathf.Sin(angle)*19-3,6,6),dot);
+            float width = seated ? PageWidth : ((RectTransform)canvas.transform).rect.width * .93f;
+            page.sizeDelta = new Vector2(width, PageHeight);
+            heading.text = title;
+            heading.fontSize = seated ? 32 : 57;
+            heading.alignment = seated ? TextAnchor.MiddleLeft : TextAnchor.MiddleCenter;
+            Place(heading.rectTransform, 16, 2, seated ? 760 : width - 32, seated ? 58 : 90);
+            Place(rule, 16, seated ? 64 : 99, width - 36, 2);
+            Place(body, 16, seated ? 78 : 119, width - 34, seated ? PageHeight - 142 : PageHeight - 196);
+            Place(footer.rectTransform, 16, PageHeight - 65, width - 32, 62);
+            footer.fontSize = seated ? 19 : 35;
+            footer.alignment = seated ? TextAnchor.MiddleLeft : TextAnchor.MiddleCenter;
+            layout.spacing = seated ? 9 : 21;
+            layout.padding.top = seated ? 0 : 14;
+            leave.gameObject.SetActive(seated);
+            for (int i = content.childCount - 1; i >= 0; i--)
+            {
+                var previous = content.GetChild(i).gameObject;
+                previous.SetActive(false);
+                Object.Destroy(previous);
             }
-            GUI.color=before;
+            scroll.StopMovement();
+            scroll.verticalNormalizedPosition = 1;
+            content.anchoredPosition = Vector2.zero;
         }
-        internal void Dispose() {foreach(var texture in textures) if(texture) Object.Destroy(texture);textures.Clear();if(Skin) Object.Destroy(Skin);}
+
+        internal void Status(string value) { footer.text = value; }
+        internal Text Line(string value, int size = 23, bool bold = false, bool accent = false)
+        {
+            var label = TextAt(content, "Chalk text", size, accent ? Mint : Chalk, bold);
+            label.text = QuizText.Display(value);
+            return label;
+        }
+
+        internal RectTransform Row()
+        {
+            var row = Child(content, "Controls");
+            var layout = row.gameObject.AddComponent<HorizontalLayoutGroup>();
+            layout.childControlWidth = layout.childControlHeight = true;
+            layout.childForceExpandWidth = true;
+            layout.childForceExpandHeight = false;
+            layout.spacing = 12;
+            return row;
+        }
+
+        internal Button ActionButton(string value, Action action, RectTransform row = null, bool primary = false)
+        {
+            var button = MakeButton(row ? row : content, value, action, primary);
+            var layout = button.gameObject.AddComponent<LayoutElement>();
+            layout.minHeight = 46;
+            layout.preferredWidth = 0;
+            layout.flexibleWidth = 1;
+            // Wrapped choices must still be fully readable on the timed question.
+            var wrap = button.gameObject.AddComponent<VerticalLayoutGroup>();
+            wrap.padding = new RectOffset(12, 12, 5, 5);
+            wrap.childControlWidth = wrap.childControlHeight = true;
+            wrap.childForceExpandWidth = wrap.childForceExpandHeight = true;
+            return button;
+        }
+
+        internal InputField Field(string name, string value, int maxLength, Action<string> changed,
+            bool multiline = false, RectTransform row = null, bool numeric = false)
+        {
+            var rect = Child(row ? row : content, name);
+            var background = rect.gameObject.AddComponent<Image>();
+            background.color = new Color(.115f, .23f, .205f);
+            var field = rect.gameObject.AddComponent<InputField>();
+            field.targetGraphic = background;
+            var entry = TextAt(rect, "Answer text", 23, Chalk);
+            Stretch(entry.rectTransform, 12, 5, 12, 5);
+            entry.supportRichText = false;
+            entry.alignment = multiline ? TextAnchor.UpperLeft : TextAnchor.MiddleLeft;
+            field.textComponent = entry;
+            var hint = TextAt(rect, "Placeholder", 21, Mint);
+            Stretch(hint.rectTransform, 12, 5, 12, 5);
+            hint.text = name;
+            field.placeholder = hint;
+            field.lineType = multiline ? InputField.LineType.MultiLineNewline : InputField.LineType.SingleLine;
+            if (numeric) field.contentType = InputField.ContentType.IntegerNumber;
+            field.characterLimit = maxLength;
+            field.customCaretColor = true;
+            field.caretColor = Chalk;
+            field.selectionColor = new Color(.54f, .81f, .7f, .5f);
+            field.text = value;
+            field.onValueChanged.AddListener(text => changed(text));
+            var layout = rect.gameObject.AddComponent<LayoutElement>();
+            layout.minHeight = multiline ? 100 : 49;
+            layout.flexibleWidth = 1;
+            return field;
+        }
+
+        Button MakeButton(RectTransform parent, string value, Action action, bool primary)
+        {
+            var rect = Child(parent, value);
+            var surface = rect.gameObject.AddComponent<Image>();
+            surface.color = primary ? Selected : Control;
+            var button = rect.gameObject.AddComponent<Button>();
+            button.targetGraphic = surface;
+            var colors = button.colors;
+            colors.highlightedColor = new Color(.82f, 1f, .91f);
+            colors.pressedColor = new Color(.8f, .8f, .8f);
+            button.colors = colors;
+            var label = TextAt(rect, "Label", 22, primary ? Amber : Chalk, true);
+            Stretch(label.rectTransform, 10, 3, 10, 3);
+            label.alignment = TextAnchor.MiddleCenter;
+            label.text = QuizText.Display(value);
+            button.onClick.AddListener(() => action());
+            return button;
+        }
+
+        Text TextAt(RectTransform parent, string name, int size, Color color, bool bold = false)
+        {
+            var text = Child(parent, name).gameObject.AddComponent<Text>();
+            text.font = font;
+            text.fontSize = size;
+            text.fontStyle = bold ? FontStyle.Bold : FontStyle.Normal;
+            text.color = color;
+            text.supportRichText = false;
+            text.raycastTarget = false;
+            text.alignment = TextAnchor.MiddleLeft;
+            text.horizontalOverflow = HorizontalWrapMode.Wrap;
+            text.verticalOverflow = VerticalWrapMode.Truncate;
+            return text;
+        }
+
+        static RectTransform Child(RectTransform parent, string name)
+        {
+            var rect = (RectTransform)new GameObject(name, typeof(RectTransform)).transform;
+            rect.SetParent(parent, false);
+            return rect;
+        }
+
+        static void Place(RectTransform rect, float x, float y, float width, float height)
+        {
+            rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0, 1);
+            rect.anchoredPosition = new Vector2(x, -y);
+            rect.sizeDelta = new Vector2(width, height);
+        }
+
+        static void Stretch(RectTransform rect, float left = 0, float top = 0, float right = 0, float bottom = 0)
+        {
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.one;
+            rect.offsetMin = new Vector2(left, bottom);
+            rect.offsetMax = new Vector2(-right, -top);
+        }
+
+        public void Dispose()
+        {
+            for (int i = 0; i < oldSigns.Length; i++)
+                if (oldSigns[i]) oldSigns[i].enabled = signVisibility[i];
+            SetInteraction(false);
+            if (ownedEvents) { ownedEvents.SetActive(false); Object.Destroy(ownedEvents); }
+            if (canvas) { canvas.gameObject.SetActive(false); Object.Destroy(canvas.gameObject); }
+        }
     }
 }

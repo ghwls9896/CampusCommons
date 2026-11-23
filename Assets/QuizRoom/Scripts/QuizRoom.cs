@@ -1,392 +1,588 @@
 using System;
-using System.Collections;
 using System.IO;
+using System.Net.Http;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using CampusCommons.Account;
 using CampusCommons.GrandLibrary;
 using UnityEngine;
-using UnityEngine.Networking;
+using UnityEngine.UI;
 
 namespace CampusCommons.Quiz
 {
+    [DefaultExecutionOrder(200)]
     [RequireComponent(typeof(Player))]
-    public class QuizRoom : MonoBehaviour
+    public sealed class QuizRoom : MonoBehaviour
     {
-        enum WorkPhase { None, Connecting, Inspecting, Generating, Grading }
-        readonly QuizSession session = new QuizSession();
-        readonly QuizDocument document = new QuizDocument();
         Player player;
-        UnityWebRequest request;
-        bool entered, working, browsing, configured, gradingAttempted, focusAnswer;
-        string typedAnswer="";
-        string server="", token="", path="", directory="", message="";
-        string[] folders=new string[0], files=new string[0];
-        byte[] documentBytes;
-        int selected=-1, browserPage;
-        float startedAt;
-        WorkPhase phase;
-        Vector2 scroll,fileScroll;
+        Seat[] chairs;
+        Seat occupied;
+        CancellationTokenSource visit;
+        QuizDuelState state;
+        string ticket, accountId;
+        bool acting;
+        int actionVersion;
+        double receivedAt;
+        string notice = "", connectionNotice = "";
+        int selected = -1, savedChoice = -1;
+        string savedText = "";
+        bool saving;
+        double nextSave;
+        GUIStyle chairHint;
+        bool boardDirty = true, framed;
+        Camera boardCamera;
+        Vector3 previousCameraPosition;
+        Quaternion previousCameraRotation;
+        Button submitButton;
+        Button[] choices;
+        Text clock, saveStatus;
+        readonly System.Collections.Generic.List<Selectable> actions = new System.Collections.Generic.List<Selectable>();
+        string draft = "";
         QuizTheme theme;
-        public bool BlocksMovement => enabled && player && player.currentSpace==Portal.Space.Quiz;
+        bool useRange;
+        CancellationTokenSource picker;
+        string startPage = "1", endPage = "1", directory;
+        readonly QuizDocument document = new QuizDocument();
+        byte[] documentBytes;
+
+        bool InRoom => player && player.currentSpace == Portal.Space.Quiz;
+        public bool BlocksMovement => enabled && InRoom && occupied && occupied.occupant == player;
+        public QuizDuelState Match => state;
 
         void Awake()
         {
-            player=GetComponent<Player>();
-            var config=Resources.Load<TextAsset>("QuizConnection");
-            if(config) try {
-                var deployment=JsonUtility.FromJson<QuizDeployment>(config.text);
-                configured=deployment!=null && deployment.IsValid();
-                if(configured) {server=deployment.server_url;token=deployment.access_token;}
-            } catch(ArgumentException) {configured=false;}
-            directory=Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            if(string.IsNullOrEmpty(directory)) directory=Application.persistentDataPath;
+            player = GetComponent<Player>();
+            directory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            if (string.IsNullOrEmpty(directory)) directory = Application.persistentDataPath;
         }
-        void Update()
+
+        void LateUpdate()
         {
-            if(BlocksMovement && !entered) {
-                entered=true;
-                if(configured && QuizConnection.IsValidUrl(server,out _)) StartCoroutine(Warmup());
-                else message="퀴즈 서비스를 준비 중입니다. 잠시 후 다시 이용해 주세요.";
-            } else if(!BlocksMovement && entered) ClearRoom();
-            if(BlocksMovement && !player.IsExitConfirmOpen && session.Current!=null && session.Tick(Time.realtimeSinceStartupAsDouble,selected,typedAnswer)) ResetQuestionInput();
-            if(BlocksMovement && session.NeedsGrading && !gradingAttempted && !working) StartCoroutine(GradeAnswers());
+            UpdateVisit();
+            if (!InRoom || !player.isActiveAndEnabled)
+            {
+                RemoveBoard();
+                return;
+            }
+            if (theme == null)
+            {
+                var room = chairs != null && chairs.Length > 0 && chairs[0] ? chairs[0].transform : null;
+                while (room && room.name != "Quiz Room") room = room.parent;
+                var surface = room ? room.Find("Architecture/Quiz Screen Structure") : null;
+                boardCamera = Camera.main;
+                if (!surface || !surface.TryGetComponent<Renderer>(out var screen) || !boardCamera) return;
+                theme = new QuizTheme(screen, boardCamera, EndVisit);
+                boardDirty = true;
+            }
+            if (BlocksMovement)
+            {
+                if (!framed)
+                {
+                    previousCameraPosition = boardCamera.transform.position;
+                    previousCameraRotation = boardCamera.transform.rotation;
+                }
+                theme.Frame(boardCamera);
+                framed = true;
+            }
+            theme.SetInteraction(BlocksMovement && !player.IsExitConfirmOpen && !AccountGate.LobbyOverlayOwnsInput);
+            RefreshBoard();
         }
-        void OnDisable() {ClearRoom();}
-        void OnDestroy() {if(theme!=null) theme.Dispose();}
-        void StopRequest()
+
+        void UpdateVisit()
         {
-            StopAllCoroutines();
-            if(request!=null) {request.Abort();request.Dispose();request=null;}
-            working=false;phase=WorkPhase.None;
+            if (!InRoom)
+            {
+                if (chairs != null) { EndVisit(); chairs = null; notice = ""; }
+                return;
+            }
+            if (chairs == null)
+            {
+                chairs = Array.FindAll(FindObjectsByType<Seat>(FindObjectsSortMode.None),
+                    seat => seat.gameObject.scene == player.gameObject.scene &&
+                        (seat.name == "Quiz Seat 01" || seat.name == "Quiz Seat 02" || seat.name == "Quiz player seat"));
+                Array.Sort(chairs, (a, b) => a.transform.position.x.CompareTo(b.transform.position.x));
+            }
+            var gate = AccountGate.Instance;
+            if (visit != null && (!occupied || occupied.occupant != player ||
+                !gate || !gate.Ready || gate.Session.UserId != accountId))
+                EndVisit();
+            if (visit != null)
+            {
+                if (!saving && !acting && HasUnsavedAnswer && Time.realtimeSinceStartupAsDouble >= nextSave)
+                    _ = SaveDraft();
+                return;
+            }
+            if (!gate || !gate.Ready || chairs.Length != 2) return;
+
+            int slot = Array.FindIndex(chairs, chair => chair && chair.occupant == player);
+            if (slot < 0) return;
+            occupied = chairs[slot];
+            boardDirty = true;
+            accountId = gate.Session.UserId;
+            visit = new CancellationTokenSource();
+            notice = connectionNotice = "";
+            if (gate.LobbyEnabled) _ = JoinAndPoll(gate.Session, slot, visit.Token);
+            else connectionNotice = "온라인 퀴즈 연결이 꺼져 있습니다.";
         }
-        void ClearRoom()
+
+        async Task JoinAndPoll(AccountSession session, int slot, CancellationToken ct)
         {
-            StopRequest();entered=browsing=false;
-            session.Reset();document.Reset();documentBytes=null;path=message="";gradingAttempted=false;ResetQuestionInput();
+            try
+            {
+                var admission = await session.JoinQuizSeatAsync(slot, ct);
+                if (ct.IsCancellationRequested)
+                {
+                    if (!string.IsNullOrEmpty(admission?.ticket)) _ = ReleaseTicket(admission.ticket);
+                    return;
+                }
+                if (string.IsNullOrEmpty(admission?.ticket) || admission.state?.players == null ||
+                    admission.state.self_slot != slot || admission.state.Self == null)
+                    throw new QuizDuelFailure(502, "좌석 정보를 확인하지 못했습니다.");
+                ticket = admission.ticket;
+                Apply(admission.state);
+                while (true)
+                {
+                    await Task.Delay(500, ct);
+                    int before = actionVersion;
+                    try
+                    {
+                        var latest = await QuizDuelApi.Request(ticket, HttpMethod.Get, "state", null, null, ct);
+                        ct.ThrowIfCancellationRequested();
+                        connectionNotice = "";
+                        // Keep the seat lease alive during uploads. A concurrent poll
+                        // may have read the state before a newer accepted command.
+                        if (!acting && before == actionVersion) Apply(latest);
+                    }
+                    catch (QuizDuelFailure e) when (e.Status == 401) { throw; }
+                    catch (Exception) when (!ct.IsCancellationRequested)
+                    {
+                        connectionNotice = "연결을 다시 확인하고 있습니다…";
+                        await Task.Delay(1000, ct);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                if (ct.IsCancellationRequested) return;
+                EndVisit();
+                if (e is AccountException account && account.Code == "seat_taken")
+                    notice = "다른 참가자가 이미 앉아 있습니다. 옆자리에 앉아 주세요.";
+                else if (e is AccountException duplicate && duplicate.Code == "already_seated")
+                    notice = "이 계정은 다른 좌석을 사용 중입니다.";
+                else if (e is QuizDuelFailure failure && failure.Status == 401)
+                    notice = "좌석 사용 시간이 끝났습니다. 다시 앉아 주세요.";
+                else notice = "좌석에 연결하지 못했습니다. 잠시 후 다시 앉아 주세요.";
+            }
         }
-        void CancelRequest()
+
+        void Apply(QuizDuelState latest)
         {
-            bool grading=phase==WorkPhase.Grading;
-            bool connecting=phase==WorkPhase.Connecting;
-            bool inspecting=phase==WorkPhase.Inspecting;
-            StopRequest();
-            if(inspecting) document.Fail("파일 확인을 취소했습니다. PDF를 다시 선택해 주세요.");
-            message=grading?"채점을 취소했습니다. 결과 화면에서 다시 채점할 수 있습니다.":inspecting?"":connecting?"연결 준비를 취소했습니다. PDF를 선택해 다시 연결할 수 있습니다.":"생성을 취소했습니다. 다시 시작할 수 있습니다.";
+            bool newRound = state == null || latest.round_id != state.round_id;
+            if (newRound || latest.phase != state.phase || latest.question?.level != state.question?.level)
+            {
+                savedChoice = selected = -1; savedText = draft = "";
+                boardDirty = true;
+                notice = "";
+            }
+            // Polls update the countdown in place so a live Korean IME composition
+            // and a scrolled review survive even when the server polls twice a second.
+            if (state == null || state.message != latest.message || state.can_upload != latest.can_upload ||
+                state.DifficultyLabel != latest.DifficultyLabel || state.Self.ready != latest.Self.ready ||
+                state.players.Length != latest.players.Length) boardDirty = true;
+            if (newRound || latest.phase == "waiting" || latest.phase == "playing")
+                ClearPdf();
+            state = latest;
+            if (picker != null && (newRound || !latest.can_upload || (latest.Self.ready && latest.phase != "error")))
+                CancelPicker();
+            receivedAt = Time.realtimeSinceStartupAsDouble;
         }
-        void BeginWork(WorkPhase next) {phase=next;working=true;startedAt=Time.realtimeSinceStartup;message="";}
-        void EndWork() {if(request!=null) {request.Dispose();request=null;}working=false;phase=WorkPhase.None;}
-        IEnumerator Warmup()
+
+        void ClearPdf()
         {
-            BeginWork(WorkPhase.Connecting);
-            request=UnityWebRequest.Get(server.TrimEnd('/')+"/healthz");request.timeout=90;
-            yield return request.SendWebRequest();
-            if(request.result!=UnityWebRequest.Result.Success) message="연결이 지연되고 있습니다. PDF를 선택해 다시 시도해 주세요.";
-            EndWork();
+            documentBytes = null;
+            document.Reset();
+            useRange = false;
+            startPage = endPage = "1";
         }
+
+        void RemoveBoard()
+        {
+            theme?.Dispose();
+            theme = null;
+            boardCamera = null;
+        }
+
+        void OnDisable() { EndVisit(); RemoveBoard(); chairs = null; }
+        void OnDestroy() { RemoveBoard(); }
+
+        void EndVisit()
+        {
+            CancelPicker();
+            var leaving = ticket;
+            ticket = accountId = null;
+            visit?.Cancel();
+            visit?.Dispose();
+            visit = null;
+            if (occupied && player && occupied.occupant == player)
+            {
+                player.Stand();
+                // AccountWorldGate disables the controller before it disables this component.
+                if (!player.enabled && player.TryGetComponent<CharacterController>(out var body)) body.enabled = false;
+            }
+            if (framed)
+            {
+                if (player && player.isActiveAndEnabled) player.RefreshView();
+                else if (boardCamera) boardCamera.transform.SetPositionAndRotation(previousCameraPosition, previousCameraRotation);
+            }
+            framed = false;
+            boardDirty = true;
+            occupied = null;
+            state = null;
+            acting = saving = false;
+            savedChoice = -1; savedText = ""; nextSave = 0;
+            actionVersion++;
+            notice = connectionNotice = draft = "";
+            selected = -1;
+            ClearPdf();
+            if (!string.IsNullOrEmpty(leaving)) _ = ReleaseTicket(leaving);
+        }
+
+        static async Task ReleaseTicket(string leaving)
+        {
+            try { await QuizDuelApi.Request(leaving, HttpMethod.Delete, "seat", null, null, CancellationToken.None); }
+            catch (Exception) { /* Server expires the seat if the client goes offline. */ }
+        }
+
+        async Task Command(string path, byte[] payload = null, string contentType = null)
+        {
+            if (acting || visit == null || string.IsNullOrEmpty(ticket)) return;
+            var ct = visit.Token;
+            acting = true; actionVersion++; notice = "";
+            try
+            {
+                var latest = await QuizDuelApi.Request(ticket, HttpMethod.Post, path, payload, contentType, ct);
+                ct.ThrowIfCancellationRequested();
+                Apply(latest);
+            }
+            catch (Exception e)
+            {
+                if (ct.IsCancellationRequested) return;
+                if (e is QuizDuelFailure expired && expired.Status == 401)
+                {
+                    EndVisit();
+                    notice = "좌석 사용 시간이 끝났습니다. 다시 앉아 주세요.";
+                }
+                else notice = e is QuizDuelFailure failure ? failure.Message :
+                    "요청을 확인하지 못했습니다. 연결을 확인하고 다시 시도해 주세요.";
+            }
+            finally { if (!ct.IsCancellationRequested) { acting = false; actionVersion++; } }
+        }
+
         void SelectPdf(string chosen)
         {
-            StopRequest();documentBytes=null;message="";path=chosen;document.Select(chosen,0);directory=Path.GetDirectoryName(chosen);browsing=false;
-            try {
-                if(!Path.GetExtension(path).Equals(".pdf",StringComparison.OrdinalIgnoreCase)) throw new IOException();
-                using(var stream=File.OpenRead(path)) {
-                    document.Select(path,stream.Length);
-                    if(!document.CanInspect) return;
-                    documentBytes=new byte[(int)stream.Length];
-                    int read=0;
-                    while(read<documentBytes.Length) {
-                        int count=stream.Read(documentBytes,read,documentBytes.Length-read);
-                        if(count==0) throw new IOException();read+=count;
+            if (acting || state == null) return;
+            boardDirty = true;
+            notice = "";
+            ClearPdf();
+            try
+            {
+                if (!Path.GetExtension(chosen).Equals(".pdf", StringComparison.OrdinalIgnoreCase)) throw new IOException();
+                using (var stream = File.OpenRead(chosen))
+                {
+                    document.Select(chosen, stream.Length);
+                    if (!document.CanInspect) { notice = document.Warning; return; }
+                    documentBytes = new byte[(int)stream.Length];
+                    int read = 0;
+                    while (read < documentBytes.Length)
+                    {
+                        int count = stream.Read(documentBytes, read, documentBytes.Length - read);
+                        if (count == 0) throw new IOException();
+                        read += count;
                     }
                 }
-            } catch(Exception e) when(e is IOException || e is UnauthorizedAccessException || e is ArgumentException || e is NotSupportedException) {
-                document.Fail("PDF를 열지 못했습니다. 파일과 접근 권한을 확인해 주세요.");documentBytes=null;return;
+                directory = Path.GetDirectoryName(chosen);
             }
-            if(!configured) {document.Fail("퀴즈 서비스에 연결할 수 없습니다. 잠시 후 다시 선택해 주세요.");return;}
-            StartCoroutine(InspectPdf());
-        }
-        UnityWebRequest PdfRequest(string endpoint)
-        {
-            var next=new UnityWebRequest(server.TrimEnd('/')+endpoint,"POST");
-            next.uploadHandler=new UploadHandlerRaw(documentBytes);next.downloadHandler=new DownloadHandlerBuffer();
-            next.SetRequestHeader("Content-Type","application/pdf");next.SetRequestHeader("X-Quiz-Token",token);
-            next.timeout=210;return next;
-        }
-        IEnumerator InspectPdf()
-        {
-            BeginWork(WorkPhase.Inspecting);request=PdfRequest("/v1/pdfs/inspect");
-            yield return request.SendWebRequest();
-            if(request.result==UnityWebRequest.Result.Success) {
-                try {document.ApplyInspection(JsonUtility.FromJson<QuizPdfInspection>(request.downloadHandler.text));}
-                catch(ArgumentException) {document.Fail("파일 정보를 읽지 못했습니다. PDF를 다시 선택해 주세요.");}
-            } else document.Fail(RequestError("파일 정보를 확인하지 못했습니다. PDF를 다시 선택해 주세요."));
-            EndWork();
-        }
-        void Generate()
-        {
-            if(!configured || working || !document.CanGenerate || documentBytes==null) return;
-            StartCoroutine(CreateQuiz());
-        }
-        IEnumerator CreateQuiz()
-        {
-            BeginWork(WorkPhase.Generating);browsing=false;request=PdfRequest("/v1/quizzes?start_page="+document.StartPage+"&end_page="+document.EndPage);
-            yield return request.SendWebRequest();
-            if(request.result==UnityWebRequest.Result.Success) {
-                try {
-                    var data=JsonUtility.FromJson<QuizSet>(request.downloadHandler.text);
-                    if(data==null || !data.IsValid(out _) || data.page_range==null || data.page_range.start_page!=document.StartPage || data.page_range.end_page!=document.EndPage || data.page_range.total_pages!=document.Pages) message="문제 응답이 올바르지 않습니다. 다시 생성해 주세요.";
-                    else {session.Begin(data,Time.realtimeSinceStartupAsDouble);gradingAttempted=false;ResetQuestionInput();}
-                } catch(ArgumentException) {message="문제 응답을 읽지 못했습니다. 다시 생성해 주세요.";}
-            } else message=RequestError("서버에 연결하지 못했거나 시간이 초과되었습니다. 다시 시도해 주세요.");
-            EndWork();
-        }
-        void ResetQuestionInput() {selected=-1;typedAnswer="";focusAnswer=false;scroll=Vector2.zero;}
-        IEnumerator GradeAnswers()
-        {
-            gradingAttempted=true;BeginWork(WorkPhase.Grading);
-            var payload=System.Text.Encoding.UTF8.GetBytes(JsonUtility.ToJson(session.GradingRequest()));
-            request=new UnityWebRequest(server.TrimEnd('/')+"/v1/quizzes/grade","POST");
-            request.uploadHandler=new UploadHandlerRaw(payload);request.downloadHandler=new DownloadHandlerBuffer();
-            request.SetRequestHeader("Content-Type","application/json");request.SetRequestHeader("X-Quiz-Token",token);request.timeout=60;
-            yield return request.SendWebRequest();
-            if(request.result==UnityWebRequest.Result.Success) {
-                try {if(!session.ApplyGrades(JsonUtility.FromJson<QuizGradeSet>(request.downloadHandler.text))) message="채점 결과를 확인하지 못했습니다. 다시 채점해 주세요.";}
-                catch(ArgumentException) {message="채점 결과를 읽지 못했습니다. 다시 채점해 주세요.";}
-            } else message=RequestError("채점에 연결하지 못했습니다. 다시 채점해 주세요.");
-            EndWork();
-        }
-        string RequestError(string fallback)
-        {
-            try {
-                var error=JsonUtility.FromJson<QuizErrorEnvelope>(request.downloadHandler.text);
-                if(error?.error!=null && !string.IsNullOrWhiteSpace(error.error.message))
-                    return error.error.code=="unauthorized" || error.error.code=="server_configuration"
-                        ?"퀴즈 서비스에 연결할 수 없습니다. 잠시 후 다시 이용해 주세요.":QuizText.Display(error.error.message);
-            } catch(ArgumentException) { }
-            return fallback;
-        }
-        void Browse(string location)
-        {
-            browsing=true;browserPage=0;fileScroll=Vector2.zero;folders=files=new string[0];
-            try {
-                var dir=new DirectoryInfo(location);var dirs=dir.GetDirectories();var entries=dir.GetFiles();
-                Array.Sort(dirs,(a,b)=>StringComparer.OrdinalIgnoreCase.Compare(a.Name,b.Name));
-                Array.Sort(entries,(a,b)=>StringComparer.OrdinalIgnoreCase.Compare(a.Name,b.Name));
-                folders=Array.ConvertAll(dirs,d=>d.FullName);
-                files=Array.ConvertAll(Array.FindAll(entries,f=>f.Extension.Equals(".pdf",StringComparison.OrdinalIgnoreCase)),f=>f.FullName);
-                directory=dir.FullName;
-            } catch(Exception e) when(e is IOException || e is UnauthorizedAccessException || e is ArgumentException || e is NotSupportedException) {
-                message="이 폴더에 접근할 수 없습니다. 홈이나 다른 드라이브를 선택해 주세요.";
+            catch (Exception e) when (e is IOException || e is UnauthorizedAccessException || e is ArgumentException || e is NotSupportedException)
+            {
+                ClearPdf();
+                notice = "PDF를 열지 못했습니다. 파일과 접근 권한을 확인해 주세요.";
             }
         }
-        void ChoosePdf()
+
+        void Upload()
         {
-#if UNITY_EDITOR
-            string chosen=UnityEditor.EditorUtility.OpenFilePanel("공부한 PDF 선택",directory,"pdf");
-            if(!string.IsNullOrEmpty(chosen)) SelectPdf(chosen);
-#else
-            Browse(directory);
-#endif
+            if (state == null || documentBytes == null || acting) return;
+            string path = "pdf?round_id=" + Uri.EscapeDataString(state.round_id);
+            if (useRange)
+            {
+                if (!int.TryParse(startPage, out int start) || !int.TryParse(endPage, out int end) ||
+                    start < 1 || end < start || end - start >= QuizDocument.MaxPages)
+                {
+                    notice = "1페이지부터 최대 1000페이지 이내로 시작과 끝을 지정해 주세요.";
+                    return;
+                }
+                path += "&start_page=" + start + "&end_page=" + end;
+            }
+            _ = Command(path, documentBytes, "application/pdf");
         }
-        void Label(string text,GUIStyle style,params GUILayoutOption[] options) => GUILayout.Label(QuizText.Display(text),style,options);
-        bool Button(string text,GUIStyle style,params GUILayoutOption[] options) => GUILayout.Button(QuizText.Display(text),style,options);
+
+        bool HasUnsavedAnswer => state?.phase == "playing" && state.question != null &&
+            (state.question.level == 1 ? selected != savedChoice : draft != savedText);
+
+        QuizDuelAnswer CurrentAnswer() => new QuizDuelAnswer {
+            round_id = state.round_id, level = state.question.level,
+            choice = state.question.level == 1 ? selected : -1, text = state.question.level == 1 ? "" : draft
+        };
+
+        async Task SaveDraft()
+        {
+            var answer = CurrentAnswer();
+            var ct = visit.Token;
+            saving = true;
+            nextSave = Time.realtimeSinceStartupAsDouble + .35;
+            try
+            {
+                await QuizDuelApi.Request(ticket, HttpMethod.Post, "draft",
+                    Encoding.UTF8.GetBytes(JsonUtility.ToJson(answer)), "application/json", ct);
+                if (!ct.IsCancellationRequested && state?.round_id == answer.round_id &&
+                    state.phase == "playing" && state.question.level == answer.level)
+                {
+                    savedChoice = answer.choice;
+                    savedText = answer.text;
+                }
+            }
+            catch (Exception) { if (!ct.IsCancellationRequested) nextSave = Time.realtimeSinceStartupAsDouble + 1; }
+            finally { if (!ct.IsCancellationRequested) saving = false; }
+        }
+
+        void Submit()
+        {
+            if (state?.phase != "playing" || state.question == null || acting) return;
+            _ = Command("answer", Encoding.UTF8.GetBytes(JsonUtility.ToJson(CurrentAnswer())), "application/json");
+        }
+
+        bool CanChoosePdf => visit != null && !acting && state?.Self != null &&
+            ((state.phase == "upload" && !state.Self.ready) || (state.phase == "error" && state.can_upload));
+
+        void CancelPicker()
+        {
+            var pending = picker;
+            picker = null;
+            pending?.Cancel();
+        }
+
+        async void ChoosePdf()
+        {
+            if (picker != null || !CanChoosePdf) return;
+            var current = CancellationTokenSource.CreateLinkedTokenSource(visit.Token);
+            picker = current;
+            var round = state.round_id;
+            try
+            {
+                var chosen = await QuizPdfPicker.OpenAsync(directory, current.Token);
+                if (picker == current && !current.IsCancellationRequested && CanChoosePdf &&
+                    state.round_id == round && !string.IsNullOrEmpty(chosen))
+                    SelectPdf(chosen);
+            }
+            catch (OperationCanceledException) { }
+            catch (Exception e)
+            {
+                if (picker == current && !current.IsCancellationRequested)
+                {
+                    notice = "PDF 선택 창을 열지 못했습니다. 다시 시도해 주세요.";
+                    Debug.LogWarning("Quiz PDF picker: " + e.GetType().Name);
+                }
+            }
+            finally
+            {
+                if (picker == current) picker = null;
+                current.Dispose();
+            }
+        }
+
         void OnGUI()
         {
-            if(!BlocksMovement || player.IsExitConfirmOpen) return;
-            if(theme==null) theme=new QuizTheme();
-            var matrix=GUI.matrix;var color=GUI.color;var skin=GUI.skin;bool enabledBefore=GUI.enabled;GUI.skin=theme.Skin;
-            float scale=Mathf.Min(Screen.width/1180f,Screen.height/820f);
-            GUI.matrix=Matrix4x4.TRS(new Vector3((Screen.width-1180*scale)/2,(Screen.height-820*scale)/2,0),Quaternion.identity,Vector3.one*scale);
-            GUI.color=new Color(0,0,0,.22f);GUI.DrawTexture(new Rect(-4000,-4000,9000,9000),Texture2D.whiteTexture);GUI.color=Color.white;
-            GUI.Box(new Rect(30,47,1120,740),GUIContent.none,theme.Shadow);
-            GUI.Box(new Rect(30,40,1120,740),GUIContent.none,theme.Panel);
-            GUILayout.BeginArea(new Rect(70,68,1040,60));
-            GUILayout.BeginHorizontal();GUILayout.BeginVertical();
-            Label("PDF 퀴즈룸",theme.Title);GUILayout.Space(4);Label("나의 자료로 완성하는 짧고 깊은 복습",theme.Small);
-            GUILayout.EndVertical();GUILayout.FlexibleSpace();
-            if(Button("나가기  ·  ESC",theme.Quiet,GUILayout.Width(175),GUILayout.Height(44))) player.RequestRoomExit();
-            GUILayout.EndHorizontal();GUILayout.EndArea();
-            GUI.color=new Color(.91f,.93f,.95f);GUI.DrawTexture(new Rect(70,144,1040,1),Texture2D.whiteTexture);GUI.color=Color.white;
-            GUILayout.BeginArea(new Rect(70,165,1040,575));
-            DrawSteps();GUILayout.Space(28);
-            scroll=GUILayout.BeginScrollView(scroll,GUIStyle.none,GUI.skin.verticalScrollbar);
-            if(session.Data==null) DrawSetup();else if(session.Finished) DrawResults();else DrawQuestion();
-            GUILayout.Space(8);GUILayout.EndScrollView();GUILayout.EndArea();
-            GUI.enabled=enabledBefore;GUI.color=color;GUI.matrix=matrix;GUI.skin=skin;
-        }
-        void DrawSteps()
-        {
-            int active=session.Data==null?0:session.Finished?2:1;
-            GUILayout.BeginHorizontal();
-            var labels=new[]{"01   자료 선택","02   문제 풀기","03   복습 완료"};
-            for(int i=0;i<3;i++) {
-                Label(labels[i],i==active?theme.ActiveStep:theme.Step,GUILayout.Width(190));
-                if(i<2) Label("—",theme.Caption,GUILayout.Width(40));
+            if (!InRoom || !player.isActiveAndEnabled || BlocksMovement || player.IsExitConfirmOpen ||
+                AccountGate.LobbyOverlayOwnsInput || chairs == null) return;
+            // Match Player.Update's actual E interaction origin and distance.
+            var origin = player.transform.position + Vector3.up * .6f;
+            if (!Array.Exists(chairs, chair => chair && !chair.occupant &&
+                (chair.transform.position - origin).sqrMagnitude < 1.65f * 1.65f)) return;
+            if (chairHint == null)
+            {
+                chairHint = new GUIStyle(GUI.skin.box) {
+                    font = Resources.Load<Font>("KIT/NotoSansKR"), fontStyle = FontStyle.Bold,
+                    alignment = TextAnchor.MiddleCenter
+                };
             }
-            GUILayout.EndHorizontal();
+            float scale = Mathf.Min(Screen.width / 1280f, Screen.height / 720f);
+            chairHint.fontSize = Mathf.Max(12, Mathf.RoundToInt(19 * scale));
+            GUI.Box(new Rect(Screen.width * .5f - 66 * scale, Screen.height * .79f, 132 * scale, 42 * scale),
+                "E   앉기", chairHint);
         }
-        void DrawSetup()
+
+        void RefreshBoard()
         {
-            GUILayout.BeginHorizontal();GUILayout.BeginVertical(GUILayout.Width(690));
-            bool hasFile=document.Path.Length>0;
-            Label(hasFile?"출제할 범위를 골라주세요.":"읽은 내용을, 내 지식으로.",hasFile?theme.Title:theme.Heading);GUILayout.Space(8);
-            Label(hasFile?"PDF 파일의 첫 장을 1페이지로 셉니다.":"학습한 PDF로 세 단계의 짧은 퀴즈에 도전하세요.",theme.Small);GUILayout.Space(18);
-            GUILayout.BeginVertical(theme.Card);
-            GUILayout.BeginHorizontal();Label("학습 자료",theme.Caption);GUILayout.FlexibleSpace();Label("PDF",theme.Caption);GUILayout.EndHorizontal();
-            GUILayout.Space(12);
-            if(!hasFile) {
-                Label("어떤 자료로 복습할까요?",theme.FileName);GUILayout.Space(8);
-                Label("PDF 한 개 · 최대 10 MB · 원하는 페이지 범위 선택",theme.Small);GUILayout.Space(18);
-            } else {
-                Label(document.Name,theme.Body);GUILayout.Space(14);
-                GUILayout.BeginHorizontal();
-                Label(document.SizeLabel+" / 10 MB",document.Bytes>QuizDocument.MaxBytes?theme.Warning:theme.Small,GUILayout.Width(280));
-                Label(document.Pages>0?"전체 "+document.Pages+"페이지":phase==WorkPhase.Inspecting?"페이지 확인 중…":"페이지 확인 전",theme.Small);
-                GUILayout.EndHorizontal();
-                if(document.Inspected) {
-                    GUILayout.Space(18);
-                    if(!working) {
-                        Label("문제를 만들 페이지 범위",theme.Caption);GUILayout.Space(8);
-                        GUILayout.BeginHorizontal();
-                        string first=GUILayout.TextField(document.StartText,10,theme.Input,GUILayout.Width(116),GUILayout.Height(46));
-                        Label("부터",theme.Small,GUILayout.Width(40));
-                        string last=GUILayout.TextField(document.EndText,10,theme.Input,GUILayout.Width(116),GUILayout.Height(46));
-                        Label("페이지까지",theme.Small,GUILayout.Width(95));
-                        document.SetRange(first,last);
-                        if(Button("전체 선택",theme.Quiet,GUILayout.Height(46))) document.SetRange("1",document.Pages.ToString());
-                        GUILayout.EndHorizontal();
-                    }
-                    if(document.SelectedPages>0) {GUILayout.Space(8);Label(document.StartPage+"~"+document.EndPage+"페이지 · "+document.SelectedPages+"페이지 선택",theme.Small);}
-                }
-                GUILayout.Space(16);
+            if (boardDirty)
+            {
+                boardDirty = false;
+                actions.Clear();
+                choices = null;
+                submitButton = null;
+                clock = saveStatus = null;
+                theme.BeginPage("2인 PDF 퀴즈", BlocksMovement);
+                if (!BlocksMovement) DrawRules();
+                else if (state == null) theme.Line("좌석 연결 중…", 30, true);
+                else DrawMatch();
             }
-            if(!working || phase==WorkPhase.Connecting) {
-                if(Button(hasFile?"다른 PDF 선택하기":"PDF 선택하기",theme.Secondary,GUILayout.Height(44))) ChoosePdf();
+
+            theme.Status(string.IsNullOrEmpty(notice) ? connectionNotice :
+                string.IsNullOrEmpty(connectionNotice) ? notice : notice + "   ·   " + connectionNotice);
+            double remaining = state == null ? 0 : Math.Max(0, state.remaining_ms / 1000d -
+                (Time.realtimeSinceStartupAsDouble - receivedAt));
+            foreach (var action in actions)
+                action.interactable = !acting && (state?.phase != "playing" || remaining > 0);
+            if (clock) clock.text = "남은 시간  " + Math.Ceiling(remaining) + "초";
+            if (choices != null)
+                for (int i = 0; i < choices.Length; i++)
+                    choices[i].image.color = i == selected ? QuizTheme.Selected : QuizTheme.Control;
+            if (submitButton) submitButton.interactable = !acting && remaining > 0 &&
+                (state.question.level == 1 ? selected >= 0 : !string.IsNullOrWhiteSpace(draft));
+            if (saveStatus) saveStatus.text = HasUnsavedAnswer || saving ? "답 저장 중…" :
+                "시간이 끝나면 마지막으로 저장한 답을 채점합니다.";
+        }
+
+        void DrawRules()
+        {
+            theme.Line("두 사람이 한 자리씩 앉아 각자 공부한 PDF를 선택하세요.", 48, true).alignment = TextAnchor.MiddleCenter;
+            theme.Line("객관식 10초   ·   단답형 15초   ·   서술형 20초", 61, true, true).alignment = TextAnchor.MiddleCenter;
+            theme.Line("각 단계는 10점입니다. 두 사람의 총점, 정답률, 풀이 시간을 비교하세요.", 40).alignment = TextAnchor.MiddleCenter;
+        }
+
+        void DrawMatch()
+        {
+            string players = string.Join("      ", Array.ConvertAll(state.players, p =>
+                (p.slot == state.self_slot ? "나  " : "상대  ") + p.nickname + "  ·  Lv." + p.level));
+            theme.Line(players, 19, false, true);
+            switch (state.phase)
+            {
+                case "waiting":
+                    theme.Line("상대 참가자를 기다리는 중  ·  1 / 2", 30, true);
+                    theme.Line("다른 계정이 나머지 좌석에 앉으면 각자의 PDF를 선택할 수 있습니다.");
+                    theme.Line("객관식 10초   ·   단답형 15초   ·   서술형 20초", 23, false, true);
+                    break;
+                case "upload":
+                    DrawUpload();
+                    break;
+                case "generating":
+                    theme.Line("두 사람의 문제를 만들고 있습니다…", 30, true);
+                    theme.Line(state.DifficultyLabel);
+                    break;
+                case "playing":
+                    DrawQuestion();
+                    break;
+                case "grading":
+                    theme.Line("최종 결과 대기 중", 30, true);
+                    theme.Line("두 사람의 풀이와 채점이 끝나면 결과를 확인할 수 있습니다.");
+                    break;
+                case "results":
+                    DrawResults();
+                    break;
+                case "error":
+                    theme.Line(state.message);
+                    actions.Add(theme.ActionButton("다시 시도", () => _ = Command("retry?round_id=" + Uri.EscapeDataString(state.round_id))));
+                    if (state.can_upload) DrawUpload();
+                    break;
+                default:
+                    theme.Line("서버에서 대전 상태를 확인하고 있습니다.");
+                    break;
             }
-            GUILayout.EndVertical();
-            if(document.Warning.Length>0) {GUILayout.Space(12);Notice(document.Warning);}
-            if(working) {GUILayout.Space(16);DrawActivity();}
-            else {
-                if(message.Length>0) {GUILayout.Space(12);Notice(message);}
-                GUILayout.Space(22);GUI.enabled=configured && document.CanGenerate;
-                if(Button("문제 만들기  →",theme.Primary,GUILayout.Height(52))) Generate();GUI.enabled=true;
+        }
+
+        void DrawUpload()
+        {
+            if (state.Self.ready && state.phase != "error")
+            {
+                theme.Line("내 PDF 제출 완료", 32, true);
+                theme.Line("상대가 PDF를 제출하면 두 사람의 문제를 준비합니다.");
+                return;
             }
-            if(browsing) {GUILayout.Space(16);DrawBrowser();}
-            GUILayout.EndVertical();GUILayout.Space(36);
-            GUILayout.BeginVertical(theme.Card,GUILayout.Width(280));
-            Label("나만의 복습 루틴",theme.Caption);GUILayout.Space(24);
-            Guide("1","객관식 · 10초","보기에서 알맞은 답을 선택해요.");GUILayout.Space(22);
-            Guide("2","단답형 · 15초","핵심 답을 짧게 입력해요.");GUILayout.Space(22);
-            Guide("3","서술형 · 20초","생각을 한두 문장으로 적어요.");
-            GUILayout.EndVertical();GUILayout.EndHorizontal();
-        }
-        void Guide(string number,string title,string detail)
-        {
-            Label(number+"   "+title,theme.Body);GUILayout.Space(6);Label(detail,theme.Small);
-        }
-        void Notice(string text)
-        {
-            GUILayout.BeginVertical(theme.ErrorCard);Label(text,theme.Warning);GUILayout.EndVertical();
-        }
-        void DrawActivity()
-        {
-            GUILayout.BeginVertical(theme.Card);
-            GUILayout.BeginHorizontal();var spinner=GUILayoutUtility.GetRect(48,48,GUILayout.Width(48));
-            theme.Spinner(spinner,Time.realtimeSinceStartup);GUILayout.Space(14);GUILayout.BeginVertical();
-            bool uploading=phase==WorkPhase.Generating && request!=null && request.uploadProgress>=0 && request.uploadProgress<1;
-            string title=phase==WorkPhase.Connecting?"학습을 준비하고 있어요":phase==WorkPhase.Inspecting?"파일 정보를 확인하고 있어요":phase==WorkPhase.Grading?"답의 의미를 비교해 채점하고 있어요":uploading?"학습 자료를 업로드하고 있어요":"문제를 만들고 있어요";
-            Label(title,theme.Body);GUILayout.Space(5);
-            int seconds=(int)(Time.realtimeSinceStartup-startedAt);
-            string detail=phase==WorkPhase.Connecting?"첫 연결은 약 1분이 걸릴 수 있어요.":phase==WorkPhase.Inspecting?"페이지 수와 파일 상태를 검사합니다.":phase==WorkPhase.Grading?"단답형 · 서술형 답안을 확인합니다.":"선택한 범위에서 세 단계의 문제를 구성합니다.";
-            Label((seconds/60).ToString("00")+":"+(seconds%60).ToString("00")+" 경과  ·  "+detail,theme.Small);
-            GUILayout.EndVertical();GUILayout.EndHorizontal();GUILayout.Space(16);
-            var track=GUILayoutUtility.GetRect(10,4,GUILayout.ExpandWidth(true));
-            GUI.color=new Color(.86f,.89f,.92f);GUI.DrawTexture(track,Texture2D.whiteTexture);GUI.color=QuizTheme.Navy;
-            if(uploading) GUI.DrawTexture(new Rect(track.x,track.y,track.width*Mathf.Clamp01(request.uploadProgress),4),Texture2D.whiteTexture);
-            else {float width=track.width*.23f;float x=(track.width-width)*(.5f+.5f*Mathf.Sin(Time.realtimeSinceStartup*2));GUI.DrawTexture(new Rect(track.x+x,track.y,width,4),Texture2D.whiteTexture);}
-            GUI.color=Color.white;GUILayout.Space(14);
-            if(Button("요청 취소",theme.Quiet,GUILayout.Height(36))) CancelRequest();
-            GUILayout.EndVertical();
-        }
-        void DrawBrowser()
-        {
-            GUILayout.BeginVertical(theme.Card);GUILayout.BeginHorizontal();
-            if(Button("내 문서",theme.Quiet)) Browse(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
-            if(Button("홈",theme.Quiet)) Browse(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
-            if(Button("상위",theme.Quiet)) {var parent=Directory.GetParent(directory);if(parent!=null) Browse(parent.FullName);}
-            if(Button("닫기",theme.Quiet)) browsing=false;GUILayout.EndHorizontal();
-            GUILayout.BeginHorizontal();foreach(string drive in Directory.GetLogicalDrives()) if(Button(drive,theme.Quiet)) {Browse(drive);break;}GUILayout.EndHorizontal();
-            Label(directory,theme.Small);GUILayout.Space(8);
-            const int pageSize=100;int pageCount=Math.Max(1,(folders.Length+files.Length+pageSize-1)/pageSize);browserPage=Math.Min(browserPage,pageCount-1);
-            GUILayout.BeginHorizontal();if(browserPage>0 && Button("이전 목록",theme.Quiet)) {browserPage--;fileScroll=Vector2.zero;}
-            Label((browserPage+1)+" / "+pageCount,theme.Small);if(browserPage+1<pageCount && Button("다음 목록",theme.Quiet)) {browserPage++;fileScroll=Vector2.zero;}GUILayout.EndHorizontal();
-            fileScroll=GUILayout.BeginScrollView(fileScroll,GUILayout.Height(190));
-            for(int i=browserPage*pageSize;i<Math.Min(folders.Length+files.Length,(browserPage+1)*pageSize);i++) {
-                if(i<folders.Length) {if(Button("[폴더] "+Path.GetFileName(folders[i]),theme.Quiet)) {Browse(folders[i]);break;}}
-                else if(Button(Path.GetFileName(files[i-folders.Length]),theme.Quiet)) {SelectPdf(files[i-folders.Length]);break;}
+            theme.Line("공부한 PDF 선택", 32, true);
+            theme.Line(state.DifficultyLabel + "  ·  각자 자기 PDF로 3문제를 풉니다.", 21);
+            actions.Add(theme.ActionButton(documentBytes == null ? "PDF 선택하기" : "다른 PDF 선택하기", ChoosePdf));
+            if (documentBytes == null) return;
+            theme.Line(document.Name + "  ·  " + document.SizeLabel);
+            var row = theme.Row();
+            actions.Add(theme.ActionButton(useRange ? "전체 페이지 사용" : "페이지 범위 지정", () => {
+                useRange = !useRange;
+                boardDirty = true;
+            }, row));
+            if (useRange)
+            {
+                actions.Add(theme.Field("시작 페이지", startPage, 8, value => startPage = value, row: row, numeric: true));
+                actions.Add(theme.Field("끝 페이지", endPage, 8, value => endPage = value, row: row, numeric: true));
             }
-            if(files.Length==0) Label("이 폴더에는 PDF가 없습니다.",theme.Small);
-            GUILayout.EndScrollView();GUILayout.EndVertical();
+            actions.Add(theme.ActionButton("이 PDF로 참가", Upload, primary: true));
         }
+
         void DrawQuestion()
         {
-            var q=session.Current;if(q==null) return;
-            double remaining=session.Remaining(Time.realtimeSinceStartupAsDouble);
-            GUILayout.BeginHorizontal();GUILayout.BeginVertical();
-            Label(q.level+"단계 · "+new[]{"객관식","단답형","서술형"}[q.level-1],theme.Caption);GUILayout.Space(7);
-            Label("제한 "+session.TimeLimit+"초 · 10점 만점",theme.Small);GUILayout.EndVertical();
-            GUILayout.FlexibleSpace();var clock=GUILayoutUtility.GetRect(82,80,GUILayout.Width(82),GUILayout.Height(80));
-            theme.Countdown(clock,remaining,session.TimeLimit);GUILayout.EndHorizontal();
-            GUILayout.Space(8);var track=GUILayoutUtility.GetRect(10,5,GUILayout.ExpandWidth(true));
-            GUI.color=new Color(.90f,.92f,.94f);GUI.DrawTexture(track,Texture2D.whiteTexture);
-            GUI.color=remaining<=3?new Color(.77f,.25f,.20f):QuizTheme.Navy;
-            GUI.DrawTexture(new Rect(track.x,track.y,track.width*(float)(remaining/session.TimeLimit),5),Texture2D.whiteTexture);GUI.color=Color.white;
-            GUILayout.Space(24);Label(q.prompt,theme.Title);GUILayout.Space(22);
-            if(q.level==1) {
-                for(int i=0;i<4;i++) {
-                    if(Button((i+1).ToString("00")+"     "+q.options[i],selected==i?theme.SelectedChoice:theme.Choice,GUILayout.MinHeight(54))) selected=i;
-                    GUILayout.Space(9);
-                }
-                GUILayout.Space(12);GUI.enabled=selected>=0;
-                if(Button("제출하고 다음으로  →",theme.Primary,GUILayout.Height(50)) && session.SubmitChoice(selected,Time.realtimeSinceStartupAsDouble)) ResetQuestionInput();
-                GUI.enabled=true;
-            } else {
-                Label(q.level==2?"핵심 용어나 짧은 문장으로 답해 주세요.":"생각을 한두 문장으로 설명해 주세요.",theme.Small);GUILayout.Space(12);
-                string name="quiz-answer-"+q.level;GUI.SetNextControlName(name);
-                typedAnswer=q.level==2?GUILayout.TextField(typedAnswer,300,theme.Input,GUILayout.Height(58)):
-                    GUILayout.TextArea(typedAnswer,1000,theme.Input,GUILayout.Height(132));
-                if(!focusAnswer) {GUI.FocusControl(name);focusAnswer=true;}
-                GUILayout.Space(12);GUI.enabled=!string.IsNullOrWhiteSpace(typedAnswer);
-                if(Button(q.level==3?"제출하고 결과 보기  →":"제출하고 다음으로  →",theme.Primary,GUILayout.Height(50)) && session.SubmitText(typedAnswer,q.level,Time.realtimeSinceStartupAsDouble)) ResetQuestionInput();
-                GUI.enabled=true;
+            var q = state.question;
+            if (q == null || q.level < 1 || q.level > 3 || string.IsNullOrWhiteSpace(q.prompt))
+            {
+                theme.Line("상대의 풀이가 끝나기를 기다리는 중…", 28, true);
+                return;
             }
-            GUILayout.Space(14);Label("시간이 끝나면 현재 답이 자동 제출됩니다. 정답과 해설은 마지막에 확인해요.",theme.Small);
+            var names = new[] { "객관식", "단답형", "서술형" };
+            theme.Line(q.level + "단계  ·  " + names[q.level - 1] + "   /   " + state.DifficultyLabel, 22, true, true);
+            clock = theme.Line("", 23, true);
+            theme.Line(q.prompt, 27, true);
+            if (q.level == 1 && q.options != null)
+            {
+                choices = new Button[q.options.Length];
+                RectTransform row = null;
+                for (int i = 0; i < choices.Length; i++)
+                {
+                    if (i % 2 == 0) row = theme.Row();
+                    int choice = i;
+                    choices[i] = theme.ActionButton((i + 1) + ".  " + q.options[i], () => selected = choice, row);
+                    actions.Add(choices[i]);
+                }
+            }
+            else actions.Add(theme.Field("답을 입력하세요", draft, q.level == 2 ? 300 : 1000,
+                value => draft = value, multiline: q.level == 3));
+            submitButton = theme.ActionButton("답 제출", Submit, primary: true);
+            saveStatus = theme.Line("", 18, false, true);
         }
+
         void DrawResults()
         {
-            Label("복습을 마쳤어요.",theme.Heading);GUILayout.Space(8);
-            Label(session.NeedsGrading?(working?"단답형 · 서술형 채점 중":"단답형 · 서술형 채점 대기"):"총 "+session.Score+" / 30점",theme.Positive);GUILayout.Space(6);
-            Label("총 풀이 시간 "+session.TotalElapsed.ToString("0.0")+"초",theme.Small);GUILayout.Space(16);
-            if(working && phase==WorkPhase.Grading) {DrawActivity();GUILayout.Space(16);}
-            else if(session.NeedsGrading) {
-                if(message.Length>0) {Notice(message);GUILayout.Space(10);}
-                if(Button("AI 채점 다시하기",theme.Secondary,GUILayout.Height(44))) StartCoroutine(GradeAnswers());GUILayout.Space(16);
+            theme.Line("대전 결과", 32, true);
+            theme.Line("정답률은 세 문제 중 만점을 받은 비율입니다. 총점에는 부분점수를 포함합니다.", 20);
+            if (state.results == null) return;
+            foreach (var result in state.results)
+            {
+                theme.Line((result.slot == state.self_slot ? "나  " : "상대  ") + result.nickname +
+                    "   ·   " + result.score + " / 30점", 25, true, true);
+                theme.Line("정답률  " + result.accuracy.ToString("0.#") + "% (" + result.correct +
+                    "/3)     풀이 시간  " + (result.elapsed_ms / 1000d).ToString("0.0") + "초", 22);
+                if (result.stages == null) continue;
+                foreach (var stage in result.stages)
+                    theme.Line(stage.level + "단계    " + stage.score + " / 10점    " +
+                        (stage.elapsed_ms / 1000d).ToString("0.0") + "초", 18);
             }
-            for(int i=0;i<3;i++) {
-                var q=session.Data.questions[i];GUILayout.BeginVertical(theme.Card);
-                string verdict=session.Points[i].HasValue?session.Points[i]+" / 10점":"채점 대기";
-                Label((i+1)+"단계 · "+new[]{"객관식","단답형","서술형"}[i]+" · "+verdict+(session.TimedOut[i]?" · 시간 종료":""),theme.Caption);GUILayout.Space(10);
-                Label("내 답  "+(session.Responses[i].Length==0?"미응답":session.Responses[i]),theme.Small);GUILayout.Space(8);
-                Label("정답  "+q.model_answer,theme.Body);GUILayout.Space(8);
-                Label(q.explanation,theme.Small);GUILayout.Space(8);
-                Label("풀이 "+session.ElapsedSeconds[i].ToString("0.0")+"초 / 제한 "+new[]{10,15,20}[i]+"초  ·  PDF "+q.source_page+"페이지",theme.Caption);
-                if(i>0 && session.CriterionScores[i]!=null) {
-                    var breakdown=new string[q.grading_criteria.Length];
-                    for(int j=0;j<breakdown.Length;j++) breakdown[j]=q.grading_criteria[j].description+" "+session.CriterionScores[i][j]+"/"+q.grading_criteria[j].max_points+"점";
-                    GUILayout.Space(7);Label(string.Join(" · ",breakdown),theme.Small);
-                }
-                if(session.GradingFeedback[i].Length>0 && session.Responses[i].Length>0) {GUILayout.Space(6);Label(session.GradingFeedback[i],theme.Small);}
-                GUILayout.EndVertical();GUILayout.Space(12);
-            }
-            if(Button("새 PDF로 다시 학습하기",theme.Primary,GUILayout.Height(50))) {
-                StopRequest();session.Reset();document.Reset();documentBytes=null;path=message="";gradingAttempted=false;ResetQuestionInput();
+            if (state.review == null || state.review.Length == 0) return;
+            theme.Line("내 PDF 풀이 복습", 28, true);
+            foreach (var item in state.review)
+            {
+                theme.Line(item.level + "단계    ·    PDF " + item.source_page + "페이지    ·    " +
+                    item.score + "/10점", 22, true, true);
+                theme.Line(item.prompt, 24, true);
+                theme.Line("내 답    " + (string.IsNullOrEmpty(item.answer) ? "미응답" : item.answer));
+                theme.Line("모범 답    " + item.model_answer);
+                theme.Line(item.explanation, 20);
+                if (!string.IsNullOrEmpty(item.feedback)) theme.Line(item.feedback, 20);
             }
         }
     }
