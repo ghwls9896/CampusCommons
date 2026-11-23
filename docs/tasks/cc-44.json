@@ -1,0 +1,24 @@
+{
+  "id": "cc-44",
+  "title": "2~8명 공용 로비 서버에서 입장·이동·퇴장 공유",
+  "owner": "HIGHCHOI",
+  "branch": "codex/cc-44-shared-lobby",
+  "issue": "https://github.com/ghwls9896/CampusCommons/issues/44",
+  "scope": [
+    "backend/app.py",
+    "backend/lobby.py",
+    "backend/requirements.txt",
+    "backend/.env.example",
+    "backend/tests/test_lobby.py",
+    "render.yaml",
+    "docs/multiplayer/LOBBY.md"
+  ],
+  "shared_files": ["backend/app.py", "render.yaml"],
+  "depends_on": [],
+  "validation": [
+    "기존 계정 Edge read의 인증·오류·공개 필드 계약 검사",
+    "실제 Uvicorn과 WebSocket 클라이언트로 입장·이동·퇴장·늦은 입장·재연결 검사",
+    "8명 정원, 만원 안내와 자리 재사용, 비정상 입력 및 계정별 상태 격리 검사",
+    "전체 백엔드 테스트, 팀 도구 테스트와 origin/main 기준 커밋 범위 검사"
+  ]
+}
