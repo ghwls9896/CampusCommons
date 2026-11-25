@@ -1,46 +1,127 @@
 #if CAMPUS_SUNBOX_AVATAR
 
-using System.Collections.Generic;
+using System;
 using UnityEngine;
+using CampusCommons.Account;
 using Sunbox.Avatars;
 
 namespace CampusCommons.GrandLibrary
 {
+    // First-lobby-entry customization. No shared Player.cs or account API changes.
+    [DefaultExecutionOrder(-100)]
     public class LibraryAvatarCustomizerUI : MonoBehaviour
     {
+        private const int SaveVersion = 1;
+        private const string SavePrefix = "CampusCommons.AvatarInitialLook.v1.";
+
+        [Serializable]
+        private sealed class AvatarLook
+        {
+            public int version = SaveVersion;
+            public int gender;
+            public int skin;
+            public int hairStyle;
+            public int hairColor;
+        }
+
         private AvatarCustomization avatar;
+        private string activeUserId;
+        private bool setupRequired;
+        private bool initializedForUser;
         private Vector2 scroll;
 
         public bool IsOpen { get; private set; }
 
         public void Initialize(GameObject avatarVisual)
         {
-            avatar = avatarVisual.GetComponentInChildren
-                <AvatarCustomization>(true);
+            avatar = avatarVisual != null
+                ? avatarVisual.GetComponentInChildren<AvatarCustomization>(true)
+                : null;
 
             if (avatar == null)
-                Debug.LogError("AvatarCustomization을 찾지 못했습니다.");
+                Debug.LogWarning("[CampusCommons] Initial avatar setup: Sunbox avatar not found.");
         }
 
-        public void Toggle()
-        {
-            if (avatar != null)
-                IsOpen = !IsOpen;
-        }
+        // Player.cs still calls Toggle() for C; deliberately disable that shortcut.
+        // The setup can only open automatically after authenticated lobby entry.
+        public void Toggle() { }
 
+        // ESC must not silently finish an incomplete initial setup.
         public void Close()
         {
+            if (!setupRequired)
+                IsOpen = false;
+        }
+
+        private static string SaveKey(string userId)
+        {
+            return SavePrefix + userId;
+        }
+
+        private void ResetForLogout()
+        {
+            activeUserId = null;
+            initializedForUser = false;
+            setupRequired = false;
             IsOpen = false;
         }
 
-        private int Wrap(int value, int count)
+        private void Update()
         {
-            return count <= 0 ? 0 :
-                (value % count + count) % count;
+            AccountGate gate = AccountGate.Instance;
+            if (gate == null || !gate.Ready || gate.Session == null ||
+                !gate.Session.IsAuthenticated ||
+                gate.Session.Profile == null ||
+                string.IsNullOrEmpty(gate.Session.UserId) ||
+                gate.Session.Profile.user_id != gate.Session.UserId)
+            {
+                if (initializedForUser || IsOpen)
+                    ResetForLogout();
+                return;
+            }
+
+            if (avatar == null || avatar.AvatarReferences == null)
+                return;
+
+            string userId = gate.Session.UserId;
+            if (initializedForUser && activeUserId == userId)
+                return;
+
+            activeUserId = userId;
+            initializedForUser = true;
+
+            string key = SaveKey(userId);
+            AvatarLook saved = null;
+            if (PlayerPrefs.HasKey(key))
+            {
+                try
+                {
+                    saved = JsonUtility.FromJson<AvatarLook>(PlayerPrefs.GetString(key));
+                    if (saved == null || saved.version != SaveVersion)
+                        saved = null;
+                }
+                catch (Exception)
+                {
+                    saved = null;
+                }
+            }
+
+            if (saved != null)
+            {
+                ApplySavedLook(saved);
+                setupRequired = false;
+                IsOpen = false;
+            }
+            else
+            {
+                // The baseline clothing is assigned before the user chooses a look.
+                ApplyBasicClothes(avatar.CurrentGender);
+                setupRequired = true;
+                IsOpen = true;
+            }
         }
 
-        private bool Compatible(
-            ClothingItem item,
+        private bool IsCompatible(ClothingItem item,
             AvatarCustomization.AvatarGender gender)
         {
             if (item == null || item.IsEmpty)
@@ -51,225 +132,240 @@ namespace CampusCommons.GrandLibrary
                 : item.FemaleMesh != null;
         }
 
-        private List<ClothingItem> GetClothes(
-            SlotType slot,
+        private ClothingItem GetBasicClothing(SlotType slot,
             AvatarCustomization.AvatarGender gender)
         {
-            var result = new List<ClothingItem>();
-            var items = avatar.AvatarReferences.AvailableClothingItems;
+            var references = avatar.AvatarReferences;
+            var available = references != null ? references.AvailableClothingItems : null;
+            if (available == null)
+                return null;
 
-            if (items == null) return result;
-
-            foreach (var item in items)
+            ClothingItem fallback = null;
+            foreach (var item in available)
             {
-                if (item != null &&
-                    item.SlotType == slot &&
-                    Compatible(item, gender))
-                    result.Add(item);
+                if (item == null || item.SlotType != slot ||
+                    !IsCompatible(item, gender))
+                    continue;
+
+                // Prefer one clothing definition compatible with both genders.
+                if (IsCompatible(item, AvatarCustomization.AvatarGender.Male) &&
+                    IsCompatible(item, AvatarCustomization.AvatarGender.Female))
+                    return item;
+
+                if (fallback == null)
+                    fallback = item;
             }
 
-            return result;
+            return fallback;
         }
 
-        private ClothingItem SuitableClothing(
-            SlotType slot,
-            ClothingItem current,
-            AvatarCustomization.AvatarGender gender)
+        private void ApplyBasicClothes(AvatarCustomization.AvatarGender gender)
         {
-            if (Compatible(current, gender))
-                return current;
+            if (avatar == null || avatar.AvatarReferences == null)
+                return;
 
-            var options = GetClothes(slot, gender);
-            return options.Count > 0 ? options[0] : null;
+            ClothingItem top = GetBasicClothing(SlotType.Top, gender);
+            ClothingItem bottom = GetBasicClothing(SlotType.Bottom, gender);
+            ClothingItem shoes = GetBasicClothing(SlotType.Shoes, gender);
+
+            // Match the existing Sunbox change-gender order: clothing before SetGender.
+            if (top != null)
+                avatar.ClothingItemTop = top;
+            if (bottom != null)
+                avatar.ClothingItemBottom = bottom;
+            if (shoes != null)
+                avatar.ClothingItemShoes = shoes;
+
+            // Hats/glasses are future shop items, not starter customization choices.
+            avatar.ClothingItemHat = null;
+            avatar.ClothingItemGlasses = null;
+
+            if (avatar.CurrentGender != gender)
+                avatar.SetGender(gender);
+
+            avatar.UpdateCustomization();
         }
 
-        private void ChangeGender(
-            AvatarCustomization.AvatarGender gender)
+        private static int Wrap(int value, int count)
         {
-            if (avatar.CurrentGender == gender) return;
-
-            // 새 성별에 사용할 수 있는 옷으로 먼저 교체
-            avatar.ClothingItemTop = SuitableClothing(
-                SlotType.Top, avatar.ClothingItemTop, gender);
-
-            avatar.ClothingItemBottom = SuitableClothing(
-                SlotType.Bottom, avatar.ClothingItemBottom, gender);
-
-            avatar.ClothingItemShoes = SuitableClothing(
-                SlotType.Shoes, avatar.ClothingItemShoes, gender);
-
-            if (avatar.ClothingItemHat != null)
-                avatar.ClothingItemHat = SuitableClothing(
-                    SlotType.Hat, avatar.ClothingItemHat, gender);
-
-            if (avatar.ClothingItemGlasses != null)
-                avatar.ClothingItemGlasses = SuitableClothing(
-                    SlotType.Glasses, avatar.ClothingItemGlasses, gender);
-
-            avatar.SetGender(gender);
+            return count > 0 ? (value % count + count) % count : 0;
         }
 
-        private void ChangeHair(int direction)
+        private int GetSkinCount()
         {
-            var hairs = avatar.AvatarReferences.HairItems;
-            if (hairs == null || hairs.Length == 0) return;
+            var refs = avatar.AvatarReferences;
+            if (refs == null)
+                return 0;
 
-            avatar.HairStyleIndex = Wrap(
-                avatar.HairStyleIndex + direction, hairs.Length);
+            if (avatar.CurrentGender == AvatarCustomization.AvatarGender.Male)
+                return refs.MaleSkinMaterials != null ? refs.MaleSkinMaterials.Length : 0;
 
+            return refs.FemaleSkinMaterials != null ? refs.FemaleSkinMaterials.Length : 0;
+        }
+
+        private int GetHairStyleCount()
+        {
+            var refs = avatar.AvatarReferences;
+            return refs != null && refs.HairItems != null ? refs.HairItems.Length : 0;
+        }
+
+        private int GetHairColorCount(int hairIndex)
+        {
+            var hairs = avatar.AvatarReferences != null
+                ? avatar.AvatarReferences.HairItems : null;
+            if (hairs == null || hairIndex < 0 || hairIndex >= hairs.Length ||
+                hairs[hairIndex] == null || hairs[hairIndex].Variations == null)
+                return 0;
+
+            return hairs[hairIndex].Variations.Length;
+        }
+
+        private void ApplySavedLook(AvatarLook saved)
+        {
+            var gender = saved.gender == 1
+                ? AvatarCustomization.AvatarGender.Female
+                : AvatarCustomization.AvatarGender.Male;
+
+            ApplyBasicClothes(gender);
+            int skinCount = GetSkinCount();
+            int hairCount = GetHairStyleCount();
+
+            if (skinCount > 0)
+                avatar.SkinMaterialIndex = Mathf.Clamp(saved.skin, 0, skinCount - 1);
+
+            if (hairCount > 0)
+            {
+                avatar.HairStyleIndex = Mathf.Clamp(saved.hairStyle, 0, hairCount - 1);
+                int colors = GetHairColorCount(avatar.HairStyleIndex);
+                avatar.HairMaterialIndex = colors > 0
+                    ? Mathf.Clamp(saved.hairColor, 0, colors - 1) : 0;
+            }
+
+            avatar.UpdateCustomization();
+        }
+
+        private void SelectGender(AvatarCustomization.AvatarGender gender)
+        {
+            if (avatar.CurrentGender == gender)
+                return;
+
+            ApplyBasicClothes(gender);
+            avatar.SkinMaterialIndex = 0;
             avatar.HairMaterialIndex = 0;
             avatar.UpdateCustomization();
         }
 
-        private void ChangeHairColor()
+        private void NextSkin()
         {
-            var hairs = avatar.AvatarReferences.HairItems;
-            if (hairs == null || hairs.Length == 0) return;
-
-            int index = Mathf.Clamp(
-                avatar.HairStyleIndex, 0, hairs.Length - 1);
-
-            var hair = hairs[index];
-            if (hair == null || hair.Variations == null ||
-                hair.Variations.Length == 0) return;
-
-            avatar.HairMaterialIndex = Wrap(
-                avatar.HairMaterialIndex + 1,
-                hair.Variations.Length);
-
+            int count = GetSkinCount();
+            if (count <= 0) return;
+            avatar.SkinMaterialIndex = Wrap(avatar.SkinMaterialIndex + 1, count);
             avatar.UpdateCustomization();
         }
 
-        private void ChangeSkin()
+        private void NextHair(int direction)
         {
-            int count = avatar.CurrentGender ==
-                AvatarCustomization.AvatarGender.Male
-                    ? avatar.AvatarReferences.MaleSkinMaterials.Length
-                    : avatar.AvatarReferences.FemaleSkinMaterials.Length;
-
-            if (count == 0) return;
-
-            avatar.SkinMaterialIndex = Wrap(
-                avatar.SkinMaterialIndex + 1, count);
-
+            int count = GetHairStyleCount();
+            if (count <= 0) return;
+            avatar.HairStyleIndex = Wrap(avatar.HairStyleIndex + direction, count);
+            avatar.HairMaterialIndex = 0;
             avatar.UpdateCustomization();
         }
 
-        private void ChangeClothing(
-            SlotType slot, int direction)
+        private void NextHairColor()
         {
-            var options = GetClothes(slot, avatar.CurrentGender);
-            if (options.Count == 0) return;
-
-            var current = avatar.GetClothingItemFromSlot(slot);
-            int index = options.IndexOf(current);
-
-            int next = index < 0 ? 0 :
-                Wrap(index + direction, options.Count);
-
-            avatar.AttachClothingItem(options[next], 0);
+            int count = GetHairColorCount(avatar.HairStyleIndex);
+            if (count <= 0) return;
+            avatar.HairMaterialIndex = Wrap(avatar.HairMaterialIndex + 1, count);
+            avatar.UpdateCustomization();
         }
 
-        private void ChangeClothingColor(SlotType slot)
+        private void FinishSetup()
         {
-            var item = avatar.GetClothingItemFromSlot(slot);
-            if (item == null || item.Variations == null ||
-                item.Variations.Length == 0) return;
+            AccountGate gate = AccountGate.Instance;
+            if (!setupRequired || avatar == null || gate == null || !gate.Ready ||
+                string.IsNullOrEmpty(activeUserId) ||
+                gate.Session == null || gate.Session.UserId != activeUserId)
+                return;
 
-            int current = avatar.GetClothingItemVariationIndex(slot);
-            int next = Wrap(current + 1, item.Variations.Length);
+            AvatarLook look = new AvatarLook
+            {
+                version = SaveVersion,
+                gender = avatar.CurrentGender == AvatarCustomization.AvatarGender.Female ? 1 : 0,
+                skin = avatar.SkinMaterialIndex,
+                hairStyle = avatar.HairStyleIndex,
+                hairColor = avatar.HairMaterialIndex
+            };
 
-            avatar.SetClothingItemVariation(slot, next);
-        }
-
-        private void ClothingRow(string title, SlotType slot)
-        {
-            var item = avatar.GetClothingItemFromSlot(slot);
-
-            GUILayout.Label(title + ": " +
-                (item != null ? item.Name : "없음"));
-
-            GUILayout.BeginHorizontal();
-
-            if (GUILayout.Button("이전"))
-                ChangeClothing(slot, -1);
-
-            if (GUILayout.Button("다음"))
-                ChangeClothing(slot, 1);
-
-            if (GUILayout.Button("색상"))
-                ChangeClothingColor(slot);
-
-            GUILayout.EndHorizontal();
-            GUILayout.Space(8);
+            PlayerPrefs.SetString(SaveKey(activeUserId), JsonUtility.ToJson(look));
+            PlayerPrefs.Save();
+            setupRequired = false;
+            IsOpen = false;
         }
 
         private void OnGUI()
         {
-            if (!IsOpen || avatar == null ||
-                avatar.AvatarReferences == null) return;
+            if (!IsOpen || !setupRequired || avatar == null ||
+                avatar.AvatarReferences == null)
+                return;
 
-            float width = Mathf.Min(360, Screen.width - 20);
+            float width = Mathf.Min(410f, Screen.width - 24f);
+            float px = Mathf.Max(12f, Screen.width - width - 15f);
+            // Avoid the existing account HUD at the upper-right corner.
+            float py = Screen.height >= 580 ? 166f : 90f;
+            float height = Mathf.Max(220f, Screen.height - py - 16f);
 
-            Rect panel = new Rect(
-                Mathf.Max(10, Screen.width - width - 10),
-                35, width, Mathf.Max(160, Screen.height - 50));
-
-            GUI.Box(panel, "캐릭터 커스터마이징");
-
-            GUILayout.BeginArea(new Rect(
-                panel.x + 10, panel.y + 28,
-                panel.width - 20, panel.height - 38));
+            GUI.Box(new Rect(px, py, width, height), "최초 캐릭터 설정");
+            GUILayout.BeginArea(new Rect(px + 16f, py + 32f,
+                width - 32f, height - 44f));
 
             scroll = GUILayout.BeginScrollView(scroll);
+            GUILayout.Label("로비 입장을 환영합니다!");
+            GUILayout.Label("기본 외형을 선택한 뒤 '설정 완료'를 눌러 주세요.");
+            GUILayout.Space(12f);
 
-            if (GUILayout.Button("닫기"))
-                Close();
-
-            GUILayout.Label("성별 선택");
+            GUILayout.Label("성별");
             GUILayout.BeginHorizontal();
-
-            if (GUILayout.Button("남성"))
-                ChangeGender(AvatarCustomization.AvatarGender.Male);
-
-            if (GUILayout.Button("여성"))
-                ChangeGender(AvatarCustomization.AvatarGender.Female);
-
+            if (GUILayout.Button("남성", GUILayout.Height(36f)))
+                SelectGender(AvatarCustomization.AvatarGender.Male);
+            if (GUILayout.Button("여성", GUILayout.Height(36f)))
+                SelectGender(AvatarCustomization.AvatarGender.Female);
             GUILayout.EndHorizontal();
+            GUILayout.Space(10f);
 
-            if (GUILayout.Button("피부색 변경"))
-                ChangeSkin();
+            if (GUILayout.Button("피부색 변경", GUILayout.Height(34f)))
+                NextSkin();
 
-            GUILayout.Space(10);
+            GUILayout.Space(10f);
             GUILayout.Label("헤어스타일");
             GUILayout.BeginHorizontal();
-
-            if (GUILayout.Button("이전 헤어"))
-                ChangeHair(-1);
-
-            if (GUILayout.Button("다음 헤어"))
-                ChangeHair(1);
-
+            if (GUILayout.Button("이전 헤어", GUILayout.Height(34f)))
+                NextHair(-1);
+            if (GUILayout.Button("다음 헤어", GUILayout.Height(34f)))
+                NextHair(1);
             GUILayout.EndHorizontal();
 
-            if (GUILayout.Button("머리색 변경"))
-                ChangeHairColor();
+            if (GUILayout.Button("머리색 변경", GUILayout.Height(34f)))
+                NextHairColor();
 
-            GUILayout.Space(10);
-            GUILayout.Label("의상");
+            GUILayout.Space(14f);
+            GUILayout.Label("상의·하의·기본 신발은 고정됩니다.");
+            GUILayout.Label("모자·안경·다른 신발은 추후 상점에서 구매합니다.");
+            GUILayout.Space(14f);
 
-            ClothingRow("상의", SlotType.Top);
-            ClothingRow("하의", SlotType.Bottom);
-            ClothingRow("신발", SlotType.Shoes);
-            ClothingRow("안경", SlotType.Glasses);
-            ClothingRow("모자", SlotType.Hat);
+            if (GUILayout.Button("설정 완료 · 로비 시작", GUILayout.Height(42f)))
+                FinishSetup();
 
             GUILayout.EndScrollView();
             GUILayout.EndArea();
         }
     }
 }
+
 #else
+
+// A project without Sunbox still compiles and the shared Player C-key handler
+// has no effect. The full initial setup needs the actual Sunbox avatar.
 using UnityEngine;
 namespace CampusCommons.GrandLibrary
 {

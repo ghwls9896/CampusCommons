@@ -13,6 +13,7 @@
     "Assets/Resources/TeamProgression.meta",
     "Assets/Resources/TeamProgression/",
     "Assets/TeamInventory/LibraryInventoryUI.cs",
+    "Assets/TeamAvatar/LibraryAvatarCustomizerUI.cs",
     "docs/tasks/cc-32.json",
     "docs/LEVEL_PROGRESSION.md"
   ],
