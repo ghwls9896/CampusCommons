@@ -33,7 +33,7 @@ namespace CampusCommons.StudyImmersive
 
         static bool Between(float n, float a, float b) => n >= a - .05f && n <= b + .05f;
         static bool Near(float a, float b) => Mathf.Abs(a - b) < .05f;
-        static bool OnCorridor(Vector3 p)
+        internal static bool OnCorridor(Vector3 p)
         {
             return (Near(p.x, 472f) && Between(p.z, -41f, 41f)) ||
                    (Near(p.z, -41f) && Between(p.x, 472f, 492.5f)) ||

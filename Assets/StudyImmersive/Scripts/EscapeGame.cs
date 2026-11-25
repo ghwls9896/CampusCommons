@@ -694,7 +694,7 @@ namespace CampusCommons.StudyImmersive
                     PixelBox(new Rect(530,20,220,48),new Color(.13f,.17f,.20f,.94f));
                     GUI.Label(new Rect(544,30,200,28),L("진행 시간  ","TIME  ")+string.Format("{0:00}:{1:00}",Mathf.FloorToInt(elapsed/60f),Mathf.FloorToInt(elapsed)%60),text);
                 }
-                if(PowerOut && breaker){PixelBox(new Rect(20,190,260,42),new Color(.13f,.17f,.20f,.94f));GUI.Label(new Rect(32,198,245,28),L("차단기까지 ","BREAKER ")+Mathf.CeilToInt(Vector3.Distance(player.transform.position,breaker.transform.position))+"m",text);}
+                if(PowerOut && breaker){PixelBox(new Rect(20,204,260,42),new Color(.13f,.17f,.20f,.94f));GUI.Label(new Rect(32,212,245,28),L("차단기까지 ","BREAKER ")+Mathf.CeilToInt(Vector3.Distance(player.transform.position,breaker.transform.position))+"m",text);}
                 if(!IsEnded)DrawEscapeHud();
                 if(!IsEnded && !IsAnswering && !(World && World.BlocksMovement) && Time.time<startGuideUntil)DrawStartGuide();
                 if(World && World.BlocksMovement && !IsEnded)
@@ -779,15 +779,16 @@ namespace CampusCommons.StudyImmersive
             }
             for(int i=0;i<inventory.Length;i++)
             {
-                float x=1032+i*77;
-                PixelBox(new Rect(x,20,70,70),new Color(.15f,.18f,.20f,.96f));
+                float x=20+i*77;
+                const float top=126;
+                PixelBox(new Rect(x,top,70,70),new Color(.15f,.18f,.20f,.96f));
                 string item=inventory[i]==InventoryItem.Soda?L("음료","CAN"):
                     inventory[i]==InventoryItem.Padlock?L("자물쇠","LOCK"):
                     inventory[i]==InventoryItem.ExcuseNote?L("공결증","NOTE"):"";
                 var icon=World?World.ItemTexture(inventory[i]):null;
-                if(icon)GUI.DrawTexture(new Rect(x+12,29,46,46),icon,ScaleMode.ScaleToFit,true);
-                else GUI.Label(new Rect(x+8,34,58,28),item,text);
-                GUI.Label(new Rect(x+7,66,20,20),(i+1).ToString(),text);
+                if(icon)GUI.DrawTexture(new Rect(x+12,top+9,46,46),icon,ScaleMode.ScaleToFit,true);
+                else GUI.Label(new Rect(x+8,top+14,58,28),item,text);
+                GUI.Label(new Rect(x+7,top+46,20,20),(i+1).ToString(),text);
             }
             if(World)World.DrawStatus(text,korean);
         }
