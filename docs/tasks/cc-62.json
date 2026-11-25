@@ -1,0 +1,21 @@
+{
+    "id":  "cc-62",
+    "title":  "liar-game-main 웹 프로젝트 소스 추가",
+    "owner":  "Yeni-sjs",
+    "branch":  "feat/cc-62-import-liar-game",
+    "issue":  "https://github.com/ghwls9896/CampusCommons/issues/62",
+    "scope":  [
+                  "liar-game-main/"
+              ],
+    "shared_files":  [
+
+                     ],
+    "depends_on":  [
+
+                   ],
+    "validation":  [
+                       "Next.js 정적 검사와 빌드",
+                       "FastAPI 앱 시작 및 HTTP 스모크 검사",
+                       "python Tools/team/check.py --base origin/main 및 PR CI"
+                   ]
+}
