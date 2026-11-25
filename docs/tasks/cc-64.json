@@ -1,0 +1,31 @@
+{
+  "id": "cc-64",
+  "title": "탈출룸 로컬 조명·배치 및 HUD 통합",
+  "owner": "ghwls9896",
+  "branch": "codex/cc-64-escape-integration",
+  "issue": "https://github.com/ghwls9896/CampusCommons/issues/64",
+  "scope": [
+    "Assets/StudyImmersive/Scripts/EscapeGame.cs",
+    "Assets/StudyImmersive/Scripts/EscapeSystems/EscapeWorld.cs",
+    "Assets/StudyImmersive/Scripts/EscapeSystems/EscapeCleanerNavigation.cs",
+    "Assets/StudyImmersive/Scripts/EscapeSystems/EscapeCorridorCleaner.cs",
+    "Assets/StudyImmersive/Scripts/EscapeSystems/Editor/EscapePlacementVerification.cs",
+    "Assets/LibraryCharacter/Scripts/SchoolHallDecorations.cs",
+    "Assets/LibraryCharacter/Scripts/SchoolUpperTrim.cs",
+    "Assets/StudyImmersive/Scenes/GrandLibrary_Living.unity",
+    "Assets/StudyImmersive/Resources/KIT/QuietSign.png",
+    "Assets/StudyImmersive/Resources/KIT/QuietSign.png.meta",
+    "Assets/LibraryCharacter/Generated/Quiet sign.mat",
+    "Assets/LibraryCharacter/Generated/Quiet sign.mat.meta",
+    "Assets/LibraryCharacter/Generated/Quiet sign frame.mat",
+    "Assets/LibraryCharacter/Generated/Quiet sign frame.mat.meta"
+  ],
+  "shared_files": [
+    "Assets/StudyImmersive/Scenes/GrandLibrary_Living.unity"
+  ],
+  "depends_on": [],
+  "validation": [
+    "Unity 6000.4.5f1 Play Mode에서 탈출룸 입장, 난이도와 NPC 배치·조명·정숙 표지판 확인",
+    "팀 검사 및 CI"
+  ]
+}
