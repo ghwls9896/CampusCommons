@@ -709,22 +709,25 @@ namespace CampusCommons.TeamProgression
 
         void ShowLevel(int level)
         {
-            if (level == displayedLevel) return;
-
+            // Reading an account level only unlocks inventory items.
+            // A cosmetic becomes visible ONLY when equipped via the inventory.
+            bool levelChanged = level != displayedLevel;
             displayedLevel = level;
 
             if (auraRoot != null)
-                auraRoot.SetActive(level >= 5);
+                auraRoot.SetActive(level >= 5 &&
+                    CosmeticEquipmentState.IsEquipped(5));
 
             if (capeRoot != null)
-                capeRoot.SetActive(level >= 10);
+                capeRoot.SetActive(level >= 10 &&
+                    CosmeticEquipmentState.IsEquipped(10));
 
             if (specialRoot != null)
-                specialRoot.SetActive(level >= 15);
+                specialRoot.SetActive(level >= 15 &&
+                    CosmeticEquipmentState.IsEquipped(15));
 
-            Debug.Log(
-                "[CampusCommons] Local cosmetic visual level: "
-                + level);
+            if (levelChanged)
+                Debug.Log("[CampusCommons] Cosmetic level checked: Lv." + level);
         }
 
         void ApplyPalette()

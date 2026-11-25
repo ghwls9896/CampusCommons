@@ -130,9 +130,9 @@ namespace CampusCommons.TeamProgression
                 level = Mathf.Clamp(original.previewLevel, 1, 15);
 #endif
             TryBindCapeEmblem();
-            if (shownLevel != level)
-                ApplyLevel(level);
-            if (level >= 6)
+            // Equip/unequip changes must update even if the account level stays the same.
+            ApplyLevel(level);
+            if (CosmeticEquipmentState.IsEquipped(6))
                 RefreshWristBindings();
         }
 
@@ -150,7 +150,8 @@ namespace CampusCommons.TeamProgression
             previousPosition = position;
             havePreviousPosition = true;
 
-            bool trailOn = visible && shownLevel >= 8 && speed > 0.35f && speed < 9f;
+            bool trailOn = visible && CosmeticEquipmentState.IsEquipped(8) &&
+                speed > 0.35f && speed < 9f;
             if (trailLeft != null) trailLeft.emitting = trailOn;
             if (trailRight != null) trailRight.emitting = trailOn;
             if (!visible) return;
@@ -621,18 +622,20 @@ namespace CampusCommons.TeamProgression
         void ApplyLevel(int level)
         {
             shownLevel = level;
-            // No new cosmetic effects for Lv.1-4.
-            // Original LevelCosmeticVisuals shows the Lv.5 circle.
-            Toggle(wristCuffs, level >= 6);
-            Toggle(cyanDust, level >= 7);
-            Toggle(crystalHarbingers, level >= 9);
-            Toggle(orbit, level >= 12);
-            Toggle(goldDust, level >= 13);
-            Toggle(wingPreview, level == 14);
-            Toggle(finalCrown, level >= 15);
-            Toggle(capeEmblemGlow, level >= 11);
+            // Each reward is independent, and NONE auto-equips on level up.
+            // Lv.9 crystals stay available at every higher level once equipped.
+            Toggle(wristCuffs, level >= 6 && CosmeticEquipmentState.IsEquipped(6));
+            Toggle(cyanDust, level >= 7 && CosmeticEquipmentState.IsEquipped(7));
+            Toggle(crystalHarbingers, level >= 9 && CosmeticEquipmentState.IsEquipped(9));
+            Toggle(orbit, level >= 12 && CosmeticEquipmentState.IsEquipped(12));
+            Toggle(goldDust, level >= 13 && CosmeticEquipmentState.IsEquipped(13));
+            Toggle(wingPreview, level >= 14 && CosmeticEquipmentState.IsEquipped(14) &&
+                !CosmeticEquipmentState.IsEquipped(15));
+            Toggle(finalCrown, level >= 15 && CosmeticEquipmentState.IsEquipped(15));
+            Toggle(capeEmblemGlow, level >= 11 &&
+                CosmeticEquipmentState.IsEquipped(11) && CosmeticEquipmentState.IsEquipped(10));
 
-            Color trailColor = level >= 13 ? Gold : Cyan;
+            Color trailColor = CosmeticEquipmentState.IsEquipped(13) ? Gold : Cyan;
             if (trailLeft != null) SetTrailColor(trailLeft, trailColor);
             if (trailRight != null) SetTrailColor(trailRight, trailColor);
         }
