@@ -1,11 +1,21 @@
 {
- "id":"cc-68",
- "title":"로비 스타일숍·조명과 바리스타",
- "owner":"ghwls9896",
- "branch":"codex/cc-68-lobby-style",
- "issue":"https://github.com/ghwls9896/CampusCommons/issues/68",
- "scope":["Assets/StudyImmersive/Scenes/GrandLibrary_Living.unity","Assets/UserModels_CafeUpdate/","Assets/UserModels_CafeUpdate.meta"],
- "shared_files":["Assets/StudyImmersive/Scenes/GrandLibrary_Living.unity"],
- "depends_on":[],
- "validation":["Unity 6000.4.5f1 로비 배치 및 기존 기능 확인","팀 검사와 CI"]
+  "id": "cc-68",
+  "title": "로비 스타일숍·조명과 바리스타",
+  "owner": "ghwls9896",
+  "branch": "codex/cc-68-lobby-style",
+  "issue": "https://github.com/ghwls9896/CampusCommons/issues/68",
+  "scope": [
+    "Assets/StudyImmersive/Scenes/GrandLibrary_Living.unity",
+    "Assets/UserModels_CafeUpdate/",
+    "Assets/UserModels_CafeUpdate.meta"
+  ],
+  "shared_files": [
+    "Assets/StudyImmersive/Scenes/GrandLibrary_Living.unity",
+    "Assets/UserModels_CafeUpdate/ReadingLamp/Library reading lamp.prefab"
+  ],
+  "depends_on": [],
+  "validation": [
+    "Unity 6000.4.5f1 로비 배치 및 기존 기능 확인",
+    "팀 검사와 CI"
+  ]
 }
