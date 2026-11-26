@@ -1,0 +1,1030 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AI 라이어 게임 · 개발 검증</title>
+
+    <style>
+        :root {
+            font-family: system-ui, "Pretendard", sans-serif;
+            color: #e8edf6;
+            background: #0b1020;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+        }
+
+        main {
+            max-width: 1100px;
+            margin: auto;
+            padding: 36px 20px 70px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .brand {
+            letter-spacing: 1px;
+            font-weight: 750;
+            color: #99a9ff;
+        }
+
+        .chip {
+            border: 1px solid #455278;
+            border-radius: 24px;
+            padding: 8px 13px;
+            font-size: 12px;
+            color: #cbd5ef;
+        }
+
+        h1 {
+            font-size: clamp(28px, 5vw, 43px);
+            margin: 0 0 9px;
+        }
+
+        h2 {
+            font-size: 18px;
+        }
+
+        h3 {
+            font-size: 15px;
+        }
+
+        p {
+            line-height: 1.65;
+            color: #aebbd4;
+        }
+
+        .lead {
+            margin-bottom: 30px;
+        }
+
+        .columns {
+            display: grid;
+            grid-template-columns: 340px 1fr;
+            gap: 18px;
+        }
+
+        .panel {
+            background: #151e32;
+            border: 1px solid #293651;
+            border-radius: 18px;
+            padding: 23px;
+            margin-bottom: 18px;
+        }
+
+        .panel h2 {
+            margin: 0 0 16px;
+        }
+
+        label {
+            display: block;
+            margin: 15px 0 7px;
+            font-size: 13px;
+            font-weight: 650;
+            color: #cdd6e8;
+        }
+
+        input[type=file],
+        input[type=text] {
+            width: 100%;
+            padding: 12px;
+            background: #0e172b;
+            border: 1px solid #3a4965;
+            border-radius: 9px;
+            color: white;
+        }
+
+        input[type=file] {
+            font-size: 12px;
+        }
+
+        .row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            cursor: pointer;
+            background: #756cfa;
+            border: 0;
+            border-radius: 10px;
+            padding: 11px 15px;
+            color: white;
+            font-weight: 700;
+        }
+
+        button:disabled {
+            opacity: .4;
+            cursor: not-allowed;
+        }
+
+        button.secondary {
+            background: #283451;
+        }
+
+        button.small {
+            padding: 7px 10px;
+            font-size: 12px;
+        }
+
+        button.choice {
+            background: #273451;
+            border: 1px solid #405170;
+        }
+
+        .muted {
+            font-size: 12px;
+            color: #9dabc4;
+        }
+
+        .error {
+            color: #ffaeae !important;
+        }
+
+        .success {
+            color: #8deac8 !important;
+        }
+
+        .stage {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 17px;
+        }
+
+        .avatars {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 9px;
+        }
+
+        .avatar {
+            background: #0f182c;
+            border: 1px solid #2c3e5a;
+            border-radius: 12px;
+            padding: 13px 7px;
+            text-align: center;
+            color: #d2dbec;
+        }
+
+        .avatar .face {
+            font-size: 25px;
+            margin-bottom: 6px;
+        }
+
+        .avatar .id {
+            font-size: 13px;
+            font-weight: 750;
+        }
+
+        .avatar .sub {
+            font-size: 11px;
+            color: #94a3bd;
+            margin-top: 4px;
+        }
+
+        .avatar.selected {
+            border-color: #b5acff;
+            background: #343265;
+        }
+
+        .transcript {
+            height: 420px;
+            overflow-y: auto;
+            background: #0b1426;
+            border: 1px solid #253650;
+            border-radius: 12px;
+            padding: 16px;
+            margin: 14px 0;
+        }
+
+        .message {
+            display: flex;
+            gap: 11px;
+            margin-bottom: 17px;
+        }
+
+        .message .face {
+            font-size: 23px;
+            flex-shrink: 0;
+        }
+
+        .bubble {
+            background: #22304b;
+            border-radius: 5px 14px 14px;
+            padding: 11px 13px;
+            line-height: 1.6;
+            flex: 1;
+            min-width: 0;
+            font-size: 14px;
+            overflow-wrap: anywhere;
+        }
+
+        .speaker {
+            font-weight: 750;
+            color: #b9c4ff;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .progress {
+            height: 6px;
+            background: #2c3851;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress span {
+            display: block;
+            height: 100%;
+            width: 0;
+            background: #8b83ff;
+            transition: width .2s;
+        }
+
+        .result {
+            border-top: 1px solid #364262;
+            padding-top: 16px;
+            margin-top: 15px;
+        }
+
+        .result-card,
+        .evidence,
+        .notice {
+            padding: 12px;
+            background: #101a2f;
+            border: 1px solid #293651;
+            border-radius: 9px;
+            margin-bottom: 10px;
+        }
+
+        .notice {
+            color: #aebbd4;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .hide {
+            display: none !important;
+        }
+
+        small {
+            color: #9ba9c4;
+        }
+
+        @media (max-width: 780px) {
+            .columns {
+                grid-template-columns: 1fr;
+            }
+
+            main {
+                padding: 24px 13px;
+            }
+
+            .panel {
+                padding: 17px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main>
+        <header>
+            <div class="brand">CAMPUS LAB / AI LIAR</div>
+            <div class="chip">웹 개발 검증용 · 6 NPC</div>
+        </header>
+
+        <h1>누가 개념을 모를까?</h1>
+
+        <p class="lead">
+            PDF 학습자료를 바탕으로 전공자 5명과
+            비전공자 1명이 토론합니다.
+            AI들의 발언을 관찰하고 비전공자를 찾아보세요.
+        </p>
+
+        <div class="columns">
+            <div>
+                <section class="panel">
+                    <h2>01 / 학습자료 준비</h2>
+
+                    <label for="pdf">
+                        텍스트 PDF 업로드 (최대 40MB)
+                    </label>
+
+                    <input
+                        id="pdf"
+                        type="file"
+                        accept="application/pdf"
+                    >
+
+                    <div class="row" style="margin-top:12px">
+                        <button id="upload">PDF 분석</button>
+                        <button id="example" class="secondary">
+                            버블 정렬 예제로 시작
+                        </button>
+                    </div>
+
+                    <p id="fileStatus" class="muted">
+                        PDF는 로컬 서버에서 텍스트만 추출합니다.
+                    </p>
+
+                    <label for="concept">학습 제시어</label>
+
+                    <input
+                        id="concept"
+                        type="text"
+                        placeholder="예: 버블 정렬"
+                        maxlength="100"
+                    >
+
+                    <div
+                        id="suggestions"
+                        class="row"
+                        style="margin-top:10px"
+                    ></div>
+
+                    <p class="muted">
+                        키워드 후보가 부정확하면 직접 입력하세요.
+                    </p>
+
+                    <button id="start" disabled>
+                        게임 시작 / 다시 시작
+                    </button>
+                </section>
+
+                <section class="panel">
+                    <h2>게임 규칙</h2>
+
+                    <p class="muted">
+                        ① PDF 개념 선택<br>
+                        ② NPC 6명이 자동으로 한 번씩 발언<br>
+                        ③ 비전공자로 의심되는 NPC 지목<br>
+                        ④ 비전공자 지목 및 PDF 해설 확인
+                    </p>
+
+                    <p id="mode" class="muted">
+                        모드: 미설정
+                    </p>
+
+                    <div class="notice">
+                        기본 모드는 규칙 기반 시뮬레이션입니다.
+                        실제 AI 대화에는 LLM 서버 연결이 필요합니다.
+                    </div>
+                </section>
+            </div>
+
+            <div>
+                <section class="panel">
+                    <div class="stage">
+                        <h2 style="margin:0">02 / 토론 관찰</h2>
+                        <div id="count" class="chip">
+                            0 / 6 발언
+                        </div>
+                    </div>
+
+                    <div id="avatars" class="avatars"></div>
+
+                    <div
+                        id="chat"
+                        class="transcript"
+                        aria-live="polite"
+                    >
+                        <p class="muted">
+                            자료를 준비한 뒤 게임을 시작하세요.
+                        </p>
+                    </div>
+
+                    <div class="progress">
+                        <span id="bar"></span>
+                    </div>
+
+                    <p
+                        id="autoStatus"
+                        class="notice"
+                        style="margin-top:16px"
+                    >
+                        게임을 시작하면 자동으로 대화가 진행됩니다.
+                    </p>
+
+                    <p id="hint" class="muted" role="status">
+                        먼저 학습자료를 준비하세요.
+                    </p>
+
+                    <div id="voteArea" class="result hide">
+                        <h2>03 / 비전공자 지목</h2>
+
+                        <p class="muted">
+                            위에서 NPC 한 명을 선택하세요.
+                            다시 클릭하면 선택이 취소됩니다.
+                        </p>
+
+                        <button id="vote" disabled>
+                            선택한 NPC 지목
+                        </button>
+                    </div>
+
+                    <div id="result" class="result hide"></div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        "use strict";
+
+        const $ = id => document.getElementById(id);
+
+        const names = [
+            "지민", "서준", "하린",
+            "도윤", "수아", "민재"
+        ];
+
+        const faces = [
+            "🧑‍💻", "👩‍🎓", "🧑‍🎓",
+            "👩‍💻", "🧑‍🏫", "👨‍🎓"
+        ];
+
+        const SPEECH_DELAY = 2000;
+
+        let sid = null;
+        let selected = null;
+        let progress = 0;
+        let total = 6;
+        let busy = false;
+        let phase = "setup";
+        let transcript = [];
+
+        const sleep = ms =>
+            new Promise(resolve => setTimeout(resolve, ms));
+
+        function escapeHtml(value) {
+            return String(value).replace(
+                /[&<>"']/g,
+                char => ({
+                    "&": "&amp;",
+                    "<": "&lt;",
+                    ">": "&gt;",
+                    '"': "&quot;",
+                    "'": "&#39;"
+                }[char])
+            );
+        }
+
+        function txt(id, value, type = "") {
+            const el = $(id);
+
+            el.textContent = value;
+            el.classList.toggle("error", type === "error");
+            el.classList.toggle("success", type === "success");
+        }
+
+        async function req(path, data, form = false) {
+            const response = await fetch("/api/" + path, {
+                method: "POST",
+                headers: form
+                    ? {}
+                    : {"Content-Type": "application/json"},
+                body: form
+                    ? data
+                    : JSON.stringify(data)
+            });
+
+            let result;
+
+            try {
+                result = await response.json();
+            } catch {
+                throw new Error(
+                    "서버 응답을 해석할 수 없습니다."
+                );
+            }
+
+            if (!response.ok) {
+                throw new Error(
+                    typeof result.detail === "string"
+                        ? result.detail
+                        : "서버 요청 실패"
+                );
+            }
+
+            return result;
+        }
+
+        function updateButtons() {
+            $("upload").disabled = busy;
+            $("example").disabled = busy;
+            $("start").disabled = busy || !sid;
+
+            $("vote").disabled =
+                busy ||
+                phase !== "voting" ||
+                selected === null;
+        }
+
+        function renderAvatars() {
+            const container = $("avatars");
+            container.innerHTML = "";
+
+            names.forEach((name, index) => {
+                const button = document.createElement("button");
+
+                const count = transcript.filter(
+                    message => message.speaker === index
+                ).length;
+
+                button.type = "button";
+
+                button.className = "avatar" + (
+                    selected === index ? " selected" : ""
+                );
+
+                button.disabled =
+                    busy || phase !== "voting";
+
+                button.innerHTML = `
+                    <div class="face">${faces[index]}</div>
+                    <div class="id">${escapeHtml(name)}</div>
+                    <div class="sub">${count}회 발언</div>
+                `;
+
+                button.addEventListener("click", () => {
+                    if (busy || phase !== "voting") {
+                        return;
+                    }
+
+                    selected =
+                        selected === index ? null : index;
+
+                    renderAvatars();
+                    updateButtons();
+
+                    txt(
+                        "hint",
+                        selected === null
+                            ? "비전공자로 의심되는 NPC를 선택하세요."
+                            : `${names[selected]} 님을 지목합니다.`
+                    );
+                });
+
+                container.appendChild(button);
+            });
+        }
+
+        async function run(action) {
+            if (busy) {
+                return;
+            }
+
+            busy = true;
+
+            updateButtons();
+            renderAvatars();
+
+            try {
+                await action();
+            } catch (error) {
+                txt(
+                    "hint",
+                    error.message || "오류가 발생했습니다.",
+                    "error"
+                );
+
+                if (phase === "speaking") {
+                    phase = "interrupted";
+
+                    txt(
+                        "autoStatus",
+                        "토론 도중 오류가 발생했습니다. 게임을 다시 시작하세요.",
+                        "error"
+                    );
+                }
+            } finally {
+                busy = false;
+
+                // 비동기 작업 종료 후 버튼 상태 재설정
+                updateButtons();
+
+                // NPC 선택 버튼의 disabled 속성 갱신
+                renderAvatars();
+            }
+        }
+
+        function resetGame() {
+            selected = null;
+            progress = 0;
+            total = 6;
+            transcript = [];
+            phase = "setup";
+
+            $("count").textContent = "0 / 6 발언";
+            $("bar").style.width = "0%";
+
+            $("chat").innerHTML = `
+                <p class="muted">
+                    토론이 시작됩니다.
+                </p>
+            `;
+
+            $("voteArea").classList.add("hide");
+            $("result").classList.add("hide");
+
+            $("result").innerHTML = "";
+
+            renderAvatars();
+            updateButtons();
+        }
+
+        function loaded(data) {
+            sid = data.session_id;
+
+            resetGame();
+
+            txt(
+                "fileStatus",
+                `${data.filename} · ${data.pages}페이지 · ${
+                    (data.excerpt || "").slice(0, 90)
+                }`
+            );
+
+            const container = $("suggestions");
+            container.innerHTML = "";
+
+            (data.concepts || []).slice(0, 8).forEach(
+                concept => {
+                    const button = document.createElement(
+                        "button"
+                    );
+
+                    button.type = "button";
+                    button.className = "small choice";
+                    button.textContent = concept;
+
+                    button.addEventListener("click", () => {
+                        $("concept").value = concept;
+                    });
+
+                    container.appendChild(button);
+                }
+            );
+
+            $("concept").value =
+                data.concepts?.[0] || "";
+
+            txt("mode", "모드: 자료 준비 완료");
+
+            txt(
+                "hint",
+                "학습 제시어를 확인하고 게임을 시작하세요."
+            );
+        }
+
+        function appendMessage(message) {
+            const index = Number(message.speaker);
+
+            if (
+                !Number.isInteger(index) ||
+                index < 0 ||
+                index >= names.length
+            ) {
+                throw new Error(
+                    "잘못된 NPC 번호입니다."
+                );
+            }
+
+            if (transcript.length === 0) {
+                $("chat").innerHTML = "";
+            }
+
+            const item = document.createElement("div");
+            item.className = "message";
+
+            item.innerHTML = `
+                <div class="face">
+                    ${faces[index]}
+                </div>
+
+                <div class="bubble">
+                    <div class="speaker">
+                        ${escapeHtml(names[index])}
+                        · ${escapeHtml(message.round)}차 발언
+                    </div>
+
+                    <div>
+                        ${escapeHtml(message.text)}
+                    </div>
+                </div>
+            `;
+
+            $("chat").appendChild(item);
+
+            $("chat").scrollTop =
+                $("chat").scrollHeight;
+
+            transcript.push(message);
+            renderAvatars();
+        }
+
+        async function autoPlay() {
+            phase = "speaking";
+
+            $("voteArea").classList.add("hide");
+
+            renderAvatars();
+
+            while (progress < total) {
+                txt(
+                    "autoStatus",
+                    `AI 토론 진행 중 · ${progress + 1}/${total}`
+                );
+
+                const data = await req("next", {
+                    session_id: sid
+                });
+
+                if (!data.message) {
+                    throw new Error(
+                        "서버에서 다음 발언을 받지 못했습니다."
+                    );
+                }
+
+                appendMessage(data.message);
+
+                const previous = progress;
+                progress = Number(data.progress);
+
+                if (
+                    !Number.isInteger(progress) ||
+                    progress <= previous ||
+                    progress > total
+                ) {
+                    throw new Error(
+                        "서버의 토론 진행 정보가 올바르지 않습니다."
+                    );
+                }
+
+                $("count").textContent =
+                    `${progress} / ${total} 발언`;
+
+                $("bar").style.width =
+                    `${progress / total * 100}%`;
+
+                if (progress < total) {
+                    await sleep(SPEECH_DELAY);
+                }
+            }
+
+            txt(
+                "autoStatus",
+                "AI 6명의 발언이 모두 종료되었습니다."
+            );
+
+            openVoting();
+        }
+
+        function openVoting() {
+            phase = "voting";
+            selected = null;
+
+            $("voteArea").classList.remove("hide");
+
+            txt(
+                "hint",
+                "의심되는 NPC를 선택하세요."
+            );
+
+            updateButtons();
+            renderAvatars();
+        }
+
+        function showResult(data) {
+            phase = "complete";
+
+            $("voteArea").classList.add("hide");
+            $("result").classList.remove("hide");
+
+            const evidence = Array.isArray(data.evidence)
+                ? data.evidence
+                : [];
+
+            const liarMessages = Array.isArray(data.liar_messages)
+                ? data.liar_messages
+                : [];
+
+            // 비전공자의 실제 발언
+            const liarMessagesHtml = liarMessages.length
+                ? liarMessages.map((message, index) => `
+                    <div class="evidence">
+                        <small>
+                            ${index + 1}차 발언
+                        </small>
+
+                        <p>
+                            "${escapeHtml(message)}"
+                        </p>
+                    </div>
+                `).join("")
+                : `
+                    <p class="muted">
+                        비전공자의 발언 기록이 없습니다.
+                    </p>
+                `;
+
+            // PDF 원문 근거
+            const evidenceHtml = evidence.length
+                ? evidence.map(item => `
+                    <div class="evidence">
+                        <small>
+                            PDF ${escapeHtml(item.page)}페이지
+                        </small>
+
+                        <p>
+                            ${escapeHtml(item.text)}
+                        </p>
+                    </div>
+                `).join("")
+                : `
+                    <p class="muted">
+                        PDF에서 근거 문장을 찾지 못했습니다.
+                    </p>
+                `;
+
+            $("result").innerHTML = `
+                <h2 class="${data.correct ? "success" : "error"}">
+                    ${data.correct
+                        ? "비전공자를 찾았습니다!"
+                        : "비전공자를 찾지 못했습니다."}
+                </h2>
+
+                <div class="result-card">
+                    <p>
+                        내가 지목한 NPC:
+                        <strong>
+                            ${escapeHtml(names[selected])}
+                        </strong>
+                    </p>
+
+                    <p>
+                        실제 비전공자:
+                        <strong>
+                            ${escapeHtml(data.liar_name)}
+                        </strong>
+                    </p>
+
+                    <p>
+                        학습 제시어:
+                        <strong>
+                            ${escapeHtml(data.concept)}
+                        </strong>
+                    </p>
+                </div>
+
+                <h3>01 / 비전공자의 발언</h3>
+
+                <p class="muted">
+                    실제 게임에서 비전공자가 말한 내용입니다.
+                </p>
+
+                ${liarMessagesHtml}
+
+                <h3>02 / 왜 의심스러운 발언일까?</h3>
+
+                <div class="result-card">
+                    <p>
+                        ${escapeHtml(data.reason)}
+                    </p>
+                </div>
+
+                <h3>03 / 올바른 학습 개념</h3>
+
+                <div class="result-card">
+                    <p>
+                        ${escapeHtml(data.correct_explanation)}
+                    </p>
+                </div>
+
+                <h3>04 / PDF 학습 근거</h3>
+
+                ${evidenceHtml}
+
+                <div class="notice">
+                    비전공자의 발언이 항상 틀린 것은 아닙니다.
+                    발언의 정확성과 구체성을 학습자료와
+                    비교하면서 복습하세요.
+                </div>
+            `;
+
+            txt(
+                "hint",
+                "게임이 종료되었습니다. 새로운 게임을 시작할 수 있습니다."
+            );
+
+            renderAvatars();
+            updateButtons();
+        }
+
+        // 버블 정렬 예제 불러오기
+        $("example").addEventListener("click", () => {
+            run(async () => {
+                loaded(await req("example", {}));
+            });
+        });
+
+        // PDF 업로드
+        $("upload").addEventListener("click", () => {
+            run(async () => {
+                const file = $("pdf").files[0];
+
+                if (!file) {
+                    throw new Error(
+                        "PDF 파일을 선택하세요."
+                    );
+                }
+
+                if (file.size > 40 * 1024 * 1024) {
+                    throw new Error(
+                        "40MB 이하 PDF만 업로드할 수 있습니다."
+                    );
+                }
+
+                const form = new FormData();
+                form.append("pdf", file);
+
+                loaded(
+                    await req("upload", form, true)
+                );
+            });
+        });
+
+        // 게임 시작
+        $("start").addEventListener("click", () => {
+            run(async () => {
+                if (!sid) {
+                    return;
+                }
+
+                const concept = $("concept").value.trim();
+
+                if (!concept) {
+                    throw new Error(
+                        "학습 제시어를 입력하세요."
+                    );
+                }
+
+                const data = await req("start", {
+                    session_id: sid,
+                    concept
+                });
+
+                resetGame();
+
+                txt(
+                    "mode",
+                    data.mode === "llm"
+                        ? "모드: 실제 LLM 생성"
+                        : "모드: 규칙 기반 시뮬레이션"
+                );
+
+                await autoPlay();
+            });
+        });
+
+        // 비전공자 최종 지목
+        $("vote").addEventListener("click", () => {
+            run(async () => {
+                if (
+                    selected === null ||
+                    phase !== "voting"
+                ) {
+                    return;
+                }
+
+                const data = await req("vote", {
+                    session_id: sid,
+                    candidate: selected
+                });
+
+                showResult(data);
+            });
+        });
+
+        // 초기 화면
+        renderAvatars();
+        updateButtons();
+    </script>
+</body>
+</html>
