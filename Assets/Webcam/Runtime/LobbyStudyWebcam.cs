@@ -15,6 +15,7 @@ namespace CampusCommons.Webcam
         readonly StudySession session=new StudySession();
         Seat[] seats=Array.Empty<Seat>(); Player player; Seat activeSeat;
         LocalStudyProcess local; WebCamTexture cameraTexture; UnityWebRequest request;
+        StudyWindowPicker studyWindow;
         bool previewAttempted, openingPreview; bool focused=true; string message="", failure; float scanAt;
         GUIStyle timerText, noticeText, button;
         public bool IsAvailable {get;private set;}
@@ -101,6 +102,8 @@ namespace CampusCommons.Webcam
         public void StopStudy()
         {
             session.Stop();StudyRecordService.Instance?.Finish();StopAllCoroutines();
+            studyWindow?.Dispose();
+            studyWindow = null;
             openingPreview = false;
             if(request!=null){request.Abort();request.Dispose();request=null;}
             if(cameraTexture){cameraTexture.Stop();Destroy(cameraTexture);cameraTexture=null;}
@@ -136,7 +139,19 @@ namespace CampusCommons.Webcam
                 request=UnityWebRequest.Get(local.Origin+"/api/config");request.timeout=2;
                 yield return request.SendWebRequest();
                 if(request.result==UnityWebRequest.Result.Success){
-                    try{var config=JsonUtility.FromJson<Config>(request.downloadHandler.text);ready=config.mode=="fast" && config.interval_ms==1000;}
+                    try
+                    {
+                        var config = JsonUtility.FromJson<Config>(request.downloadHandler.text);
+                        ready = config.mode == "fast" && config.interval_ms == 1000;
+                        if (ready && !config.combined_study)
+                        {
+                            request.Dispose();
+                            request = null;
+                            Fail("공부 인식 파일을 새 버전으로 준비해 주세요.");
+                            yield break;
+                        }
+                        if (ready && config.window_capture) studyWindow = new StudyWindowPicker(this, local);
+                    }
                     catch(Exception){ready=false;}
                 }
                 request.Dispose();request=null;
@@ -157,7 +172,7 @@ namespace CampusCommons.Webcam
                 double captured=Time.realtimeSinceStartupAsDouble;float began=Time.realtimeSinceStartup;byte[] bytes;
                 try{bytes=WebcamFrameEncoder.Encode(cameraTexture);}
                 catch(Exception){Fail("카메라 프레임을 읽지 못했습니다.");yield break;}
-                request=new UnityWebRequest(local.Origin+"/api/infer","POST");
+                request=new UnityWebRequest(local.Origin+"/api/study-frame","POST");
                 request.uploadHandler=new UploadHandlerRaw(bytes);request.downloadHandler=new DownloadHandlerBuffer();request.timeout=30;
                 request.SetRequestHeader("Content-Type","image/jpeg");request.SetRequestHeader("Origin",local.Origin);
                 request.SetRequestHeader("X-Session-Token",local.Token);
@@ -167,12 +182,24 @@ namespace CampusCommons.Webcam
                     try{state=DecisionState(request.downloadHandler.text);decision=JsonUtility.FromJson<Decision>(request.downloadHandler.text);}catch(Exception){state=null;}
                 }
                 request.Dispose();request=null;
-                if(state==null){Fail("분석 오류입니다. 다시 시작해 주세요.");yield break;}
-                var records=StudyRecordService.Instance;var scores=decision.probabilities;
-                records.Observe(captured,new double[]{scores.studying,scores.phone,scores.other,scores.away,scores.drowsy});
-                string stable=records.Tracker?.Label;
-                if(stable!=null){if(!session.Apply(epoch,stable))yield break;message="";}
-                else message="분석 중";
+                var records = StudyRecordService.Instance;
+                if (decision != null && decision.ok && decision.mode == "fast" &&
+                    !decision.observed && decision.screen == "unknown" && decision.probabilities == null)
+                {
+                    records.BreakObservation();
+                    message = decision.reason == "camera_unreadable" ? "카메라 영상 확인 필요" :
+                        studyWindow == null ? "공부 창 확인 불가" : "화면 확인 필요";
+                }
+                else
+                {
+                    if (state == null || decision == null || !decision.observed)
+                    { Fail("분석 오류입니다. 다시 시작해 주세요."); yield break; }
+                    var scores = decision.probabilities;
+                    records.Observe(captured, new double[] { scores.studying, scores.phone, scores.other, scores.away, scores.drowsy });
+                    string stable = records.Tracker?.Label;
+                    if (stable != null) { if (!session.Apply(epoch, stable)) yield break; message = ""; }
+                    else message = "분석 중";
+                }
                 float wait=1-(Time.realtimeSinceStartup-began);
                 if(wait>0)yield return new WaitForSecondsRealtime(wait);
             }
@@ -187,9 +214,9 @@ namespace CampusCommons.Webcam
             if(Mathf.Abs(sum-1)>.001f||values[index]<max)return null;
             return r.state;
         }
-        [Serializable] class Config{public string mode;public int interval_ms;}
+        [Serializable] class Config{public string mode;public int interval_ms;public bool combined_study,window_capture;}
         [Serializable] class Scores{public float studying,phone,other,away,drowsy;}
-        [Serializable] class Decision{public bool ok;public string state,mode;public Scores probabilities;}
+        [Serializable] class Decision{public bool ok,observed;public string state,mode,screen,reason;public Scores probabilities;}
         void OnApplicationFocus(bool value){focused=value;}
         void OnApplicationPause(bool value){if(value)StopStudy();else previewAttempted=false;}
         void OnDisable(){EndStudy();}
@@ -219,6 +246,7 @@ namespace CampusCommons.Webcam
             GUI.matrix = Matrix4x4.identity;
             DrawStudyTimers();
             DrawSeatControls();
+            studyWindow?.Draw(button, noticeText);
             GUI.matrix = matrix;
         }
 

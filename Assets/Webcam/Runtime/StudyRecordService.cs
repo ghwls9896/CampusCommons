@@ -164,6 +164,8 @@ namespace CampusCommons.Webcam
             RefreshToday();
         }
 
+        internal void BreakObservation() => Tracker?.Break();
+
         public void Finish()
         {
             if (active == null) return;

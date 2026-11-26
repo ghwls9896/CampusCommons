@@ -8,6 +8,7 @@
 - 첫 실행에 게임에 동봉된 Python 3.12.11·QEV 모델·라이브러리를 사용자 전용 폴더에 자동 준비합니다. 시스템 Python, PATH, 관리자 권한, pip 명령은 필요 없습니다. Mac 패키지는 압축 약 1.6 GB, 준비 후 약 2.4 GB이며 게임 파일과 별도로 저장 공간이 필요합니다.
 - 준비 진행률과 실패 시 재시도를 표시합니다. 준비 중에도 로그인·퀴즈 화면을 쓸 수 있습니다. 다음 실행은 준비된 환경을 재사용합니다.
 - 좌석에 앉으면 카메라 미리보기, **시작**을 누르면 로컬 QEV 추론, **종료·일어나기**를 누르면 추론/카메라 종료 및 기립입니다. 운영체제의 카메라 허용은 사용자가 직접 해야 합니다.
+- 컴퓨터 공부에는 **공부 창 선택**을 사용합니다. macOS는 화면 기록 권한과 동봉된 ScreenCaptureKit·Vision 헬퍼를 사용하며, Windows는 동봉된 Windows Graphics Capture 모듈을 사용합니다. 화면 캡처는 선택한 창이 활성인 동안 필요한 경우에만 이루어집니다. [공부 기록 사용법](../study/RECORDS.md)
 - 로그인/회원가입·PDF 퀴즈는 인터넷과 운영 중인 서버가 필요합니다. 모델은 설치 및 실행 시 인터넷이 필요 없습니다. 회원가입 이메일 확인 정책은 현재 서버 설정을 따릅니다.
 - 배포본에는 계정 프로젝트의 공개 `AccountConnection.json`을 포함합니다. 공용 로비와 2인 퀴즈는 고정 서비스 주소로 접속합니다.
 
@@ -16,6 +17,8 @@ Windows 팀원은 [검토·실행 순서](WINDOWS_TEAM.md)를 먼저 확인하�
 ## 배포자 빌드
 
 각 운영체제에서 해당 배포본을 만듭니다. 빌드 PC만 Unity **6000.4.5f1** 및 해당 Standalone Build Support, [uv](https://docs.astral.sh/uv/getting-started/installation/), Git과 인터넷이 필요합니다. 게임에는 빌드 도구가 필요 없습니다.
+
+Mac 빌드 PC는 macOS 15 이상을 지원하는 Apple Swift 도구 모음이 필요합니다. 기존 에디터 개발용 QEV 설치는 `python3.12 Tools/webcam/install_runtime.py --app-only`로 앱과 헬퍼를 갱신할 수 있습니다. Windows 개발용 설치는 `install_runtime.py`로 캡처 의존성을 함께 준비합니다.
 
 1. 통합 소스를 받습니다. 필요한 씬/팀 에셋도 포함되어 있어야 합니다.
 2. `Assets/Account/Resources/AccountConnection.json`의 공개 계정 설정을 확인합니다. 깨끗한 체크아웃에서 그대로 2인 퀴즈 클라이언트를 빌드할 수 있습니다. Gemini API 키는 서버에서 관리합니다.

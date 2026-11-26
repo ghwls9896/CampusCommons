@@ -10,6 +10,7 @@ import platform
 import re
 import shutil
 import subprocess
+import sys
 import zipfile
 
 REPO = Path(__file__).resolve().parents[2]
@@ -18,7 +19,6 @@ PYTHON_VERSION = '3.12.11'
 MACOS_MINIMUM = (15, 0)
 BACKBONE = '4a245fab7757f2d0f82abb4df69fa294847c6f66'
 MODEL = 'ken-jo/QEV-0.8B'
-APP_FILES = ('live.py','qev_backend.py','index.html','app.js','style.css')
 
 
 def platform_id(system=None, machine=None):
@@ -74,7 +74,7 @@ def archive_payload(root, output, target):
     with zipfile.ZipFile(temp,'w',compression=zipfile.ZIP_DEFLATED,compresslevel=1,allowZip64=True) as archive:
         for p in files: archive.write(p,p.relative_to(root).as_posix())
     final=output/'payload.zip';os.replace(temp,final)
-    manifest={'schema':1,'platform':target,'archive':'payload.zip','sha256':sha256(final),
+    manifest={'schema':1,'studyProtocol':1,'platform':target,'archive':'payload.zip','sha256':sha256(final),
               'archiveBytes':final.stat().st_size,'unpackedBytes':sum(p.stat().st_size for p in files),
               'python':python_relative(target),'executablePaths':executable,
               'minimumOS':'.'.join(map(str,MACOS_MINIMUM)) if target=='macos-arm64' else '10.0'}
@@ -125,8 +125,6 @@ def main():
         python=root/python_relative(target)
         run([python,'-I','-c',"import sys;assert sys.version_info[:3]==(3,12,11)"])
         run([uv,'pip','install','--python',python,'-r',SOURCE/'requirements-qev.txt'])
-        (root/'app').mkdir()
-        for name in APP_FILES: shutil.copy2(SOURCE/name,root/'app'/name)
         for name in ['QEV-NOTICE.txt','QEV-LICENSE.txt']: shutil.copy2(SOURCE/name,root/name)
         if args.model_source: copy_models(args.model_source.resolve(),root)
         else:
@@ -136,6 +134,7 @@ def main():
         # Record exact native dependency provenance without including credentials.
         result=subprocess.check_output([uv,'pip','freeze','--python',str(python)],env=clean_env(),text=True)
         (root/'DEPENDENCIES.txt').write_text(result)
+    run([sys.executable, SOURCE/'install_runtime.py', '--app-dir', root/'app'])
     # Rename the whole payload before launching it: catches build-machine absolute paths.
     relocated=work/'relocated runtime 한글'
     if relocated.exists(): raise SystemExit('Previous interrupted relocation exists; inspect work directory before retrying')

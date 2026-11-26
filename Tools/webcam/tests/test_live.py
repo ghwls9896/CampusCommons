@@ -12,6 +12,7 @@ from urllib.request import Request, urlopen
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import probe
 import live
+from screen_study import Window
 
 
 @contextmanager
@@ -43,6 +44,53 @@ class ModelReply(BaseHTTPRequestHandler):
 
 
 class LiveTests(unittest.TestCase):
+    def test_study_frame_requires_selected_matching_window_and_returns_only_fused_scores(self):
+        class Desktop:
+            active_window = Window('11', 22, 'chrome.exe', 'Chrome', '교재.pdf')
+
+            def permitted(self):
+                return True
+
+            def windows(self):
+                return [self.active_window]
+
+            def active(self):
+                return self.active_window
+
+        class Camera:
+            device = 'fixture'
+
+            def classify_pose(self, _):
+                return {'state': 'screen', 'mode': 'fast',
+                        'probabilities': dict(paper=.04, screen=.86, phone=0, other=.1, away=0, drowsy=0)}
+
+        with running(live.Handler) as (server, endpoint):
+            desktop = Desktop()
+            live.configure(server, Camera(), 'Fixture', unity=True, desktop=desktop)
+            with server.screen:
+                def post(path, data=b'', content_type='application/json', token=server.token):
+                    request = Request(endpoint + path, data=data, headers={
+                        'Origin': endpoint, 'X-Session-Token': token, 'Content-Type': content_type})
+                    with urlopen(request) as response:
+                        return json.load(response)
+
+                camera = b'\xff\xd8\xfffixture'
+                with self.assertRaises(HTTPError) as rejected:
+                    post('/api/study/windows', token='')
+                self.assertEqual(rejected.exception.code, 403)
+                rejected.exception.close()
+                self.assertFalse(post('/api/study-frame', camera, 'image/jpeg')['observed'])
+                selection = post('/api/study/select', b'{"id":"11","pid":22}')
+                self.assertTrue(selection['ok'])
+                combined = post('/api/study-frame', camera, 'image/jpeg')
+                self.assertEqual(combined['state'], 'studying')
+                self.assertEqual(set(combined['probabilities']), {'studying', 'phone', 'other', 'away', 'drowsy'})
+                self.assertNotIn('교재.pdf', json.dumps(combined, ensure_ascii=False))
+                desktop.active_window = Window('99', 33, 'discord.exe', 'Discord', '친구와 대화')
+                self.assertEqual(post('/api/study-frame', camera, 'image/jpeg')['state'], 'other')
+                post('/api/study/clear')
+                self.assertFalse(post('/api/study-frame', camera, 'image/jpeg')['observed'])
+
     def test_model_protocol_errors_remain_unknown(self):
         for code, body, extra in ((500, b'failed', 0), (302, b'', 0),
                                   (200, b'not json', 0), (200, b'{}', 20)):

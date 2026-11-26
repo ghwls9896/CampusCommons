@@ -11,7 +11,7 @@ namespace CampusCommons.Webcam
     [Serializable]
     public sealed class RuntimePackageManifest
     {
-        public int schema;
+        public int schema, studyProtocol;
         public string platform, archive, sha256, python, minimumOS;
         public long archiveBytes, unpackedBytes;
         public string[] executablePaths;
