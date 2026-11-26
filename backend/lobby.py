@@ -11,7 +11,7 @@ from uuid import UUID, uuid4
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 import httpx
-from pydantic import BaseModel, ConfigDict, Field, ValidationError
+from pydantic import BaseModel, ConfigDict, Field, TypeAdapter, ValidationError
 
 
 CAPACITY = 8
@@ -92,16 +92,38 @@ class Move(BaseModel):
     motion: Literal['idle', 'walk', 'run']
 
 
+AppearanceIndex = Annotated[int, Field(ge=0, le=255)]
+ClothingName = Annotated[str, Field(max_length=64, pattern=r'^[A-Za-z0-9 _-]*$')]
+
+
+class Appearance(BaseModel):
+    model_config = ConfigDict(strict=True, extra='forbid')
+    type: Literal['appearance']
+    body: int = Field(ge=0, le=1)
+    skin: AppearanceIndex
+    hair: AppearanceIndex
+    hair_color: AppearanceIndex
+    items: list[ClothingName] = Field(min_length=5, max_length=5)
+    colors: list[AppearanceIndex] = Field(min_length=5, max_length=5)
+
+
+LOBBY_INPUT = TypeAdapter(Annotated[Move | Appearance, Field(discriminator='type')])
+
+
 @dataclass(eq=False)
 class Member:
     account: Account
     slot: int
     peer_id: str = field(default_factory=lambda: uuid4().hex)
     pose: Move | None = None
+    appearance: Appearance | None = None
 
     def public_state(self) -> dict:
-        return {'id': self.peer_id, 'nickname': self.account.nickname, 'level': self.account.level, 'slot': self.slot,
-                'pose': self.pose.model_dump(exclude={'type'}) if self.pose else None}
+        state = {'id': self.peer_id, 'nickname': self.account.nickname, 'level': self.account.level, 'slot': self.slot,
+                 'pose': self.pose.model_dump(exclude={'type'}) if self.pose else None}
+        if self.appearance:
+            state['appearance'] = self.appearance.model_dump(exclude={'type'})
+        return state
 
 
 class Lobby:
@@ -139,6 +161,11 @@ class Lobby:
             member.pose = move
             self.revision += 1
 
+    def change_appearance(self, member: Member, appearance: Appearance):
+        if appearance != member.appearance:
+            member.appearance = appearance
+            self.revision += 1
+
     def roster(self):
         return [peer.public_state() for peer in sorted(self.members.values(), key=lambda p: p.slot)]
 
@@ -163,10 +190,13 @@ async def receive_moves(socket: WebSocket, room: Lobby, member: Member):
         if count > 30:
             raise LobbyClose(1008, 'rate_limited')
         try:
-            move = Move.model_validate_json(raw)
+            payload = LOBBY_INPUT.validate_json(raw)
         except ValidationError as exc:
             raise LobbyClose(1008, 'invalid_move') from exc
-        room.move(member, move)
+        if isinstance(payload, Move):
+            room.move(member, payload)
+        else:
+            room.change_appearance(member, payload)
 
 
 async def publish_roster(socket: WebSocket, room: Lobby, member: Member):
@@ -176,7 +206,7 @@ async def publish_roster(socket: WebSocket, room: Lobby, member: Member):
         if room.revision != last_revision:
             frame = {'type': 'snapshot', 'revision': room.revision, 'players': room.roster()}
             if last_revision is None:
-                frame.update(type='welcome', self_id=member.peer_id)
+                frame.update(type='welcome', self_id=member.peer_id, appearance_version=1)
             last_revision = room.revision
             try:
                 async with asyncio.timeout(3):

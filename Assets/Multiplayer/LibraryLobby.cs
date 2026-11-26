@@ -89,7 +89,7 @@ namespace CampusCommons.Multiplayer
             if (selfId != null && Time.unscaledTime >= nextSample)
             {
                 nextSample = Time.unscaledTime + .101f;
-                connection.Publish(avatars.Sample());
+                connection.Publish(avatars.Sample(), connection.SupportsAppearance ? avatars.SampleAppearance() : null);
             }
             avatars.Tick();
         }

@@ -7,6 +7,9 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using Object = UnityEngine.Object;
+#if CAMPUS_SUNBOX_AVATAR
+using Sunbox.Avatars;
+#endif
 
 namespace CampusCommons.Multiplayer
 {
@@ -103,6 +106,7 @@ namespace CampusCommons.Multiplayer
                 !avatar.GetComponentInChildren<Collider>(true) && !avatar.GetComponentInChildren<AudioListener>(true),
                 "Remote avatar duplicated local gameplay, camera, physics, or audio.");
             CheckNameplates(avatars, welcome.self_id, other);
+            CheckAppearance(avatars, welcome.self_id, other, avatar, player);
             avatars.Apply(welcome.self_id, new[] { welcome.players[0] });
             Require(!avatar.gameObject.activeSelf, "Departed avatar remained visible.");
         }
@@ -138,6 +142,7 @@ namespace CampusCommons.Multiplayer
             Require(prefabVisual ? prefabVisual.localPosition.y < standingOffset.y - .2f :
                 leg && Quaternion.Angle(leg.localRotation, Quaternion.identity) > 65f,
                 "A participant on the real quiz chair must visibly sit.");
+            CheckAppearance(avatars, "self", quizPeer, remote, player);
 
             var camera = new GameObject("Quiz nameplate test camera").AddComponent<Camera>();
             try
@@ -160,6 +165,43 @@ namespace CampusCommons.Multiplayer
             Require(player.RequestRoomExit() && player.ConfirmRoomExit(), "Could not return to the library.");
             Require(avatars.Apply("self", peers) == 1 && !remote.gameObject.activeSelf,
                 "Returning to the library must replace quiz participants with lobby participants.");
+        }
+
+        static void CheckAppearance(LobbyAvatars avatars, string self, LobbyPeer peer, Transform remote, Player player)
+        {
+#if CAMPUS_SUNBOX_AVATAR
+            var local = player.GetComponentInChildren<AvatarCustomization>(true);
+            var target = remote.GetComponentInChildren<AvatarCustomization>(true);
+            Require(local && target, "Both visuals must use the installed avatar catalog.");
+            var look = avatars.SampleAppearance();
+            look.body = 1 - look.body;
+            var gender = (AvatarCustomization.AvatarGender)look.body;
+            bool male = gender == AvatarCustomization.AvatarGender.Male;
+            var wardrobe = target.AvatarReferences.AvailableClothingItems;
+            var top = Array.Find(wardrobe, item => item && item.SlotType == SlotType.Top && !item.IsEmpty &&
+                (male ? item.MaleMesh : item.FemaleMesh) && item.Variations.Length > 1);
+            Require(top, "Fixture avatar catalog needs a top with two colors.");
+            look.items[0] = top.Name;
+            look.colors[0] = 0;
+            // Use the same serializer as the actual snapshot before updating an existing remote.
+            peer.appearance = JsonUtility.FromJson<LobbyAppearance>(JsonUtility.ToJson(look));
+            avatars.Apply(self, new[] { peer });
+            Require(target.CurrentGender == gender && target.ClothingItemTop == top, "Remote body and clothing must change in place.");
+            look.colors[0] = 1;
+            peer.appearance = JsonUtility.FromJson<LobbyAppearance>(JsonUtility.ToJson(look));
+            avatars.Apply(self, new[] { peer });
+            var clothes = Array.Find(target.CurrentBase.GetComponentsInChildren<UClothingItem>(),
+                item => item.ClothingItem == top && item.IsEquipped);
+            Require(clothes && clothes.GetComponent<Renderer>().sharedMaterial == top.Variations[1],
+                "The stationary participant's actual clothing material must reflect its selected color.");
+            Require(local.CurrentGender != gender, "Remote changes must not change the local avatar.");
+#else
+            peer.appearance = new LobbyAppearance {
+                body = 1, items = new[] { "Blouse", "", "", "", "" }, colors = new int[LobbyAppearance.SlotCount]
+            };
+            avatars.Apply(self, new[] { peer });
+            Require(remote.GetComponentsInChildren<Renderer>().Length > 0, "The fallback avatar must survive a styled peer update.");
+#endif
         }
 
         static void CheckNameplates(LobbyAvatars avatars, string self, LobbyPeer other)
