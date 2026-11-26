@@ -1,92 +1,77 @@
-# Campus Commons — 학생 교류 공간
+# Campus Commons
 
-## 팀 협업부터 시작하기
+Unity 기반 학습·탈출 게임입니다. 로그인한 학생들은 공용 도서관에서 만나고, 퀴즈룸의 두 좌석에서 각자 공부한 PDF로 대결합니다. 공부 기록과 학교 탈출 게임도 이용할 수 있습니다.
 
-모든 팀원과 AI 에이전트는 [공통 지침](AGENTS.md), [개발 절차](CONTRIBUTING.md), [담당표](docs/team/OWNERSHIP.md)를 먼저 읽습니다. 기존 작업을 새 규칙으로 옮기는 방법과 복사할 에이전트 시작 프롬프트는 [팀 시작 안내](docs/team/START_HERE.md)에 있습니다. **main 직접 수정 대신 작업 Issue → 독립 브랜치/폴더 → PR → 검토 후 통합**으로 진행합니다.
+## 현재 기준
 
-## 팀원 시작하기
+- 기존 배포본 기준: 2026-11-17 `main` [`38a8568`](https://github.com/ghwls9896/CampusCommons/commit/38a8568f79f2de92d43f5745276073ad1bb4a76c). #31, #35, #37, #39 통합 완료.
+- 계정 UI, 공용 로비, 공부 좌석과 2인 퀴즈는 [통합 PR #55](https://github.com/ghwls9896/CampusCommons/pull/55)에서 검토합니다.
+- Unity **6000.4.5f1**.
+- 현재 메인 씬: `Assets/StudyImmersive/Scenes/GrandLibrary_Living.unity`.
+- #33(레벨 성장·보상)는 보류 중이며 main에 포함되지 않습니다.
+- #41(마피아 AI 대화·동기화)은 병합 없이 닫혔습니다. 원본 브랜치는 보존합니다.
+- 아래 상태는 소스 구현 기준입니다. 빌드·실행·외부 서버 검증은 [배포 및 검증 현황](docs/distribution/STATUS.md)을 확인하세요.
 
-1. 저장소를 클론한 뒤 Unity Hub에서 이 폴더를 프로젝트로 추가합니다.
-2. **Unity 6000.4.5f1**로 열고 `Assets/StudyImmersive/Scenes/GrandLibrary_Living.unity` 씬을 엽니다.
-3. Play를 눌러 실행합니다. 첫 실행에는 Unity가 에셋을 가져오는 시간이 걸릴 수 있습니다.
+## 구현된 기능
 
-기본 조작은 WASD 이동, Shift 달리기, V 시점 전환, E 상호작용입니다. 1인칭에서는 마우스를 움직여 시점을 조절하고, 3인칭에서는 마우스 오른쪽 버튼을 누른 채 시점을 조절합니다. 탈출방에서는 클릭 또는 E로 상호작용합니다.
-
-`Library`, `Temp`, 로컬 씬 백업 등은 업로드하지 않으며 Unity가 필요한 파일을 다시 생성합니다. 아래 설명은 이전 버전의 기록입니다.
-
-> **새 버전:** 사진을 참고해 만든 원형 서재형 라운지와 세 포탈은 `Assets/GrandLibrary/Scenes/GrandLibrary.unity`에 있습니다. 실행 방법과 구성은 [그랜드 라이브러리 안내](README_GrandLibrary.md)를 먼저 확인하세요. 아래 내용은 보관된 초기 씬 `CampusCommons.unity`에 대한 설명입니다.
-
-넓은 라운지, 퀴즈방, 마피아방이 열린 출입구로 연결되는 Unity용 3D 기본 공간입니다. 모든 가구와 캐릭터는 이 프로젝트에서 만든 기본 도형으로 구성되어 별도 유료 에셋이 필요 없습니다.
-
-## 시작하기
-
-1. 설치된 **Unity Editor 6000.4.5f1**로 엽니다. 제작 중 실제 설치 경로를 확인하고 해당 버전에서 씬 생성·컴파일·Play Mode 검사를 마쳤습니다.
-2. Hub의 **Projects → Add → Add project from disk**에서 이 `CampusCommons` 폴더를 선택합니다. `Assets` 폴더가 아닌 상위 프로젝트 폴더를 선택하세요.
-3. `Assets/Campus/Scenes/CampusCommons.unity`를 더블클릭합니다. 편집 가능한 씬과 `CampusEnvironment.prefab`이 이미 포함되어 있습니다.
-4. 원래 배치를 다시 생성하려면 상단 **Campus → Create editable campus scene**을 실행합니다.
-5. **Play**를 누르고 Game 창을 클릭합니다.
-
-씬 생성 후 Hierarchy의 **Campus Commons → Lounge / Quiz / Mafia** 아래에서 가구를 직접 옮기고 수정할 수 있습니다. 생성 메뉴를 다시 실행하면 원래 배치로 덮어쓰므로, 수정본은 다른 씬 이름으로 저장하세요. 플레이 중의 변경은 저장되지 않습니다.
-
-## 구성
-
-| 공간 | 크기 | 내용 |
+| 영역 | 소스 구현 | 현재 경계 |
 |---|---|---|
-| 라운지 | 36 × 28m | 소파 대화 공간 3곳, 커피 테이블, 스터디 테이블, 책장, 안내 데스크, 화분 |
-| 퀴즈방 | 16 × 16m | 12인 좌석·책상, 중앙 통로, 무대, 문제 표시용 화면 |
-| 마피아방 | 16 × 16m | 10인 원형 좌석, 토론 테이블, 진행 표시용 화면 |
+| 계정 | 이메일 가입·인증 코드·로그인·비밀번호 복구·로그아웃, 닉네임·Lv.1~15 조회 | 자동 경험치/레벨 상승 비활성 |
+| 로비 | 계정 로그인 후 공용 도서관 자동 입장, 이동·착석, 닉네임·레벨 이름표, MY/F9 | 서버 한 곳에 최대 8명 |
+| PDF 퀴즈 | 2명 착석, 각자 PDF·페이지 범위 선택, 공통 난이도의 3단계, 풀이 시간·정답률 비교와 개인 해설 | 서버·AI 연결 필요, 경기당 30점 |
+| 공부 인식 | 착석 미리보기, 수동 시작, 로컬 QEV-0.8B fast, 다섯 상태 판정 | 개인 환경별 정확도와 Windows 카메라 추가 확인 필요 |
+| 공부 기록 | 이번 공부·한국시간 오늘 합계, 최근 세션·행동별 시간, 로컬 보관 및 계정 동기화 | 영상 업로드 없음, 레벨 보상과 별개 |
+| 아바타 | 외형 변경·미리보기·이동·손 흔들기·착석 | Sunbox 별도 설치, 외형의 계정 저장·멀티 동기화 없음 |
+| 공용 인벤토리 | 30칸 UI·1~5 단축 슬롯 선택·캐릭터 미리보기 | 실제 아이템 획득·장착·저장 미연결 |
+| 탈출룸 | 난이도/타임어택, 문제지·NPC·추격·아이템·정전·탈출·음악 | 별도 3칸 실제 아이템 사용, 타임어택 기록은 기기 저장 |
+| 마피아 공간 | 로비에서 입장·복귀 | AI 대화·역할·게임 진행·방 동기화 main 미통합 |
 
-건물 높이는 3.4m이고 모든 바닥은 연결됩니다. 출입구 폭은 3m입니다. 초기 편집과 3인칭 카메라를 위해 천장은 열어 두었습니다. 길이 단위는 Unity 1 unit = 1m입니다.
+## 실행하기
 
-## 조작
+### 플레이어
+
+운영체제에 맞는 완성 게임 폴더를 받습니다. GitHub 소스 ZIP은 실행본이 아닙니다.
+
+- macOS: Apple Silicon, macOS 15 이상.
+- Windows: x64. 현재 검증 범위와 배포본 유무는 [현황](docs/distribution/STATUS.md)을 따릅니다.
+- 로그인·계정 기록·PDF 퀴즈에는 인터넷과 해당 서버가 필요합니다.
+- 동봉 웹캠 모델은 기기에서 실행합니다. 카메라 허용은 사용자가 직접 선택합니다.
+
+### 팀 개발
+
+1. #55 병합 후 처음 받는 팀원은 `git clone https://github.com/ghwls9896/CampusCommons.git`으로 받습니다. 기존 작업이 있으면 커밋한 뒤 `git fetch origin`으로 최신 상태를 가져옵니다.
+2. 새 작업은 `origin/main`에서 이슈별 브랜치를 만들고 별도 작업 폴더에서 진행합니다. 진행 중인 자기 브랜치에 최신 통합 코드를 반영하려면 해당 브랜치에서 `git merge origin/main`을 실행합니다. [팀 작업 절차](CONTRIBUTING.md) · [기능 담당표](docs/team/OWNERSHIP.md)
+3. Mac과 Windows에서 Unity Hub로 저장소의 프로젝트 폴더를 추가하고 **6000.4.5f1**로 엽니다. `Assets/StudyImmersive/Scenes/GrandLibrary_Living.unity`를 열고 **Play**를 누릅니다.
+4. 공용 로비와 퀴즈를 함께 테스트할 때는 각자 다른 계정으로 로그인합니다. 공개 계정 연결 설정은 프로젝트에 포함돼 있습니다. [계정 설정](docs/account/SETUP.md) · [2인 퀴즈와 방 동작](docs/multiplayer/QUIZ_PLAY.md)
+5. 상세 아바타는 [설치 안내](docs/AVATAR_SETUP.md), 공부 인식 런타임은 [데스크톱 안내](docs/distribution/DESKTOP.md)를 확인합니다. 상세 아바타를 설치하지 않은 상태에서도 기본 캐릭터로 테스트할 수 있습니다. 팀 개발과 Play Mode 실행에는 GitHub Releases가 필요 없습니다.
+
+## 주요 조작
 
 | 입력 | 동작 |
 |---|---|
 | WASD / 방향키 | 이동 |
-| 왼쪽 Shift | 달리기 |
-| 마우스 오른쪽 버튼 누른 채 이동 | 카메라 회전 |
-| E | 가까운 좌석에 앉기 / 원래 위치로 일어나기 |
+| Shift | 달리기 |
+| V | 1인칭 / 3인칭 |
+| E | 착석·기립 / 문·탈출룸 상호작용 |
 | R | 손 흔들기 |
-| M | 공간 선택 지도 열기 / 닫기 |
-| Esc | 지도 닫기 |
+| C | 아바타 커스터마이징 |
+| I / 1~5 | 로비 공용 인벤토리 / 단축 슬롯 선택 |
+| MY / F9 | 계정·공부 기록 |
+| 시작 버튼 / F8 | 착석 후 공부 분석 시작·중지 |
+| Esc | 현재 창 닫기 / 방 나가기 확인 / 로비 메뉴 |
 
-지도 버튼은 확인용 순간 이동입니다. 실제 출입구를 걸어서 통과해도 됩니다.
+퀴즈 입력이나 다른 UI가 열려 있으면 해당 UI가 키보드 입력을 사용합니다. 탈출룸 아이템은 별도의 3칸 슬롯과 화면 안내를 따릅니다.
 
-## 파일
+## 검증과 남은 일
 
-- `Assets/Campus/Resources/campus.json`: Unity와 Blender가 공유하는 배치·재질·좌석 데이터
-- `Assets/Campus/Scripts`: 기본 캐릭터, 이동, 카메라, 로컬 좌석 상호작용
-- `Assets/Campus/Editor`: 편집 가능한 씬·환경 프리팹 생성기
-- `Design/CampusCommons.blend`: Blender 4.4로 생성한 공간 원본. Unity 자동 변환을 피하기 위해 Assets 밖에 보관합니다.
-- `Design/Campus-overview.png`, `Design/Lounge-detail.png`: Blender에서 렌더한 공간 미리보기. Unity 실행 화면은 아닙니다.
-- `Design/Unity-overview.png`: 실제 Unity 재질과 조명으로 렌더한 공간 미리보기
-- `Tools/build_world.py`: Blender에서 원본과 JSON, 미리보기를 재생성하는 도구
-- `Tools/validate_world.py`: 배치·출입구·좌석 접근성 검사
+main `38a8568`의 GitHub CI에서 팀 도구 16개·퀴즈 백엔드 52개 테스트가 통과했습니다. CI는 Unity Play Mode, 실제 카메라, 실제 AI 서비스, 여러 PC의 게임 실행을 대신하지 않습니다.
 
-씬은 Unity 내장 렌더 파이프라인의 Standard 재질을 사용합니다. 이 프로젝트를 그대로 열면 됩니다. 다른 URP 프로젝트에 복사할 경우 해당 파이프라인용 재질 변환이 필요합니다. 입력은 기존 Input Manager를 사용하므로 다른 프로젝트에 가져올 때 Active Input Handling을 Input Manager 또는 Both로 설정하세요.
+#31 공결증, #37 추격·음악·배전함, #39 학교 통행은 HIGHCHOI의 수동 확인 및 승인 후 병합됐습니다. 과거 자동 검증의 시험용 인증·기존 Unity 검색 인덱스 예외·열린 문 경로 검사 제한은 관련 PR과 작업 인계에 보존합니다.
 
-## 현재 구현 범위와 다음 단계
+남은 실환경 검증은 #7(카메라 정확도), #8(계정 복구·다른 계정/PC), #24(실제 계정 공부 기록) 및 [배포 현황](docs/distribution/STATUS.md)에서 구분합니다. 미검증을 완료로 표시하지 않습니다.
 
-현재는 **1인 로컬 공간 프로토타입**입니다. 기본 학생 아바타 1개와 이동·걷기 모션·손 흔들기·앉기·공간 이동을 구현했습니다. 화면의 참가자 수나 온라인 사용자를 모사하지 않습니다.
+## 팀 작업
 
-여러 학생의 실제 동시 접속, 음성·텍스트 채팅, 인증, 방 생성·참가, 서버의 좌석 점유 관리, 퀴즈 출제·채점, 마피아 역할 배정·투표·낮밤 진행은 아직 구현하지 않았습니다. 이 공간의 좌석 Transform과 방별 그룹을 해당 기능의 배치 지점으로 사용할 수 있습니다. 좌석 점유 필드는 로컬 시연용이므로 네트워크 도입 시 서버 권한으로 교체해야 합니다.
+[AGENTS.md](AGENTS.md) → [CONTRIBUTING.md](CONTRIBUTING.md) → [담당표](docs/team/OWNERSHIP.md) → 작업별 `docs/tasks/cc-번호.json` 순으로 확인합니다. 최신 공유 상태는 GitHub Issue/PR이 기준이며, 과거 인계 기록은 각 문서 상단의 현재 상태와 구분합니다.
 
-## 검증 환경
-
-Unity Editor `6000.4.5f1`에서 스크립트 컴파일과 씬·프리팹 생성을 완료했습니다. Play Mode에서 캐릭터 생성, 바닥 접촉과 이동, 43개 좌석 생성, 좌석 점유·앉기·일어나기, 양쪽 출입구 통과를 검사했습니다. 0.25m 간격의 배치 검사에서도 모든 좌석에 상호작용 거리 내로 접근할 수 있었습니다. `Design/unity-validation.txt`와 `Design/validation.json`에 결과가 있습니다.
-
-자동 검사 중 Unity Editor의 검색 인덱스 시작 코드(`UnityEditor.Search.SearchDatabase`)에서 별도 예외가 발생했습니다. 이 batch mode 편집기 내부 오류는 공간의 Play Mode 검사와 구분해 결과 파일에 기록했습니다. 수동 키보드·마우스 조작, 실행 파일 빌드, 실제 여러 명의 접속은 검사하지 않았습니다.
-
-Blender 재생성 명령(PowerShell):
-
-```powershell
-& 'C:\Program Files\Blender Foundation\Blender 4.4\blender.exe' --background --python .\Tools\build_world.py
-```
-
-## PDF 퀴즈룸 (1인 복습)
-
-Render 무료 백엔드 + Gemini API로 PDF에서 레벨 1·2·3 문제를 하나씩 생성하고 정답·해설·근거 페이지를 확인합니다. 계정 가입, 배포, Unity 연결 방법은 [퀴즈룸 설정 안내](docs/QUIZ_ROOM_SETUP.md)를 참고하세요.
-
-## 완성 게임 배포
-
-Windows x64 / macOS 15 이상 Apple Silicon 게임에 Python·QEV 모델과 연결 설정을 동봉하는 방법은 [데스크톱 배포 안내](docs/distribution/DESKTOP.md)를 참고하세요. GitHub 소스 ZIP과 실행 가능한 게임 배포본은 다릅니다.
+구형 `CampusCommons.unity`, `GrandLibrary.unity`와 관련 생성 도구·문서는 이전 공간 제작 기록입니다. 현재 기본 실행 씬은 `GrandLibrary_Living.unity` 하나입니다. 원본 공간/에셋은 참조 관계와 미통합 변경 확인 없이 삭제하지 않습니다.

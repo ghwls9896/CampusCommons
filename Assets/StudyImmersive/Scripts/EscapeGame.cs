@@ -149,10 +149,28 @@ namespace CampusCommons.StudyImmersive
             jumpAudio=gameObject.AddComponent<AudioSource>();jumpAudio.playOnAwake=false;jumpAudio.spatialBlend=0;
             if(schoolGrid)
             {
+                PrepareInteriorShadows();
                 SchoolUpperTrim.Create(schoolRoot);SchoolHallDecorations.Create(schoolRoot);elevators=SchoolElevators.Create(this,schoolRoot);
             }
+            if(schoolRoot){var school=schoolRoot.Find("Escape School");if(school)breaker=WallBreakerVisual.Create(school);}
             if(exitDoor)exitDoor.RetireExitDesignation();
         }
+        void PrepareInteriorShadows()
+        {
+            if (!schoolRoot) return;
+            foreach (var surface in schoolRoot.GetComponentsInChildren<MeshRenderer>(true))
+            {
+                foreach (var material in surface.sharedMaterials)
+                {
+                    if (!material || (material.name != "Campus Ceiling" &&
+                        material.name != "Campus Wall" && material.name != "Campus Plain Wall")) continue;
+                    // Imported wall and ceiling panels are open meshes. Block light from either side.
+                    surface.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.TwoSided;
+                    break;
+                }
+            }
+        }
+
         void OnTriggerEnter(Collider other){var local=other.GetComponent<Player>();if(local)BeginSelection(local);}
         void OnTriggerStay(Collider other)
         {
@@ -340,7 +358,13 @@ namespace CampusCommons.StudyImmersive
         public bool Interact(bool requireAim)
         {
             if(!running || IsEnded || IsAnswering || exitConfirm || !view || !player || (World && World.BlocksMovement))return false;
-            if(PowerOut && breaker && Vector3.Distance(player.transform.position,breaker.transform.position)<2.2f){RepairPower();return true;}
+            if(CanUseBreaker())
+            {
+                var cabinet=breaker.GetComponent<WallBreakerVisual>();
+                if(cabinet && !cabinet.IsOpen){cabinet.Open();Notice("배전함을 열었습니다. 스위치를 올리세요.","Cabinet opened. Reset the switch.");}
+                else RepairPower();
+                return true;
+            }
             if(World && World.TryInteract(requireAim))return true;
             var ray=view.ViewportPointToRay(new Vector3(.5f,.5f,0));
             var hits=Physics.RaycastAll(ray,2.25f,Physics.DefaultRaycastLayers,QueryTriggerInteraction.Collide);
@@ -452,15 +476,33 @@ namespace CampusCommons.StudyImmersive
         }
         void TryBlackout()
         {
-            if(blackoutTriggered || found<2 || found>=target || (currentMode!=Mode.Easy && currentMode!=Mode.Medium) || UnityEngine.Random.value>=.3f || !schoolGrid)return;
+            if(blackoutTriggered || found<2 || found>=target || (currentMode!=Mode.Easy && currentMode!=Mode.Medium) || UnityEngine.Random.value>=.3f || !schoolGrid || !breaker)return;
             var school=schoolRoot?schoolRoot.Find("Escape School"):null;if(!school)return;
-            var route=new List<Vector3>();Vector3 point=Vector3.zero;bool foundPoint=false;
-            foreach(var loc in otherRoomLocations){var candidate=school.TransformPoint(loc);int cell=schoolGrid.NearestCell(candidate);if(cell>=0 && schoolGrid.FindPath(player.transform.position,schoolGrid.Position(cell),route)){point=schoolGrid.Position(cell);foundPoint=true;break;}}
-            if(!foundPoint)return;blackoutTriggered=true;lighting.StartDark();
-            breaker=GameObject.CreatePrimitive(PrimitiveType.Cube);breaker.name="전기실 차단기";breaker.transform.position=point+Vector3.up*.85f;breaker.transform.localScale=new Vector3(.38f,.55f,.2f);
-            var renderer=breaker.GetComponent<Renderer>();renderer.material.color=new Color(.96f,.7f,.12f);Notice("정전! 전기실 차단기를 올리세요.","Blackout! Reset the breaker.");
+            // The hall breaker stays at the same location every round.
+            var candidate=school.TransformPoint(new Vector3(0f,0f,-21f));
+            int cell=schoolGrid.NearestCell(candidate);
+            if(cell<0)return;
+            Vector3 point=schoolGrid.Position(cell);
+            var route=new List<Vector3>();
+            if(Vector3.Distance(point,candidate)>.75f || !schoolGrid.FindPath(player.transform.position,point,route))return;
+            blackoutTriggered=true;lighting.StartDark();
+            Notice("정전! 강당의 차단기를 올리세요.","Blackout! Reset the breaker in the hall.");
         }
-        void RepairPower(){if(!PowerOut)return;lighting.Restore();Destroy(breaker);breaker=null;Notice("전력이 복구됐습니다.","Power restored.");}
+        bool CanUseBreaker()
+        {
+            if(!PowerOut || !breaker || !player || !view)return false;
+            Vector3 towardPlayer=player.transform.position-breaker.transform.position;towardPlayer.y=0f;
+            if(towardPlayer.magnitude>1.65f || Vector3.Dot(towardPlayer,breaker.transform.forward)<.25f)return false;
+            Vector3 towardCabinet=breaker.transform.position-view.transform.position;
+            if(towardCabinet.sqrMagnitude<.001f || Vector3.Dot(view.transform.forward,towardCabinet.normalized)<.88f)return false;
+            Vector3 start=player.transform.position+Vector3.up*1.2f;
+            Vector3 end=breaker.transform.position+breaker.transform.forward*.24f;
+            Vector3 delta=end-start;
+            foreach(var hit in Physics.RaycastAll(start,delta.normalized,delta.magnitude,Physics.DefaultRaycastLayers,QueryTriggerInteraction.Ignore))
+                if(hit.collider && !hit.collider.transform.IsChildOf(player.transform) && !hit.collider.transform.IsChildOf(breaker.transform))return false;
+            return true;
+        }
+        void RepairPower(){if(!PowerOut)return;lighting.Restore();Notice("전력이 복구됐습니다.","Power restored.");}
         void SaveTimeAttackRecord(){if(IsTimeAttack && found>BestTimeAttackRecord){PlayerPrefs.SetInt(RecordKey,found);PlayerPrefs.Save();}}
         public void Notice(string message,string english="Keep moving!"){notice=message;noticeEnglish=english;noticeUntil=Time.time+3f;}
         public void CaughtByMonster()
@@ -536,11 +578,6 @@ namespace CampusCommons.StudyImmersive
                 Destroy(darkAtmosphere.gameObject);
                 darkAtmosphere = null;
             }
-            if (breaker)
-            {
-                Destroy(breaker);
-                breaker = null;
-            }
             if (lighting)
             {
                 lighting.Restore();
@@ -584,7 +621,7 @@ namespace CampusCommons.StudyImmersive
             timedOut = false;
             caught = false;
             blackoutTriggered = false;
-            breaker = null;
+            if(breaker){var cabinet=breaker.GetComponent<WallBreakerVisual>();if(cabinet)cabinet.Close();}
             jumpElapsed = 0;
             quizOpen = false;
             quizFeedback = false;
@@ -693,7 +730,7 @@ namespace CampusCommons.StudyImmersive
                 else
                 {
                     GUI.Label(new Rect(622,342,36,36),"+",crosshair);
-                    if(PowerOut && breaker && Vector3.Distance(player.transform.position,breaker.transform.position)<2.2f){Panel(new Rect(420,555,440,48),.87f);GUI.Label(new Rect(435,565,410,28),L("E / 클릭  차단기 올리기","E / CLICK  RESET BREAKER"),text);}
+                    if(CanUseBreaker()){var cabinet=breaker.GetComponent<WallBreakerVisual>();Panel(new Rect(420,555,440,48),.87f);GUI.Label(new Rect(435,565,410,28),cabinet && cabinet.IsOpen?L("E / 클릭  차단기 올리기","E / CLICK  RESET BREAKER"):L("E / 클릭  배전함 열기","E / CLICK  OPEN CABINET"),text);}
                     else if(Time.time<noticeUntil){Panel(new Rect(365,555,550,48),.88f);GUI.Label(new Rect(380,565,520,28),korean?notice:noticeEnglish,text);}
                     else if(World && World.NearbyHint!=null){Panel(new Rect(420,555,440,48),.87f);GUI.Label(new Rect(435,565,410,28),World.NearbyHint,text);}
                     else if(NearestDistance()<1.7f){Panel(new Rect(475,555,330,48),.87f);GUI.Label(new Rect(490,565,300,28),L("클릭 / E   문제지 열기","CLICK / E   OPEN SHEET"),text);}

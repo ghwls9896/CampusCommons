@@ -81,12 +81,12 @@ public static class StudySyncVerification
                     "A conflicting session blocked a subsequent valid upload");
             if (stage == 0)
             {
+                if (service.Available) throw new Exception("A signed-out game already owns the study record store");
                 stage = 1;
                 transport = new Fixture();
                 var account = AccountGate.Instance;
                 account.Configure(transport);
                 await account.LoginAsync("study@example.test", "fixture");
-                await account.EnterAsync("테스트");
             }
             else if (stage == 1 && service.TodayMilliseconds == 1000)
             {

@@ -1,6 +1,8 @@
 using System;
 using System.Linq;
-using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
+using CampusCommons.Account;
 using CampusCommons.GrandLibrary;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -17,8 +19,23 @@ namespace CampusCommons.Quiz.Editor
         static double deadline;
         static Player player;
         static QuizRoom room;
-        static QuizSession session;
-        const BindingFlags Private = BindingFlags.NonPublic | BindingFlags.Instance;
+        static Seat chair;
+        static Canvas board;
+        static Task signingIn;
+        sealed class FixtureAccount : IAccountTransport
+        {
+            public Task<T> SendAsync<T>(string method, string path, object body, string token, CancellationToken ct) where T : class
+            {
+                object value = null;
+                if (typeof(T) == typeof(AuthResponse))
+                    value = new AuthResponse { access_token = "fixture", refresh_token = "fixture", expires_at = 4000000000,
+                        user = new AuthUser { id = "quiz-test", email_confirmed_at = "date" } };
+                if (typeof(T) == typeof(AccountProfile))
+                    value = new AccountProfile { user_id = "quiz-test", nickname = "퀴즈검사", level = 2 };
+                return Task.FromResult((T)value);
+            }
+        }
+
         public static void Run()
         {
             EditorSceneManager.OpenScene("Assets/StudyImmersive/Scenes/GrandLibrary_Living.unity");
@@ -57,70 +74,84 @@ namespace CampusCommons.Quiz.Editor
             {
                 Check(EditorApplication.timeSinceStartup<deadline,"Quiz integration test timed out");
                 if(!EditorApplication.isPlaying || Time.timeSinceLevelLoad<2) return;
-                if(step==0)
+                if (step == 0)
                 {
-                    player=UnityEngine.Object.FindAnyObjectByType<Player>();
-                    Check(player,"Scene did not create player"); room=player.GetComponent<QuizRoom>();
-                    Check(room && !room.BlocksMovement,"Quiz component missing or blocks lobby");
-                    // No external network/PlayerPrefs dependency in this fixture.
-                    typeof(QuizRoom).GetField("server",Private).SetValue(room,"");
-                    var portal=UnityEngine.Object.FindObjectsByType<Portal>().First(p=>p.destination==Portal.Space.Quiz);
-                    Check(player.TryUsePortal(portal),"Cannot enter actual quiz portal");
-                    step=1; changed=Time.time; return;
+                    var gate = AccountGate.Instance;
+                    gate.Configure(new FixtureAccount());
+                    signingIn = gate.LoginAsync("quiz@example.test", "fixture");
+                    step++; return;
                 }
-                if(Time.time-changed<.4f) return;
-                if(step==1)
+                if (!signingIn.IsCompleted) return;
+                signingIn.GetAwaiter().GetResult();
+                if (step == 1)
                 {
-                    Check(room.BlocksMovement && Cursor.visible && Cursor.lockState==CursorLockMode.None,"Quiz must release cursor and block movement");
-                    var document=(QuizDocument)typeof(QuizRoom).GetField("document",Private).GetValue(room);
-                    document.Select("/tmp/분할정복.pdf",2048);
-                    Check(document.Name=="분할정복.pdf","Decomposed Korean filename was not composed");
-                    document.ApplyInspection(new QuizPdfInspection {size_bytes=2048,page_count=120,max_pages=1000,max_selected_pages=1000,supports_page_ranges=true,max_size_bytes=10485760,within_limits=true});
-                    document.SetRange("81","100");Check(document.CanGenerate,"Large PDF range must be selectable");
-                    document.SetRange("100","81");
-                    typeof(QuizRoom).GetMethod("Generate",Private).Invoke(room,null);
-                    Check(!document.CanGenerate && !(bool)typeof(QuizRoom).GetField("working",Private).GetValue(room),"Invalid range must prevent generating");
-                    document.Reset();
-                    session=(QuizSession)typeof(QuizRoom).GetField("session",Private).GetValue(room);
-                    double now=Time.realtimeSinceStartupAsDouble;
-                    session.Begin(Fixture(),now);Check(session.SubmitChoice(0,now+1),"Choice answer failed");
-                    Check(player.RequestRoomExit() && player.CancelRoomExit(),"Exit cancellation failed");
-                    Check(session.Current.level==2 && session.Responses[0]=="정답 보기","Cancel exit lost answer");
-                    Check(session.SubmitText("입력한 단답",2,now+2),"Short answer did not advance");
-                    Check(session.Tick(now+22,-1,"입력한 서술형 답"),"Written timeout did not advance");
-                    Check(session.Finished && session.ApplyGrades(new QuizGradeSet {grades=new[]{new QuizGrade {level=2,score=4,criterion_scores=new[]{4},feedback="핵심 일부 충족"},new QuizGrade {level=3,score=8,criterion_scores=new[]{8},feedback="핵심 대부분 충족"}}}),"Final grading failed");
-                    Check(session.Score==22 && !session.NeedsGrading,"Final result wrong");
-                    step=2;changed=Time.time;return;
+                    player = UnityEngine.Object.FindAnyObjectByType<Player>();
+                    room = player.GetComponent<QuizRoom>();
+                    Check(room && !room.BlocksMovement, "Quiz component missing or blocks lobby");
+                    var portal = UnityEngine.Object.FindObjectsByType<Portal>().First(p => p.destination == Portal.Space.Quiz);
+                    Check(player.TryUsePortal(portal), "Cannot enter actual quiz portal");
+                    step++; changed = Time.time; return;
                 }
-                if(step==2)
+                if (Time.time - changed < .4f) return;
+                if (step == 2)
                 {
-                    Check(player.RequestRoomExit() && player.ConfirmRoomExit(),"Exit did not return to lobby");
-                    step=3;changed=Time.time;return;
+                    Check(!room.BlocksMovement && room.Match == null, "Walking into the quiz room started a match");
+                    board = UnityEngine.Object.FindObjectsByType<Canvas>(FindObjectsSortMode.None)
+                        .Single(c => c.name == "Quiz chalkboard");
+                    Check(board.renderMode == RenderMode.WorldSpace && board.worldCamera == Camera.main &&
+                        board.transform.parent.name == "Quiz Screen Structure", "Rules are not on the classroom board");
+                    Check(board.GetComponentsInChildren<UnityEngine.UI.Text>().Any(t => t.text.Contains("객관식 10초")),
+                        "Entering the classroom did not show its timing rules");
+                    var seats = UnityEngine.Object.FindObjectsByType<Seat>().Where(s => s.name.StartsWith("Quiz Seat ")).ToArray();
+                    Check(seats.Length == 2, "Expected two physical quiz seats");
+                    chair = seats.OrderBy(s => s.transform.position.x).First();
+                    var body = player.GetComponent<CharacterController>();
+                    body.enabled = false; player.transform.position = chair.transform.position - Vector3.up * .6f;
+                    body.enabled = true; Physics.SyncTransforms();
+                    Check(player.TrySit(chair), "Cannot sit at the actual quiz chair");
+                    step++; changed = Time.time; return;
                 }
-                if(step==3)
+                if (step == 3)
                 {
-                    Check(player.currentSpace==Portal.Space.Library && !room.BlocksMovement && session.Data==null,"Leaving did not clear quiz");
-                    // Verify a pending request is aborted on leave, without any network call.
-                    player.currentSpace=Portal.Space.Quiz;
-                    step=4;changed=Time.time;return;
+                    Check(room.BlocksMovement && chair.occupant == player, "Seated quiz did not take input");
+                    Check(board.GetComponentsInChildren<UnityEngine.UI.Button>().Any(b => b.name == "일어나기" && b.interactable),
+                        "The seated player cannot interact with the classroom board");
+                    Check(player.RequestRoomExit() && player.CancelRoomExit(), "Exit cancellation failed");
+                    Check(chair.occupant == player, "Cancel exit lost the seat");
+                    Check(player.RequestRoomExit() && player.ConfirmRoomExit(), "Exit did not return to lobby");
+                    step++; changed = Time.time; return;
                 }
-                if(step==4)
-                {
-                    var pending=UnityEngine.Networking.UnityWebRequest.Get("https://example.invalid");
-                    typeof(QuizRoom).GetField("request",Private).SetValue(room,pending);
-                    typeof(QuizRoom).GetField("working",Private).SetValue(room,true);
-                    Check(player.RequestRoomExit() && player.ConfirmRoomExit(),"Second exit failed");
-                    step=5;changed=Time.time;return;
-                }
-                if(step==5)
-                {
-                    Check(typeof(QuizRoom).GetField("request",Private).GetValue(room)==null &&
-                        !(bool)typeof(QuizRoom).GetField("working",Private).GetValue(room),"Leaving retained pending request");
-                    Check(!runtimeError,"Runtime errors were logged during quiz flow");
-                    Debug.Log("PDF_QUIZ_ROOM_PASS"); Finish(0);
-                }
+                Check(player.currentSpace == Portal.Space.Library && !room.BlocksMovement &&
+                    !chair.occupant && room.Match == null, "Leaving retained quiz state");
+                CheckQuizModels();
+                Check(!runtimeError, "Runtime errors were logged during quiz flow");
+                Debug.Log("PDF_QUIZ_ROOM_PASS"); Finish(0);
             }
             catch(Exception ex) { Debug.LogException(ex); Finish(1); }
+        }
+        static void CheckQuizModels()
+        {
+            var difficulty = new QuizDuelState { target_level = 7, difficulty_mode = "pending" };
+            Check(!difficulty.DifficultyLabel.Contains("Lv."), "Unconfirmed target displayed as applied");
+            difficulty.difficulty_mode = "standard";
+            Check(difficulty.DifficultyLabel == "기본 3단계 난이도", "Legacy Render difficulty not displayed");
+            difficulty.difficulty_mode = "account";
+            Check(difficulty.DifficultyLabel == "공통 난이도 Lv.7", "Acknowledged account level missing");
+            var doc = new QuizDocument();
+            doc.Select("/tmp/분할정복.pdf", 2048);
+            Check(doc.Name == "분할정복.pdf", "Decomposed Korean filename was not composed");
+            doc.ApplyInspection(new QuizPdfInspection { size_bytes = 2048, page_count = 120, max_pages = 1000,
+                max_selected_pages = 1000, supports_page_ranges = true, max_size_bytes = 10485760, within_limits = true });
+            doc.SetRange("81", "100"); Check(doc.CanGenerate, "Large PDF range must be selectable");
+            doc.SetRange("100", "81"); Check(!doc.CanGenerate, "Invalid range must be rejected");
+            var session = new QuizSession();
+            session.Begin(Fixture(), 100);
+            Check(session.SubmitChoice(0, 101) && session.SubmitText("입력한 단답", 2, 102), "Submission failed");
+            Check(session.Tick(122, -1, "입력한 서술형 답") && session.Finished, "Written timeout did not advance");
+            Check(session.ApplyGrades(new QuizGradeSet { grades = new[] {
+                new QuizGrade { level = 2, score = 4, criterion_scores = new[] { 4 }, feedback = "핵심 일부 충족" },
+                new QuizGrade { level = 3, score = 8, criterion_scores = new[] { 8 }, feedback = "핵심 대부분 충족" }
+            } }) && session.Score == 22, "Three-stage scoring failed");
         }
         static void Finish(int code)
         {

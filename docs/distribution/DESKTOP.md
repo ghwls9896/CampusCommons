@@ -1,3 +1,5 @@
+> 현재 실행본과 검증 범위는 [STATUS.md](STATUS.md)를 먼저 확인하세요. 아래는 재현 가능한 빌드 절차입니다.
+
 # 데스크톱 게임 배포
 
 플레이어는 운영체제에 맞는 **완성 게임 배포본**을 받아 실행합니다. GitHub의 Source code ZIP은 개발 소스이며 완성 게임이 아닙니다.
@@ -7,7 +9,7 @@
 - 준비 진행률과 실패 시 재시도를 표시합니다. 준비 중에도 로그인·퀴즈 화면을 쓸 수 있습니다. 다음 실행은 준비된 환경을 재사용합니다.
 - 좌석에 앉으면 카메라 미리보기, **시작**을 누르면 로컬 QEV 추론, **종료·일어나기**를 누르면 추론/카메라 종료 및 기립입니다. 운영체제의 카메라 허용은 사용자가 직접 해야 합니다.
 - 로그인/회원가입·PDF 퀴즈는 인터넷과 운영 중인 서버가 필요합니다. 모델은 설치 및 실행 시 인터넷이 필요 없습니다. 회원가입 이메일 확인 정책은 현재 서버 설정을 따릅니다.
-- `AccountConnection.json`과 `QuizConnection.json`은 Unity Resources로 빌드에 포함합니다. 플레이어가 파일을 만들거나 서버 주소를 입력할 필요가 없습니다.
+- 배포본에는 계정 프로젝트의 공개 `AccountConnection.json`을 포함합니다. 공용 로비와 2인 퀴즈는 고정 서비스 주소로 접속합니다.
 
 Windows 팀원은 [검토·실행 순서](WINDOWS_TEAM.md)를 먼저 확인하세요.
 
@@ -16,7 +18,7 @@ Windows 팀원은 [검토·실행 순서](WINDOWS_TEAM.md)를 먼저 확인하�
 각 운영체제에서 해당 배포본을 만듭니다. 빌드 PC만 Unity **6000.4.5f1** 및 해당 Standalone Build Support, [uv](https://docs.astral.sh/uv/getting-started/installation/), Git과 인터넷이 필요합니다. 게임에는 빌드 도구가 필요 없습니다.
 
 1. 통합 소스를 받습니다. 필요한 씬/팀 에셋도 포함되어 있어야 합니다.
-2. `Assets/Account/Resources/AccountConnection.json`을 확인하고, 팀의 비공개 `Assets/QuizRoom/Resources/QuizConnection.json`을 안전한 경로로 받아 넣습니다. 기존 빌드 PC에는 이미 있습니다. 퀴즈 토큰 파일은 Git에 커밋하지 않습니다. Gemini/API 서비스 비밀 키나 Supabase service_role 키를 클라이언트에 넣지 않습니다. 클라이언트에 동봉한 데모 접근 토큰은 추출 가능하며 서버 측 사용량 제한이 필요합니다.
+2. `Assets/Account/Resources/AccountConnection.json`의 공개 계정 설정을 확인합니다. 깨끗한 체크아웃에서 그대로 2인 퀴즈 클라이언트를 빌드할 수 있습니다. Gemini API 키는 서버에서 관리합니다.
 3. 해당 OS에서 실행합니다. Unity에서 이 프로젝트가 열려 있으면 먼저 저장하고 닫습니다.
 
 macOS 터미널:
@@ -46,3 +48,12 @@ Intel Mac 및 Windows ARM은 현재 지원 대상으로 검증하지 않았습�
 ## 검증 기록
 
 구현 및 실제 테스트 결과는 작업 인계 문서 `docs/tasks/cc-2.md`에 기록합니다.
+
+
+## Windows CPU 패키지를 GitHub에서 준비하기
+
+`.github/workflows/windows-runtime.yml`은 Windows runner에서 기존 `prepare_runtime.py`를 실행하고, 경로를 옮긴 뒤 네트워크 없이 모델을 실제 실행해 통과한 패키지만 artifact로 올립니다. QEV의 고정 소스가 CUDA index를 지정하므로, 같은 버전의 `torch/torchvision +cpu` wheel을 공식 CPU index에서 명시적으로 설치한 뒤 CUDA 미포함과 오프라인 추론을 다시 확인합니다. 게임·계정 설정·사용자 영상은 이 workflow에 올리지 않습니다. artifact 보관 기간은 3일입니다.
+
+workflow가 main에 통합된 뒤 Actions → Windows study runtime → Run workflow로 실행합니다. 산출물은 런타임 패키지이며 게임 실행 파일 자체가 아닙니다. `manifest.json`과 `payload.zip`을 `Assets/StreamingAssets/StudyRuntime/`에 놓고 Unity Windows 빌드 메뉴를 실행합니다. `DistributionBuild`가 플랫폼·길이·SHA256을 검사합니다. Mac에서 Windows Mono 모듈로 빌드할 수 있지만 Windows의 GUI·카메라 검증을 대신하지 않습니다.
+
+일반 빌드 스크립트는 QEV의 기본 의존성을 사용합니다. CPU 전용 배포를 재현할 때는 위 workflow의 검증된 artifact를 사용하거나 같은 wheel 교체·동결 목록 갱신·재검증 단계를 수행합니다. GPU 가속 배포와 CPU 배포의 용량·실행 성능을 구분합니다.

@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using CampusCommons.Account;
@@ -10,13 +9,11 @@ using CampusCommons.Webcam;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
-using UnityEngine.Networking;
 
 // Local integration regression: real scene and lifecycle, fixture authentication, no external requests/camera.
 public static class IntegratedQuizFlowTest
 {
     const string Key = "IntegratedQuizFlowTest";
-    const BindingFlags Private = BindingFlags.NonPublic | BindingFlags.Instance;
     static int step;
     static double deadline;
     static float at;
@@ -26,7 +23,6 @@ public static class IntegratedQuizFlowTest
     static Player player;
     static QuizRoom quiz;
     static LobbyStudyWebcam study;
-    static QuizSession session;
     static Seat seat;
     sealed class Fixture : IAccountTransport
     {
@@ -83,12 +79,9 @@ public static class IntegratedQuizFlowTest
                 quiz = player.GetComponent<QuizRoom>();
                 Check(gate && quiz && study, "Account/quiz/webcam bootstraps missing");
                 Check(!gate.Ready && !player.enabled && !quiz.enabled, "Pre-auth input not blocked");
-                Check((bool)typeof(QuizRoom).GetField("configured", Private).GetValue(quiz), "Local quiz deployment configuration missing");
-                typeof(QuizRoom).GetField("server", Private).SetValue(quiz, "");
-                session = (QuizSession)typeof(QuizRoom).GetField("session", Private).GetValue(quiz);
                 gate.Configure(new Fixture()); pending = gate.LoginAsync("integration@example.test", "fixture-password"); Next();
             }
-            else if (step == 1) { pending = gate.EnterAsync("통합검사"); Next(); }
+            else if (step == 1) { Check(gate.Ready, "Login did not enter directly"); Next(); }
             else if (step == 2)
             {
                 Check(gate.Ready && player.enabled && quiz.enabled, "Login did not release quiz/player");
@@ -99,28 +92,30 @@ public static class IntegratedQuizFlowTest
             else if (step == 3)
             {
                 if (Time.time - at < .8f) return;
-                Check(player.currentSpace == Portal.Space.Quiz && quiz.BlocksMovement, "Door did not enter quiz");
-                Check(Cursor.visible && Cursor.lockState == CursorLockMode.None, "Quiz input cursor captured");
-                var fixtureMethod = typeof(CampusCommons.Quiz.Editor.QuizRoomTest).GetMethod("Fixture", BindingFlags.NonPublic | BindingFlags.Static);
-                session.Begin((QuizSet)fixtureMethod.Invoke(null, null), Time.realtimeSinceStartupAsDouble);
-                Check(session.SubmitChoice(0, Time.realtimeSinceStartupAsDouble), "Fixture quiz answer rejected");
-                // Unsent request: revoking authentication must dispose it without networking.
-                typeof(QuizRoom).GetField("request", Private).SetValue(quiz, UnityWebRequest.Get("https://example.invalid"));
-                typeof(QuizRoom).GetField("working", Private).SetValue(quiz, true);
-                pending = gate.LogoutAsync(); Next();
+                Check(player.currentSpace == Portal.Space.Quiz && !quiz.BlocksMovement, "Room entry must permit walking to a seat");
+                seat = UnityEngine.Object.FindObjectsByType<Seat>().First(s => s.name == "Quiz Seat 01");
+                Move(seat.transform.position - Vector3.up * .6f);
+                Check(player.TrySit(seat), "Cannot sit at the first quiz chair");
+                Next();
             }
             else if (step == 4)
             {
+                Check(quiz.BlocksMovement && Cursor.visible && Cursor.lockState == CursorLockMode.None, "Quiz seat must own typing input");
+                pending = gate.LogoutAsync(); Next();
+            }
+            else if (step == 5)
+            {
                 Check(!player.enabled && !quiz.enabled && !gate.Ready, "Logout retained quiz input");
-                Check(session.Data == null && typeof(QuizRoom).GetField("request", Private).GetValue(quiz) == null, "Logout retained answers or pending request");
+                Check(!seat.occupant && quiz.Match == null, "Logout retained seat or match");
                 Check(!player.GetComponent<CharacterController>().enabled, "Logout re-enabled controller");
                 pending = gate.LoginAsync("integration@example.test", "fixture-password"); Next();
             }
-            else if (step == 5) { pending = gate.EnterAsync("통합검사"); Next(); }
             else if (step == 6)
             {
-                Check(quiz.enabled && gate.Ready && session.Data == null, "Relogin did not reset quiz");
-                Check(player.RequestRoomExit() && player.ConfirmRoomExit(), "Cannot return to lobby after relogin"); Next();
+                Check(quiz.enabled && gate.Ready && quiz.Match == null, "Relogin did not reset quiz");
+                if (player.currentSpace == Portal.Space.Quiz)
+                    Check(player.RequestRoomExit() && player.ConfirmRoomExit(), "Cannot return to lobby after relogin");
+                Next();
             }
             else if (step == 7)
             {

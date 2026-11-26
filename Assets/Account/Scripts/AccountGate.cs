@@ -7,16 +7,19 @@ namespace CampusCommons.Account
  [DefaultExecutionOrder(-32000)]
  public sealed class AccountGate : MonoBehaviour
  {
-  public enum Screen { Start,Login,Signup,SignupCode,RecoveryEmail,RecoveryCode,NewPassword,Nickname,World }
+  public enum Screen { Start,Login,Signup,SignupCode,RecoveryEmail,RecoveryCode,NewPassword,LoadingProfile,World,SignupReceipt }
   public static AccountGate Instance {get;private set;}
+  public static bool LobbyOverlayOwnsInput => Instance && Instance.view && Instance.view.LobbyOverlayOpen;
   public AccountSession Session {get;private set;}
   public Screen Page {get;set;}=Screen.Start;
   public bool Ready {get;private set;}
+  public bool LobbyEnabled {get; private set;} = true;
   public bool Busy {get;private set;}
   public string Message {get;private set;}="";
   public bool Configured {get;private set;}
   public AccountWorldGate World {get;private set;}
   float refreshAt;int operation;Camera backdrop;
+  AccountView view;
   public event Action<AccountProfile> EntryReady;
   public event Action EntryRevoked;
   [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)] static void ResetStatic(){Instance=null;}
@@ -34,40 +37,117 @@ namespace CampusCommons.Account
    backdrop.allowHDR=false;backdrop.allowMSAA=false;
    var config=Resources.Load<TextAsset>("AccountConnection");AccountConnection connection=null;try{if(config)connection=JsonUtility.FromJson<AccountConnection>(config.text);}catch{}
    connection=connection??new AccountConnection();Configured=connection.IsValid();SetSession(new UnityAccountTransport(this,connection));
-   gameObject.AddComponent<AccountView>();SceneManager.sceneLoaded+=SceneLoaded;
+   view=gameObject.AddComponent<AccountView>();SceneManager.sceneLoaded+=SceneLoaded;
   }
-  void SceneLoaded(Scene scene,LoadSceneMode mode){Revoke();Page=Session.IsAuthenticated?Screen.Nickname:Screen.Start;World.Capture();}
+  void SceneLoaded(Scene scene, LoadSceneMode mode)
+  {
+   Revoke();
+   World.Capture();
+   var profile = Session.Profile;
+   if (Session.IsAuthenticated && profile != null && !string.IsNullOrWhiteSpace(profile.nickname))
+    EnterWorld(profile);
+   else
+    Page = Session.HasSession && !Session.RecoveryPending ? Screen.LoadingProfile : Screen.Start;
+  }
   void SetSession(IAccountTransport transport)
   {
    if(Session!=null){Session.Changed-=SessionChanged;Session.Dispose();}Session=new AccountSession(transport);Session.Changed+=SessionChanged;
   }
   // Dependency injection for editor fixtures and future platform transports, not an auth bypass.
-  public void Configure(IAccountTransport transport){Revoke();SetSession(transport);Configured=true;Page=Screen.Start;}
+  public void Configure(IAccountTransport transport) => Configure(transport, false);
+  public void Configure(IAccountTransport transport, bool enableLobby)
+  {
+   Revoke();
+   LobbyEnabled = enableLobby;
+   SetSession(transport);
+   Configured = true;
+   Page = Screen.Start;
+  }
   void SessionChanged(){if(!Session.IsAuthenticated&&Ready){Revoke();Page=Screen.Login;}}
   public void Revoke(){bool wasReady=Ready;Ready=false;if(backdrop)backdrop.enabled=true;if(World)World.Block();if(wasReady)EntryRevoked?.Invoke();}
-  public async Task LoginAsync(string email,string password){Revoke();await Session.SignInAsync(email,password);Page=Screen.Nickname;await Session.ReadProfileAsync();}
-  public async Task SignupAsync(string email,string password){Revoke();await Session.SignUpAsync(email,password);Page=Screen.SignupCode;Message="메일의 확인 코드를 입력해 주세요.";}
-  public async Task VerifySignupAsync(string email,string code){await Session.VerifySignupCodeAsync(email,code);Page=Screen.Nickname;await Session.ReadProfileAsync();}
+  public async Task LoginAsync(string email, string password)
+  {
+   Revoke();
+   try { await Session.SignInAsync(email, password); }
+   catch (AccountException e) when (e.Code == "email_not_confirmed")
+   {
+    Page = Screen.SignupCode;
+    throw;
+   }
+   await LoadProfileAndEnterAsync();
+  }
+  public async Task SignupAsync(string email, string password)
+  {
+   Revoke();
+   try { await Session.SignUpAsync(email, password); }
+   catch (AccountException e) when (e.Code == "user_already_exists" || e.Code == "email_exists")
+   {
+    Page = Screen.Login;
+    throw;
+   }
+   OpenAccessPage(Screen.SignupReceipt);
+  }
+  public async Task VerifySignupAsync(string email, string code)
+  {
+   await Session.VerifySignupCodeAsync(email, code);
+   await LoadProfileAndEnterAsync();
+  }
   public async Task RecoverAsync(string email){Revoke();await Session.BeginPasswordRecoveryAsync(email);Page=Screen.RecoveryCode;Message="등록된 이메일이라면 재설정 코드가 전송됩니다.";}
   public async Task VerifyRecoveryAsync(string email,string code){await Session.VerifyRecoveryCodeAsync(email,code);Page=Screen.NewPassword;}
   public async Task ResetPasswordAsync(string password){await Session.UpdatePasswordAsync(password);Page=Screen.Login;Message="비밀번호를 변경했습니다. 다시 로그인해 주세요.";}
-  public async Task EnterAsync(string nickname)
+  internal void OpenAccessPage(Screen page)
   {
-   var profile=await Session.EnterAsync(nickname);Ready=true;if(backdrop)backdrop.enabled=false;Page=Screen.World;World.Release();EntryReady?.Invoke(profile);
+   Message = "";
+   Page = page;
   }
-  public async Task LogoutAsync(){operation++;Busy=false;Revoke();Page=Screen.Start;Message="로그아웃했습니다.";await Session.SignOutAsync();}
+  internal async Task ResendSignupCodeAsync(string email)
+  {
+   await Session.ResendSignupAsync(email);
+   Message = "인증 메일을 확인해 주세요. 이미 가입한 이메일이라면 로그인해 주세요.";
+  }
+  public async Task LoadProfileAndEnterAsync()
+  {
+   var session = Session;
+   Page = Screen.LoadingProfile;
+   var profile = await session.ReadProfileAsync();
+   if (string.IsNullOrWhiteSpace(profile.nickname))
+    profile = await session.EnterAsync("학생");
+
+   if (session != Session || !session.IsAuthenticated || session.Profile != profile)
+    throw new OperationCanceledException();
+   EnterWorld(profile);
+  }
+
+  void EnterWorld(AccountProfile profile)
+  {
+   Ready = true;
+   if (backdrop) backdrop.enabled = false;
+   Page = Screen.World;
+   World.Release();
+   EntryReady?.Invoke(profile);
+  }
+
+  public async Task ChangeNicknameAsync(string nickname)
+  {
+   if (!Ready || !Session.IsAuthenticated) throw new AccountException(401, "not_signed_in");
+   var session = Session;
+   await session.EnterAsync(nickname);
+   if (session != Session || !Ready) throw new OperationCanceledException();
+   Message = "닉네임을 저장했습니다.";
+  }
+  public async Task LogoutAsync(){operation++;Busy=false;Revoke();Page=Screen.Login;Message="";await Session.SignOutAsync();}
   public async void Perform(Func<Task> action)
   {
    if(Busy)return;int id=++operation;Busy=true;Message="";
    try{await action();}
    catch(OperationCanceledException){}
-   catch(AccountException e){if(id==operation){Message=Describe(e);if(!Session.IsAuthenticated&&!Session.RecoveryPending&&Page==Screen.Nickname)Page=Screen.Login;}}
+   catch(AccountException e){if(id==operation){Message=Describe(e);if(!Session.HasSession&&Page==Screen.LoadingProfile)Page=Screen.Login;}}
    catch(Exception){if(id==operation)Message="요청을 완료하지 못했습니다. 연결 상태를 확인하고 다시 시도해 주세요.";}
    finally{if(id==operation)Busy=false;}
   }
   async void Update()
   {
-   if(Ready&&Session.TokenExpired){Revoke();Page=Screen.Nickname;Message="로그인 유효 시간이 지났습니다. 연결을 확인하고 내 정보를 다시 불러오거나 다시 로그인해 주세요.";}
+   if(Ready&&Session.TokenExpired){Revoke();Page=Screen.LoadingProfile;Message="로그인 유효 시간이 지났습니다. 연결을 확인하고 다시 시도해 주세요.";}
    if(!Ready||Busy||Time.unscaledTime<refreshAt)return;refreshAt=Time.unscaledTime+20;
    try{await Session.EnsureFreshAsync();}catch(AccountException e){Message=Describe(e);if(!Session.IsAuthenticated){Revoke();Page=Screen.Login;}}catch(OperationCanceledException){}
    catch{Message="서버 연결을 확인해 주세요.";}
@@ -77,12 +157,14 @@ namespace CampusCommons.Account
    switch(e.Code)
    {
     case "configuration_required":return "Supabase 연결 설정이 필요합니다. 설정 안내를 확인해 주세요.";
+    case "user_already_exists":case "email_exists":return "이미 가입한 이메일입니다. 로그인하거나 비밀번호를 찾아 주세요.";
     case "invalid_email":return "올바른 이메일 주소를 입력해 주세요.";
     case "password_mismatch":return "비밀번호 확인 값이 일치하지 않습니다.";
+    case "same_password":return "기존 비밀번호와 같습니다. 다른 비밀번호를 입력해 주세요.";
     case "weak_password":return "비밀번호는 12~128자로 입력해 주세요.";
     case "invalid_nickname":return "닉네임은 2~12자로 입력해 주세요. 줄바꿈·태그·제어문자는 사용할 수 없습니다.";
     case "invalid_code":case "otp_expired":return "확인 코드가 올바르지 않거나 만료됐습니다. 코드를 다시 확인하거나 재전송해 주세요.";
-    case "email_not_confirmed":return "이메일 확인 후 로그인해 주세요. 확인 코드 재전송을 이용할 수 있습니다.";
+    case "email_not_confirmed":return "이메일 인증이 필요합니다. 메일로 받은 코드를 입력하거나 인증 코드를 다시 받아 주세요.";
     case "invalid_credentials":return "이메일 또는 비밀번호가 맞지 않습니다.";
     case "over_email_send_rate_limit":case "over_request_rate_limit":return "요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.";
     case "invalid_profile":return "사용자 정보를 확인하지 못했습니다. 다시 불러와 주세요.";
