@@ -33,6 +33,7 @@ namespace CampusCommons.Multiplayer
         public string id, nickname;
         public int slot, level;
         public LobbyMove pose;
+        public LobbyAppearance appearance;
     }
 
     [Serializable]
@@ -40,6 +41,7 @@ namespace CampusCommons.Multiplayer
     {
         public string type, self_id;
         public long revision;
+        public int appearance_version;
         public LobbyPeer[] players;
     }
 #pragma warning restore 0649
@@ -53,6 +55,8 @@ namespace CampusCommons.Multiplayer
         bool stopped;
         int nextSequence;
         LobbyMove last;
+        LobbyAppearance lastAppearance;
+        public bool SupportsAppearance { get; private set; }
 
         public void Stop()
         {
@@ -64,26 +68,39 @@ namespace CampusCommons.Multiplayer
 
         // LateUpdate invokes this at most ten times per second. A slow send drops
         // intermediate poses, so it cannot build a queue of stale positions.
-        public void Publish(LobbyMove pose)
+        public void Publish(LobbyMove pose, LobbyAppearance appearance)
         {
-            if (!pendingSend.IsCompleted || socket?.State != WebSocketState.Open || !pose.ChangedSince(last))
-                return;
-            pose.seq = nextSequence++;
-            last = pose;
-            pendingSend = SendAsync(Encoding.UTF8.GetBytes(JsonUtility.ToJson(pose)));
+            if (!pendingSend.IsCompleted || socket?.State != WebSocketState.Open) return;
+            string style = null, movement = null;
+            if (SupportsAppearance && appearance != null && !appearance.Matches(lastAppearance))
+            {
+                style = JsonUtility.ToJson(appearance);
+                lastAppearance = appearance;
+            }
+            if (pose.ChangedSince(last))
+            {
+                pose.seq = nextSequence++;
+                movement = JsonUtility.ToJson(pose);
+                last = pose;
+            }
+            if (style != null || movement != null) pendingSend = SendAsync(style, movement);
         }
 
-        async Task SendAsync(byte[] data)
+        async Task SendAsync(string style, string movement)
         {
             try
             {
-                await socket.SendAsync(new ArraySegment<byte>(data), WebSocketMessageType.Text, true, lifetime.Token);
+                if (style != null) await SendText(style);
+                if (movement != null) await SendText(movement);
             }
             catch (Exception)
             {
                 if (!lifetime.IsCancellationRequested) Stop();
             }
         }
+
+        Task SendText(string json) => socket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(json)),
+            WebSocketMessageType.Text, true, lifetime.Token);
 
         public async Task<int> RunAsync(AccountSession session, string user, Action<LobbyFrame> apply)
         {
@@ -114,6 +131,7 @@ namespace CampusCommons.Multiplayer
 
                     lifetime.Token.ThrowIfCancellationRequested();
                     var frame = JsonUtility.FromJson<LobbyFrame>(Encoding.UTF8.GetString(buffer, 0, length));
+                    if (frame?.type == "welcome") SupportsAppearance = frame.appearance_version == 1;
                     apply(frame);
                     if (frame.type == "welcome") lifetime.CancelAfter(Timeout.Infinite);
                 }

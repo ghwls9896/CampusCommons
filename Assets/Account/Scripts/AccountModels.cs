@@ -3,9 +3,11 @@ using System.Globalization;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using CampusCommons.Multiplayer;
 namespace CampusCommons.Account
 {
- [Serializable] public sealed class AuthUser { public string id,email,email_confirmed_at; public bool is_anonymous; }
+ [Serializable] public sealed class AuthUser { public string id,email,email_confirmed_at; public bool is_anonymous; public AvatarUserMetadata user_metadata; }
+ [Serializable] public sealed class AvatarUserMetadata { public LobbyAppearance campus_avatar_v1; }
  [Serializable] public sealed class AuthResponse { public string access_token,refresh_token; public long expires_at,expires_in; public AuthUser user; }
  [Serializable] public sealed class AccountProfile { public string user_id,nickname; public int level; }
  [Serializable] public sealed class Credentials {public string email,password;}
