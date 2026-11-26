@@ -1,0 +1,40 @@
+{
+  "id": "cc-32",
+  "title": "캐릭터 외형 퀄리티 개선 및 아우라·망토·특수 이펙트 정리",
+  "owner": "GongBeak",
+  "branch": "feat/cc-32-level-progression",
+  "issue": "https://github.com/ghwls9896/CampusCommons/issues/32",
+
+
+  "scope": [
+    "Assets/TeamProgression/",
+    "Assets/TeamProgression.meta",
+    "Assets/Resources.meta",
+    "Assets/Resources/TeamProgression.meta",
+    "Assets/Resources/TeamProgression/",
+    "Assets/TeamInventory/LibraryInventoryUI.cs",
+    "Assets/TeamAvatar/LibraryAvatarCustomizerUI.cs",
+    "docs/tasks/cc-32.json",
+    "docs/LEVEL_PROGRESSION.md"
+  ],
+
+
+  "shared_files": [],
+  "depends_on": [
+    "cc-8",
+    "cc-19",
+    "cc-21",
+    "cc-24"
+  ],
+
+  "validation": [
+    "XP 지급, HUD, 게임 결과 연동 코드가 PR에서 제거되었는지 확인",
+    "캐릭터 외형 및 읽기 전용 계정 레벨 조회 유지",
+    "Unity 6000.4.5f1 C# 컴파일 확인",
+    "기본/Lv.5/Lv.10/Lv.15 외형 프리뷰 검증",
+    "남녀 캐릭터와 이동·달리기·착석 시 외형 간섭 검증",
+    "Sunbox 미설치 환경의 컴파일 호환성 확인",
+    "외부 라이선스 에셋 및 팀 공통 파일 미포함 확인",
+    "python Tools/team/check.py --base origin/main"
+  ]
+}
