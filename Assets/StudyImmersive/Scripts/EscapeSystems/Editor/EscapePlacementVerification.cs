@@ -23,7 +23,13 @@ public static class EscapePlacementVerification
  var school=game.schoolRoot.Find("Escape School");Check(school,"School missing");
  var desks=new[]{new Vector3(-12.25f,.788f,35f),new Vector3(10.5f,.788f,35f),new Vector3(-10.5f,.788f,16.25f),new Vector3(-10f,.788f,1.25f),new Vector3(14.75f,.788f,-12.5f)};
  foreach(var p in game.PendingSheetPositions){var local=school.InverseTransformPoint(p);var rooms=new[]{new Vector3(32f,0,-26f),new Vector3(22.5f,0,0f)};Check(desks.Any(d=>Vector3.Distance(local,d)<.6f)||rooms.Any(d=>Vector3.Distance(local,d)<.1f),"Sheet is outside an approved room: "+p);var path=new System.Collections.Generic.List<Vector3>();Check(game.schoolGrid.FindPath(game.schoolArrival,p,path),"Sheet room is unreachable: "+p);}
- var world=game.World;Check(world,"World missing");var professor=GameObject.Find("Professor");Check(professor && professor.GetComponentInChildren<SpriteRenderer>(),"Professor missing or invisible");Check(Vector3.Distance(professor.transform.position,player.transform.position)<=12.1f,"Professor too far from start");
+ var world=game.World;Check(world,"World missing");var professor=GameObject.Find("Professor");Check(professor && professor.GetComponentInChildren<SpriteRenderer>(),"Professor missing or invisible");var cast = new[]{professor,GameObject.Find("Maintenance Worker"),world.GetComponentInChildren<EscapeCorridorCleaner>().gameObject};
+ foreach(var npc in cast){
+    var point=npc.transform.position;
+    Check(Vector3.Distance(point,player.transform.position)>=7.99f,"NPC too close to entry");
+    Check(game.schoolGrid.FindPath(player.transform.position,point,new System.Collections.Generic.List<Vector3>()),"Unreachable NPC");
+    foreach(var other in cast)if(other!=npc)Check(Vector3.Distance(point,other.transform.position)>=4.99f,"NPC spawn overlap");
+ }
  var machine=GameObject.Find("Soda vending machine");Check(machine,"Machine missing");var front=machine.transform.Find("Photographic vending front");Check(front && front.GetComponent<Renderer>().sharedMaterial.mainTexture,"Photo missing");var logo=machine.transform.Find("KIT university logo");Check(logo && logo.GetComponent<Renderer>().sharedMaterial.mainTexture,"KIT logo missing");
  var list=(IList)Field(world,"pickups");Check(list.Count==5,"Wrong number of pickups: "+list.Count);
  var positions=list.Cast<object>().Select(x=>((GameObject)Field(x,"root")).transform.position).ToArray();for(int i=0;i<positions.Length;i++)for(int j=i+1;j<positions.Length;j++)Check(Vector3.Distance(positions[i],positions[j])>=4.99f,"Pickups too close");

@@ -8,7 +8,6 @@ namespace CampusCommons.StudyImmersive
     public sealed class EscapeCorridorCleaner : MonoBehaviour
     {
         // Endpoints stop near the actual corridor walls, leaving room for a pushed player.
-        static readonly Vector3 SpawnPoint = new Vector3(527.5f, .08f, -27f);
         static readonly Vector3[] CorridorNodes = {
             new Vector3(527.5f, .08f, -46f),
             new Vector3(527.5f, .08f, -18.5f),
@@ -64,7 +63,7 @@ namespace CampusCommons.StudyImmersive
         Vector3 direction, facingDirection;
         public bool IsPushing => pushing;
 
-        public static EscapeCorridorCleaner Create(EscapeGame owner, EscapeWorld ownerWorld, Transform target, Door[] roomDoors)
+        public static EscapeCorridorCleaner Create(EscapeGame owner, EscapeWorld ownerWorld, Transform target, Door[] roomDoors, Vector3 spawn)
         {
             var atlas = Resources.Load<Texture2D>("EscapePixels/CleaningRobot8");
             if (!atlas || !owner || !ownerWorld || !target) return null;
@@ -72,7 +71,7 @@ namespace CampusCommons.StudyImmersive
             if (!targetBody) return null;
             var root = new GameObject("Corridor cleaning robot");
             root.transform.SetParent(ownerWorld.transform, true);
-            root.transform.position = SpawnPoint;
+            root.transform.position = spawn;
             var cleaner = root.AddComponent<EscapeCorridorCleaner>();
             cleaner.game = owner;
             cleaner.world = ownerWorld;
