@@ -44,6 +44,8 @@ namespace CampusCommons.Webcam.Editor
             {
                 var manifest = JsonUtility.FromJson<RuntimePackageManifest>(File.ReadAllText(Path.Combine(Package, "manifest.json")));
                 RuntimePackageInstaller.Validate(manifest, platform);
+                if (manifest.studyProtocol != 1)
+                    throw new InvalidDataException("Combined study runtime package required.");
                 if (platform == "macos-arm64" && manifest.minimumOS != "15.0") throw new InvalidDataException("macOS runtime minimum must be 15.0.");
                 string archive = Path.Combine(Package, manifest.archive);
                 if (new FileInfo(archive).Length != manifest.archiveBytes || RuntimePackageInstaller.HashFile(archive, CancellationToken.None) != manifest.sha256)
@@ -80,19 +82,30 @@ namespace CampusCommons.Webcam.Editor
                     scenes = new[] { "Assets/StudyImmersive/Scenes/GrandLibrary_Living.unity" },
                     locationPathName = path, target = target, options = BuildOptions.None });
                 if (report.summary.result != BuildResult.Succeeded) throw new BuildFailedException("Distribution build failed: " + report.summary.result);
-                if (target == BuildTarget.StandaloneOSX) VerifyMacPlist(path);
+                if (target == BuildTarget.StandaloneOSX) FinalizeMacBundle(path);
                 Debug.Log("DESKTOP_DISTRIBUTION_BUILD_PASS platform=" + target + " bytes=" + report.summary.totalSize);
             }
             finally { PlayerSettings.SetScriptingBackend(NamedBuildTarget.Standalone, previous); PlayerSettings.iOS.cameraUsageDescription = previousCamera; MacMinimum(previousMinimum); }
         }
-        static void VerifyMacPlist(string app)
+        static void FinalizeMacBundle(string app)
         {
-            var info = new System.Diagnostics.ProcessStartInfo("/usr/bin/plutil", "-lint \"" + Path.GetFullPath(Path.Combine(app, "Contents/Info.plist")) + "\"")
+            string bundle = "\"" + Path.GetFullPath(app) + "\"";
+            RunBundleTool("/usr/bin/plutil", "-lint \"" + Path.GetFullPath(Path.Combine(app, "Contents/Info.plist")) + "\"");
+            // The camera description is written after Unity's initial ad-hoc signature.
+            RunBundleTool("/usr/bin/codesign", "--force --sign - " + bundle);
+            RunBundleTool("/usr/bin/codesign", "--verify --deep --strict " + bundle);
+        }
+        static void RunBundleTool(string executable, string arguments)
+        {
+            var info = new System.Diagnostics.ProcessStartInfo(executable, arguments)
                 { UseShellExecute = false, RedirectStandardOutput = true, RedirectStandardError = true };
             using (var process = System.Diagnostics.Process.Start(info))
             {
-                process.StandardOutput.ReadToEnd(); process.StandardError.ReadToEnd(); process.WaitForExit();
-                if (process.ExitCode != 0) throw new BuildFailedException("macOS rejected the generated Info.plist.");
+                var output = process.StandardOutput.ReadToEndAsync();
+                var error = process.StandardError.ReadToEndAsync();
+                process.WaitForExit();
+                if (process.ExitCode != 0)
+                    throw new BuildFailedException(executable + " failed. " + error.GetAwaiter().GetResult() + output.GetAwaiter().GetResult());
             }
         }
         // Unity serializes this macOS setting but does not expose a public typed setter.

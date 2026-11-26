@@ -10,3 +10,4 @@ Pillow==12.3.0
 safetensors==0.8.0
 pydantic==2.13.5
 huggingface-hub==1.33.0
+windows-capture==2.0.1; sys_platform == "win32" and platform_machine == "AMD64"

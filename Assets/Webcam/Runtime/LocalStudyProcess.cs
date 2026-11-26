@@ -28,7 +28,7 @@ namespace CampusCommons.Webcam
             Origin="http://127.0.0.1:"+port;Token=Guid.NewGuid().ToString("N")+Guid.NewGuid().ToString("N");
             var info=new ProcessStartInfo(python) {UseShellExecute=false,CreateNoWindow=true,
                 WorkingDirectory=root,RedirectStandardOutput=true,RedirectStandardError=true,
-                Arguments="-u "+Quote(script)+" --model-dir "+Quote(Path.Combine(root,"model"))+" --cache-dir "+Quote(Path.Combine(root,"hf-cache","hub"))+" --port "+port};
+                Arguments="-u "+Quote(script)+" --unity-study --model-dir "+Quote(Path.Combine(root,"model"))+" --cache-dir "+Quote(Path.Combine(root,"hf-cache","hub"))+" --port "+port};
             info.EnvironmentVariables["QEV_SESSION_TOKEN"]=Token;
             info.EnvironmentVariables["QEV_PARENT_PID"]=Process.GetCurrentProcess().Id.ToString();
             info.EnvironmentVariables.Remove("PYTHONHOME");
