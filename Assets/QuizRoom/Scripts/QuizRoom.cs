@@ -15,6 +15,8 @@ namespace CampusCommons.Quiz
     [RequireComponent(typeof(Player))]
     public sealed class QuizRoom : MonoBehaviour
     {
+        static readonly string[] QuestionTypes = { "객관식", "단답형", "주관식" };
+
         Player player;
         Seat[] chairs;
         Seat occupied;
@@ -47,7 +49,9 @@ namespace CampusCommons.Quiz
         byte[] documentBytes;
 
         bool InRoom => player && player.currentSpace == Portal.Space.Quiz;
-        public bool BlocksMovement => enabled && InRoom && occupied && occupied.occupant == player;
+        bool IsSeated => enabled && InRoom && occupied && occupied.occupant == player;
+        public bool BlocksMovement => IsSeated && state != null &&
+            (state.phase == "results" || (state.phase != "waiting" && state.players.Length == 2));
         public QuizDuelState Match => state;
 
         void Awake()
@@ -75,7 +79,8 @@ namespace CampusCommons.Quiz
                 theme = new QuizTheme(screen, boardCamera, EndVisit);
                 boardDirty = true;
             }
-            if (BlocksMovement)
+            bool showMatch = BlocksMovement;
+            if (showMatch)
             {
                 if (!framed)
                 {
@@ -85,7 +90,8 @@ namespace CampusCommons.Quiz
                 theme.Frame(boardCamera);
                 framed = true;
             }
-            theme.SetInteraction(BlocksMovement && !player.IsExitConfirmOpen && !AccountGate.LobbyOverlayOwnsInput);
+            else RestoreBoardView();
+            theme.SetInteraction(showMatch && !player.IsExitConfirmOpen && !AccountGate.LobbyOverlayOwnsInput);
             RefreshBoard();
         }
 
@@ -219,6 +225,14 @@ namespace CampusCommons.Quiz
         void OnDisable() { EndVisit(); RemoveBoard(); chairs = null; }
         void OnDestroy() { RemoveBoard(); }
 
+        void RestoreBoardView()
+        {
+            if (!framed) return;
+            framed = false;
+            if (player && player.isActiveAndEnabled) player.RefreshView();
+            else if (boardCamera) boardCamera.transform.SetPositionAndRotation(previousCameraPosition, previousCameraRotation);
+        }
+
         void EndVisit()
         {
             CancelPicker();
@@ -233,12 +247,7 @@ namespace CampusCommons.Quiz
                 // AccountWorldGate disables the controller before it disables this component.
                 if (!player.enabled && player.TryGetComponent<CharacterController>(out var body)) body.enabled = false;
             }
-            if (framed)
-            {
-                if (player && player.isActiveAndEnabled) player.RefreshView();
-                else if (boardCamera) boardCamera.transform.SetPositionAndRotation(previousCameraPosition, previousCameraRotation);
-            }
-            framed = false;
+            RestoreBoardView();
             boardDirty = true;
             occupied = null;
             state = null;
@@ -408,10 +417,13 @@ namespace CampusCommons.Quiz
         {
             if (!InRoom || !player.isActiveAndEnabled || BlocksMovement || player.IsExitConfirmOpen ||
                 AccountGate.LobbyOverlayOwnsInput || chairs == null) return;
-            // Match Player.Update's actual E interaction origin and distance.
-            var origin = player.transform.position + Vector3.up * .6f;
-            if (!Array.Exists(chairs, chair => chair && !chair.occupant &&
-                (chair.transform.position - origin).sqrMagnitude < 1.65f * 1.65f)) return;
+            if (!IsSeated)
+            {
+                // Match Player.Update's E interaction origin and distance.
+                var origin = player.transform.position + Vector3.up * .6f;
+                if (!Array.Exists(chairs, chair => chair && !chair.occupant &&
+                    (chair.transform.position - origin).sqrMagnitude < 1.65f * 1.65f)) return;
+            }
             if (chairHint == null)
             {
                 chairHint = new GUIStyle(GUI.skin.box) {
@@ -421,8 +433,19 @@ namespace CampusCommons.Quiz
             }
             float scale = Mathf.Min(Screen.width / 1280f, Screen.height / 720f);
             chairHint.fontSize = Mathf.Max(12, Mathf.RoundToInt(19 * scale));
-            GUI.Box(new Rect(Screen.width * .5f - 66 * scale, Screen.height * .79f, 132 * scale, 42 * scale),
-                "E   앉기", chairHint);
+            if (IsSeated)
+            {
+                string waiting = state == null ? "좌석 연결 중…" : "상대 참가자 대기 중 · 1/2";
+                if (!string.IsNullOrEmpty(connectionNotice)) waiting = connectionNotice;
+                float width = Mathf.Min(Screen.width * .92f, Mathf.Max(310, 410 * scale));
+                GUI.Box(new Rect((Screen.width - width) * .5f, Screen.height * .83f, width, Mathf.Max(48, 54 * scale)),
+                    waiting + "\n우클릭으로 둘러보기 · E 일어나기", chairHint);
+            }
+            else
+            {
+                GUI.Box(new Rect(Screen.width * .5f - 66 * scale, Screen.height * .79f, 132 * scale, 42 * scale),
+                    "E   앉기", chairHint);
+            }
         }
 
         void RefreshBoard()
@@ -436,7 +459,6 @@ namespace CampusCommons.Quiz
                 clock = saveStatus = null;
                 theme.BeginPage("2인 PDF 퀴즈", BlocksMovement);
                 if (!BlocksMovement) DrawRules();
-                else if (state == null) theme.Line("좌석 연결 중…", 30, true);
                 else DrawMatch();
             }
 
@@ -459,8 +481,9 @@ namespace CampusCommons.Quiz
         void DrawRules()
         {
             theme.Line("두 사람이 한 자리씩 앉아 각자 공부한 PDF를 선택하세요.", 48, true).alignment = TextAnchor.MiddleCenter;
-            theme.Line("객관식 10초   ·   단답형 15초   ·   서술형 20초", 61, true, true).alignment = TextAnchor.MiddleCenter;
-            theme.Line("각 단계는 10점입니다. 두 사람의 총점, 정답률, 풀이 시간을 비교하세요.", 40).alignment = TextAnchor.MiddleCenter;
+            theme.Line("객관식 15초 · 2점   /   단답형 30초 · 3점   /   주관식 60초 · 5점", 61, true, true)
+                .alignment = TextAnchor.MiddleCenter;
+            theme.Line("총 10점 · 정확도와 풀이 시간으로 경기 XP를 계산합니다.", 40).alignment = TextAnchor.MiddleCenter;
         }
 
         void DrawMatch()
@@ -470,11 +493,6 @@ namespace CampusCommons.Quiz
             theme.Line(players, 19, false, true);
             switch (state.phase)
             {
-                case "waiting":
-                    theme.Line("상대 참가자를 기다리는 중  ·  1 / 2", 30, true);
-                    theme.Line("다른 계정이 나머지 좌석에 앉으면 각자의 PDF를 선택할 수 있습니다.");
-                    theme.Line("객관식 10초   ·   단답형 15초   ·   서술형 20초", 23, false, true);
-                    break;
                 case "upload":
                     DrawUpload();
                     break;
@@ -537,8 +555,7 @@ namespace CampusCommons.Quiz
                 theme.Line("상대의 풀이가 끝나기를 기다리는 중…", 28, true);
                 return;
             }
-            var names = new[] { "객관식", "단답형", "서술형" };
-            theme.Line(q.level + "단계  ·  " + names[q.level - 1] + "   /   " + state.DifficultyLabel, 22, true, true);
+            theme.Line(q.level + "단계  ·  " + QuestionTypes[q.level - 1] + "   /   " + state.DifficultyLabel, 22, true, true);
             clock = theme.Line("", 23, true);
             theme.Line(q.prompt, 27, true);
             if (q.level == 1 && q.options != null)
@@ -562,25 +579,35 @@ namespace CampusCommons.Quiz
         void DrawResults()
         {
             theme.Line("대전 결과", 32, true);
-            theme.Line("정답률은 세 문제 중 만점을 받은 비율입니다. 총점에는 부분점수를 포함합니다.", 20);
             if (state.results == null) return;
+            if (Array.Exists(state.results, result => result.max_points > 0))
+                theme.Line("객관식은 정오로, 단답형·주관식은 AI가 기준별로 채점합니다.", 20);
             foreach (var result in state.results)
             {
+                bool weighted = result.max_points > 0;
+                string score = weighted ? Score(result.earned_points, result.max_points) : Score(result.score, 30);
                 theme.Line((result.slot == state.self_slot ? "나  " : "상대  ") + result.nickname +
-                    "   ·   " + result.score + " / 30점", 25, true, true);
-                theme.Line("정답률  " + result.accuracy.ToString("0.#") + "% (" + result.correct +
-                    "/3)     풀이 시간  " + (result.elapsed_ms / 1000d).ToString("0.0") + "초", 22);
+                    "   ·   " + score + (weighted ? "   ·   경기 XP " + result.xp : ""), 25, true, true);
+                string accuracy = weighted ? $"종합 정확도 {result.accuracy_percent:0.00}%" :
+                    $"정답률 {result.accuracy:0.#}% ({result.correct}/3)";
+                theme.Line(accuracy + "    ·    풀이 시간 " + Duration(result.elapsed_ms), 22);
                 if (result.stages == null) continue;
                 foreach (var stage in result.stages)
-                    theme.Line(stage.level + "단계    " + stage.score + " / 10점    " +
-                        (stage.elapsed_ms / 1000d).ToString("0.0") + "초", 18);
+                {
+                    string details = stage.max_points > 0
+                        ? $"{Score(stage.earned_points, stage.max_points)}    ·    정확도 {stage.accuracy_percent:0.00}%    ·    +{stage.xp} XP"
+                        : Score(stage.score, 10);
+                    theme.Line(QuestionTypes[stage.level - 1] + "    ·    " + Duration(stage.elapsed_ms) +
+                        "    ·    " + details, 18);
+                }
             }
             if (state.review == null || state.review.Length == 0) return;
             theme.Line("내 PDF 풀이 복습", 28, true);
             foreach (var item in state.review)
             {
                 theme.Line(item.level + "단계    ·    PDF " + item.source_page + "페이지    ·    " +
-                    item.score + "/10점", 22, true, true);
+                    (item.max_points > 0 ? Score(item.earned_points, item.max_points) : Score(item.score, 10)),
+                    22, true, true);
                 theme.Line(item.prompt, 24, true);
                 theme.Line("내 답    " + (string.IsNullOrEmpty(item.answer) ? "미응답" : item.answer));
                 theme.Line("모범 답    " + item.model_answer);
@@ -588,5 +615,8 @@ namespace CampusCommons.Quiz
                 if (!string.IsNullOrEmpty(item.feedback)) theme.Line(item.feedback, 20);
             }
         }
+
+        static string Score(float points, int max) => $"{points:0.##} / {max}점";
+        static string Duration(int milliseconds) => $"{milliseconds / 1000d:0.0}초";
     }
 }

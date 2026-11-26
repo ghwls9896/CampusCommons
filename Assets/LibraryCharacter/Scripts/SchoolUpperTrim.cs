@@ -14,7 +14,8 @@ namespace CampusCommons.LibraryCharacter
             var root=new GameObject("School Upper Blue Trim");
             if(mapRoot)root.transform.SetParent(mapRoot,true);
             root.AddComponent<MeshFilter>().sharedMesh=mesh;
-            var material=new Material(Shader.Find("Unlit/Texture")){name="School Upper Blue Trim (runtime)",mainTexture=texture};
+            var material=new Material(Shader.Find("Standard")){name="School Upper Blue Trim (runtime)",mainTexture=texture};
+            material.SetFloat("_Glossiness",.30f);
             root.AddComponent<MeshRenderer>().sharedMaterial=material;
         }
     }

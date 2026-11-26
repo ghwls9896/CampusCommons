@@ -343,12 +343,22 @@ def test_semantic_grader_provider_contract_and_empty_answer_override():
         body=json.loads(request.content)
         assert 'inlineData' not in str(body)
         assert '모범답안' in body['systemInstruction']['parts'][0]['text']
-        assert body['generationConfig']['responseFormat']['text']['schema']['type']=='object'
-        return httpx.Response(200,json={'candidates':[{'finishReason':'STOP','content':{'parts':[{'text':json.dumps({'grades':[{'level':2,'criterion_scores':[10],'feedback':'동일한 의미입니다.'},{'level':3,'criterion_scores':[10],'feedback':'제출 성공'}]})}]}}]})
+        schema = body['generationConfig']['responseFormat']['text']['schema']
+        accuracy = schema['$defs']['PreciseGrade']['properties']['criterion_accuracy']['items']
+        assert (accuracy['type'], accuracy['minimum'], accuracy['maximum']) == ('number', 0, 100)
+        result = {'grades': [
+            {'level': 2, 'criterion_accuracy': [91.25], 'feedback': '핵심 의미가 맞습니다.'},
+            {'level': 3, 'criterion_accuracy': [100], 'feedback': '제출 성공'},
+        ]}
+        return httpx.Response(200, json={'candidates': [
+            {'finishReason': 'STOP', 'content': {'parts': [{'text': json.dumps(result)}]}},
+        ]})
     async def run():
         async with httpx.AsyncClient(transport=httpx.MockTransport(upstream)) as client:
             return await grade_answers(answers,'secret','gemini-3.5-flash-lite',client)
-    assert [g['score'] for g in asyncio.run(run())['grades']]==[10,0]
+    grades = asyncio.run(run())['grades']
+    assert [g['criterion_accuracy'] for g in grades] == [[91.25], [0]]
+    assert [g['score'] for g in grades] == [9, 0]
 
 
 def test_invalid_grade_and_grading_timeout_release_busy_slot():

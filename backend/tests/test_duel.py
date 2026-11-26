@@ -31,6 +31,7 @@ class Game:
         self.graded = []
         self.fail_generate_once = False
         self.fail_grade_once = False
+        self.grade_accuracy = None
         self.hold_generation = threading.Event()
         self.hold_generation.set()
         self.cancelled = threading.Event()
@@ -65,6 +66,9 @@ class Game:
         if self.fail_grade_once:
             self.fail_grade_once = False
             raise QuizError('invalid_grading', '다시 채점해 주세요.', 503)
+        if self.grade_accuracy is not None:
+            return {'grades': [{'level': answer.level, 'criterion_accuracy': [accuracy], 'feedback': '채점했습니다.'}
+                               for answer, accuracy in zip(answers, self.grade_accuracy)]}
         return {'grades': [{'level': a.level, 'criterion_scores': [10 if a.answer == '정답' else 5],
                             'feedback': '채점했습니다.'} for a in answers]}
 
@@ -129,7 +133,7 @@ def test_two_seats_use_private_pdfs_common_level_and_server_scored_results(game)
         for user, pages in enumerate((3, 4)):
             state = game.wait('playing', user)
             assert state['target_level'] == 7 and state['self_slot'] == user
-            assert state['remaining_ms'] == 10_000
+            assert state['remaining_ms'] == 15_000
             assert state['question'] == {'level': 1, 'prompt': f'PDF {pages}, 문제 1',
                                          'options': ['가','나','다','라'], 'answer_type': 'multiple_choice'}
             assert 'correct_index' not in json.dumps(state) and not state['results']
@@ -151,9 +155,8 @@ def test_two_seats_use_private_pdfs_common_level_and_server_scored_results(game)
         x, y = a['results']
         assert (x['elapsed_ms'], x['score'], x['correct'], x['accuracy']) == (9000, 30, 3, 100)
         assert (y['elapsed_ms'], y['score'], y['correct'], y['accuracy']) == (11000, 15, 1, 33.3)
-        assert y['stages'] == [{'level': 1, 'score': 0, 'elapsed_ms': 2000},
-                               {'level': 2, 'score': 5, 'elapsed_ms': 4000},
-                               {'level': 3, 'score': 10, 'elapsed_ms': 5000}]
+        assert [(s['level'], s['score'], s['elapsed_ms']) for s in y['stages']] == [
+            (1, 0, 2000), (2, 5, 4000), (3, 10, 5000)]
         assert game.leave(0).status_code == 204
         assert game.state(1)['results'] == a['results']
         assert game.leave(1).status_code == 204
@@ -185,17 +188,42 @@ def test_deadlines_expire_without_client_answers_or_local_clock(game):
     with game.open():
         game.prepare()
         game.wait('playing')
-        game.now += 10
+        game.now += 15
         assert game.move(0, 1, choice=0).json()['question']['level'] == 2
         assert game.move(0, 2, text='임의' * 200).status_code == 422
         assert game.state(1)['question']['level'] == 2
-        game.now += 15
+        game.now += 30
         assert game.state(0)['question']['level'] == 3
-        assert game.state(1)['remaining_ms'] == 20_000
-        game.now += 20
+        assert game.state(1)['remaining_ms'] == 60_000
+        game.now += 30
+        game.state(0)
+        game.state(1)
+        game.now += 30
         results = game.wait('results')['results']
-        assert all(r['elapsed_ms'] == 45000 and r['score'] == 0 and r['correct'] == 0 for r in results)
+        assert all(r['elapsed_ms'] == 105_000 and r['earned_points'] == 0 and r['xp'] == 0 for r in results)
         assert game.graded == []
+
+
+def test_precise_accuracy_scores_weights_and_server_timed_xp(game):
+    game.grade_accuracy = [41.25, 72.5]
+    with game.open():
+        game.prepare()
+        game.wait('playing')
+        for level, elapsed in enumerate((5_000, 15_000, 55_000), 1):
+            if elapsed > 30_000:
+                game.now += 25
+                game.state(0)
+                game.state(1)
+                elapsed -= 25_000
+            game.now += elapsed / 1000
+            assert game.move(0, level, choice=0 if level == 1 else -1, text='' if level == 1 else '답').is_success
+            assert game.move(1, level, choice=1 if level == 1 else -1, text='' if level == 1 else '답').is_success
+        result = game.wait('results')['results'][0]
+        assert (result['earned_points'], result['max_points'], result['accuracy_percent'], result['xp']) == (6.86, 10, 68.62, 61)
+        assert [(s['accuracy_percent'], s['earned_points'], s['max_points'], s['elapsed_ms'], s['xp']) for s in result['stages']] == [
+            (100, 2, 2, 5_000, 19), (41.25, 1.24, 3, 15_000, 11), (72.5, 3.62, 5, 55_000, 31)]
+        wrong = game.state(1)['results'][1]['stages'][0]
+        assert wrong['accuracy_percent'] == wrong['earned_points'] == wrong['xp'] == 0
 
 
 def test_seat_lease_expiration_frees_chair_and_discards_private_files(game):
@@ -237,7 +265,7 @@ def test_renewing_the_same_seat_keeps_round_answer_and_original_deadline(game):
         game.now += 11
         state = game.state(0)
         assert state['round_id'] == original_round and game.state(1)['round_id'] == original_round
-        assert state['question']['level'] == 2 and state['remaining_ms'] == 4000
+        assert state['question']['level'] == 2 and state['remaining_ms'] == 19000
         for user in (0, 1):
             assert game.move(user, 2, text='정답').is_success
             assert game.move(user, 3, text='정답').is_success
@@ -345,18 +373,21 @@ def test_authoritative_timeout_grades_last_draft_and_reveals_only_own_review(gam
         assert draft(1, 1, choice=0, seq=1).is_success
         assert draft(1, 1, choice=-1, seq=2).is_success  # clear the selection
         assert draft(1, 1, choice=0, seq=1).is_success  # delayed write cannot undo clear
-        game.now += 10
+        game.now += 15
         assert draft(0, 1, choice=2).json()['question']['level'] == 2
         assert draft(0, 2, text='정답', seq=2).is_success
         assert draft(0, 2, text='낡은 초안', seq=1).is_success
         assert draft(1, 2, text='다른 참가자의 답').is_success
-        game.now += 15
+        game.now += 30
         assert game.state(0)['question']['level'] == 3
         assert draft(0, 3, text='삭제할 답', seq=1).is_success
         assert draft(0, 3, text='', seq=2).is_success
         assert draft(1, 3, text='정답').is_success
         game.state(1)
-        game.now += 20
+        game.now += 30
+        game.state(0)
+        game.state(1)
+        game.now += 30
         a = game.wait('results')
         b = game.state(1)
         assert a['results'][0]['score'] == 20 and a['results'][1]['score'] == 15

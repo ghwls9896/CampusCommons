@@ -13,7 +13,8 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from lobby import Account, LobbyClose, read_account
 from quiz import AnswerSubmission, QuizError, select_pdf_range, validate_grades
 
-LIMITS = (10, 15, 20)
+LIMITS = (15, 30, 60)
+MAX_POINTS = (2, 3, 5)
 LEASE = 45  # Clients poll during PDF upload, AI processing and play.
 
 
@@ -49,6 +50,7 @@ class Sheet:
     answers: list = field(default_factory=list)
     times: list = field(default_factory=list)
     points: list = field(default_factory=list)
+    accuracies: list = field(default_factory=list)
     feedback: list = field(default_factory=list)
     draft_choice: int = -1
     draft_text: str = ''
@@ -204,9 +206,9 @@ class Duel:
                 answer = me.answers[i]
                 if i == 0:
                     answer = q['options'][answer] if answer >= 0 else ''
-                review.append({'level': i + 1, 'prompt': q['prompt'], 'answer': answer,
+                review.append({**self.stage_result(me, i), 'prompt': q['prompt'], 'answer': answer,
                                'model_answer': q['model_answer'], 'explanation': q['explanation'],
-                               'source_page': q['source_page'], 'score': me.points[i], 'feedback': me.feedback[i]})
+                               'source_page': q['source_page'], 'feedback': me.feedback[i]})
         difficulty_mode = 'account'
         if self.hosted_quiz:
             if not all(sheet.questions for sheet in rd.sheets):
@@ -262,7 +264,7 @@ class Duel:
                     elif phase == 'grading' and not sheet.points:
                         timeout = self.settings.grading_timeout + (90 if self.hosted_quiz else 0)
                         async with asyncio.timeout(timeout):
-                            sheet.points, sheet.feedback = await self.score(sheet, client)
+                            sheet.points, sheet.accuracies, sheet.feedback = await self.score(sheet, client)
             if self.round is not rd:
                 return
             if phase == 'generating':
@@ -286,7 +288,7 @@ class Duel:
         choice = 10 if sheet.answers[0] == sheet.questions[0]['correct_index'] else 0
         first_feedback = '정답입니다.' if choice else ('제출된 답이 없습니다.' if sheet.answers[0] < 0 else '선택한 보기가 정답과 다릅니다.')
         if not any(sheet.answers[1:]):
-            return [choice, 0, 0], [first_feedback, '제출된 답이 없습니다.', '제출된 답이 없습니다.']
+            return [choice, 0, 0], [choice * 10, 0, 0], [first_feedback, '제출된 답이 없습니다.', '제출된 답이 없습니다.']
         answers = [AnswerSubmission(level=i + 1, prompt=sheet.questions[i]['prompt'],
                                     model_answer=sheet.questions[i]['model_answer'],
                                     grading_criteria=sheet.questions[i]['grading_criteria'],
@@ -297,15 +299,33 @@ class Duel:
         else:
             result = await self.grader(answers, self.settings.api_key, self.settings.model, client)
         grades = validate_grades(result, answers)['grades']
-        return [choice] + [g['score'] for g in grades], [first_feedback] + [g['feedback'] for g in grades]
+        percentages = [
+            sum(criterion.max_points * percent for criterion, percent in zip(answer.grading_criteria, grade['criterion_accuracy'])) / 10
+            for answer, grade in zip(answers, grades)
+        ]
+        return [choice] + [g['score'] for g in grades], [choice * 10] + percentages, [first_feedback] + [g['feedback'] for g in grades]
 
     @staticmethod
-    def summary(seat, sheet):
+    def stage_result(sheet, index):
+        accuracy = sheet.accuracies[index]
+        elapsed = sheet.times[index]
+        remaining_fraction = max(0, 1 - elapsed / (LIMITS[index] * 1000))
+        points = MAX_POINTS[index] * accuracy / 100
+        xp = round(10 * points * (.85 + .15 * remaining_fraction))
+        return {'level': index + 1, 'score': sheet.points[index], 'elapsed_ms': elapsed, 'max_points': MAX_POINTS[index],
+                'earned_points': round(points, 2), 'accuracy_percent': round(accuracy, 2), 'xp': xp}
+
+    @classmethod
+    def summary(cls, seat, sheet):
         correct = sheet.points.count(10)
+        stages = [cls.stage_result(sheet, index) for index in range(len(LIMITS))]
+        cap = sum(MAX_POINTS)
+        weighted_accuracy = sum(points * accuracy for points, accuracy in zip(MAX_POINTS, sheet.accuracies)) / cap
+        # Keep the original integer score and completion ratio for deployed clients.
         return {'slot': seat.slot, 'nickname': seat.account.nickname, 'score': sum(sheet.points),
                 'correct': correct, 'accuracy': round(correct * 100 / 3, 1), 'elapsed_ms': sum(sheet.times),
-                'stages': [{'level': i + 1, 'score': score, 'elapsed_ms': sheet.times[i]}
-                           for i, score in enumerate(sheet.points)]}
+                'max_points': cap, 'earned_points': round(weighted_accuracy * cap / 100, 2),
+                'accuracy_percent': round(weighted_accuracy, 2), 'xp': sum(stage['xp'] for stage in stages), 'stages': stages}
 
     def submit(self, seat, answer):
         rd = self.round

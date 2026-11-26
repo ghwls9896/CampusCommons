@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using CampusCommons.Account;
@@ -100,7 +101,9 @@ namespace CampusCommons.Quiz.Editor
                         .Single(c => c.name == "Quiz chalkboard");
                     Check(board.renderMode == RenderMode.WorldSpace && board.worldCamera == Camera.main &&
                         board.transform.parent.name == "Quiz Screen Structure", "Rules are not on the classroom board");
-                    Check(board.GetComponentsInChildren<UnityEngine.UI.Text>().Any(t => t.text.Contains("객관식 10초")),
+                    Check(board.GetComponentsInChildren<UnityEngine.UI.Text>().Any(t =>
+                        t.text.Contains("객관식 15초 · 2점") && t.text.Contains("단답형 30초 · 3점") &&
+                        t.text.Contains("주관식 60초 · 5점")),
                         "Entering the classroom did not show its timing rules");
                     var seats = UnityEngine.Object.FindObjectsByType<Seat>().Where(s => s.name.StartsWith("Quiz Seat ")).ToArray();
                     Check(seats.Length == 2, "Expected two physical quiz seats");
@@ -113,9 +116,43 @@ namespace CampusCommons.Quiz.Editor
                 }
                 if (step == 3)
                 {
-                    Check(room.BlocksMovement && chair.occupant == player, "Seated quiz did not take input");
+                    CheckWaitingBoard("The first player should wait seated with the wall rules visible");
+                    Apply(Round("waiting", false));
+                    step++; changed = Time.time; return;
+                }
+                if (step == 4)
+                {
+                    CheckWaitingBoard("Confirmed solo waiting should keep the seated view and wall rules");
+                    Apply(Round("upload", true));
+                    step++; changed = Time.time; return;
+                }
+                if (step == 5)
+                {
+                    Check(room.BlocksMovement && board.enabled && chair.occupant == player,
+                        "The second player should open the board");
                     Check(board.GetComponentsInChildren<UnityEngine.UI.Button>().Any(b => b.name == "일어나기" && b.interactable),
                         "The seated player cannot interact with the classroom board");
+                    Apply(Round("waiting", false));
+                    step++; changed = Time.time; return;
+                }
+                if (step == 6)
+                {
+                    CheckWaitingBoard("A departing partner should restore the seated view and wall rules");
+                    var results = Round("results", true);
+                    results.results = new[] { new QuizDuelResult {
+                        nickname = "퀴즈검사", max_points = 10, earned_points = 6.86f, xp = 61,
+                        stages = new[] { new QuizDuelStage { level = 2, max_points = 3,
+                            earned_points = 1.24f, accuracy_percent = 41.25f, elapsed_ms = 15000, xp = 11 } }
+                    } };
+                    Apply(results);
+                    step++; changed = Time.time; return;
+                }
+                if (step == 7)
+                {
+                    var labels = board.GetComponentsInChildren<UnityEngine.UI.Text>().Select(t => t.text).ToArray();
+                    Check(labels.Any(t => t.Contains("경기 XP 61")) &&
+                        labels.Any(t => t.Contains("41.25%") && t.Contains("15.0초") && t.Contains("+11 XP")),
+                        "The board should show precise per-question accuracy, time and XP");
                     Check(player.RequestRoomExit() && player.CancelRoomExit(), "Exit cancellation failed");
                     Check(chair.occupant == player, "Cancel exit lost the seat");
                     Check(player.RequestRoomExit() && player.ConfirmRoomExit(), "Exit did not return to lobby");
@@ -129,6 +166,24 @@ namespace CampusCommons.Quiz.Editor
             }
             catch(Exception ex) { Debug.LogException(ex); Finish(1); }
         }
+        static void CheckWaitingBoard(string reason)
+        {
+            Check(!room.BlocksMovement && board.enabled && chair.occupant == player &&
+                board.GetComponentsInChildren<UnityEngine.UI.Text>().Any(t => t.text.Contains("객관식 15초")) &&
+                !board.GetComponentsInChildren<UnityEngine.UI.Button>().Any(b => b.name == "일어나기"), reason);
+        }
+
+        static QuizDuelState Round(string phase, bool paired)
+        {
+            var self = new QuizDuelPlayer { slot = 0, nickname = "퀴즈검사", level = 2 };
+            var partner = new QuizDuelPlayer { slot = 1, nickname = "상대", level = 3 };
+            return new QuizDuelState { phase = phase, round_id = "round",
+                players = paired ? new[] { self, partner } : new[] { self } };
+        }
+        static void Apply(QuizDuelState state) =>
+            typeof(QuizRoom).GetMethod("Apply", BindingFlags.Instance | BindingFlags.NonPublic)
+                .Invoke(room, new object[] { state });
+
         static void CheckQuizModels()
         {
             var difficulty = new QuizDuelState { target_level = 7, difficulty_mode = "pending" };

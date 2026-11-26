@@ -100,7 +100,7 @@ public static class IntegratedQuizFlowTest
             }
             else if (step == 4)
             {
-                Check(quiz.BlocksMovement && Cursor.visible && Cursor.lockState == CursorLockMode.None, "Quiz seat must own typing input");
+                Check(!quiz.BlocksMovement && seat.occupant == player, "A solo quiz seat must leave the normal seated view available");
                 pending = gate.LogoutAsync(); Next();
             }
             else if (step == 5)

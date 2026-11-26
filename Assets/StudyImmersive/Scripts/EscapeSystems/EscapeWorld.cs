@@ -98,16 +98,17 @@ namespace CampusCommons.StudyImmersive
             professorSprite=Resources.Load<Sprite>("EscapePixels/CodingProfessor");
             workerSprite=Resources.Load<Sprite>("EscapePixels/MaintenanceWorker");
             if(!map || !player)return;
+            InstallHallLights();
             EscapePlayerFootsteps.Create(game, player, transform);
             FinalNotebookMusic.Create(game, transform);
             usedPositions.Add(player.position);
             if(game.monster)usedPositions.Add(game.monster.transform.position);
             foreach(var p in game.PendingSheetPositions)usedPositions.Add(p);
-            // Put the professor in a nearby visible part of the school so players can find them.
-            professor=SpawnPatrol("Professor",professorSprite,2.0f,true);
-            worker=SpawnPatrol("Maintenance Worker",workerSprite,2.0f,false);
+            professor=SpawnPatrol("Professor",professorSprite,2.0f);
+            worker=SpawnPatrol("Maintenance Worker",workerSprite,2.0f);
             if(professor?.body && worker?.body)Physics.IgnoreCollision(professor.body,worker.body);
-            cleaner = EscapeCorridorCleaner.Create(game, this, player, doors);
+            if (TryCorridorSpawn(out var cleanerSpawn))
+                cleaner = EscapeCorridorCleaner.Create(game, this, player, doors, cleanerSpawn);
             if (cleaner)
                 cleaner.RegisterParticipants(professor?.body, worker?.body,
                     game.monster ? game.monster.GetComponent<CharacterController>() : null);
@@ -145,10 +146,13 @@ namespace CampusCommons.StudyImmersive
             }
             return false;
         }
-        Material Material(Color color)
+        Material Material(Color color, float metallic, float smoothness)
         {
-            var shader=Shader.Find("Unlit/Color");if(!shader)shader=Shader.Find("Standard");
-            var material=new Material(shader){color=color};materials.Add(material);return material;
+            var shader=Shader.Find("Standard");
+            var material=new Material(shader){color=color};
+            material.SetFloat("_Metallic",metallic);
+            material.SetFloat("_Glossiness",smoothness);
+            materials.Add(material);return material;
         }
         GameObject Cube(Transform parent,string name,Vector3 local,Vector3 scale,Material material)
         {
@@ -157,6 +161,44 @@ namespace CampusCommons.StudyImmersive
             obj.GetComponent<Renderer>().sharedMaterial=material;
             var collider=obj.GetComponent<Collider>();if(collider)Destroy(collider);
             return obj;
+        }
+        void InstallHallLights()
+        {
+            var housing = Material(new Color(.45f,.47f,.49f), .32f, .4f);
+            var diffuser = Material(new Color(.91f,.91f,.86f), 0f, .32f);
+            diffuser.EnableKeyword("_EMISSION");
+            diffuser.SetColor("_EmissionColor", new Color(.52f,.51f,.46f));
+            var mounts = new List<Vector3>();
+            foreach (float x in new[]{472f,485f,492.5f,500f,527.5f})
+                for (int z = -40; z <= 40; z += 8) mounts.Add(new Vector3(x,0,z));
+            foreach (float z in new[]{-41f,-18.5f,8.5f,41f})
+                for (int x = 476; x <= 524; x += 8) mounts.Add(new Vector3(x,0,z));
+
+            var installed = new List<Vector3>();
+            foreach (var point in mounts)
+            {
+                if (!EscapeCleanerNavigation.OnCorridor(point) ||
+                    installed.Exists(other => Horizontal(other,point)<5f)) continue;
+                if (!Physics.Raycast(point + Vector3.up, Vector3.up, out var hit, 4f,
+                        Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore) || hit.point.y<2.2f) continue;
+                var fixture = new GameObject("Corridor ceiling light").transform;
+                fixture.SetParent(transform,false);
+                fixture.position = hit.point - Vector3.up * .06f;
+                installed.Add(point);
+                Cube(fixture,"Enclosure",Vector3.zero,new Vector3(.35f,.09f,1.25f),housing);
+                Cube(fixture,"Diffuser",Vector3.down*.05f,new Vector3(.30f,.023f,1.18f),diffuser);
+                var lamp = new GameObject("Downlight").AddComponent<Light>();
+                lamp.transform.SetParent(fixture,false);
+                lamp.transform.localPosition=Vector3.down*.09f;
+                lamp.transform.localRotation=Quaternion.Euler(90f,0f,0f);
+                lamp.type=LightType.Spot;
+                lamp.color=new Color(1f,.96f,.89f);
+                lamp.spotAngle=105f;
+                lamp.range=6.5f;
+                lamp.intensity=.95f;
+                lamp.shadows=LightShadows.Soft;
+                lamp.shadowResolution=UnityEngine.Rendering.LightShadowResolution.Low;
+            }
         }
         bool TryVendingPoint(Vector3 anchor,out Vector3 position,out Vector3 towardWall)
         {
@@ -195,16 +237,23 @@ namespace CampusCommons.StudyImmersive
             usedPositions.Add(p);
             vending=new GameObject("Soda vending machine");vendingMachines.Add(vending);vending.layer=2;vending.transform.SetParent(transform,false);
             vending.transform.position=p;vending.transform.rotation=rotation;
-            var blue=Material(new Color(.08f,.22f,.48f));
+            var blue=Material(new Color(.08f,.22f,.48f),.35f,.53f);
             Cube(vending.transform,"Machine",new Vector3(0,.9f,0),new Vector3(.85f,1.8f,.42f),blue);
+            var trim=Material(new Color(.23f,.25f,.27f),.69f,.42f);
+            Cube(vending.transform,"Recessed plinth",new Vector3(0,.045f,0),new Vector3(.78f,.09f,.39f),trim);
+            foreach(float side in new[]{-.423f,.423f})
+                Cube(vending.transform,"Front edge trim",new Vector3(side,.92f,-.215f),new Vector3(.018f,1.75f,.028f),trim);
+            for(int slat=0;slat<6;slat++)
+                Cube(vending.transform,"Side vent",new Vector3(.427f,.22f+slat*.026f,.03f),new Vector3(.012f,.012f,.23f),trim);
             var image=Resources.Load<Texture2D>("EscapePixels/VendingMachinePhoto");
             if(image)
             {
-                var shader=Shader.Find("Unlit/Texture");if(!shader)shader=Shader.Find("Standard");
+                var shader=Shader.Find("Standard");
                 var material=new Material(shader);material.mainTexture=image;materials.Add(material);
                 var face=GameObject.CreatePrimitive(PrimitiveType.Quad);face.name="Photographic vending front";face.layer=2;
                 face.transform.SetParent(vending.transform,false);face.transform.localPosition=new Vector3(0,.9f,-.216f);
                 face.transform.localRotation=Quaternion.identity;face.transform.localScale=new Vector3(.85f,1.8f,1f);
+                face.GetComponent<Renderer>().shadowCastingMode=UnityEngine.Rendering.ShadowCastingMode.Off;
                 face.GetComponent<Renderer>().sharedMaterial=material;Destroy(face.GetComponent<Collider>());
                 // Use the supplied university artwork itself, preserving its Korean name exactly.
                 var logo=Resources.Load<Texture2D>("EscapePixels/KIT_WordmarkVending");
@@ -214,7 +263,8 @@ namespace CampusCommons.StudyImmersive
                     var decal=GameObject.CreatePrimitive(PrimitiveType.Quad);decal.name="KIT university logo";decal.layer=2;
                     decal.transform.SetParent(vending.transform,false);decal.transform.localPosition=new Vector3(-.12f,.65f,-.219f);
                     decal.transform.localRotation=Quaternion.identity;decal.transform.localScale=new Vector3(.47f,.11f,1f);
-                    decal.GetComponent<Renderer>().sharedMaterial=logoMaterial;Destroy(decal.GetComponent<Collider>());
+                    decal.GetComponent<Renderer>().shadowCastingMode=UnityEngine.Rendering.ShadowCastingMode.Off;
+                decal.GetComponent<Renderer>().sharedMaterial=logoMaterial;Destroy(decal.GetComponent<Collider>());
                 }
             }
         }
@@ -226,7 +276,7 @@ namespace CampusCommons.StudyImmersive
             {
                 var mesh=GameObject.CreatePrimitive(PrimitiveType.Cylinder);mesh.layer=2;mesh.name="Coin graphic";mesh.transform.SetParent(root.transform,false);
                 mesh.transform.localRotation=Quaternion.Euler(90,0,0);mesh.transform.localScale=new Vector3(.26f,.025f,.26f);
-                mesh.GetComponent<Renderer>().sharedMaterial=Material(new Color(1f,.68f,.08f));Destroy(mesh.GetComponent<Collider>());root.AddComponent<FaceCamera>();
+                mesh.GetComponent<Renderer>().sharedMaterial=Material(new Color(.92f,.63f,.23f),.72f,.54f);Destroy(mesh.GetComponent<Collider>());root.AddComponent<FaceCamera>();
             }
             else CreateBillboard(root.transform,ItemSprite(item),.55f,"Pickup sprite");
             pickups.Add(new Pickup{root=root,item=item,coin=coin});
@@ -237,33 +287,36 @@ namespace CampusCommons.StudyImmersive
             var renderer=child.AddComponent<SpriteRenderer>();renderer.sprite=sprite;child.AddComponent<FaceCamera>();
             float scale=height/Mathf.Max(.01f,sprite.rect.height/sprite.pixelsPerUnit);child.transform.localScale=Vector3.one*scale;
         }
-        bool TryVisiblePatrolPoint(out Vector3 result)
+        bool TryCorridorSpawn(out Vector3 spawn)
         {
-            result=Vector3.zero;var route=new List<Vector3>();var candidates=new List<Vector3>();
-            for(int index=0;index<map.links.Length;index++)
+            var cells = new List<int>();
+            for (int i = 0; i < map.links.Length; i++)
+                if (map.links[i] != 0 && EscapeCleanerNavigation.OnCorridor(map.Position(i)))
+                    cells.Add(i);
+
+            var path = new List<Vector3>();
+            for (int remaining = cells.Count; remaining > 0; remaining--)
             {
-                if(map.links[index]==0)continue;var point=map.Position(index);float distance=Horizontal(point,player.position);
-                if(distance>=6f && distance<=12f)candidates.Add(point);
+                int pick = Random.Range(0, remaining);
+                Vector3 point = map.Position(cells[pick]);
+                cells[pick] = cells[remaining - 1];
+                if (Horizontal(player.position, point) < 8f ||
+                    usedPositions.Exists(p => Horizontal(p, point) < 5f)) continue;
+                if (Physics.CheckCapsule(point + Vector3.up * .65f, point + Vector3.up * 1.35f,
+                        .55f, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore)) continue;
+                if (!map.FindPath(player.position, point, path)) continue;
+                usedPositions.Add(point);
+                spawn = point + Vector3.up * .08f;
+                return true;
             }
-            for(int i=candidates.Count-1;i>0;i--){int j=Random.Range(0,i+1);var temp=candidates[i];candidates[i]=candidates[j];candidates[j]=temp;}
-            foreach(var point in candidates)
-            {
-                Vector3 eye=player.position+Vector3.up*1.2f,target=point+Vector3.up*1.2f;
-                if(Physics.Linecast(eye,target,Physics.DefaultRaycastLayers,QueryTriggerInteraction.Ignore))continue;
-                if(!map.FindPath(player.position,point,route))continue;
-                result=point;usedPositions.Add(point);return true;
-            }
-            foreach(var point in candidates)if(map.FindPath(player.position,point,route))
-            {result=point;usedPositions.Add(point);return true;}
-            return TryPoint(6f,out result);
+            Debug.LogWarning("No clear, reachable escape corridor spawn available.");
+            spawn = default;
+            return false;
         }
-        Patrol SpawnPatrol(string name,Sprite sprite,float height,bool visible)
+
+        Patrol SpawnPatrol(string name,Sprite sprite,float height)
         {
-            if(!sprite){Debug.LogWarning("Escape patrol sprite missing: "+name);return null;}
-            var marker=EscapeSpawnPoint.Find(visible?EscapeSpawnPoint.Kind.Professor:EscapeSpawnPoint.Kind.Worker);
-            Vector3 p;
-            if(marker){p=marker.transform.position;usedPositions.Add(p);}
-            else {if(!(visible?TryVisiblePatrolPoint(out p):TryPoint(8f,out p)))return null;p+=Vector3.up*.08f;}
+            if(!sprite || !TryCorridorSpawn(out var p))return null;
             var root=new GameObject(name);root.layer=2;root.transform.SetParent(transform,false);root.transform.position=p;
             var body=root.AddComponent<CharacterController>();body.height=1.8f;body.radius=.27f;body.center=Vector3.up*.9f;
             if(name=="Professor") { var playerBody=player.GetComponent<CharacterController>();if(playerBody)Physics.IgnoreCollision(body,playerBody,true); }

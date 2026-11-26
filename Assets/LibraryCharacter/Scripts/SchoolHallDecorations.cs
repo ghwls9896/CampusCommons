@@ -20,8 +20,13 @@ namespace CampusCommons.LibraryCharacter
             var item=GameObject.CreatePrimitive(shape);var mesh=item.GetComponent<MeshFilter>().sharedMesh;
             if(Application.isPlaying)Object.Destroy(item);else Object.DestroyImmediate(item);return mesh;
         }
-        static Material ColorMaterial(string name,Color color)
-        {return new Material(Shader.Find("Unlit/Color")){name=name,color=color};}
+        static Material ColorMaterial(string name,Color color,float smoothness=.23f,float metallic=0f)
+        {
+            var material=new Material(Shader.Find("Standard")){name=name,color=color};
+            material.SetFloat("_Glossiness",smoothness);
+            material.SetFloat("_Metallic",metallic);
+            return material;
+        }
         static void Part(Transform parent,string name,Mesh mesh,Vector3 position,Vector3 scale,Material material)
         {
             var part=new GameObject(name);part.transform.SetParent(parent,false);part.transform.localPosition=position;part.transform.localScale=scale;
@@ -35,9 +40,9 @@ namespace CampusCommons.LibraryCharacter
             {
                 covers=new[]{ColorMaterial("Book cover blue",new Color(.15f,.32f,.48f)),ColorMaterial("Book cover green",new Color(.24f,.39f,.30f)),
                     ColorMaterial("Book cover ochre",new Color(.70f,.43f,.17f)),ColorMaterial("Book cover red",new Color(.56f,.23f,.20f))};
-                pages=ColorMaterial("Paper",new Color(.96f,.94f,.85f));ceramic=ColorMaterial("Mug",new Color(.92f,.94f,.91f));
-                coffee=ColorMaterial("Drink",new Color(.25f,.14f,.08f));pencil=ColorMaterial("Pencil",new Color(.94f,.65f,.16f));
-                laptop=ColorMaterial("Laptop case",new Color(.16f,.20f,.23f));screen=ColorMaterial("Laptop screen",new Color(.48f,.68f,.75f));
+                pages=ColorMaterial("Paper",new Color(.96f,.94f,.85f));ceramic=ColorMaterial("Mug",new Color(.92f,.94f,.91f),.67f);
+                coffee=ColorMaterial("Drink",new Color(.25f,.14f,.08f),.82f);pencil=ColorMaterial("Pencil",new Color(.94f,.65f,.16f));
+                laptop=ColorMaterial("Laptop case",new Color(.16f,.20f,.23f),.38f,.45f);screen=ColorMaterial("Laptop screen",new Color(.48f,.68f,.75f),.72f);
             }
             var root=new GameObject("School Hall Study Items");
             if(mapRoot)root.transform.SetParent(mapRoot,true);
