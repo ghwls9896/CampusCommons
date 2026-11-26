@@ -1,0 +1,24 @@
+{
+  "id": "cc-66",
+  "title": "웹캠과 공부 창을 함께 확인해 공부시간 집계",
+  "owner": "HIGHCHOI",
+  "branch": "feat/cc-66-combined-study",
+  "issue": "https://github.com/ghwls9896/CampusCommons/issues/66",
+  "scope": [
+    "Assets/Webcam/",
+    "Tools/webcam/",
+    "Tools/distribution/prepare_runtime.py",
+    "Tools/distribution/smoke_runtime.py",
+    "docs/study/RECORDS.md",
+    "docs/distribution/DESKTOP.md",
+    "docs/tasks/cc-66.md"
+  ],
+  "shared_files": [],
+  "depends_on": [],
+  "validation": [
+    "선택 창 캡처 범위와 전환·권한 실패 시 집계 보류",
+    "합성 샘플에서 종이 공부·화면 공부·오락·휴대폰·자리비움 판정",
+    "Unity 6000.4.5f1 실제 로비 착석 검사",
+    "macOS 네이티브 도구 빌드와 로컬 QEV 오프라인 추론"
+  ]
+}
