@@ -23,7 +23,8 @@ namespace CampusCommons.StudyImmersive
             public int next;
             public float replan,stuckTime,chaseMemory;
             public bool pursuing,hasDestination;
-            public Vector3 destination,chaseTarget;
+            public Vector3 destination,chaseTarget,blockedTarget;
+            public Door blockedPursuitDoor;
             public AudioSource audio;
             public AudioClip ambient;
             public float ambientWait;
@@ -196,7 +197,8 @@ namespace CampusCommons.StudyImmersive
                 lamp.spotAngle=105f;
                 lamp.range=6.5f;
                 lamp.intensity=.95f;
-                lamp.shadows=LightShadows.Soft;
+                lamp.shadows=game.CurrentMode==EscapeGame.Mode.Easy?LightShadows.None:LightShadows.Soft;
+                if(game.CurrentMode==EscapeGame.Mode.Easy)lamp.renderMode=LightRenderMode.ForcePixel;
                 lamp.shadowResolution=UnityEngine.Rendering.LightShadowResolution.Low;
             }
         }
@@ -364,7 +366,10 @@ namespace CampusCommons.StudyImmersive
             bool professorCarried = professor != null && IsCleanerCarrying(professor.body);
             if (!BlocksMovement && !professorCarried)
             {
-                bool visible = professorCooldown <= 0f && CanSeePlayer(12f);
+                if (professor != null && professor.blockedPursuitDoor &&
+                    (!professor.blockedPursuitDoor.IsLocked || Horizontal(player.position, professor.blockedTarget) > 3f))
+                    professor.blockedPursuitDoor = null;
+                bool visible = professorCooldown <= 0f && professor != null && !professor.blockedPursuitDoor && CanSeePlayer(12f);
                 if (professor != null)
                 {
                     professor.chaseMemory = visible ? 8f : Mathf.Max(0f, professor.chaseMemory - dt);
@@ -379,7 +384,16 @@ namespace CampusCommons.StudyImmersive
                     professor.destination = professor.chaseTarget;
                     professor.hasDestination = true;
                     if (!map.FindPath(professor.root.transform.position, professor.destination, professor.route, CanTraverse))
+                    {
+                        professor.blockedPursuitDoor = LockedDoorOnRoute(professor.root.transform.position, professor.destination);
+                        if (professor.blockedPursuitDoor)
+                        {
+                            professor.blockedTarget = professor.destination;
+                            professor.chaseMemory = 0f;
+                            pursuing = false;
+                        }
                         ReplanPatrol(professor, false);
+                    }
                 }
                 if (professor != null) professor.pursuing = pursuing;
                 MovePatrol(professor, 4.85f * DifficultySpeed(), dt);
@@ -412,7 +426,7 @@ namespace CampusCommons.StudyImmersive
             int cell = map.NearestCell(ahead);
             if (cell < 0 || !TryPlaceSafeBarrier(map.Position(cell))) barrierCountdown = Random.Range(4f, 7f);
         }
-        float DifficultySpeed()=>(game.CurrentMode==EscapeGame.Mode.Medium?1.07f:game.CurrentMode==EscapeGame.Mode.Hard?1.14f:1f)*game.TimeAttackSpeed;
+        float DifficultySpeed()=>(game.CurrentMode==EscapeGame.Mode.Medium?1.07f:game.CurrentMode==EscapeGame.Mode.Hard?1.14f:1f)*game.DifficultyNpcSpeed*game.TimeAttackSpeed;
         void UpdatePatrolAmbient(Patrol npc, float dt)
         {
             if (npc == null || !npc.audio || !npc.ambient) return;
@@ -451,6 +465,17 @@ namespace CampusCommons.StudyImmersive
             npc.route.Clear();npc.next=0;
             if(keepDestination && npc.hasDestination && map.FindPath(npc.root.transform.position,npc.destination,npc.route,CanTraverse) && npc.route.Count>0)
             {npc.replan=4f;return true;}
+            if (keepDestination && npc == professor && npc.pursuing && npc.hasDestination)
+            {
+                var blocked = LockedDoorOnRoute(npc.root.transform.position, npc.destination);
+                if (blocked)
+                {
+                    npc.blockedPursuitDoor = blocked;
+                    npc.blockedTarget = npc.destination;
+                    npc.chaseMemory = 0f;
+                    npc.pursuing = false;
+                }
+            }
             npc.route.Clear();npc.hasDestination=false;
             var candidates=new List<int>();
             for(int i=0;i<map.links.Length;i++)
@@ -532,6 +557,21 @@ namespace CampusCommons.StudyImmersive
             foreach(var barrier in barriers)if(barrier && Crosses(a,b,barrier.transform.position,barrier.transform.rotation,barrier.Width))return true;
             foreach(var door in doors)if(door && door.IsLocked && Crosses(a,b,door.DoorwayCenter,door.transform.rotation,door.DoorwayWidth))return true;
             return false;
+        }
+        public Door LockedDoorOnRoute(Vector3 from, Vector3 destination)
+        {
+            if (!map || doors == null) return null;
+            var route = new List<Vector3>();
+            if (!map.FindPath(from, destination, route)) return null;
+            Vector3 previous = from;
+            foreach (var point in route)
+            {
+                foreach (var door in doors)
+                    if (door && door.IsLocked && Crosses(previous, point, door.DoorwayCenter, door.transform.rotation, door.DoorwayWidth))
+                        return door;
+                previous = point;
+            }
+            return null;
         }
         bool WallDistance(Vector3 p,Vector3 direction,out float distance)
         {

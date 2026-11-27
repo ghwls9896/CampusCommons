@@ -178,7 +178,7 @@ namespace CampusCommons.StudyImmersive
                 return;
             }
             UpdateAcceleration(Time.deltaTime);
-            float distance = Mathf.Min(speed * game.TimeAttackSpeed * Time.deltaTime,
+            float distance = Mathf.Min(speed * game.DifficultyNpcSpeed * game.TimeAttackSpeed * Time.deltaTime,
                 Mathf.Max(0f, Vector3.Dot((navigation != null ? navigation.Target : CorridorNodes[targetNode]) - transform.position, direction)));
             if (!professorEncounter && catchCooldown <= 0f && !pushing && CanCatch(playerBody, distance))
             {
@@ -313,7 +313,7 @@ namespace CampusCommons.StudyImmersive
         bool WaitForDoor()
         {
             if (doors == null) return false;
-            float lookAhead = 3.5f + speed * game.TimeAttackSpeed * Time.deltaTime;
+            float lookAhead = 3.5f + speed * game.DifficultyNpcSpeed * game.TimeAttackSpeed * Time.deltaTime;
             bool wait = false;
             foreach (var door in doors)
             {
