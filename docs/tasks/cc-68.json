@@ -1,0 +1,32 @@
+{
+  "id": "cc-68",
+  "title": "로비와 탈출룸 사용자 확인 수정 통합",
+  "owner": "ghwls9896",
+  "branch": "codex/cc-68-lobby-style",
+  "issue": "https://github.com/ghwls9896/CampusCommons/issues/68",
+  "scope": [
+    "Assets/StudyImmersive/Scenes/GrandLibrary_Living.unity",
+    "Assets/UserModels_CafeUpdate/",
+    "Assets/UserModels_CafeUpdate.meta",
+    "Assets/LibraryCharacter/Scripts/Monster.cs",
+    "Assets/StudyImmersive/Scripts/EscapeGame.cs",
+    "Assets/StudyImmersive/Scripts/EscapeSystems/EscapeWorld.cs",
+    "Assets/StudyImmersive/Scripts/EscapeSystems/EscapeCorridorCleaner.cs",
+    "Assets/StudyImmersive/Scripts/EscapeSystems/EscapeLighting.cs",
+    "Assets/StudyImmersive/Resources/KIT/EscapeNoticeLit.shader",
+    "Assets/StudyImmersive/Resources/KIT/EscapeNoticeLit.shader.meta",
+    "Assets/StudyImmersive/Resources/KIT/EscapeWorldTextLit.shader",
+    "Assets/StudyImmersive/Resources/KIT/EscapeWorldTextLit.shader.meta",
+    "Assets/StudyImmersive/Resources/SchoolSurfaceFix/",
+    "Assets/StudyImmersive/Resources/SchoolSurfaceFix.meta"
+  ],
+  "shared_files": [
+    "Assets/StudyImmersive/Scenes/GrandLibrary_Living.unity",
+    "Assets/UserModels_CafeUpdate/ReadingLamp/Library reading lamp.prefab"
+  ],
+  "depends_on": [],
+  "validation": [
+    "Unity 6000.4.5f1 로비 및 탈출룸 난이도·잠금·조명·표면 확인",
+    "팀 검사 및 CI"
+  ]
+}

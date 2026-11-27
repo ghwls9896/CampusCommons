@@ -114,6 +114,7 @@ namespace CampusCommons.StudyImmersive
         public bool PowerOut=>blackoutTriggered && breaker && lighting && lighting.IsDark;
         public bool IsTimeAttack=>currentMode==Mode.TimeAttack || currentMode==Mode.TimeAttackDark;
         public bool IsDark=>lighting && lighting.IsDark;
+        public float DifficultyNpcSpeed => currentMode == Mode.Easy ? .8f : currentMode == Mode.Medium ? .9f : 1f;
         public float TimeAttackSpeed { get { if(!IsTimeAttack)return 1f;float minutes=elapsed/60f;return 1f+.15f*minutes*minutes; } }
         string RecordKey=>currentMode==Mode.TimeAttackDark?"EscapeTimeAttackDarkRecord":"EscapeTimeAttackBrightRecord";
         public int BestTimeAttackRecord=>PlayerPrefs.GetInt(RecordKey,0);
@@ -268,9 +269,10 @@ namespace CampusCommons.StudyImmersive
             if (monster && view) proximityEffect = MonsterProximityEffect.Create(this, monster, player.transform, view);
             World = EscapeWorld.Create(this, player.transform, schoolGrid, doors);
             lighting = EscapeLighting.Create(view);
+            if (mode == Mode.Easy || mode == Mode.Medium) lighting.StartBright(schoolRoot);
             if (mode == Mode.Hard || mode == Mode.TimeAttackDark)
             {
-                lighting.StartDark();
+                lighting.StartDark(true);
                 darkAtmosphere = DarkEscapeAtmosphere.Create(this, monster, player.transform);
             }
             startGuideUntil = Time.time + 10f;
@@ -476,7 +478,7 @@ namespace CampusCommons.StudyImmersive
         }
         void TryBlackout()
         {
-            if(blackoutTriggered || found<2 || found>=target || (currentMode!=Mode.Easy && currentMode!=Mode.Medium) || UnityEngine.Random.value>=.3f || !schoolGrid || !breaker)return;
+            if(blackoutTriggered || found<2 || found>=target || currentMode!=Mode.Medium || UnityEngine.Random.value>=.3f || !schoolGrid || !breaker)return;
             var school=schoolRoot?schoolRoot.Find("Escape School"):null;if(!school)return;
             // The hall breaker stays at the same location every round.
             var candidate=school.TransformPoint(new Vector3(0f,0f,-21f));

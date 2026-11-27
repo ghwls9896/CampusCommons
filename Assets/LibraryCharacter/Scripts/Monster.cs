@@ -32,7 +32,8 @@ namespace CampusCommons.LibraryCharacter
         Transform target;
         Vector3 spawn,heading,lastSeen,goal,heardPosition,picturePosition,pictureScale,blockedFrom,blockedTo;
         Door[] doors;
-        Door waitingDoor;
+        Door waitingDoor, blockedChaseDoor;
+        Vector3 blockedChaseTarget;
         readonly List<Vector3> path=new List<Vector3>();
         readonly List<Vector3> roomRoute=new List<Vector3>();
         readonly List<Collider> openPanels=new List<Collider>();
@@ -55,7 +56,7 @@ namespace CampusCommons.LibraryCharacter
         public Behaviour State=>state;
         public bool IsAwakened=>running && awakened;
         public bool IsFinalHunt=>running && awakened && game && game.ReadyToExit;
-        float BaseMoveSpeed=>Speed*1.1f*(game?game.TimeAttackSpeed:1f);
+        float BaseMoveSpeed=>Speed*1.1f*(game?game.DifficultyNpcSpeed*game.TimeAttackSpeed:1f);
         public float CurrentMoveSpeed=>BaseMoveSpeed*(IsFinalHunt?Mathf.Max(1f,finalSpeedMultiplier):1f);
         public bool IsChasing=>running && awakened && state==Behaviour.Chase && wakeRemaining<=0 && game && game.IsRunning && !game.IsEnded && !game.IsAnswering && !game.IsExitConfirmOpen;
 
@@ -79,7 +80,7 @@ namespace CampusCommons.LibraryCharacter
         public void Begin(EscapeGame owner,Transform player,EscapeGame.Mode mode)
         {
             RestoreOpenDoorCollisions();
-            game=owner;target=player;running=true;awakened=false;path.Clear();next=0;hasGoal=false;waitingDoor=null;
+            game=owner;target=player;blockedChaseDoor=null;running=true;awakened=false;path.Clear();next=0;hasGoal=false;waitingDoor=null;
             Speed=mode==EscapeGame.Mode.Easy?2.65f:mode==EscapeGame.Mode.Medium?3.1f:mode==EscapeGame.Mode.Hard?3.5f:3.25f;
             var marker=EscapeSpawnPoint.Find(EscapeSpawnPoint.Kind.Monster);
             body.enabled=false;transform.position=marker?marker.transform.position:InitialPosition(player);if(picture)picture.gameObject.SetActive(true);
@@ -287,7 +288,9 @@ namespace CampusCommons.LibraryCharacter
         void UpdateVisibilityAndChase(float dt)
         {
             // After the last sheet, the monster knows the live position through walls.
-            bool visible = IsFinalHunt || CanSeeTarget();
+            if (blockedChaseDoor && (!blockedChaseDoor.IsLocked || HorizontalDistance(target.position, blockedChaseTarget) > 3f))
+                blockedChaseDoor = null;
+            bool visible = !blockedChaseDoor && (IsFinalHunt || CanSeeTarget());
             if (visible)
             {
                 // A fresh sighting cancels the old continuation and follows the player.
@@ -370,6 +373,17 @@ namespace CampusCommons.LibraryCharacter
 
             repathRemaining = state == Behaviour.Chase ? .45f : 1.2f;
             if (PlanPath()) return;
+            if (state == Behaviour.Chase && game && game.World)
+            {
+                var lockedDoor = game.World.LockedDoorOnRoute(transform.position, goal);
+                if (lockedDoor)
+                {
+                    blockedChaseDoor = lockedDoor;
+                    blockedChaseTarget = target.position;
+                    SetState(Behaviour.Patrol);
+                    return;
+                }
+            }
             if (state == Behaviour.Chase && pastLastSeen)
             {
                 hasGoal = false;
@@ -394,7 +408,7 @@ namespace CampusCommons.LibraryCharacter
             Door best=null;float bestDistance=float.PositiveInfinity;Vector3 bestGoal=Vector3.zero;
             foreach(var door in doors)
             {
-                if(!door || door.exitDoor || door==lastInvestigatedDoor || door.DoorwayWidth<.7f)continue;
+                if(!door || door.IsLocked || door.exitDoor || door==lastInvestigatedDoor || door.DoorwayWidth<.7f)continue;
                 Vector3 center=door.DoorwayCenter;Vector3 normal=door.transform.forward;normal.y=0;normal.Normalize();
                 float distance=HorizontalDistance(center,transform.position);
                 if(distance>roomSearchRange || distance>=bestDistance)continue;
