@@ -1,0 +1,18 @@
+{
+  "id": "cc-71",
+  "title": "어두운 탈출룸과 안내문 조명 보정",
+  "owner": "ghwls9896",
+  "branch": "codex/cc-71-dark-lighting",
+  "issue": "https://github.com/ghwls9896/CampusCommons/issues/71",
+  "scope": [
+    "Assets/StudyImmersive/Scripts/EscapeGame.cs",
+    "Assets/StudyImmersive/Scripts/EscapeSystems/EscapeLighting.cs",
+    "Assets/StudyImmersive/Resources/KIT/EscapeNoticeLit.shader",
+    "Assets/StudyImmersive/Resources/KIT/EscapeNoticeLit.shader.meta",
+    "Assets/StudyImmersive/Resources/KIT/EscapeWorldTextLit.shader",
+    "Assets/StudyImmersive/Resources/KIT/EscapeWorldTextLit.shader.meta"
+  ],
+  "shared_files": [],
+  "depends_on": [],
+  "validation": ["Unity 6000.4.5f1 컴파일 및 어려움·보통 정전·어두운 타임어택 조명과 로비 복귀 확인", "팀 검사 및 CI"]
+}
